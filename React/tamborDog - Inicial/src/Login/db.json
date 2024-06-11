@@ -1,0 +1,361 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "usuario": "Frank",
+      "senha": "123",
+      "token": "123"
+    },
+    {
+      "id": 2,
+      "usuario": "Frank",
+      "senha": "Cursos",
+      "token": "123"
+    },
+    {
+      "id": 3,
+      "usuario": "Pedro",
+      "senha": "awxsvwddhadkfj123#2022a",
+      "token": "123"
+    }
+  ],
+  "person": [
+    {
+      "idPerson": 1,
+      "name": "Frank Alves dos Santos",
+      "category": 1,
+      "cpf": "007.323.026-09",
+      "ativo": true,
+      "cep": "35.500-530",
+      "endereco": "Rua Argentina",
+      "numero": "1290",
+      "bairro": "Santa Rosa",
+      "cidade": "Divinópolis",
+      "uf": "Mg"
+    },
+    {
+      "idPerson": 2,
+      "name": "Ana Clara Alves Gontijo",
+      "category": 0,
+      "cpf": "007.323.026-09",
+      "ativo": true,
+      "cep": "35.500-530",
+      "endereco": "Rua Argentina",
+      "numero": "1290",
+      "bairro": "Santa Rosa",
+      "cidade": "Divinópolis",
+      "uf": "Mg"
+    },
+    {
+      "idPerson": 3,
+      "name": "Leidiane Neves Campos",
+      "category": 0,
+      "cpf": "007.323.026-09",
+      "ativo": false,
+      "cep": "35.500-530",
+      "endereco": "Rua Argentina",
+      "numero": "1290",
+      "bairro": "Santa Rosa",
+      "cidade": "Divinópolis",
+      "uf": "Mg"
+    },
+    {
+      "idPerson": 4,
+      "name": "Maria Aparecida dos Santos",
+      "category": 1,
+      "cpf": "00732302609",
+      "cep": "35500155",
+      "endereco": "Avenida JK",
+      "numero": "1690",
+      "bairro": "Bom Pastor",
+      "cidade": "Bom Pastor",
+      "uf": "MG",
+      "ativo": true
+    },
+    {
+      "idPerson": 5,
+      "name": "Anderson Silva",
+      "category": 0,
+      "cpf": "00732302609",
+      "cep": "35500002",
+      "endereco": "Avenida Primeiro de Junho",
+      "numero": "135",
+      "bairro": "Centro",
+      "cidade": "Centro",
+      "uf": "MG",
+      "ativo": true
+    },
+    {
+      "idPerson": 6,
+      "name": "Joao do Guido",
+      "category": 1,
+      "cpf": "007.323.026-09",
+      "cep": "35501506",
+      "endereco": "Rodovia BR-494",
+      "numero": "13700",
+      "bairro": "Padre Herculano Yanes",
+      "cidade": "Padre Herculano Yanes",
+      "uf": "MG",
+      "ativo": false
+    },
+    {
+      "idPerson": 8,
+      "name": "Janete Clear",
+      "category": 0,
+      "cpf": "007.323.026-09",
+      "cep": "35.500-002",
+      "endereco": "Avenida Primeiro de Junho",
+      "numero": "1690",
+      "bairro": "Centro",
+      "cidade": "Divinópolis",
+      "uf": "MG",
+      "ativo": true
+    },
+    {
+      "idPerson": 9,
+      "name": "Anabio Walfrido",
+      "category": 0,
+      "cpf": "007.323.026-09",
+      "cep": "35.501-155",
+      "endereco": "Avenida dos Buritis",
+      "numero": "[object Object]x",
+      "bairro": "Costa Azul",
+      "cidade": "Divinópolis",
+      "uf": "MG",
+      "ativo": true
+    }
+  ],
+  "MenuDto": [
+    {
+      "id": "Inicio",
+      "parentId": "Principal",
+      "descricao": "Início",
+      "icon": "home",
+      "path": ""
+    },
+    {
+      "id": "Parametros",
+      "parentId": "Principal",
+      "descricao": "Parâmetros",
+      "icon": "settings",
+      "path": "Perfil"
+    },
+    {
+      "id": "Cadastros",
+      "parentId": "Principal",
+      "descricao": "Cadastros",
+      "icon": "grid_view",
+      "path": ""
+    },
+    {
+      "id": "Bairros",
+      "parentId": "Cadastros",
+      "descricao": "Bairros",
+      "icon": "location_on",
+      "path": "Person"
+    },
+    {
+      "id": "Cidades",
+      "parentId": "Cadastros",
+      "descricao": "Cidades",
+      "icon": "apartment",
+      "path": "Ordem"
+    },
+    {
+      "id": "Cao",
+      "parentId": "Cadastros",
+      "descricao": "Cães",
+      "icon": "how_to_reg",
+      "path": "Cao"
+    },
+    {
+      "id": "Categorias",
+      "parentId": "Cadastros",
+      "descricao": "Categorias",
+      "icon": "category",
+      "path": ""
+    },
+    {
+      "id": "Sprints",
+      "parentId": "Cadastros",
+      "descricao": "Sprints",
+      "icon": "add_to_queue",
+      "path": ""
+    },
+    {
+      "id": "Sats",
+      "parentId": "Sprints",
+      "descricao": "Sats",
+      "icon": "dynamic_feed",
+      "path": ""
+    },
+    {
+      "id": "Historias",
+      "parentId": "Sprints",
+      "descricao": "Histórias",
+      "icon": "layers",
+      "path": ""
+    },
+    {
+      "id": "PriorizarSats",
+      "parentId": "Sprints",
+      "descricao": "Priorizar Sats",
+      "icon": "format_list_numbered",
+      "path": ""
+    },
+    {
+      "id": "Sprint",
+      "parentId": "Sprints",
+      "descricao": "Sprint",
+      "icon": "add_to_queue",
+      "path": ""
+    },
+    {
+      "id": "Etiquetas",
+      "parentId": "Sprints",
+      "descricao": "Etiquetas",
+      "icon": "discount",
+      "path": ""
+    },
+    {
+      "id": "Desktop",
+      "parentId": "Sprints",
+      "descricao": "Área de Trabalho",
+      "icon": "web_asset",
+      "path": ""
+    },
+    {
+      "id": "ColunasQuadro",
+      "parentId": "Sprints",
+      "descricao": "Colunas Quadro",
+      "icon": "vertical_split",
+      "path": ""
+    },
+    {
+      "id": "GerenciadorDiasNaoTrabalhados",
+      "parentId": "Cadastros",
+      "descricao": "Gerenciador de dias não trabalhados",
+      "icon": "calendar_today",
+      "path": ""
+    },
+    {
+      "id": "SistemasAlterados",
+      "parentId": "Cadastros",
+      "descricao": "Sistemas alterados",
+      "icon": "border_color",
+      "path": ""
+    },
+    {
+      "id": "Relatorios",
+      "parentId": "Principal",
+      "descricao": "Relatórios",
+      "icon": "assignment",
+      "path": ""
+    },
+    {
+      "id": "ImpressaoDocumentos",
+      "parentId": "Relatorios",
+      "descricao": "Impressão de documentos",
+      "icon": "content_paste",
+      "path": ""
+    },
+    {
+      "id": "GraficoSprints",
+      "parentId": "Relatorios",
+      "descricao": "Gráfico das Sprints",
+      "icon": "trending_up",
+      "path": ""
+    },
+    {
+      "id": "RelatorioAcompanhamentoSprints",
+      "parentId": "Relatorios",
+      "descricao": "Relatório de acompanhamento das Sprints",
+      "icon": "inventory",
+      "path": ""
+    },
+    {
+      "id": "HistoriasReuniaoPlanejamento",
+      "parentId": "Relatorios",
+      "descricao": "Histórias para Reunião de Planejamento",
+      "icon": "reorder",
+      "path": ""
+    },
+    {
+      "id": "ResumoHistorias",
+      "parentId": "Relatorios",
+      "descricao": "Resumo das Historias",
+      "icon": "receipt_long",
+      "path": ""
+    },
+    {
+      "id": "RelatorioApresentacaoSprint",
+      "parentId": "Relatorios",
+      "descricao": "Relatório de Apresentaçãao da Sprint",
+      "icon": "list_alt",
+      "path": ""
+    },
+    {
+      "id": "Sistema",
+      "parentId": "Principal",
+      "descricao": "Sistema",
+      "icon": "personal_video",
+      "path": ""
+    },
+    {
+      "id": "Acesso",
+      "parentId": "Sistema",
+      "descricao": "Acesso",
+      "icon": "airplay",
+      "path": ""
+    },
+    {
+      "id": "Pessoa",
+      "parentId": "Acesso",
+      "descricao": "Pessoa",
+      "icon": "account_box",
+      "path": ""
+    },
+    {
+      "id": "PerfilUsuario",
+      "parentId": "Acesso",
+      "descricao": "Perfil do Usuário",
+      "icon": "people_alt",
+      "path": ""
+    },
+    {
+      "id": "Usuario",
+      "parentId": "Sistema",
+      "descricao": "Usuário",
+      "icon": "manage_accounts",
+      "path": ""
+    },
+    {
+      "id": "Permissoes",
+      "parentId": "Sistema",
+      "descricao": "Permissões",
+      "icon": "lock_person",
+      "path": ""
+    },
+    {
+      "id": "AlterarSenha",
+      "parentId": "Principal",
+      "descricao": "Alterar Senha",
+      "icon": "password",
+      "path": ""
+    },
+    {
+      "id": "Sobre",
+      "parentId": "Principal",
+      "descricao": "Sobre",
+      "icon": "info",
+      "path": ""
+    },
+    {
+      "id": "Sair",
+      "parentId": "Principal",
+      "descricao": "Sair",
+      "icon": "logout",
+      "path": ""
+    }
+  ]
+}

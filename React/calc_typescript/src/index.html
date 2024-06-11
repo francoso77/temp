@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./styles.css" rel="stylesheet">
+  <title>Calculadora</title>
+  <script>var exports = {}</script>
+  <script src="../dist/CalculadoraCls.js"></script>
+  <script>
+    function passaValor(bt) {
+      var calc = new CalculadoraCls();
+      calc.enviaValor(bt)
+    }
+  </script>
+</head>
+
+<body>
+  <div class="calc-content">
+
+    <h1>Calculadora</h1>
+
+    <div class="visor">
+      <input type="text" value="0" name="txtVisor" id="txtVisor" disabled>
+    </div>
+
+    <div class="teclado">
+
+      <table class="teclas">
+        <tr>
+          <td><input type="button" value='x²' id="btElevado" onclick="passaValor('x²')"></td>
+          <td><input type="button" value='√' id="btRaiz" onclick="passaValor('√')"></td>
+          <td><input type="button" value='←' id="Backspace" onclick="passaValor('←')"></td>
+          <td><input type="button" value='/' id="/" onclick="passaValor('/')"></td>
+        </tr>
+        <tr>
+          <td><input type="button" value='7' id="7" onclick="passaValor('7')"></td>
+          <td><input type="button" value='8' id="8" onclick="passaValor('8')"></td>
+          <td><input type="button" value='9' id="9" onclick="passaValor('9')"></td>
+          <td><input type="button" value='*' id="*" onclick="passaValor('*')"></td>
+        </tr>
+        <tr>
+          <td><input type="button" value='4' id="4" onclick="passaValor('4')"></td>
+          <td><input type="button" value='5' id="5" onclick="passaValor('5')"></td>
+          <td><input type="button" value='6' id="6" onclick="passaValor('6')"></td>
+          <td><input type="button" value='+' id="+" onclick="passaValor('+')"></td>
+        </tr>
+        <tr>
+          <td><input type="button" value='1' id="1" onclick="passaValor('1')"></td>
+          <td><input type="button" value='2' id="2" onclick="passaValor('2')"></td>
+          <td><input type="button" value='3' id="3" onclick="passaValor('3')"></td>
+          <td><input type="button" value='-' id="-" onclick="passaValor('-')"></td>
+        </tr>
+        <tr>
+          <td><input type="button" value='C' id="Escape" onclick="passaValor('C')"></td>
+          <td><input type="button" value='0 ' id="0" onclick="passaValor('0')"></td>
+          <td><input type="button" value=',' id="," onclick="passaValor(',')"></td>
+          <td><input type="button" value='=' id="Enter" onclick="passaValor('=')"></td>
+
+        </tr>
+
+      </table>
+    </div>
+  </div>
+</body>
+<script lang="ts">
+
+  window.
+    document.addEventListener('keydown', (e) => {
+      document.getElementById(e.key).onclick()
+    })
+</script>
+
+</html>
