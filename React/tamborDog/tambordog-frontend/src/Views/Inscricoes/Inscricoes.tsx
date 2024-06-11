@@ -6,7 +6,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { InscricaoInterface } from '../../../../td-fleek-nest/src/interfaces/inscricaoInterface';
+import { InscricaoInterface } from '../../../../tambordog-backend/src/interfaces/inscricaoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -16,9 +16,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ComboBox from '../../Componentes/ComboBox';
-import { CaoInterface } from '../../../../td-fleek-nest/src/interfaces/caoInterface';
+import { CaoInterface } from '../../../../tambordog-backend/src/interfaces/caoInterface';
 import { InscricaoTypes } from '../../types/InscricaoTypes';
-import { ProvaInterface } from '../../../../td-fleek-nest/src/interfaces/provaInterface';
+import { ProvaInterface } from '../../../../tambordog-backend/src/interfaces/provaInterface';
 
 
 export default function Inscricao(idProva: string) {

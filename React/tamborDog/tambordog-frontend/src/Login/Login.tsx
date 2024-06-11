@@ -5,7 +5,7 @@ import Text from '../Componentes/Text';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../ContextoGlobal/MensagemState';
-import { UserInterface } from '../../../td-fleek-nest/src/interfaces/userInterface';
+import { UserInterface } from '../../../tambordog-backend/src/interfaces/userInterface';
 import ClsCrud from '../Utils/ClsCrudApi';
 
 const APPLE: string = '/apple.png';

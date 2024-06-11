@@ -7,7 +7,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { ProvaInterface } from '../../../../td-fleek-nest/src/interfaces/provaInterface';
+import { ProvaInterface } from '../../../../tambordog-backend/src/interfaces/provaInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
@@ -21,7 +21,7 @@ import InputSelect from '../../Componentes/Select';
 import { PisoTypes } from '../../types/PisoTypes';
 import { ProvaTypes } from '../../types/ProvaTypes';
 import ComboBox from '../../Componentes/ComboBox';
-import { CampeonatoInterface } from '../../../../td-fleek-nest/src/interfaces/campeonatoInterface';
+import { CampeonatoInterface } from '../../../../tambordog-backend/src/interfaces/campeonatoInterface';
 import InputMultiline from '../../Componentes/InputMultline';
 
 const ResetDados: ProvaInterface = {

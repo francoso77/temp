@@ -1,7 +1,7 @@
 import {
   PadraoPesquisaInterface,
   RespostaPadraoInterface,
-} from "../../../td-fleek-nest/src/interfaces/respostaPadrao.interface"
+} from "../../../tambordog-backend/src/interfaces/respostaPadrao.interface"
 import axios, { AxiosRequestConfig } from "axios"
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState'
 import { actionTypes } from '../Interfaces/ActionInterface'

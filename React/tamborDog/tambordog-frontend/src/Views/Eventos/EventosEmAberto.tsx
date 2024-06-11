@@ -3,7 +3,7 @@ import { Chip, Grid, Stack } from '@mui/material';
 import CardEvento from './CardEvento';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { ProvaInterface } from '../../../../td-fleek-nest/src/interfaces/provaInterface';
+import { ProvaInterface } from '../../../../tambordog-backend/src/interfaces/provaInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import Inscricao from '../Inscricoes/Inscricoes';
 import Condicional from '../../Componentes/Condicional/Condicional';
