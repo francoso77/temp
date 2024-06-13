@@ -20,10 +20,8 @@ import InputText from '../../Componentes/InputText';
 
 
 const ResetDados: CampeonatoInterface = {
-  nomeCampeonato: '',
-  descritivo: '',
+  nome: '',
   ativo: true,
-  pdfFile: ''
 }
 interface PesquisaInterface {
   nome: string
@@ -48,15 +46,8 @@ export default function Campeonato() {
     {
       cabecalho: 'Campeonato',
       alinhamento: 'left',
-      campo: 'nomeCampeonato'
+      campo: 'nome'
     },
-
-    {
-      cabecalho: 'Descritivo',
-      alinhamento: 'left',
-      campo: 'descritivo'
-    },
-
     {
       cabecalho: 'Ativo',
       alinhamento: 'left',
@@ -177,10 +168,10 @@ export default function Campeonato() {
       .pesquisar({
         entidade: "Campeonato",
         criterio: {
-          nomeCampeonato: "%".concat(pesquisa.nome).concat("%"),
+          nome: "%".concat(pesquisa.nome).concat("%"),
         },
-        camposLike: ["nomeCampeonato"],
-        select: ["idCampeonato", "nomeCampeonato", "descritivo", "ativo", "pdfFile"],
+        camposLike: ["nome"],
+        select: ["idCampeonato", "nome", "ativo"],
         msg: 'Pesquisando campeonatos ...',
         setMensagemState: setMensagemState
       })
@@ -277,34 +268,12 @@ export default function Campeonato() {
                 label="Nome Campeonato"
                 tipo="text"
                 dados={campeonato}
-                field="nomeCampeonato"
+                field="nome"
                 setState={setCampeonato}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
                 maxLength={35}
                 autoFocus
-              />
-            </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Descritivo"
-                tipo="text"
-                dados={campeonato}
-                field="descritivo"
-                setState={setCampeonato}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
-            </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Regulamento"
-                tipo="text"
-                dados={campeonato}
-                field="pdfFile"
-                setState={setCampeonato}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

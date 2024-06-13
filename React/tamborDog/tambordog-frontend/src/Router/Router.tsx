@@ -8,8 +8,8 @@ import EtapasRealizadas from '../Views/Etapas/EtapasRealizadas';
 import Raca from '../Views/Crud/Raca';
 import Categoria from '../Views/Crud/Categoria';
 import User from '../Views/Users/User';
-import Campeonato from '../Views/Campeonatos/Campeonatos';
-import Prova from '../Views/Provas/Provas';
+import Campeonato from '../Views/Crud/Campeonatos';
+import Prova from '../Views/Crud/Provas';
 import Inscricao from '../Views/Inscricoes/Inscricoes';
 
 export const router = createBrowserRouter([

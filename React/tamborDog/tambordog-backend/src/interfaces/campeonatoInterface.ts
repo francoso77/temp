@@ -1,7 +1,5 @@
 export interface CampeonatoInterface {
   idCampeonato?: string
-  nomeCampeonato: string
-  descritivo: string
+  nome: string
   ativo: boolean
-  pdfFile: string
 }

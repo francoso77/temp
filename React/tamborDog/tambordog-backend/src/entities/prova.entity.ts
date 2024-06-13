@@ -1,9 +1,9 @@
 import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { PisoTypes } from '../types/PisoTypes';
-import { ProvaTypes } from '../types/ProvaTypes';
 import Inscricao from './inscricao.entity';
 import Campeonato from './campeonato.entity';
 import { ProvaInterface } from '../interfaces/provaInterface';
+import { StatusProvaType } from '../types/ProvaTypes';
 
 @Entity({ name: 'provas' })
 export default class Prova implements ProvaInterface {
@@ -32,25 +32,22 @@ export default class Prova implements ProvaInterface {
   @Column({ length: 10 })
   cep: string
 
-  @Column({ length: 30 })
-  localizacao: string
+  @Column({ length: 10 })
+  lat: string
 
-  @Column({ length: 255 })
-  adicionais: string
+  @Column({ length: 10 })
+  long: string
 
-  @Column({ type: 'enum', enum: PisoTypes })
-  piso: PisoTypes
+  @Column({ type: 'varchar', length: 10 })
+  tipoPiso: PisoTypes
 
-  @Column({ type: 'date' })
-  dataProva: string
+  @Column({ type: 'datetime' })
+  dataHoraProva: string
 
-  @Column({ type: 'time' })
-  horaProva: string
-
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'float', precision: 2 })
   valorProva: number
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'float', precision: 2, scale: 2 })
   valorProvaAte12: number
 
   @Column({
@@ -71,13 +68,19 @@ export default class Prova implements ProvaInterface {
   })
   email: string
 
-  @Column({ type: 'enum', enum: ProvaTypes })
-  status: ProvaTypes
+  @Column({ type: "text" })
+  termoAceite: string;
+
+  @Column({ length: 2 })
+  status: StatusProvaType;
+
+  @Column({ default: false })
+  foto: boolean;
 
   @OneToMany(() => Inscricao, (inscricao) => inscricao.prova)
   inscricoes: Inscricao[]
 
-  @Column({ length: 36 })
+  @Column({ length: 36, nullable: true })
   idCampeonato: string | null
 
   @JoinColumn({ name: 'idCampeonato' })

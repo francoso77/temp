@@ -1,5 +1,5 @@
 import { PisoTypes } from '../types/PisoTypes'
-import { ProvaTypes } from '../types/ProvaTypes'
+import { StatusProvaType } from '../types/ProvaTypes'
 
 export interface ProvaInterface {
   idProva?: string
@@ -10,16 +10,24 @@ export interface ProvaInterface {
   cidade: string
   uf: string
   cep: string
-  localizacao: string
-  adicionais: string
-  piso: PisoTypes
-  dataProva: string
-  horaProva: string
+  lat: string;
+  long: string;
+  tipoPiso: PisoTypes;
+  dataHoraProva: string;
   valorProva: number
   valorProvaAte12: number
   telefone: string
   whatsapp: string
   email: string
-  status: ProvaTypes
+  status: StatusProvaType;
+  termoAceite: string;
+  foto: boolean;
   idCampeonato: string | null
+}
+
+export interface ProvaCategoriaInterface {
+  idProvaCategoria?: string;
+  idProva: string;
+  idCategoria: string;
+  qtdPistas: number;
 }

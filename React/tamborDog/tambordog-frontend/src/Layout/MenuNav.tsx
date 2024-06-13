@@ -17,65 +17,66 @@ import { Icon } from '@mui/material';
 import PetsOutlinedIcon from '@mui/icons-material/PetsOutlined';
 import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
+import menuCrud from '../Utils/menuCrud.json';
 
-const settingsJSON = [
-  {
-    "id": 1,
-    "menu": "Atletas",
-    "icon": "person_outline_outlined",
-    "path": "/Atleta",
-    "titulo": "Atletas",
-  },
-  {
-    "id": 2,
-    "menu": "Cães",
-    "icon": "pets",
-    "path": "/Cao",
-    "titulo": "Cães",
-  },
-  {
-    "id": 3,
-    "menu": "Calendário",
-    "icon": "calendar_month",
-    "path": "/EventosEmAberto",
-    "titulo": "Eventos Em Aberto",
-  },
-  {
-    "id": 4,
-    "menu": "Etapas Realizadas",
-    "icon": "military_tech",
-    "path": "/EtapasRealizadas",
-    "titulo": "Etapas Realizadas",
-  },
-  {
-    "id": 5,
-    "menu": "Raças",
-    "icon": "military_tech",
-    "path": "/Raca",
-    "titulo": "Raças",
-  },
-  {
-    "id": 6,
-    "menu": "Categorias",
-    "icon": "military_tech",
-    "path": "/Categoria",
-    "titulo": "Categorias",
-  },
-  {
-    "id": 7,
-    "menu": "Campeonatos",
-    "icon": "military_tech",
-    "path": "/Campeonato",
-    "titulo": "Campeonatos",
-  },
-  {
-    "id": 8,
-    "menu": "Provas",
-    "icon": "military_tech",
-    "path": "/Prova",
-    "titulo": "Provas",
-  },
-]
+// const settingsJSON = [
+//   {
+//     "id": 1,
+//     "menu": "Atletas",
+//     "icon": "person_outline_outlined",
+//     "path": "/Atleta",
+//     "titulo": "Atletas",
+//   },
+//   {
+//     "id": 2,
+//     "menu": "Cães",
+//     "icon": "pets",
+//     "path": "/Cao",
+//     "titulo": "Cães",
+//   },
+//   {
+//     "id": 3,
+//     "menu": "Calendário",
+//     "icon": "calendar_month",
+//     "path": "/EventosEmAberto",
+//     "titulo": "Eventos Em Aberto",
+//   },
+//   {
+//     "id": 4,
+//     "menu": "Etapas Realizadas",
+//     "icon": "military_tech",
+//     "path": "/EtapasRealizadas",
+//     "titulo": "Etapas Realizadas",
+//   },
+//   {
+//     "id": 5,
+//     "menu": "Raças",
+//     "icon": "military_tech",
+//     "path": "/Raca",
+//     "titulo": "Raças",
+//   },
+//   {
+//     "id": 6,
+//     "menu": "Categorias",
+//     "icon": "military_tech",
+//     "path": "/Categoria",
+//     "titulo": "Categorias",
+//   },
+//   {
+//     "id": 7,
+//     "menu": "Campeonatos",
+//     "icon": "military_tech",
+//     "path": "/Campeonato",
+//     "titulo": "Campeonatos",
+//   },
+//   {
+//     "id": 8,
+//     "menu": "Provas",
+//     "icon": "military_tech",
+//     "path": "/Prova",
+//     "titulo": "Provas",
+//   },
+// ]
 const StyledFab = styled(Fab)({
   position: 'absolute',
   zIndex: 1,
@@ -153,7 +154,7 @@ export default function MenuNav() {
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
           >
-            {settingsJSON.map((setting) => (
+            {menuCrud.map((setting) => (
               <MenuItem key={setting.id} onClick={() => irPara(setting.path, setting.titulo)}>
                 <Icon sx={{ textAlign: 'center', marginRight: 1 }}>{setting.icon}</Icon>
                 <Typography textAlign="center">{setting.menu}</Typography>
