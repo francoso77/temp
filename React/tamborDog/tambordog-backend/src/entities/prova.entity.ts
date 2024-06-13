@@ -41,8 +41,8 @@ export default class Prova implements ProvaInterface {
   @Column({ type: 'varchar', length: 10 })
   tipoPiso: PisoTypes
 
-  @Column({ type: 'datetime' })
-  dataHoraProva: string
+  @Column({ type: 'timestamp' })
+  dataHoraProva: Date;
 
   @Column({ type: 'float', precision: 2 })
   valorProva: number

@@ -13,7 +13,7 @@ export interface ProvaInterface {
   lat: string;
   long: string;
   tipoPiso: PisoTypes;
-  dataHoraProva: string;
+  dataHoraProva: Date;
   valorProva: number
   valorProvaAte12: number
   telefone: string

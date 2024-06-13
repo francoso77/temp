@@ -1,3 +1,4 @@
+import { timeStamp } from 'console';
 import { DateTime } from "luxon";
 
 export default class ClsFormatacao {
@@ -34,6 +35,11 @@ export default class ClsFormatacao {
   /** Converte yyyy-MM-dd para dd/MM/yyyy */
   public dataISOtoUser(data: string): string {
     return DateTime.fromFormat(data, 'yyyy-MM-dd').toFormat('dd/MM/yyyy')
+  }
+
+  public dataEHora(data: string): string {
+    const dd = new Date(data)
+    return dd.toLocaleString()
   }
 
   public currency(numero: number): string {

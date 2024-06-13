@@ -19,10 +19,10 @@ import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import InputSelect from '../../Componentes/Select';
 import { PisoTypes } from '../../types/PisoTypes';
-import { ProvaTypes } from '../../types/ProvaTypes';
 import ComboBox from '../../Componentes/ComboBox';
 import { CampeonatoInterface } from '../../../../tambordog-backend/src/interfaces/campeonatoInterface';
 import InputMultiline from '../../Componentes/InputMultline';
+import { StatusProvaType } from '../../types/ProvaTypes';
 
 const ResetDados: ProvaInterface = {
   nomeProva: '',
@@ -32,18 +32,19 @@ const ResetDados: ProvaInterface = {
   cidade: '',
   uf: '',
   cep: '',
-  localizacao: '',
-  adicionais: '',
-  piso: PisoTypes.grama,
-  dataProva: '',
-  horaProva: '',
+  lat: '',
+  long: '',
+  tipoPiso: PisoTypes.grama,
+  dataHoraProva: new Date(),
   valorProva: 0,
   valorProvaAte12: 0,
   telefone: '',
   whatsapp: '',
   email: '',
-  status: ProvaTypes.recebendoInscricoes,
+  status: StatusProvaType.inscAberta,
   idCampeonato: '',
+  termoAceite: '',
+  foto: false
 }
 interface PesquisaInterface {
   nome: string
@@ -75,8 +76,8 @@ export default function Prova() {
     {
       cabecalho: 'Data',
       alinhamento: 'left',
-      campo: 'dataProva',
-      format: (data) => clsFormatacao.dataISOtoUser(data)
+      campo: 'dataHoraProva',
+      format: (data) => clsFormatacao.dataEHora(data)
     },
     {
       cabecalho: 'Situação',
@@ -139,7 +140,7 @@ export default function Prova() {
     let erros: { [key: string]: string } = {}
     retorno = validaCampo.naoVazio('nomeProva', prova, erros, retorno, 'Nome do prova não pode ser vázio')
     retorno = validaCampo.naoVazio('cep', prova, erros, retorno, 'Informe um CEP válido')
-    retorno = validaCampo.eData('dataProva', prova, erros, retorno, false)
+    retorno = validaCampo.eData('dataHoraProva', prova, erros, retorno, false)
     // retorno = validaCampo.eData('horaProva', prova, erros, retorno, false)
     retorno = validaCampo.eTelefone('telefone', prova, erros, retorno, false)
     retorno = validaCampo.eTelefone('whatsapp', prova, erros, retorno, false)
@@ -227,14 +228,15 @@ export default function Prova() {
           'cidade',
           'uf',
           'cep',
-          'localizacao',
-          'adicionais',
-          'piso',
-          'dataProva',
-          'horaProva',
+          'lat',
+          'long',
+          'tipoPiso',
+          'dataHoraProva',
           'valorProva',
           'valorProvaAte12',
           'status',
+          'termoAceite',
+          'foto',
           'idCampeonato'
         ],
         msg: 'Pesquisando provas ...',
@@ -256,39 +258,50 @@ export default function Prova() {
   }
 
   const btBuscaCep = () => {
-    clsCrud.verificaCEP({ CEP: prova.cep, setMensagemState: setMensagemState })
-      .then((temCep) => {
-        if (temCep) {
-          prova.endereco = clsCrud.tmp_eCEP.logradouro
-          prova.bairro = clsCrud.tmp_eCEP.bairro
-          prova.cidade = clsCrud.tmp_eCEP.localidade
-          prova.uf = clsCrud.tmp_eCEP.uf
-        }
-        else {
-          prova.endereco = ''
-          prova.bairro = ''
-          prova.cidade = ''
-          prova.uf = ''
-        }
-      }).catch((e) => {
-        setMensagemState({
-          titulo: "Erro...",
-          exibir: true,
-          mensagem: 'Erro na conexão com o servidor de cep!',
-          tipo: MensagemTipo.Error,
-          exibirBotao: true,
-          cb: null
-        })
+    if (!prova.cep || prova.cep.length < 10) {
+      setMensagemState({
+        titulo: "Erro...",
+        exibir: true,
+        mensagem: 'CEP inválido para pesquisa',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
       })
+    } else {
+      clsCrud.verificaCEP({ CEP: prova.cep, setMensagemState: setMensagemState })
+        .then((temCep) => {
+          if (temCep) {
+            prova.endereco = clsCrud.tmp_eCEP.logradouro
+            prova.bairro = clsCrud.tmp_eCEP.bairro
+            prova.cidade = clsCrud.tmp_eCEP.localidade
+            prova.uf = clsCrud.tmp_eCEP.uf
+          }
+          else {
+            prova.endereco = ''
+            prova.bairro = ''
+            prova.cidade = ''
+            prova.uf = ''
+          }
+        }).catch((e) => {
+          setMensagemState({
+            titulo: "Erro...",
+            exibir: true,
+            mensagem: 'Erro na conexão com o servidor de cep!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+        })
+    }
   }
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
         entidade: "Campeonato",
         criterio: {
-          nomeCampeonato: "%".concat("%"),
+          nome: "%".concat("%"),
         },
-        camposLike: ["nomeCampeonato"],
+        camposLike: ["nome"],
       })
       .then((rs: Array<CampeonatoInterface>) => {
         setRsCampeonato(rs)
@@ -448,28 +461,15 @@ export default function Prova() {
                 maxLength={2}
               />
             </Grid>
-            <Grid item xs={6} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Data da Prova"
+                label="Data e Hora da Prova"
                 setState={setProva}
                 dados={prova}
-                field="dataProva"
+                field="dataHoraProva"
                 erros={erros}
                 type="tel"
-                tipo='date'
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-            <Grid item xs={6} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Hora da Prova"
-                setState={setProva}
-                dados={prova}
-                field="horaProva"
-                erros={erros}
-                type="tel"
-                tipo='mac'
-                mask='hora'
+                tipo='dateTime'
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
@@ -571,35 +571,60 @@ export default function Prova() {
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <ComboBox
                 opcoes={rsCampeonato}
-                campoDescricao="nomeCampeonato"
+                campoDescricao="nome"
                 campoID="idCampeonato"
                 dados={prova}
-                mensagemPadraoCampoEmBranco="Escolha uma prova"
+                mensagemPadraoCampoEmBranco="Escolha um campeonato"
                 field="idCampeonato"
-                label="Prova"
+                label="Campeonato"
                 erros={erros}
                 setState={setProva}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Latitude"
+                tipo="text"
+                dados={prova}
+                field="lat"
+                setState={setProva}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+                maxLength={10}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Longitude"
+                tipo="text"
+                dados={prova}
+                field="long"
+                setState={setProva}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+                maxLength={10}
               />
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Localização"
+                label="Aceite"
                 tipo="text"
                 dados={prova}
-                field="localizacao"
+                field="termoAceite"
                 setState={setProva}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={30}
               />
             </Grid>
-            <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
-              <InputMultiline
-                label="Dados adicionais..."
-                setState={setProva}
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Foto"
+                tipo="checkbox"
                 dados={prova}
-                field="adicionais"
+                field="foto"
+                setState={setProva}
                 disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
@@ -643,3 +668,13 @@ export default function Prova() {
     </Container >
   )
 }
+
+{/* <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+      <InputMultiline
+        label="Dados adicionais..."
+        setState={setProva}
+        dados={prova}
+        field="adicionais"
+        disabled={localState.action === 'excluindo' ? true : false}
+      />
+    </Grid> */}

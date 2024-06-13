@@ -10,31 +10,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var prova_entity_1 = require("./prova.entity");
-var Campeonato = /** @class */ (function () {
-    function Campeonato() {
+var ProvaCategoria = /** @class */ (function () {
+    function ProvaCategoria() {
     }
     __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
-        (0, typeorm_1.Generated)('uuid'),
+        (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+        (0, typeorm_1.Generated)("uuid"),
         __metadata("design:type", String)
-    ], Campeonato.prototype, "idCampeonato", void 0);
+    ], ProvaCategoria.prototype, "idProvaCategoria", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 35 }),
+        (0, typeorm_1.Column)({ length: 36, nullable: true }),
         __metadata("design:type", String)
-    ], Campeonato.prototype, "nome", void 0);
+    ], ProvaCategoria.prototype, "idProva", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
-        __metadata("design:type", Boolean)
-    ], Campeonato.prototype, "ativo", void 0);
+        (0, typeorm_1.Column)({ length: 36, nullable: true }),
+        __metadata("design:type", String)
+    ], ProvaCategoria.prototype, "idCategoria", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return prova_entity_1.default; }, function (prova) { return prova.campeonato; }),
-        __metadata("design:type", Array)
-    ], Campeonato.prototype, "provas", void 0);
-    Campeonato = __decorate([
-        (0, typeorm_1.Entity)({ name: 'campeonatos' })
-    ], Campeonato);
-    return Campeonato;
+        (0, typeorm_1.Column)({ default: 1 }),
+        __metadata("design:type", Number)
+    ], ProvaCategoria.prototype, "qtdPistas", void 0);
+    ProvaCategoria = __decorate([
+        (0, typeorm_1.Entity)({ name: "provascategorias" })
+    ], ProvaCategoria);
+    return ProvaCategoria;
 }());
-exports.default = Campeonato;
-//# sourceMappingURL=campeonato.entity.js.map
+exports.default = ProvaCategoria;
+//# sourceMappingURL=provaCategoria.entity.js.map

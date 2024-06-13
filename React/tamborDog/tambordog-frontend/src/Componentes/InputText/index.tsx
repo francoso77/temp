@@ -46,6 +46,7 @@ interface InputTextInterface {
   | "float"
   | "uppercase"
   | "date"
+  | "dateTime"
   | "currency"
   | "mac"
   maxLength?: number | null
@@ -151,15 +152,17 @@ const TextMaskCustom = forwardRef((props: any, ref: any) => {
           ? "aa"
           : tipo === "date"
             ? "00/00/0000"
-            : mask === "cnpj"
-              ? "00.000.000/0000-00"
-              : mask === "cpf"
-                ? "000.000.000-00"
-                : mask === "cep"
-                  ? "00.000-000"
-                  : mask === "mac" || tipo === "mac"
-                    ? "mm:mm:mm:mm:mm:mm"
-                    : mask
+            : tipo === "dateTime"
+              ? "00/00/0000 00:00:00"
+              : mask === "cnpj"
+                ? "00.000.000/0000-00"
+                : mask === "cpf"
+                  ? "000.000.000-00"
+                  : mask === "cep"
+                    ? "00.000-000"
+                    : mask === "mac" || tipo === "mac"
+                      ? "mm:mm:mm:mm:mm:mm"
+                      : mask
       }
       definitions={MASK_DEFINITIONS}
       inputRef={ref}
@@ -394,17 +397,19 @@ export default function InputText({
                 ? 17
                 : tipo === "date"
                   ? 10
-                  : mask === "uf"
-                    ? 2
-                    : mask === "tel"
-                      ? 15
-                      : mask === "cnpj"
-                        ? 18
-                        : mask === "cpf"
-                          ? 14
-                          : mask === "cep"
-                            ? 10
-                            : maxLength,
+                  : tipo === "dateTime"
+                    ? 19
+                    : mask === "uf"
+                      ? 2
+                      : mask === "tel"
+                        ? 15
+                        : mask === "cnpj"
+                          ? 18
+                          : mask === "cpf"
+                            ? 14
+                            : mask === "cep"
+                              ? 10
+                              : maxLength,
             mask: mask,
             min: min,
             max: max,

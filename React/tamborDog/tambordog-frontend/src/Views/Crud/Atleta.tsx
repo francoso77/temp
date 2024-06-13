@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, Paper, Typography, Avatar, Tooltip } from '@mui/material';
+import { Container, Grid, IconButton, Paper, Avatar, Tooltip } from '@mui/material';
 import Text from '../../Componentes/Text';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';

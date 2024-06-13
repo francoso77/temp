@@ -104,8 +104,7 @@ export default function Campeonato() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('nomeCampeonato', campeonato, erros, retorno, 'Nome do Campeonato não pode ser vázio')
-    retorno = validaCampo.naoVazio('descritivo', campeonato, erros, retorno, 'Informe o descritivo')
+    retorno = validaCampo.naoVazio('Campeonato', campeonato, erros, retorno, 'Nome do Campeonato não pode ser vázio')
     setErros(erros)
     return retorno
   }

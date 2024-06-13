@@ -17,8 +17,8 @@ import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ComboBox from '../../Componentes/ComboBox';
 import { CaoInterface } from '../../../../tambordog-backend/src/interfaces/caoInterface';
-import { InscricaoTypes } from '../../types/InscricaoTypes';
 import { ProvaInterface } from '../../../../tambordog-backend/src/interfaces/provaInterface';
+import { InscricaoTypes } from '../../types/InscricaoTypes';
 
 
 export default function Inscricao(idProva: string) {
@@ -174,7 +174,7 @@ export default function Inscricao(idProva: string) {
           idProva: idProva,
         },
         camposLike: ["idProva"],
-        select: ['idProva', 'nomeProva', 'dataProva', 'cidade', 'uf', 'status']
+        select: ['idProva', 'nomeProva', 'dataHoraProva', 'cidade', 'uf', 'status']
       })
       .then((rs: Array<ProvaInterface>) => {
         setRsProva(rs)

@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var PisoTypes_1 = require("../types/PisoTypes");
-var ProvaTypes_1 = require("../types/ProvaTypes");
 var inscricao_entity_1 = require("./inscricao.entity");
 var campeonato_entity_1 = require("./campeonato.entity");
+var ProvaTypes_1 = require("../types/ProvaTypes");
 var Prova = /** @class */ (function () {
     function Prova() {
     }
@@ -51,31 +51,27 @@ var Prova = /** @class */ (function () {
         __metadata("design:type", String)
     ], Prova.prototype, "cep", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 30 }),
+        (0, typeorm_1.Column)({ length: 10 }),
         __metadata("design:type", String)
-    ], Prova.prototype, "localizacao", void 0);
+    ], Prova.prototype, "lat", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 255 }),
+        (0, typeorm_1.Column)({ length: 10 }),
         __metadata("design:type", String)
-    ], Prova.prototype, "adicionais", void 0);
+    ], Prova.prototype, "long", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'enum', enum: PisoTypes_1.PisoTypes }),
+        (0, typeorm_1.Column)({ type: 'varchar', length: 10 }),
         __metadata("design:type", String)
-    ], Prova.prototype, "piso", void 0);
+    ], Prova.prototype, "tipoPiso", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'date' }),
-        __metadata("design:type", String)
-    ], Prova.prototype, "dataProva", void 0);
+        (0, typeorm_1.Column)({ type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Prova.prototype, "dataHoraProva", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'time' }),
-        __metadata("design:type", String)
-    ], Prova.prototype, "horaProva", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
         __metadata("design:type", Number)
     ], Prova.prototype, "valorProva", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 2, scale: 2 }),
         __metadata("design:type", Number)
     ], Prova.prototype, "valorProvaAte12", void 0);
     __decorate([
@@ -100,15 +96,23 @@ var Prova = /** @class */ (function () {
         __metadata("design:type", String)
     ], Prova.prototype, "email", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'enum', enum: ProvaTypes_1.ProvaTypes }),
+        (0, typeorm_1.Column)({ type: "text" }),
+        __metadata("design:type", String)
+    ], Prova.prototype, "termoAceite", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ length: 2 }),
         __metadata("design:type", String)
     ], Prova.prototype, "status", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ default: false }),
+        __metadata("design:type", Boolean)
+    ], Prova.prototype, "foto", void 0);
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return inscricao_entity_1.default; }, function (inscricao) { return inscricao.prova; }),
         __metadata("design:type", Array)
     ], Prova.prototype, "inscricoes", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 36 }),
+        (0, typeorm_1.Column)({ length: 36, nullable: true }),
         __metadata("design:type", String)
     ], Prova.prototype, "idCampeonato", void 0);
     __decorate([
