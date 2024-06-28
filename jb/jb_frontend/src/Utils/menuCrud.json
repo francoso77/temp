@@ -1,37 +1,37 @@
 [
   {
     "id": 1,
-    "menu": "Atletas",
+    "menu": "Cores",
     "icon": "person_outline_outlined",
-    "path": "/Atleta",
-    "titulo": "Cadastro de Atletas"
+    "path": "/Cor",
+    "titulo": "Cadastro de Cores"
   },
   {
     "id": 2,
-    "menu": "Raças",
+    "menu": "Máquinas",
     "icon": "pets",
-    "path": "/Raca",
-    "titulo": "Cadastro de Raças"
+    "path": "/Maquina",
+    "titulo": "Cadastro de Máquinas"
   },
   {
     "id": 3,
-    "menu": "Categorias",
+    "menu": "Produtos",
     "icon": "military_tech",
-    "path": "/Categoria",
-    "titulo": "Cadastro de Categorias"
+    "path": "/Produto",
+    "titulo": "Cadastro de Produtos"
   },
   {
     "id": 4,
-    "menu": "Campeonatos",
+    "menu": "Tipos de Produto",
     "icon": "emoji_events",
-    "path": "/Campeonato",
-    "titulo": "Cadastro de Campeonatos"
+    "path": "/TipoProduto",
+    "titulo": "Cadastro de Tipos de produtos"
   },
   {
     "id": 5,
-    "menu": "Provas",
+    "menu": "Unidades de Medida",
     "icon": "sports_score",
-    "path": "/Prova",
-    "titulo": "Cadastro de Provas"
+    "path": "/UnidadeMedida",
+    "titulo": "Cadastro de Unidades de Medida"
   }
 ]

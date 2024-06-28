@@ -8,6 +8,9 @@ export default class UnidadeMedida implements UnidadeMedidaInterface {
   @PrimaryGeneratedColumn()
   idUnidade: number
 
+  @Column({ length: 2 })
+  sigla: string
+
   @Column({ length: 35 })
   nome: string
 

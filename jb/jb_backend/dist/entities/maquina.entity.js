@@ -21,7 +21,7 @@ var Maquina = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)({ length: 35 }),
         __metadata("design:type", String)
-    ], Maquina.prototype, "descricao", void 0);
+    ], Maquina.prototype, "nome", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 15 }),
         __metadata("design:type", String)

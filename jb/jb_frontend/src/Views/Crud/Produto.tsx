@@ -1,14 +1,12 @@
-import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
-// import { styled } from '@mui/system';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import Text from '../../Componentes/Text';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
@@ -16,42 +14,70 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
+import InputText from '../../Componentes/InputText';
+import ComboBox from '../../Componentes/ComboBox';
+import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
+import { TipoProdutoInterface } from '../../../../jb_backend/src/interfaces/tipoProdutoInterface';
 
-export default function UnidadeMedida() {
+
+export default function Produto() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
+  const ResetDados: ProdutoInterface = {
+    nome: '',
+    idUnidade: 0,
+    localizacao: '',
+    largura: 0,
+    gm2: 0,
+    ativo: false,
+    idTipoProduto: 0,
 
-
-  const ResetDados: UnidadeMedidaInterface = {
-    sigla: '',
-    nome: ''
   }
   interface PesquisaInterface {
     nome: string
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
-  const [rsPesquisa, setRsPesquisa] = useState<Array<UnidadeMedidaInterface>>([])
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
+  const [rsPesquisa, setRsPesquisa] = useState<Array<ProdutoInterface>>([])
   const [erros, setErros] = useState({})
-  const [unidadeMedida, setUnidadeMedida] = useState<UnidadeMedidaInterface>(ResetDados)
+  const [produto, setProduto] = useState<ProdutoInterface>(ResetDados)
+  const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
+  const [rsTipoProduto, setRsTipoProduto] = useState<Array<TipoProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Sigla',
-      alinhamento: 'left',
-      campo: 'sigla'
-    },
-    {
-      cabecalho: 'Nome',
+      cabecalho: 'Produto',
       alinhamento: 'left',
       campo: 'nome'
+    },
+    {
+      cabecalho: 'Unidade',
+      alinhamento: 'left',
+      campo: 'Produto_Unidade.nome',
+    },
+    {
+      cabecalho: 'Tipo Produto',
+      alinhamento: 'left',
+      campo: 'Produto_TipoProduto.nome',
+    },
+    {
+      cabecalho: 'Localização',
+      alinhamento: 'left',
+      campo: 'localizacao',
+    },
+    {
+      cabecalho: 'Ativo',
+      alinhamento: 'left',
+      campo: 'ativo',
+      format: (v: boolean) => { return v ? 'Sim' : 'Não' }
     },
   ]
 
@@ -64,54 +90,38 @@ export default function UnidadeMedida() {
     setOrderBy(property);
   };
 
-  const btPesquisar = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "UnidadeMedida",
-        criterio: {
-          nome: "%".concat(pesquisa.nome).concat("%"),
-        },
-        camposLike: ["nome"],
-        select: ["idUnidade", "sigla", "nome"],
-        msg: 'Pesquisando unidade de medidas ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<UnidadeMedidaInterface>) => {
-        setRsPesquisa(rs)
-      })
-  }
-  const pesquisarID = (id: string | number): Promise<UnidadeMedidaInterface> => {
+  const pesquisarID = (id: string | number): Promise<ProdutoInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "UnidadeMedida",
+        entidade: "Produto",
         criterio: {
-          idUnidade: id,
+          idProduto: id,
         },
       })
-      .then((rs: Array<UnidadeMedidaInterface>) => {
+      .then((rs: Array<ProdutoInterface>) => {
         return rs[0]
       })
   }
-
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setUnidadeMedida(rs)
+      setProduto(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setUnidadeMedida(rs)
+      setProduto(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
+
   const btIncluir = () => {
-    setUnidadeMedida(ResetDados)
+    setProduto(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
   const btCancelar = () => {
     setErros({})
-    setUnidadeMedida(ResetDados)
+    setProduto(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
@@ -119,20 +129,24 @@ export default function UnidadeMedida() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('nome', unidadeMedida, erros, retorno, 'Nome da unidade de Medida não pode ser vázio')
-    retorno = validaCampo.naoVazio('sigla', unidadeMedida, erros, retorno, 'Sigla não pode ser vázio')
+    retorno = validaCampo.naoVazio('nome', produto, erros, retorno, 'Nome do produto não pode ser vázio')
+    retorno = validaCampo.naoVazio('largura', produto, erros, retorno, 'Informe a largura')
+    retorno = validaCampo.naoVazio('gm2', produto, erros, retorno, 'Informe a gramatura')
+    retorno = validaCampo.naoVazio('idUnidade', produto, erros, retorno, 'Informe uma Unidade')
+    retorno = validaCampo.naoVazio('idTipoProduto', produto, erros, retorno, 'Informe um Tipo')
 
     setErros(erros)
     return retorno
   }
 
   const btConfirmar = () => {
+
     if (validarDados()) {
 
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
-          entidade: "UnidadeMedida",
-          criterio: unidadeMedida,
+          entidade: "Produto",
+          criterio: produto,
           localState: localState.action,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
@@ -153,9 +167,9 @@ export default function UnidadeMedida() {
           })
       } else if (localState.action === actionTypes.excluindo) {
         clsCrud.excluir({
-          entidade: "UnidadeMedida",
+          entidade: "Produto",
           criterio: {
-            idUnidade: unidadeMedida.idUnidade
+            idProduto: produto.idProduto
           },
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
@@ -178,18 +192,71 @@ export default function UnidadeMedida() {
     }
   }
 
-  const irPara = useNavigate()
+  const btPesquisar = () => {
+    clsCrud
+      .query({
+        entidade: "Produto",
+        criterio: {
+          nome: "%".concat(pesquisa.nome).concat("%"),
+        },
+        camposLike: ["nome"],
+        select: [
+          "idProduto",
+          // "unidade.nome",
+          // "tipoProduto.nome",
+          "localizacao",
+          "largura",
+          "gm2",
+          "ativo",
 
+        ],
+        msg: 'Pesquisando produtos ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<ProdutoInterface>) => {
+        setRsPesquisa(rs)
+      })
+  }
+  const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Unidade Medida',
+      tituloAnterior: 'Produto',
       pathTitulo: '/',
-      pathTituloAnterior: '/UnidadeMedida'
+      pathTituloAnterior: '/Produto'
     })
     irPara('/')
   }
 
+  const BuscarDados = () => {
+    clsCrud
+      .pesquisar({
+        entidade: "UnidadeMedida",
+        criterio: {
+          nome: "%".concat("%"),
+        },
+        camposLike: ["nome"],
+      })
+      .then((rs: Array<UnidadeMedidaInterface>) => {
+        setRsUnidade(rs)
+      })
+
+    clsCrud
+      .pesquisar({
+        entidade: "TipoProduto",
+        criterio: {
+          nome: "%".concat("%"),
+        },
+        camposLike: ["nome"],
+      })
+      .then((rs: Array<TipoProdutoInterface>) => {
+        setRsTipoProduto(rs)
+      })
+  }
+
+  useEffect(() => {
+    BuscarDados()
+  }, [])
   return (
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -197,14 +264,7 @@ export default function UnidadeMedida() {
 
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-            <Typography component="h5" variant="h5" align="left">
-              {/* Informe aqui o nome técnico de cada raça */}
-              <Typography variant="body2" gutterBottom>
-                Informe o nome da unidade de Medida
-              </Typography>
-            </Typography>
-
+          <Grid item xs={12} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -218,7 +278,7 @@ export default function UnidadeMedida() {
                 field="nome"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
-                onClickIconeEnd={() => { btPesquisar() }}
+                onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autofocus
               />
@@ -241,14 +301,14 @@ export default function UnidadeMedida() {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: UnidadeMedidaInterface) =>
-                      onEditar(rs.idUnidade as number),
+                    onAcionador: (rs: ProdutoInterface) =>
+                      onEditar(rs.idProduto as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: UnidadeMedidaInterface) =>
-                      onExcluir(rs.idUnidade as number),
+                    onAcionador: (rs: ProdutoInterface) =>
+                      onExcluir(rs.idProduto as number),
                     toolTip: "Excluir",
                   },
                 ]}
@@ -258,30 +318,90 @@ export default function UnidadeMedida() {
               />
             </Grid>
           </Condicional>
-          <Condicional condicao={localState.action !== 'pesquisando'}>
-            <Grid item xs={12}>
-              <Text
-                label="Sigla"
+
+          <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
+            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Produto"
                 tipo="text"
-                dados={unidadeMedida}
-                field="sigla"
-                setState={setUnidadeMedida}
+                dados={produto}
+                field="nome"
+                setState={setProduto}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={2}
-                autofocus
+                maxLength={80}
+                autoFocus
               />
             </Grid>
-            <Grid item xs={12}>
-              <Text
-                label="Nome"
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsUnidade}
+                campoDescricao="sigla"
+                campoID="idUnidade"
+                dados={produto}
+                mensagemPadraoCampoEmBranco="Escolha uma unidade de medida"
+                field="idUnidade"
+                label="Unidade"
+                erros={erros}
+                setState={setProduto}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsTipoProduto}
+                campoDescricao="nome"
+                campoID="idTipoProduto"
+                dados={produto}
+                mensagemPadraoCampoEmBranco="Escolha um Tipo"
+                field="idTipoProduto"
+                label="Tipo de Produto"
+                erros={erros}
+                setState={setProduto}
+              />
+            </Grid>
+            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Localização"
                 tipo="text"
-                dados={unidadeMedida}
-                field="nome"
-                setState={setUnidadeMedida}
+                dados={produto}
+                field="localizacao"
+                setState={setProduto}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={35}
+                maxLength={10}
+              />
+            </Grid>
+            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                type='number'
+                label="Largura"
+                dados={produto}
+                field="largura"
+                setState={setProduto}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+              />
+            </Grid>
+            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                type='number'
+                label="G/M²"
+                dados={produto}
+                field="gm2"
+                setState={setProduto}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+              />
+            </Grid>
+            <Grid item xs={12} md={3} sx={{ ml: 8, mt: 5 }}>
+              <InputText
+                label="Ativo"
+                tipo="checkbox"
+                dados={produto}
+                field="ativo"
+                setState={setProduto}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
@@ -320,7 +440,18 @@ export default function UnidadeMedida() {
             </Grid>
           </Condicional>
         </Grid>
-      </Paper>
-    </Container>
+      </Paper >
+      {/* {JSON.stringify(produto)} */}
+    </Container >
   )
 }
+
+{/* <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+      <InputMultiline
+        label="Dados adicionais..."
+        setState={setProduto}
+        dados={produto}
+        field="adicionais"
+        disabled={localState.action === 'excluindo' ? true : false}
+      />
+    </Grid> */}

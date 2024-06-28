@@ -18,19 +18,19 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 
-
-const ResetDados: PrazoEntregaInterface = {
-  nome: '',
-  dias: ''
-}
-interface PesquisaInterface {
-  nome: string
-}
-
 export default function prazoEntrega() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
+
+
+  const ResetDados: PrazoEntregaInterface = {
+    nome: '',
+    dias: ''
+  }
+  interface PesquisaInterface {
+    nome: string
+  }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
@@ -155,7 +155,7 @@ export default function prazoEntrega() {
         clsCrud.excluir({
           entidade: "PrazoEntrega",
           criterio: {
-            idprazoEntrega: prazoEntrega.idPrazoEntrega
+            idPrazoEntrega: prazoEntrega.idPrazoEntrega
           },
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState

@@ -23,7 +23,7 @@ export default class Produto implements ProdutoInterface {
   @Column()
   idUnidade: number
 
-  @JoinColumn({ name: 'idUnidade' })
+  @JoinColumn({ name: 'unidade' })
   @ManyToOne(() => UnidadeMedida, (unidadeMedida) => unidadeMedida.produtos)
   unidadeMedida: UnidadeMedida
 
@@ -42,7 +42,7 @@ export default class Produto implements ProdutoInterface {
   @Column()
   idTipoProduto: number
 
-  @JoinColumn({ name: 'idTipoProduto' })
+  @JoinColumn({ name: 'tipoProduto' })
   @ManyToOne(() => TipoProduto, (tipoProduto) => tipoProduto.produtos)
   tipoProduto: TipoProduto
 

@@ -19,6 +19,10 @@ var UnidadeMedida = /** @class */ (function () {
         __metadata("design:type", Number)
     ], UnidadeMedida.prototype, "idUnidade", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ length: 2 }),
+        __metadata("design:type", String)
+    ], UnidadeMedida.prototype, "sigla", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ length: 35 }),
         __metadata("design:type", String)
     ], UnidadeMedida.prototype, "nome", void 0);

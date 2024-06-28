@@ -73,6 +73,46 @@ var ClsCrudController = /** @class */ (function () {
             });
         });
     };
+    ClsCrudController.prototype.query = function (_a) {
+        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select;
+        return __awaiter(this, void 0, void 0, function () {
+            var where;
+            return __generator(this, function (_b) {
+                where = {};
+                where = __assign({}, criterio);
+                camposLike.forEach(function (campo) {
+                    where[campo] = (0, typeorm_1.Like)(where[campo]);
+                });
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(entidade)
+                        .find({
+                        where: where,
+                        select: select,
+                        relations: ['tipoProduto']
+                    })
+                        .then(function (rs) {
+                        return {
+                            ok: true,
+                            mensagem: 'Pesquisa Concluída',
+                            dados: rs
+                        };
+                    })
+                    // return AppDataSource.getRepository(entidade)
+                    //   .createQueryBuilder('produto')
+                    //   .leftJoinAndSelect('produto.tipoProduto', 'tipoProduto')
+                    //   .where(where)
+                    //   .select(select)
+                    //   .getRawMany()
+                    //   .then((rs) => {
+                    //     return {
+                    //       ok: true,
+                    //       mensagem: 'Pesquisa Concluída',
+                    //       dados: rs
+                    //     }
+                    //   })
+                ];
+            });
+        });
+    };
     ClsCrudController.prototype.pesquisar = function (_a) {
         var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select;
         return __awaiter(this, void 0, void 0, function () {
@@ -84,7 +124,10 @@ var ClsCrudController = /** @class */ (function () {
                     where[campo] = (0, typeorm_1.Like)(where[campo]);
                 });
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(entidade)
-                        .find({ where: where, select: select })
+                        .find({
+                        where: where,
+                        select: select
+                    })
                         .then(function (rs) {
                         return {
                             ok: true,

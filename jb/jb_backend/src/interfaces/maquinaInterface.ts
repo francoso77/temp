@@ -1,6 +1,6 @@
 export interface MaquinaInterface {
   idMaquina?: number
-  descricao: string
+  nome: string
   marca: string
   tipoTear: string
   kitElastano: boolean

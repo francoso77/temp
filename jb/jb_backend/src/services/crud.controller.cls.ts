@@ -22,6 +22,45 @@ export default class ClsCrudController {
       });
   }
 
+  public async query({ entidade, criterio, camposLike, select }: PadraoPesquisaInterface):
+    Promise<RespostaPadraoInterface<any>> {
+
+    let where: Record<string, any> = {}
+    where = { ...criterio }
+
+    camposLike.forEach((campo) => {
+      where[campo] = Like(where[campo])
+    })
+
+    return AppDataSource.getRepository(entidade)
+      .find({
+        where: where,
+        select: select,
+        relations: ['tipoProduto']
+      })
+      .then((rs) => {
+        return {
+          ok: true,
+          mensagem: 'Pesquisa Concluída',
+          dados: rs
+        }
+      })
+
+    // return AppDataSource.getRepository(entidade)
+    //   .createQueryBuilder('produto')
+    //   .leftJoinAndSelect('produto.tipoProduto', 'tipoProduto')
+    //   .where(where)
+    //   .select(select)
+    //   .getRawMany()
+    //   .then((rs) => {
+    //     return {
+    //       ok: true,
+    //       mensagem: 'Pesquisa Concluída',
+    //       dados: rs
+    //     }
+    //   })
+  }
+
   public async pesquisar({ entidade, criterio, camposLike, select }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
 
@@ -33,7 +72,10 @@ export default class ClsCrudController {
     })
 
     return AppDataSource.getRepository(entidade)
-      .find({ where: where, select: select })
+      .find({
+        where: where,
+        select: select
+      })
       .then((rs) => {
         return {
           ok: true,
@@ -66,4 +108,5 @@ export default class ClsCrudController {
         };
       });
   }
+  // .leftJoinAndSelect(`create.${join}`, join)
 }

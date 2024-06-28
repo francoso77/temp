@@ -9,7 +9,7 @@ export default class Maquina implements MaquinaInterface {
   idMaquina: number
 
   @Column({ length: 35 })
-  descricao: string
+  nome: string
 
   @Column({ length: 15 })
   marca: string

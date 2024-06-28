@@ -23,12 +23,27 @@ export class CrudController {
     return new ClsCrudController().incluir(criterio, entidade)
   }
 
+  @Post("query")
+  query(
+    @Body("entidade") entidade: string,
+    @Body("criterio") criterio: Record<string, any>,
+    @Body("camposLike") camposLike: Array<string>,
+    @Body("select") select: Array<string>,
+  ): Promise<RespostaPadraoInterface<any>> {
+    return new ClsCrudController().query({
+      entidade: entidade,
+      criterio: criterio,
+      camposLike: camposLike ? camposLike : [],
+      select: select ? select : [],
+    });
+  }
+
   @Post("pesquisar")
   pesquisar(
     @Body("entidade") entidade: string,
     @Body("criterio") criterio: Record<string, any>,
     @Body("camposLike") camposLike: Array<string>,
-    @Body("select") select: Array<string>
+    @Body("select") select: Array<string>,
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({
       entidade: entidade,

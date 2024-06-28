@@ -130,6 +130,23 @@ export default class ClsValidacao {
 
   }
 
+
+  /**
+   * Valida se o campo é um número inteiro ou decimal
+   * @param _eNUMERO number
+   * @returns Retorna se é um número inteiro ou decimal correto
+   */
+  public eNUMERO(_eNUMERO: number): boolean {
+    if (!_eNUMERO) {
+      return false
+    }
+    else {
+      return true
+    }
+
+  }
+
+
   /**
    * Verifica se é um telefone válido - padrão BR | 11 ou 12 dígitos (com DDD)
    * @param campo Nome do campo a ser testado

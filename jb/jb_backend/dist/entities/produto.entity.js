@@ -35,7 +35,7 @@ var Produto = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Produto.prototype, "idUnidade", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idUnidade' }),
+        (0, typeorm_1.JoinColumn)({ name: 'unidade' }),
         (0, typeorm_1.ManyToOne)(function () { return unidadeMedida_entity_1.default; }, function (unidadeMedida) { return unidadeMedida.produtos; }),
         __metadata("design:type", unidadeMedida_entity_1.default)
     ], Produto.prototype, "unidadeMedida", void 0);
@@ -60,7 +60,7 @@ var Produto = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Produto.prototype, "idTipoProduto", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idTipoProduto' }),
+        (0, typeorm_1.JoinColumn)({ name: 'tipoProduto' }),
         (0, typeorm_1.ManyToOne)(function () { return tipoProduto_entity_1.default; }, function (tipoProduto) { return tipoProduto.produtos; }),
         __metadata("design:type", tipoProduto_entity_1.default)
     ], Produto.prototype, "tipoProduto", void 0);

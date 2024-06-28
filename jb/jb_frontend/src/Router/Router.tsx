@@ -10,6 +10,9 @@ import Campeonato from '../Views/Crud/Campeonatos';
 import Prova from '../Views/Crud/Provas';
 import Cor from '../Views/Crud/Cor';
 import UnidadeMedida from '../Views/Crud/UnidadeMedida';
+import TipoProduto from '../Views/Crud/TipoProduto';
+import Maquina from '../Views/Crud/Maquina';
+import Produto from '../Views/Crud/Produto';
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +62,18 @@ export const router = createBrowserRouter([
       {
         path: "/UnidadeMedida",
         element: <UnidadeMedida />,
+      },
+      {
+        path: "/TipoProduto",
+        element: <TipoProduto />,
+      },
+      {
+        path: "/Maquina",
+        element: <Maquina />,
+      },
+      {
+        path: "/Produto",
+        element: <Produto />,
       },
     ]
   },

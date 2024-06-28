@@ -7,6 +7,6 @@ export interface RespostaPadraoInterface<T> {
 export interface PadraoPesquisaInterface {
   entidade: string,
   criterio: Record<string, any>,
-  camposLike?: Array<string>,
-  select?: Array<string>
+  camposLike?: Array<any>,
+  select?: Array<any>,
 }

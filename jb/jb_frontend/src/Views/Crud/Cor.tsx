@@ -19,17 +19,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 
 
-const ResetDados: CorInterface = {
-  nome: ''
-}
-interface PesquisaInterface {
-  nome: string
-}
-
 export default function Cor() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
+
+  const ResetDados: CorInterface = {
+    nome: ''
+  }
+  interface PesquisaInterface {
+    nome: string
+  }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })

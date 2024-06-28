@@ -5,7 +5,7 @@ import Text from '../Componentes/Text';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../ContextoGlobal/MensagemState';
-import { UserInterface } from '../../../tambordog-backend/src/interfaces/userInterface';
+import { UserInterface } from '../../../jb_backend/src/interfaces/userInterface';
 import ClsCrud from '../Utils/ClsCrudApi';
 
 const APPLE: string = '/apple.png';
@@ -18,7 +18,6 @@ export default function Login() {
   const [dados, setDados] = useState({ cpf: '', senha: '' })
   const clsCrud = new ClsCrud()
   const clsValidacao: ClsValidacao = new ClsValidacao()
-  const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
@@ -49,7 +48,7 @@ export default function Login() {
         .then((rs: Array<UserInterface>) => {
           if (dados.cpf === rs[0].cpf && dados.senha === rs[0].senha) {
             contextGlobal.setUsuarioState({
-              usuario: rs[0].idUser ? rs[0].idUser : 'sem id',
+              usuario: rs[0].cpf ? rs[0].cpf : 'sem id',
               logado: true
             })
             contextGlobal.setLayoutState({

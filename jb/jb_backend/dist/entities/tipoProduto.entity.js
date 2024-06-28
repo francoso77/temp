@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var produto_entity_1 = require("./produto.entity");
-var tipoProdutoTypes_1 = require("../types/tipoProdutoTypes");
 var TipoProduto = /** @class */ (function () {
     function TipoProduto() {
     }
@@ -23,10 +22,6 @@ var TipoProduto = /** @class */ (function () {
         (0, typeorm_1.Column)({ length: 35 }),
         __metadata("design:type", String)
     ], TipoProduto.prototype, "nome", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", Number)
-    ], TipoProduto.prototype, "tipo", void 0);
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return produto_entity_1.default; }, function (produto) { return produto.tipoProduto; }),
         __metadata("design:type", Array)

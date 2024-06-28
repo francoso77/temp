@@ -28,6 +28,69 @@ interface dadosCepInterface {
 
 export default class ClsCrud {
 
+  public query({
+    entidade,
+    criterio,
+    camposLike,
+    select,
+    msg = 'Pesquisando...',
+    cb,
+    setMensagemState
+  }: PropsInterface): Promise<Array<any>> {
+    const dados: PadraoPesquisaInterface = {
+      entidade: entidade,
+      criterio: criterio,
+      camposLike: camposLike,
+      select: select,
+    }
+
+    const config: AxiosRequestConfig = {
+      maxBodyLength: Infinity,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+
+    if (setMensagemState) {
+      setMensagemState({
+        titulo: msg,
+        exibir: true,
+        mensagem: '',
+        tipo: MensagemTipo.Loading,
+        exibirBotao: false,
+        cb: null
+      })
+    }
+    return axios
+      .post<RespostaPadraoInterface<Array<any>>>(
+        "http://localhost:4000/query",
+        dados,
+        config
+      )
+      .then((rs) => {
+        if (rs.data.ok && setMensagemState) {
+          setMensagemState({
+            titulo: '',
+            exibir: false,
+            mensagem: '',
+            tipo: MensagemTipo.Info,
+            exibirBotao: false,
+            cb: null
+          })
+        } else if (!rs.data.ok && setMensagemState) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Erro ao pesquisar!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+        }
+        return rs.data.dados as any
+      })
+  }
+
   public pesquisar({
     entidade,
     criterio,
@@ -41,7 +104,7 @@ export default class ClsCrud {
       entidade: entidade,
       criterio: criterio,
       camposLike: camposLike,
-      select: select
+      select: select,
     }
 
     const config: AxiosRequestConfig = {
