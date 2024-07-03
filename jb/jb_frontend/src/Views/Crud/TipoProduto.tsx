@@ -1,6 +1,5 @@
 import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
 // import { styled } from '@mui/system';
-import Text from '../../Componentes/Text';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +15,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
-import ComboBox from '../../Componentes/ComboBox';
+import InputText from '../../Componentes/InputText';
 
 
 
@@ -111,64 +110,91 @@ export default function TipoProduto() {
   }
 
   const validarDados = (): boolean => {
+
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
     retorno = validaCampo.naoVazio('nome', tipoProduto, erros, retorno, 'Nome do tipo de produto não pode ser vázio')
     setErros(erros)
     return retorno
+
   }
 
   const btConfirmar = () => {
-    if (validarDados()) {
 
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-        clsCrud.incluir({
-          entidade: "TipoProduto",
-          criterio: tipoProduto,
-          localState: localState.action,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
+    clsCrud
+      .pesquisar({
+        entidade: "TipoProduto",
+        criterio: {
+          nome: "%".concat(tipoProduto.nome).concat("%"),
+        },
+        camposLike: ["nome"],
+        select: ["idTipoProduto", "nome"],
+        msg: 'Pesquisando tipos de Produtos ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs) => {
+        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Item já cadastrado!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
           })
-      } else if (localState.action === actionTypes.excluindo) {
-        clsCrud.excluir({
-          entidade: "TipoProduto",
-          criterio: {
-            idTipoProduto: tipoProduto.idTipoProduto
-          },
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
+        } else {
+
+          if (validarDados()) {
+            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+              clsCrud.incluir({
+                entidade: "TipoProduto",
+                criterio: tipoProduto,
+                localState: localState.action,
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
               })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
+            } else if (localState.action === actionTypes.excluindo) {
+              clsCrud.excluir({
+                entidade: "TipoProduto",
+                criterio: {
+                  idTipoProduto: tipoProduto.idTipoProduto
+                },
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
+              })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
             }
-          })
-      }
-    }
+          }
+        }
+      })
   }
 
   const irPara = useNavigate()
@@ -176,7 +202,7 @@ export default function TipoProduto() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Tipo de Produto',
+      tituloAnterior: 'Cadastro de Tipos de Produto',
       pathTitulo: '/',
       pathTituloAnterior: '/TipoProduto'
     })
@@ -204,16 +230,16 @@ export default function TipoProduto() {
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
-              <Text
+              <InputText
                 label="Digite o nome"
-                tipo="text"
                 dados={pesquisa}
                 field="nome"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => { btPesquisar() }}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autofocus
+                tipo="uppercase"
+                autoFocus
               />
             </Grid>
             <Grid item xs={1}>
@@ -253,16 +279,16 @@ export default function TipoProduto() {
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
             <Grid item xs={12}>
-              <Text
+              <InputText
                 label="Nome"
-                tipo="text"
+                tipo="uppercase"
                 dados={tipoProduto}
                 field="nome"
                 setState={setTipoProduto}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
                 maxLength={35}
-                autofocus
+                autoFocus
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

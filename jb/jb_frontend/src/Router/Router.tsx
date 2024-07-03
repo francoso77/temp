@@ -13,6 +13,7 @@ import UnidadeMedida from '../Views/Crud/UnidadeMedida';
 import TipoProduto from '../Views/Crud/TipoProduto';
 import Maquina from '../Views/Crud/Maquina';
 import Produto from '../Views/Crud/Produto';
+import Pessoa from '../Views/Crud/Pessoa';
 
 export const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ export const router = createBrowserRouter([
       {
         path: "/Produto",
         element: <Produto />,
+      },
+      {
+        path: "/Pessoa",
+        element: <Pessoa />,
       },
     ]
   },

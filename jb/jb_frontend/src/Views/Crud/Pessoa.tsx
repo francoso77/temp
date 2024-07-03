@@ -1,12 +1,11 @@
 import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { MaquinaInterface } from '../../../../jb_backend/src/interfaces/maquinaInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
@@ -16,74 +15,72 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
+import ComboBox from '../../Componentes/ComboBox';
+import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { PessoaTypes } from '../../types/pessoaTypes';
 
 
-export default function Maquina() {
+export default function Pessoa() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const ResetDados: MaquinaInterface = {
+  const ResetDados: PessoaInterface = {
     nome: '',
-    marca: '',
-    tipoTear: '',
-    kitElastano: false,
-    modelo: '',
-    serie: '',
-    qtdAgulhas: 0,
-    qtdAlimentadores: 0,
-    diametro: 0,
-    espessura: 0,
-    platina: '',
-    correia: '',
-    agulha: '',
-    dataPreventiva: '',
-    ativo: true,
+    apelido: '',
+    cpf_cnpj: '',
+    endereco: '',
+    numero: 0,
+    bairro: '',
+    cidade: '',
+    uf: '',
+    cep: '',
+    telefone: '',
+    whatsapp: '',
+    email: '',
+    comissao: 0,
+    tipoPessoa: PessoaTypes.cliente,
+    ativo: true
   }
   interface PesquisaInterface {
     nome: string
   }
-
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<MaquinaInterface>>([])
+  const [rsPesquisa, setRsPesquisa] = useState<Array<PessoaInterface>>([])
   const [erros, setErros] = useState({})
-  const [maquina, setMaquina] = useState<MaquinaInterface>(ResetDados)
+  const [pessoa, setPessoa] = useState<PessoaInterface>(ResetDados)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Nome',
+      cabecalho: 'pessoa',
       alinhamento: 'left',
       campo: 'nome'
     },
-
     {
-      cabecalho: 'Tear',
+      cabecalho: 'Apelido',
       alinhamento: 'left',
-      campo: 'tipoTear'
-    },
-
-    {
-      cabecalho: 'Modelo',
-      alinhamento: 'left',
-      campo: 'modelo'
+      campo: 'apelido'
     },
     {
-      cabecalho: 'Próxima Preventiva',
+      cabecalho: 'Tipo de Pessoa',
       alinhamento: 'left',
-      campo: 'dataPreventiva',
-      format: (data) => clsFormatacao.dataISOtoUser(data)
+      campo: 'tipoPessoa',
+      format: (tipo) =>
+        tipo === 'C' ? 'CLIENTE'
+          : tipo === 'F' ? 'FORNECEDOR'
+            : tipo === 'R' ? 'REVISADOR'
+              : tipo === 'T' ? 'TECELÃO' : 'VENDEDOR'
     },
     {
-      cabecalho: 'Ativo',
+      cabecalho: 'Whatsapp',
       alinhamento: 'left',
-      campo: 'ativo',
-      format: (v: boolean) => { return v ? 'Sim' : 'Não' }
+      campo: 'whatsapp'
     },
   ]
 
@@ -96,59 +93,54 @@ export default function Maquina() {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<MaquinaInterface> => {
+  const pesquisarID = (id: string | number): Promise<PessoaInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "Maquina",
+        entidade: "Pessoa",
         criterio: {
-          idMaquina: id,
+          idPessoa: id,
         },
       })
-      .then((rs: Array<MaquinaInterface>) => {
+      .then((rs: Array<PessoaInterface>) => {
         return rs[0]
       })
   }
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setMaquina(rs)
+      setPessoa(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setMaquina(rs)
+      setPessoa(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
 
   const btIncluir = () => {
-    setMaquina(ResetDados)
-    setLocalState({ action: actionTypes.incluindo })
+    setPessoa(ResetDados)
+    setLocalState({ action: actionTypes.pessoa })
   }
   const btCancelar = () => {
     setErros({})
-    setMaquina(ResetDados)
+    setPessoa(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
-
-    retorno = validaCampo.naoVazio('nome', maquina, erros, retorno, 'Nome ds máquina não pode ser vázio')
-    retorno = validaCampo.naoVazio('marca', maquina, erros, retorno, 'Informe a marca do tear')
-    retorno = validaCampo.naoVazio('tipoTear', maquina, erros, retorno, 'Qual o tipo do tear')
-    retorno = validaCampo.naoVazio('modelo', maquina, erros, retorno, 'Informe o modelo do tear')
-    retorno = validaCampo.naoVazio('serie', maquina, erros, retorno, 'Informe o número de série')
-    retorno = validaCampo.naoVazio('qtdAgulhas', maquina, erros, retorno, 'Deve ser maior que zero')
-    retorno = validaCampo.naoVazio('qtdAlimentadores', maquina, erros, retorno, 'Deve ser maior que zero')
-    retorno = validaCampo.naoVazio('diametro', maquina, erros, retorno, 'Deve ser maior que zero')
-    retorno = validaCampo.naoVazio('espessura', maquina, erros, retorno, 'Deve ser maior que zero')
-    retorno = validaCampo.naoVazio('platina', maquina, erros, retorno, 'Qual o tipo de platina')
-    retorno = validaCampo.naoVazio('correia', maquina, erros, retorno, 'Qual o tipo de correia')
-    retorno = validaCampo.naoVazio('agulha', maquina, erros, retorno, 'Qual o tipo de agulha')
-    retorno = validaCampo.eData('dataPreventiva', maquina, erros, retorno,)
-
+    retorno = validaCampo.naoVazio('nome', pessoa, erros, retorno, 'Nome da pessoa não pode ser vázio')
+    retorno = validaCampo.naoVazio('cep', pessoa, erros, retorno, 'Informe um CEP válido')
+    retorno = validaCampo.eTelefone('telefone', pessoa, erros, retorno, false)
+    retorno = validaCampo.eTelefone('whatsapp', pessoa, erros, retorno, false)
+    retorno = validaCampo.eEmail('email', pessoa, erros, retorno, false)
+    retorno = validaCampo.naoVazio('endereco', pessoa, erros, retorno, 'Informe um endereço')
+    retorno = validaCampo.naoVazio('numero', pessoa, erros, retorno, 'Número inválido')
+    retorno = validaCampo.naoVazio('bairro', pessoa, erros, retorno, 'Informe um bairro')
+    retorno = validaCampo.naoVazio('cidade', pessoa, erros, retorno, 'Informe a cidade')
+    retorno = validaCampo.eUF('uf', pessoa, erros, retorno, false)
     setErros(erros)
     return retorno
   }
@@ -157,13 +149,14 @@ export default function Maquina() {
 
     clsCrud
       .pesquisar({
-        entidade: "Maquina",
+        entidade: "Pessoa",
         criterio: {
-          nome: "%".concat(maquina.nome).concat("%"),
+          nome: "%".concat(pessoa.nome).concat("%"),
+          tipoPessoa: pessoa.tipoPessoa
         },
         camposLike: ["nome"],
         select: ["nome"],
-        msg: 'Pesquisando máquinas ...',
+        msg: 'Pesquisando pessoas ...',
         setMensagemState: setMensagemState
       })
       .then((rs) => {
@@ -182,8 +175,8 @@ export default function Maquina() {
 
             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
               clsCrud.incluir({
-                entidade: "Maquina",
-                criterio: maquina,
+                entidade: "Pessoa",
+                criterio: pessoa,
                 localState: localState.action,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
@@ -204,9 +197,9 @@ export default function Maquina() {
                 })
             } else if (localState.action === actionTypes.excluindo) {
               clsCrud.excluir({
-                entidade: "Maquina",
+                entidade: "Pessoa",
                 criterio: {
-                  idMaquina: maquina.idMaquina
+                  idPessoa: pessoa.idPessoa
                 },
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
@@ -234,33 +227,33 @@ export default function Maquina() {
   const btPesquisar = () => {
     clsCrud
       .pesquisar({
-        entidade: "Maquina",
+        entidade: "Pessoa",
         criterio: {
           nome: "%".concat(pesquisa.nome).concat("%"),
         },
         camposLike: ["nome"],
-        select: [
-          "idMaquina",
-          "nome",
-          "marca",
-          "tipoTear",
-          "kitElastano",
-          "modelo",
-          "serie",
-          "qtdAgulhas",
-          "qtdAlimentadores",
-          "diametro",
-          "espessura",
-          "platina",
-          "correia",
-          "agulha",
-          "dataPreventiva",
-          "ativo",
-        ],
-        msg: 'Pesquisando máquinas ...',
+        // select: [
+        //   "idPessoa",
+        //   "nome",
+        //   "telefone",
+        //   "whatsapp",
+        //   "email",
+        //   'endereco',
+        //   'numero',
+        //   'bairro',
+        //   'cidade',
+        //   'uf',
+        //   'cep',
+        //   'apelido',
+        //   'cpf_cnpj',
+        //   'comissao',
+        //   'tipoPessoa',
+        //   'ativo'
+        // ],
+        msg: 'Pesquisando pessoas ...',
         setMensagemState: setMensagemState
       })
-      .then((rs: Array<MaquinaInterface>) => {
+      .then((rs: Array<PessoaInterface>) => {
         setRsPesquisa(rs)
       })
   }
@@ -268,11 +261,49 @@ export default function Maquina() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Cadastro de Máquinas',
+      tituloAnterior: 'Cadastro de Pessoas',
       pathTitulo: '/',
-      pathTituloAnterior: '/Maquina'
+      pathTituloAnterior: '/Pessoa'
     })
     irPara('/')
+  }
+
+  const btBuscaCep = () => {
+    if (!pessoa.cep || pessoa.cep.length < 10) {
+      setMensagemState({
+        titulo: "Erro...",
+        exibir: true,
+        mensagem: 'CEP inválido para pesquisa',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    } else {
+      clsCrud.verificaCEP({ CEP: pessoa.cep, setMensagemState: setMensagemState })
+        .then((temCep) => {
+          if (temCep) {
+            pessoa.endereco = clsCrud.tmp_eCEP.logradouro
+            pessoa.bairro = clsCrud.tmp_eCEP.bairro
+            pessoa.cidade = clsCrud.tmp_eCEP.localidade
+            pessoa.uf = clsCrud.tmp_eCEP.uf
+          }
+          else {
+            pessoa.endereco = ''
+            pessoa.bairro = ''
+            pessoa.cidade = ''
+            pessoa.uf = ''
+          }
+        }).catch((e) => {
+          setMensagemState({
+            titulo: "Erro...",
+            exibir: true,
+            mensagem: 'Erro na conexão com o servidor de cep!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+        })
+    }
   }
 
   return (
@@ -319,14 +350,14 @@ export default function Maquina() {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: MaquinaInterface) =>
-                      onEditar(rs.idMaquina as number),
+                    onAcionador: (rs: PessoaInterface) =>
+                      onEditar(rs.idPessoa as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: MaquinaInterface) =>
-                      onExcluir(rs.idMaquina as number),
+                    onAcionador: (rs: PessoaInterface) =>
+                      onExcluir(rs.idPessoa as number),
                     toolTip: "Excluir",
                   },
                 ]}
@@ -336,181 +367,178 @@ export default function Maquina() {
               />
             </Grid>
           </Condicional>
-
+          <Condicional condicao={localState.action === 'pessoa'}>
+            oi
+            {/* <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
+              <InputText
+                label="Ativo"
+                tipo="checkbox"
+                dados={pessoa}
+                field="ativo"
+                setState={setPessoa}
+                disabled={localState.action === 'excluindo' ? true : false}
+              />
+            </Grid> */}
+          </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
               <InputText
                 label="Ativo"
                 tipo="checkbox"
-                dados={maquina}
+                dados={pessoa}
                 field="ativo"
-                setState={setMaquina}
+                setState={setPessoa}
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Nome"
+                label="pessoa"
                 tipo="uppercase"
-                dados={maquina}
+                dados={pessoa}
                 field="nome"
-                setState={setMaquina}
+                setState={setPessoa}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={35}
+                maxLength={50}
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Marca"
+                label="pessoa"
                 tipo="uppercase"
-                dados={maquina}
-                field="marca"
-                setState={setMaquina}
+                dados={pessoa}
+                field="apelido"
+                setState={setPessoa}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={15}
+                maxLength={25}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={4} sx={{ mt: 2 }}>
               <InputText
-                label="Tipo Tear"
-                tipo="uppercase"
-                dados={maquina}
-                field="tipoTear"
-                setState={setMaquina}
+                label={pessoa.tipoPessoa === 'C' ? "CPF" : "CNPJ"}
+                mask={pessoa.tipoPessoa === 'C' ? "cpf" : "cnpj"}
+                setState={setPessoa}
+                dados={pessoa}
+                field="cpf_cnpj"
+                erros={erros}
+                type='tel'
+                disabled={localState.action === 'excluindo' ? true : false}
+              />
+            </Grid>
+            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="CEP"
+                mask='cep'
+                dados={pessoa}
+                field="cep"
+                setState={setPessoa}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={15}
+                iconeEnd='searchicon'
+                onClickIconeEnd={() => btBuscaCep()}
+                mapKeyPress={[{ key: 'Enter', onKey: btBuscaCep }]}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={9} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Modelo"
+                label="Endereço"
                 tipo="uppercase"
-                dados={maquina}
-                field="modelo"
-                setState={setMaquina}
+                dados={pessoa}
+                field="endereco"
+                setState={setPessoa}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={15}
+                maxLength={100}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Série"
-                tipo="uppercase"
-                dados={maquina}
-                field="serie"
-                setState={setMaquina}
+                label="Número"
+                tipo="number"
+                type='tel'
+                dados={pessoa}
+                field="numero"
+                setState={setPessoa}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                maxLength={15}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={9} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Próxima Preventiva"
-                setState={setMaquina}
-                dados={maquina}
-                field="dataPreventiva"
+                label="Bairro"
+                tipo="uppercase"
+                dados={pessoa}
+                field="bairro"
+                setState={setPessoa}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+                maxLength={60}
+              />
+            </Grid>
+            <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Cidade"
+                tipo="uppercase"
+                dados={pessoa}
+                field="cidade"
+                setState={setPessoa}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+                maxLength={60}
+              />
+            </Grid>
+            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="UF"
+                tipo="uppercase"
+                dados={pessoa}
+                field="uf"
+                setState={setPessoa}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+                maxLength={2}
+              />
+            </Grid>
+            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                label="Telefone"
+                setState={setPessoa}
+                dados={pessoa}
+                field="telefone"
                 erros={erros}
                 type="tel"
-                tipo='date'
+                mask='tel'
                 disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Platina"
-                tipo="uppercase"
-                dados={maquina}
-                field="platina"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
-            </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Correia"
-                tipo="uppercase"
-                dados={maquina}
-                field="correia"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
-            </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Agulha"
-                tipo="uppercase"
-                dados={maquina}
-                field="agulha"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
               />
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Qtd Agulhas"
-                tipo="number"
-                dados={maquina}
-                field="qtdAgulhas"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
+                label="WhatsApp"
+                setState={setPessoa}
+                dados={pessoa}
+                field="whatsapp"
                 erros={erros}
+                type="tel"
+                mask='tel'
+                disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="Qtd Alimentadores"
-                tipo="number"
-                dados={maquina}
-                field="qtdAlimentadores"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
+                label="E-mail"
+                setState={setPessoa}
+                dados={pessoa}
+                field="email"
                 erros={erros}
-              />
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Diâmetro"
-                tipo="number"
-                dados={maquina}
-                field="diametro"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Espessura"
-                tipo="number"
-                dados={maquina}
-                field="espessura"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
-            </Grid>
-            <Grid item xs={12} sm={3} md={3} sx={{ textAlign: 'left' }}>
-              <InputText
-                label="Kit Elastano?"
-                tipo="checkbox"
-                dados={maquina}
-                field="kitElastano"
-                setState={setMaquina}
+                type="email"
+                tipo="text"
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
+
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
@@ -548,6 +576,17 @@ export default function Maquina() {
           </Condicional>
         </Grid>
       </Paper >
+      {/* {JSON.stringify(pessoa)} */}
     </Container >
   )
 }
+
+{/* <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+      <InputMultiline
+        label="Dados adicionais..."
+        setState={setPessoa}
+        dados={pessoa}
+        field="adicionais"
+        disabled={localState.action === 'excluindo' ? true : false}
+      />
+    </Grid> */}

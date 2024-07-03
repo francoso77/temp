@@ -1,6 +1,5 @@
 import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
 // import { styled } from '@mui/system';
-import Text from '../../Componentes/Text';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +15,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
+import InputText from '../../Componentes/InputText';
 
 export default function UnidadeMedida() {
 
@@ -127,55 +127,80 @@ export default function UnidadeMedida() {
   }
 
   const btConfirmar = () => {
-    if (validarDados()) {
 
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-        clsCrud.incluir({
-          entidade: "UnidadeMedida",
-          criterio: unidadeMedida,
-          localState: localState.action,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
+    clsCrud
+      .pesquisar({
+        entidade: "UnidadeMedida",
+        criterio: {
+          nome: "%".concat(unidadeMedida.nome).concat("%"),
+        },
+        camposLike: ["nome"],
+        select: ["nome"],
+        msg: 'Pesquisando unidades de medidas ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs) => {
+        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Item já cadastrado!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
           })
-      } else if (localState.action === actionTypes.excluindo) {
-        clsCrud.excluir({
-          entidade: "UnidadeMedida",
-          criterio: {
-            idUnidade: unidadeMedida.idUnidade
-          },
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
+        } else {
+          if (validarDados()) {
+
+            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+              clsCrud.incluir({
+                entidade: "UnidadeMedida",
+                criterio: unidadeMedida,
+                localState: localState.action,
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
               })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
+            } else if (localState.action === actionTypes.excluindo) {
+              clsCrud.excluir({
+                entidade: "UnidadeMedida",
+                criterio: {
+                  idUnidade: unidadeMedida.idUnidade
+                },
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
+              })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
             }
-          })
-      }
-    }
+          }
+        }
+      })
   }
 
   const irPara = useNavigate()
@@ -183,7 +208,7 @@ export default function UnidadeMedida() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Unidade Medida',
+      tituloAnterior: 'Cadastro de Unidades Medida',
       pathTitulo: '/',
       pathTituloAnterior: '/UnidadeMedida'
     })
@@ -211,16 +236,16 @@ export default function UnidadeMedida() {
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
-              <Text
+              <InputText
                 label="Digite o nome"
-                tipo="text"
+                tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => { btPesquisar() }}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autofocus
+                autoFocus
               />
             </Grid>
             <Grid item xs={1}>
@@ -260,22 +285,22 @@ export default function UnidadeMedida() {
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
             <Grid item xs={12}>
-              <Text
+              <InputText
                 label="Sigla"
-                tipo="text"
+                tipo="uppercase"
                 dados={unidadeMedida}
                 field="sigla"
                 setState={setUnidadeMedida}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
                 maxLength={2}
-                autofocus
+                autoFocus
               />
             </Grid>
             <Grid item xs={12}>
-              <Text
+              <InputText
                 label="Nome"
-                tipo="text"
+                tipo="uppercase"
                 dados={unidadeMedida}
                 field="nome"
                 setState={setUnidadeMedida}

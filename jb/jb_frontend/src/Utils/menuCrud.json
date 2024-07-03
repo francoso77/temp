@@ -2,35 +2,42 @@
   {
     "id": 1,
     "menu": "Cores",
-    "icon": "person_outline_outlined",
+    "icon": "color_lens",
     "path": "/Cor",
     "titulo": "Cadastro de Cores"
   },
   {
     "id": 2,
+    "menu": "Pessoas",
+    "icon": "groups_rounded",
+    "path": "/Pessoa",
+    "titulo": "Cadastro de Pessoas"
+  },
+  {
+    "id": 3,
     "menu": "Máquinas",
-    "icon": "pets",
+    "icon": "miscellaneous_services",
     "path": "/Maquina",
     "titulo": "Cadastro de Máquinas"
   },
   {
-    "id": 3,
+    "id": 4,
     "menu": "Produtos",
-    "icon": "military_tech",
+    "icon": "category_rounded",
     "path": "/Produto",
     "titulo": "Cadastro de Produtos"
   },
   {
-    "id": 4,
+    "id": 5,
     "menu": "Tipos de Produto",
-    "icon": "emoji_events",
+    "icon": "article_rounded",
     "path": "/TipoProduto",
     "titulo": "Cadastro de Tipos de produtos"
   },
   {
-    "id": 5,
+    "id": 6,
     "menu": "Unidades de Medida",
-    "icon": "sports_score",
+    "icon": "square_foot",
     "path": "/UnidadeMedida",
     "titulo": "Cadastro de Unidades de Medida"
   }

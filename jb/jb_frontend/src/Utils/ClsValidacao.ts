@@ -304,6 +304,7 @@ export default class ClsValidacao {
 
   }
 
+
   public eUF(campo: string,
     dados: { [key: string]: any },
     erros: { [key: string]: string },

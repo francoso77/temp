@@ -9,4 +9,5 @@ export interface PadraoPesquisaInterface {
   criterio: Record<string, any>,
   camposLike?: Array<any>,
   select?: Array<any>,
+  joins?: { tabelaRelacao: string, relacao: string }[],
 }

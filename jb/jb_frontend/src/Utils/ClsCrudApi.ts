@@ -33,6 +33,7 @@ export default class ClsCrud {
     criterio,
     camposLike,
     select,
+    joins,
     msg = 'Pesquisando...',
     cb,
     setMensagemState
@@ -42,6 +43,7 @@ export default class ClsCrud {
       criterio: criterio,
       camposLike: camposLike,
       select: select,
+      joins: joins,
     }
 
     const config: AxiosRequestConfig = {

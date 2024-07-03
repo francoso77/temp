@@ -1,6 +1,5 @@
 import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
 // import { styled } from '@mui/system';
-import Text from '../../Componentes/Text';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +15,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
+import InputText from '../../Componentes/InputText';
 
 
 export default function prazoEntrega() {
@@ -127,55 +127,81 @@ export default function prazoEntrega() {
   }
 
   const btConfirmar = () => {
-    if (validarDados()) {
 
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-        clsCrud.incluir({
-          entidade: "PrazoEntrega",
-          criterio: prazoEntrega,
-          localState: localState.action,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
+    clsCrud
+      .pesquisar({
+        entidade: "PrazoEntrega",
+        criterio: {
+          nome: "%".concat(prazoEntrega.nome).concat("%"),
+        },
+        camposLike: ["nome"],
+        select: ["nome"],
+        msg: 'Pesquisando prazos de entrega ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs) => {
+        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Item já cadastrado!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
           })
-      } else if (localState.action === actionTypes.excluindo) {
-        clsCrud.excluir({
-          entidade: "PrazoEntrega",
-          criterio: {
-            idPrazoEntrega: prazoEntrega.idPrazoEntrega
-          },
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
+        } else {
+
+          if (validarDados()) {
+
+            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+              clsCrud.incluir({
+                entidade: "PrazoEntrega",
+                criterio: prazoEntrega,
+                localState: localState.action,
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
               })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
+            } else if (localState.action === actionTypes.excluindo) {
+              clsCrud.excluir({
+                entidade: "PrazoEntrega",
+                criterio: {
+                  idPrazoEntrega: prazoEntrega.idPrazoEntrega
+                },
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
+              })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
             }
-          })
-      }
-    }
+          }
+        }
+      })
   }
 
   const irPara = useNavigate()
@@ -183,7 +209,7 @@ export default function prazoEntrega() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Prazo de Entrega',
+      tituloAnterior: 'Cadastro de Prazo de Entrega',
       pathTitulo: '/',
       pathTituloAnterior: '/PrazoEntrega'
     })
@@ -211,16 +237,16 @@ export default function prazoEntrega() {
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
-              <Text
+              <InputText
                 label="Digite o nome"
-                tipo="text"
+                tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => { btPesquisar() }}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autofocus
+                autoFocus
               />
             </Grid>
             <Grid item xs={1}>
@@ -260,29 +286,28 @@ export default function prazoEntrega() {
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
             <Grid item xs={12}>
-              <Text
+              <InputText
                 label="Nome"
-                tipo="text"
+                tipo="uppercase"
                 dados={prazoEntrega}
                 field="nome"
                 setState={setPrazoEntrega}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
                 maxLength={35}
-                autofocus
+                autoFocus
               />
             </Grid>
             <Grid item xs={12}>
-              <Text
+              <InputText
                 label="Qtd de Dias"
-                tipo="text"
+                tipo="number"
                 dados={prazoEntrega}
                 field="dias"
                 setState={setPrazoEntrega}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
                 maxLength={35}
-                autofocus
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

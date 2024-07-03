@@ -22,7 +22,7 @@ export default class ClsCrudController {
       });
   }
 
-  public async query({ entidade, criterio, camposLike, select }: PadraoPesquisaInterface):
+  public async query({ entidade, criterio, camposLike, select, joins }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
 
     let where: Record<string, any> = {}
@@ -32,33 +32,26 @@ export default class ClsCrudController {
       where[campo] = Like(where[campo])
     })
 
-    return AppDataSource.getRepository(entidade)
-      .find({
-        where: where,
-        select: select,
-        relations: ['tipoProduto']
-      })
+    const repository = AppDataSource.getRepository(entidade)
+    let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
+
+    joins.forEach(join => {
+      queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
+    })
+
+    queryBuilder = queryBuilder
+      .where(where)
+      .select(select)
+
+    return queryBuilder.getRawMany()
       .then((rs) => {
+        console.log(rs)
         return {
           ok: true,
           mensagem: 'Pesquisa Concluída',
           dados: rs
         }
       })
-
-    // return AppDataSource.getRepository(entidade)
-    //   .createQueryBuilder('produto')
-    //   .leftJoinAndSelect('produto.tipoProduto', 'tipoProduto')
-    //   .where(where)
-    //   .select(select)
-    //   .getRawMany()
-    //   .then((rs) => {
-    //     return {
-    //       ok: true,
-    //       mensagem: 'Pesquisa Concluída',
-    //       dados: rs
-    //     }
-    //   })
   }
 
   public async pesquisar({ entidade, criterio, camposLike, select }: PadraoPesquisaInterface):
@@ -108,5 +101,4 @@ export default class ClsCrudController {
         };
       });
   }
-  // .leftJoinAndSelect(`create.${join}`, join)
 }

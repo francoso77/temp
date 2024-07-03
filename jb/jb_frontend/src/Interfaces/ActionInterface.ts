@@ -4,6 +4,7 @@ export enum actionTypes {
   excluindo = 'excluindo',
   incluindo = 'incluindo',
   detalhes = 'detalhes',
+  pessoa = 'pessoa'
 }
 
 export interface ActionInterface {

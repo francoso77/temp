@@ -24,12 +24,13 @@ var CrudController = /** @class */ (function () {
     CrudController.prototype.atualizar = function (criterio, entidade) {
         return new crud_controller_cls_1.default().incluir(criterio, entidade);
     };
-    CrudController.prototype.query = function (entidade, criterio, camposLike, select) {
+    CrudController.prototype.query = function (entidade, criterio, camposLike, select, joins) {
         return new crud_controller_cls_1.default().query({
             entidade: entidade,
             criterio: criterio,
             camposLike: camposLike ? camposLike : [],
             select: select ? select : [],
+            joins: joins,
         });
     };
     CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select) {
@@ -65,9 +66,10 @@ var CrudController = /** @class */ (function () {
         __param(1, (0, common_1.Body)("criterio")),
         __param(2, (0, common_1.Body)("camposLike")),
         __param(3, (0, common_1.Body)("select")),
+        __param(4, (0, common_1.Body)("joins")),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Object, Array,
-            Array]),
+            Array, Array]),
         __metadata("design:returntype", Promise)
     ], CrudController.prototype, "query", null);
     __decorate([

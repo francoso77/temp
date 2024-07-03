@@ -1,4 +1,3 @@
-import { timeStamp } from 'console';
 import { DateTime } from "luxon";
 
 export default class ClsFormatacao {
@@ -60,5 +59,9 @@ export default class ClsFormatacao {
     } else {
       return ""
     }
+  }
+
+  public dataTimeZoneZtoLocalInput(data: string): string {
+    return DateTime.fromISO(data).toFormat("yyyy-MM-dd'T'HH:mm")
   }
 }
