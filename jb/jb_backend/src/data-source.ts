@@ -29,7 +29,7 @@ export const AppDataSource = new DataSource({
   host: "localhost",
   port: 3306,
   username: "root",
-  password: "Frk@071569#",
+  password: "071569",
   database: "jb",
   synchronize: true,
   logging: false,

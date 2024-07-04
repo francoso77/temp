@@ -284,7 +284,7 @@ export default function Produto() {
 
   useEffect(() => {
     BuscarDados()
-  })
+  },[])
 
   return (
 
