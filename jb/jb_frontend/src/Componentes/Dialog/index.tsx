@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -9,16 +8,15 @@ import ListItemText from '@mui/material/ListItemText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
-import Typography from '@mui/material/Typography';
 import { blue } from '@mui/material/colors';
 
 export const pessoas = [
-    { nome: 'Cliente', codigo: 'C' },
-    { nome: 'Fornecedor', codigo: 'F' },
-    { nome: 'Revisador', codigo: 'R' },
-    { nome: 'Tecelão', codigo: 'T' },
-    { nome: 'Vendedor', codigo: 'V' }
+  { nome: 'Cliente PF', codigo: 'C' },
+  { nome: 'Cliente PJ', codigo: 'J' },
+  { nome: 'Fornecedor', codigo: 'F' },
+  { nome: 'Revisador', codigo: 'R' },
+  { nome: 'Tecelão', codigo: 'T' },
+  { nome: 'Vendedor', codigo: 'V' }
 
 ];
 
@@ -59,34 +57,3 @@ export default function SimpleDialog(props: SimpleDialogProps) {
     </Dialog>
   );
 }
-
-// export default function SimpleDialogDemo() {
-//   const [open, setOpen] = React.useState(true);
-//   const [selectedValue, setSelectedValue] = React.useState(pessoas[1].codigo);
-
-// //   const handleClickOpen = () => {
-// //     setOpen(true);
-// //   };
-
-//   const handleClose = (value: string) => {
-//     setOpen(false);
-//     setSelectedValue(value);
-//   };
-
-//   return (
-//     <div>
-//       {/* <Typography variant="subtitle1" component="div">
-//         Selected: {selectedValue}
-//       </Typography>
-//       <br />
-//       <Button variant="outlined" onClick={handleClickOpen}>
-//         Open simple dialog
-//       </Button> */}
-//       <SimpleDialog
-//         selectedValue={selectedValue}
-//         open={open}
-//         onClose={handleClose}
-//       />
-//     </div>
-//   );
-// }

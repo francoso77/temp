@@ -22,28 +22,46 @@ export default class ClsCrudController {
       });
   }
 
-  public async query({ entidade, criterio, camposLike, select, joins }: PadraoPesquisaInterface):
+  public async query({ entidade, sql }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
+    const repositorio = AppDataSource.getRepository(entidade)
 
-    let where: Record<string, any> = {}
-    where = { ...criterio }
+    // let where: Record<string, any> = {}
+    // where = { ...criterio }
 
-    camposLike.forEach((campo) => {
-      where[campo] = Like(where[campo])
-    })
+    // camposLike.forEach((campo) => {
+    //   where[campo] = Like(where[campo])
+    // })
 
-    const repository = AppDataSource.getRepository(entidade)
-    let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
+    // console.log("where: ", where)
+    // const rep = AppDataSource.getRepository(entidade)
+    // const repository = AppDataSource.getRepository(entidade)
+    // let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
 
-    joins.forEach(join => {
-      queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
-    })
+    // joins.forEach(join => {
+    //   queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
+    // })
 
-    queryBuilder = queryBuilder
-      .where(where)
-      .select(select)
+    // queryBuilder = queryBuilder
+    //   .select(select)
+    //   .where(where)
 
-    return queryBuilder.getRawMany()
+    // const query = `
+    //   SELECT 
+    //       e.*,
+    //       p.nome AS nomeProduto,
+    //       tp.nome AS nomeTipoProduto
+    //   FROM 
+    //       estruturas e
+    //   INNER JOIN 
+    //       produtos p ON e.idProduto = p.idProduto
+    //   INNER JOIN 
+    //       tipoprodutos tp ON p.idTipoProduto = tp.idTipoProduto
+    //   WHERE 
+    //       p.nome LIKE '%%';
+    //   `;
+
+    return repositorio.query(sql)
       .then((rs) => {
         console.log(rs)
         return {

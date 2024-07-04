@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UnidadeMedidaInterface } from '../interfaces/unidadeMedidaInteface';
 import Produto from './produto.entity';
+import Estrutura from './estrutura.entity';
 
 @Entity({ name: 'unidademedidas' })
 export default class UnidadeMedida implements UnidadeMedidaInterface {
@@ -16,5 +17,8 @@ export default class UnidadeMedida implements UnidadeMedidaInterface {
 
   @OneToMany(() => Produto, (produto) => produto.unidadeMedida)
   produtos: Produto[]
+
+  @OneToMany(() => Estrutura, (estrutura) => estrutura.unidadeMedida)
+  estruturas: Estrutura[]
 
 }

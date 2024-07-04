@@ -1,7 +1,8 @@
 export enum PessoaTypes {
-  cliente = 'C',
+  clienteFisica = 'C',
+  clienteJuridica = 'J',
   fornecedor = 'F',
   vendedor = 'V',
   revisador = 'R',
-  tecelão = 'T'
+  tecelao = 'T'
 }

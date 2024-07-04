@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var produto_entity_1 = require("./produto.entity");
 var detalheEstrutura_entity_1 = require("./detalheEstrutura.entity");
+var unidadeMedida_entity_1 = require("./unidadeMedida.entity");
 var Estrutura = /** @class */ (function () {
     function Estrutura() {
     }
@@ -20,9 +21,14 @@ var Estrutura = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Estrutura.prototype, "idEstrutura", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 2 }),
-        __metadata("design:type", String)
-    ], Estrutura.prototype, "unidade", void 0);
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], Estrutura.prototype, "idUnidade", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idUnidade' }),
+        (0, typeorm_1.ManyToOne)(function () { return unidadeMedida_entity_1.default; }, function (unidadeMedida) { return unidadeMedida.estruturas; }),
+        __metadata("design:type", unidadeMedida_entity_1.default)
+    ], Estrutura.prototype, "unidadeMedida", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
         __metadata("design:type", Number)

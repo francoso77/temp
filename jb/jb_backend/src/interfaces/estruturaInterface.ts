@@ -1,7 +1,7 @@
 export interface EstruturaInterface {
   idEstrutura?: number
   idProduto: number
-  unidade: string
+  idUnidade: number
   qtdBase: number
 }
 

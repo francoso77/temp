@@ -1,4 +1,4 @@
-import { Container, FormControl, FormControlLabel, FormLabel, Grid, IconButton, Paper, Radio, RadioGroup, Tooltip } from '@mui/material';
+import { Container, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ import InputText from '../../Componentes/InputText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PessoaTypes } from '../../types/pessoaTypes';
 import SimpleDialog, { pessoas } from '../../Componentes/Dialog';
+import { THEME } from '../../Layout/Theme';
 
 
 export default function Pessoa() {
@@ -29,10 +30,11 @@ export default function Pessoa() {
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value);
-    value === 'C' ?  pessoa.tipoPessoa = PessoaTypes.cliente 
-    : value === 'F' ? pessoa.tipoPessoa = PessoaTypes.fornecedor
-    : value === 'R' ? pessoa.tipoPessoa = PessoaTypes.revisador
-    : value === 'T' ? pessoa.tipoPessoa = PessoaTypes.tecelão : pessoa.tipoPessoa = PessoaTypes.vendedor
+    value === 'C' ? pessoa.tipoPessoa = PessoaTypes.clienteFisica
+      : value === 'J' ? pessoa.tipoPessoa = PessoaTypes.clienteJuridica
+        : value === 'F' ? pessoa.tipoPessoa = PessoaTypes.fornecedor
+          : value === 'R' ? pessoa.tipoPessoa = PessoaTypes.revisador
+            : value === 'T' ? pessoa.tipoPessoa = PessoaTypes.tecelao : pessoa.tipoPessoa = PessoaTypes.vendedor
 
     setLocalState({ action: actionTypes.incluindo })
   };
@@ -51,7 +53,7 @@ export default function Pessoa() {
     whatsapp: '',
     email: '',
     comissao: 0,
-    tipoPessoa: PessoaTypes.cliente,
+    tipoPessoa: PessoaTypes.clienteJuridica,
     ativo: true
   }
   interface PesquisaInterface {
@@ -69,7 +71,7 @@ export default function Pessoa() {
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'pessoa',
+      cabecalho: 'Pessoa',
       alinhamento: 'left',
       campo: 'nome'
     },
@@ -79,14 +81,15 @@ export default function Pessoa() {
       campo: 'apelido'
     },
     {
-      cabecalho: 'Tipo de Pessoa',
+      cabecalho: 'Tipo',
       alinhamento: 'left',
       campo: 'tipoPessoa',
       format: (tipo) =>
-        tipo === 'C' ? 'CLIENTE'
-          : tipo === 'F' ? 'FORNECEDOR'
-            : tipo === 'R' ? 'REVISADOR'
-              : tipo === 'T' ? 'TECELÃO' : 'VENDEDOR'
+        tipo === 'C' ? 'CLIENTE PF'
+          : tipo === 'J' ? 'CLIENTE PJ'
+            : tipo === 'F' ? 'FORNECEDOR'
+              : tipo === 'R' ? 'REVISADOR'
+                : tipo === 'T' ? 'TECELÃO' : 'VENDEDOR'
     },
     {
       cabecalho: 'Whatsapp',
@@ -132,6 +135,7 @@ export default function Pessoa() {
   const btIncluir = () => {
     setPessoa(ResetDados)
     setLocalState({ action: actionTypes.pessoa })
+    setOpen(true)
   }
   const btCancelar = () => {
     setErros({})
@@ -139,19 +143,39 @@ export default function Pessoa() {
     setLocalState({ action: actionTypes.pesquisando })
   }
 
+  const btCheck = (): boolean => {
+    let retorno: boolean = true
+    let erros: { [key: string]: string } = {}
+    if (['C', 'F', 'J'].includes(pessoa.tipoPessoa)) {
+      if (pessoa.tipoPessoa === 'C') {
+        retorno = validaCampo.eCPF('cpf_cnpj', pessoa, erros, retorno)
+      } else {
+        retorno = validaCampo.eCNPJ('cpf_cnpj', pessoa, erros, retorno)
+      }
+    }
+    setErros(erros)
+    return retorno
+  }
+
   const validarDados = (): boolean => {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
     retorno = validaCampo.naoVazio('nome', pessoa, erros, retorno, 'Nome da pessoa não pode ser vázio')
-    retorno = validaCampo.naoVazio('cep', pessoa, erros, retorno, 'Informe um CEP válido')
     retorno = validaCampo.eTelefone('telefone', pessoa, erros, retorno, false)
     retorno = validaCampo.eTelefone('whatsapp', pessoa, erros, retorno, false)
-    retorno = validaCampo.eEmail('email', pessoa, erros, retorno, false)
-    retorno = validaCampo.naoVazio('endereco', pessoa, erros, retorno, 'Informe um endereço')
-    retorno = validaCampo.naoVazio('numero', pessoa, erros, retorno, 'Número inválido')
-    retorno = validaCampo.naoVazio('bairro', pessoa, erros, retorno, 'Informe um bairro')
-    retorno = validaCampo.naoVazio('cidade', pessoa, erros, retorno, 'Informe a cidade')
-    retorno = validaCampo.eUF('uf', pessoa, erros, retorno, false)
+    if (['C', 'F', 'J'].includes(pessoa.tipoPessoa)) {
+      if (pessoa.tipoPessoa === 'C') {
+        retorno = validaCampo.eCPF('cpf_cnpj', pessoa, erros, retorno)
+      } else {
+        retorno = validaCampo.eCNPJ('cpf_cnpj', pessoa, erros, retorno)
+      }
+      retorno = validaCampo.naoVazio('cep', pessoa, erros, retorno, 'Informe um CEP válido')
+      retorno = validaCampo.naoVazio('endereco', pessoa, erros, retorno, 'Informe um endereço')
+      retorno = validaCampo.naoVazio('numero', pessoa, erros, retorno, 'Número inválido')
+      retorno = validaCampo.naoVazio('bairro', pessoa, erros, retorno, 'Informe um bairro')
+      retorno = validaCampo.naoVazio('cidade', pessoa, erros, retorno, 'Informe a cidade')
+      retorno = validaCampo.eUF('uf', pessoa, erros, retorno, false)
+    }
     setErros(erros)
     return retorno
   }
@@ -386,7 +410,7 @@ export default function Pessoa() {
             />
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
+            <Grid item xs={6} sm={6} md={6} sx={{ textAlign: 'left' }}>
               <InputText
                 label="Ativo"
                 tipo="checkbox"
@@ -396,9 +420,18 @@ export default function Pessoa() {
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={6} sm={6} md={6} sx={{ textAlign: 'right', color: THEME.cores.cinzaTexto }}>
+              <Typography variant="h6" component="div">
+                Tipo de Pessoa: {pessoa.tipoPessoa === 'C' ? 'CLIENTE PF'
+                  : pessoa.tipoPessoa === 'J' ? 'CLIENTE PJ'
+                    : pessoa.tipoPessoa === 'F' ? 'FORNECEDOR'
+                      : pessoa.tipoPessoa === 'R' ? 'REVISADOR'
+                        : pessoa.tipoPessoa === 'T' ? 'TECELÃO' : 'VENDEDOR'}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={['C', 'F', 'J'].includes(pessoa.tipoPessoa) ? 6 : 4} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="pessoa"
+                label="Nome"
                 tipo="uppercase"
                 dados={pessoa}
                 field="nome"
@@ -409,9 +442,9 @@ export default function Pessoa() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={['C', 'F', 'J'].includes(pessoa.tipoPessoa) ? 3 : 2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="pessoa"
+                label="Apelido"
                 tipo="uppercase"
                 dados={pessoa}
                 field="apelido"
@@ -421,92 +454,112 @@ export default function Pessoa() {
                 maxLength={25}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2 }}>
-              <InputText
-                label={pessoa.tipoPessoa === 'C' ? "CPF" : "CNPJ"}
-                mask={pessoa.tipoPessoa === 'C' ? "cpf" : "cnpj"}
-                setState={setPessoa}
-                dados={pessoa}
-                field="cpf_cnpj"
-                erros={erros}
-                type='tel'
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="CEP"
-                mask='cep'
-                dados={pessoa}
-                field="cep"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                iconeEnd='searchicon'
-                onClickIconeEnd={() => btBuscaCep()}
-                mapKeyPress={[{ key: 'Enter', onKey: btBuscaCep }]}
-              />
-            </Grid>
-            <Grid item xs={12} md={9} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Endereço"
-                tipo="uppercase"
-                dados={pessoa}
-                field="endereco"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={100}
-              />
-            </Grid>
-            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Número"
-                tipo="number"
-                type='tel'
-                dados={pessoa}
-                field="numero"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
-            </Grid>
-            <Grid item xs={9} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Bairro"
-                tipo="uppercase"
-                dados={pessoa}
-                field="bairro"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={60}
-              />
-            </Grid>
-            <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Cidade"
-                tipo="uppercase"
-                dados={pessoa}
-                field="cidade"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={60}
-              />
-            </Grid>
-            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="UF"
-                tipo="uppercase"
-                dados={pessoa}
-                field="uf"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={2}
-              />
-            </Grid>
+            <Condicional condicao={['C', 'F', 'J'].includes(pessoa.tipoPessoa)}>
+              <Grid item xs={12} md={3} sx={{ mt: 2 }}>
+                <InputText
+                  label={pessoa.tipoPessoa === 'C' ? "CPF" : "CNPJ"}
+                  mask={pessoa.tipoPessoa === 'C' ? "cpf" : "cnpj"}
+                  setState={setPessoa}
+                  dados={pessoa}
+                  field="cpf_cnpj"
+                  erros={erros}
+                  type='tel'
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  mapKeyPress={
+                    [
+                      { key: 'Enter', onKey: btCheck },
+                      { key: 'Tab', onKey: btCheck },
+                    ]
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="CEP"
+                  mask='cep'
+                  dados={pessoa}
+                  field="cep"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  iconeEnd='searchicon'
+                  onClickIconeEnd={() => btBuscaCep()}
+                  mapKeyPress={[{ key: 'Enter', onKey: btBuscaCep }]}
+                />
+              </Grid>
+              <Grid item xs={12} md={9} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="Endereço"
+                  tipo="uppercase"
+                  dados={pessoa}
+                  field="endereco"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={100}
+                />
+              </Grid>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="Número"
+                  tipo="number"
+                  type='tel'
+                  dados={pessoa}
+                  field="numero"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                />
+              </Grid>
+              <Grid item xs={9} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="Bairro"
+                  tipo="uppercase"
+                  dados={pessoa}
+                  field="bairro"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={60}
+                />
+              </Grid>
+              <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="Cidade"
+                  tipo="uppercase"
+                  dados={pessoa}
+                  field="cidade"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={60}
+                />
+              </Grid>
+              <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="UF"
+                  tipo="uppercase"
+                  dados={pessoa}
+                  field="uf"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={2}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="E-mail"
+                  setState={setPessoa}
+                  dados={pessoa}
+                  field="email"
+                  erros={erros}
+                  type="email"
+                  tipo="text"
+                  disabled={localState.action === 'excluindo' ? true : false}
+                />
+              </Grid>
+            </Condicional>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 label="Telefone"
@@ -531,19 +584,20 @@ export default function Pessoa() {
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
-            <Grid item xs={12} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="E-mail"
-                setState={setPessoa}
-                dados={pessoa}
-                field="email"
-                erros={erros}
-                type="email"
-                tipo="text"
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-
+            <Condicional condicao={pessoa.tipoPessoa === 'V'}>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="Comissão"
+                  tipo="number"
+                  type='tel'
+                  dados={pessoa}
+                  field="comissao"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                />
+              </Grid>
+            </Condicional>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton

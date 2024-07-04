@@ -8,34 +8,41 @@
   },
   {
     "id": 2,
+    "menu": "Estruturas de Produtos",
+    "icon": "auto_awesome_motion_outlined",
+    "path": "/Estrutura",
+    "titulo": "Cadastro de Estruturas de Produtos"
+  },
+  {
+    "id": 3,
     "menu": "Pessoas",
     "icon": "groups_rounded",
     "path": "/Pessoa",
     "titulo": "Cadastro de Pessoas"
   },
   {
-    "id": 3,
+    "id": 4,
     "menu": "Máquinas",
     "icon": "miscellaneous_services",
     "path": "/Maquina",
     "titulo": "Cadastro de Máquinas"
   },
   {
-    "id": 4,
+    "id": 5,
     "menu": "Produtos",
     "icon": "category_rounded",
     "path": "/Produto",
     "titulo": "Cadastro de Produtos"
   },
   {
-    "id": 5,
+    "id": 6,
     "menu": "Tipos de Produto",
     "icon": "article_rounded",
     "path": "/TipoProduto",
     "titulo": "Cadastro de Tipos de produtos"
   },
   {
-    "id": 6,
+    "id": 7,
     "menu": "Unidades de Medida",
     "icon": "square_foot",
     "path": "/UnidadeMedida",

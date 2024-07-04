@@ -30,20 +30,14 @@ export default class ClsCrud {
 
   public query({
     entidade,
-    criterio,
-    camposLike,
-    select,
-    joins,
+    sql,
     msg = 'Pesquisando...',
     cb,
     setMensagemState
   }: PropsInterface): Promise<Array<any>> {
     const dados: PadraoPesquisaInterface = {
       entidade: entidade,
-      criterio: criterio,
-      camposLike: camposLike,
-      select: select,
-      joins: joins,
+      sql: sql,
     }
 
     const config: AxiosRequestConfig = {

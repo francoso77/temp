@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var produto_entity_1 = require("./produto.entity");
+var estrutura_entity_1 = require("./estrutura.entity");
 var UnidadeMedida = /** @class */ (function () {
     function UnidadeMedida() {
     }
@@ -30,6 +31,10 @@ var UnidadeMedida = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return produto_entity_1.default; }, function (produto) { return produto.unidadeMedida; }),
         __metadata("design:type", Array)
     ], UnidadeMedida.prototype, "produtos", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.unidadeMedida; }),
+        __metadata("design:type", Array)
+    ], UnidadeMedida.prototype, "estruturas", void 0);
     UnidadeMedida = __decorate([
         (0, typeorm_1.Entity)({ name: 'unidademedidas' })
     ], UnidadeMedida);

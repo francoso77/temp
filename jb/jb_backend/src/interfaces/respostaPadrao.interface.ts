@@ -5,9 +5,10 @@ export interface RespostaPadraoInterface<T> {
 }
 
 export interface PadraoPesquisaInterface {
-  entidade: string,
-  criterio: Record<string, any>,
+  entidade?: string,
+  criterio?: Record<string, any>,
   camposLike?: Array<any>,
   select?: Array<any>,
   joins?: { tabelaRelacao: string, relacao: string }[],
+  sql?: string
 }

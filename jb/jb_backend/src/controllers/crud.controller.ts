@@ -25,18 +25,12 @@ export class CrudController {
 
   @Post("query")
   query(
-    @Body("entidade") entidade: string,
-    @Body("criterio") criterio: Record<string, any>,
-    @Body("camposLike") camposLike: Array<string>,
-    @Body("select") select: Array<string>,
-    @Body("joins") joins: { tabelaRelacao: string, relacao: string }[],
+    @Body("entidade:") entidade: string,
+    @Body("sql") sql: string,
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().query({
-      entidade: entidade,
-      criterio: criterio,
-      camposLike: camposLike ? camposLike : [],
-      select: select ? select : [],
-      joins: joins,
+      entidade: entidade ? entidade : '',
+      sql: sql ? sql : ''
     });
   }
 
@@ -64,3 +58,22 @@ export class CrudController {
   }
 
 }
+
+// @Post("query")
+// query(
+//   @Body("entidade") entidade: string,
+//   @Body("criterio") criterio: Record<string, any>,
+//   @Body("camposLike") camposLike: Array<string>,
+//   @Body("select") select: Array<string>,
+//   @Body("joins") joins: { tabelaRelacao: string, relacao: string }[],
+//   @Body("sql") sql: string,
+// ): Promise<RespostaPadraoInterface<any>> {
+//   return new ClsCrudController().query({
+//     entidade: entidade ? entidade : '',
+//     criterio: criterio ? criterio : [],
+//     camposLike: camposLike ? camposLike : [],
+//     select: select ? select : [],
+//     joins: joins,
+//     sql: sql ? sql : ''
+//   });
+// }

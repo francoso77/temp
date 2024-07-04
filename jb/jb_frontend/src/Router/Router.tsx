@@ -14,6 +14,7 @@ import TipoProduto from '../Views/Crud/TipoProduto';
 import Maquina from '../Views/Crud/Maquina';
 import Produto from '../Views/Crud/Produto';
 import Pessoa from '../Views/Crud/Pessoa';
+import Estrutura from '../Views/Crud/Estrutura';
 
 export const router = createBrowserRouter([
   {
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
       {
         path: "/Pessoa",
         element: <Pessoa />,
+      },
+      {
+        path: "/Estrutura",
+        element: <Estrutura />,
       },
     ]
   },

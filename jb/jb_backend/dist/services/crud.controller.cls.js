@@ -74,24 +74,41 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.query = function (_a) {
-        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, joins = _a.joins;
+        var entidade = _a.entidade, sql = _a.sql;
         return __awaiter(this, void 0, void 0, function () {
-            var where, repository, queryBuilder;
+            var repositorio;
             return __generator(this, function (_b) {
-                where = {};
-                where = __assign({}, criterio);
-                camposLike.forEach(function (campo) {
-                    where[campo] = (0, typeorm_1.Like)(where[campo]);
-                });
-                repository = data_source_1.AppDataSource.getRepository(entidade);
-                queryBuilder = repository.createQueryBuilder(entidade.toLowerCase());
-                joins.forEach(function (join) {
-                    queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao);
-                });
-                queryBuilder = queryBuilder
-                    .where(where)
-                    .select(select);
-                return [2 /*return*/, queryBuilder.getRawMany()
+                repositorio = data_source_1.AppDataSource.getRepository(entidade);
+                // let where: Record<string, any> = {}
+                // where = { ...criterio }
+                // camposLike.forEach((campo) => {
+                //   where[campo] = Like(where[campo])
+                // })
+                // console.log("where: ", where)
+                // const rep = AppDataSource.getRepository(entidade)
+                // const repository = AppDataSource.getRepository(entidade)
+                // let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
+                // joins.forEach(join => {
+                //   queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
+                // })
+                // queryBuilder = queryBuilder
+                //   .select(select)
+                //   .where(where)
+                // const query = `
+                //   SELECT 
+                //       e.*,
+                //       p.nome AS nomeProduto,
+                //       tp.nome AS nomeTipoProduto
+                //   FROM 
+                //       estruturas e
+                //   INNER JOIN 
+                //       produtos p ON e.idProduto = p.idProduto
+                //   INNER JOIN 
+                //       tipoprodutos tp ON p.idTipoProduto = tp.idTipoProduto
+                //   WHERE 
+                //       p.nome LIKE '%%';
+                //   `;
+                return [2 /*return*/, repositorio.query(sql)
                         .then(function (rs) {
                         console.log(rs);
                         return {
