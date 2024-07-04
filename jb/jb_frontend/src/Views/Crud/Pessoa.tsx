@@ -14,17 +14,28 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PessoaTypes } from '../../types/pessoaTypes';
-import SimpleDialogDemo from '../../Componentes/Dialog';
+import SimpleDialog, { pessoas } from '../../Componentes/Dialog';
 
 
 export default function Pessoa() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
-  const clsFormatacao = new ClsFormatacao()
+  const [open, setOpen] = useState(true);
+  const [selectedValue, setSelectedValue] = useState(pessoas[1].codigo);
+
+  const handleClose = (value: string) => {
+    setOpen(false);
+    setSelectedValue(value);
+    value === 'C' ?  pessoa.tipoPessoa = PessoaTypes.cliente 
+    : value === 'F' ? pessoa.tipoPessoa = PessoaTypes.fornecedor
+    : value === 'R' ? pessoa.tipoPessoa = PessoaTypes.revisador
+    : value === 'T' ? pessoa.tipoPessoa = PessoaTypes.tecelão : pessoa.tipoPessoa = PessoaTypes.vendedor
+
+    setLocalState({ action: actionTypes.incluindo })
+  };
 
   const ResetDados: PessoaInterface = {
     nome: '',
@@ -368,22 +379,11 @@ export default function Pessoa() {
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action === 'pessoa'}>
-            {/* <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-
-              <FormControl>
-                <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  defaultValue="female"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel value="female" control={<Radio />} label="Female" />
-                  <FormControlLabel value="male" control={<Radio />} label="Male" />
-                  <FormControlLabel value="other" control={<Radio />} label="Other" />
-                </RadioGroup>
-              </FormControl>
-            </Grid> */}
-            <SimpleDialogDemo />
+            <SimpleDialog
+              selectedValue={selectedValue}
+              open={open}
+              onClose={handleClose}
+            />
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>

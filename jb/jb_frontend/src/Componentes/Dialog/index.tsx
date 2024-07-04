@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import { blue } from '@mui/material/colors';
 
-const pessoas = [
+export const pessoas = [
     { nome: 'Cliente', codigo: 'C' },
     { nome: 'Fornecedor', codigo: 'F' },
     { nome: 'Revisador', codigo: 'R' },
@@ -28,7 +28,7 @@ export interface SimpleDialogProps {
   onClose: (value: string) => void;
 }
 
-function SimpleDialog(props: SimpleDialogProps) {
+export default function SimpleDialog(props: SimpleDialogProps) {
   const { onClose, selectedValue, open } = props;
 
   const handleClose = () => {
@@ -60,33 +60,33 @@ function SimpleDialog(props: SimpleDialogProps) {
   );
 }
 
-export default function SimpleDialogDemo() {
-  const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState(pessoas[1].codigo);
+// export default function SimpleDialogDemo() {
+//   const [open, setOpen] = React.useState(true);
+//   const [selectedValue, setSelectedValue] = React.useState(pessoas[1].codigo);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+// //   const handleClickOpen = () => {
+// //     setOpen(true);
+// //   };
 
-  const handleClose = (value: string) => {
-    setOpen(false);
-    setSelectedValue(value);
-  };
+//   const handleClose = (value: string) => {
+//     setOpen(false);
+//     setSelectedValue(value);
+//   };
 
-  return (
-    <div>
-      <Typography variant="subtitle1" component="div">
-        Selected: {selectedValue}
-      </Typography>
-      <br />
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open simple dialog
-      </Button>
-      <SimpleDialog
-        selectedValue={selectedValue}
-        open={open}
-        onClose={handleClose}
-      />
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       {/* <Typography variant="subtitle1" component="div">
+//         Selected: {selectedValue}
+//       </Typography>
+//       <br />
+//       <Button variant="outlined" onClick={handleClickOpen}>
+//         Open simple dialog
+//       </Button> */}
+//       <SimpleDialog
+//         selectedValue={selectedValue}
+//         open={open}
+//         onClose={handleClose}
+//       />
+//     </div>
+//   );
+// }
