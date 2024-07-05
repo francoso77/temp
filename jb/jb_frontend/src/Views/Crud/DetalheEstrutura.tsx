@@ -1,5 +1,4 @@
-import { Grid, IconButton, Paper, Avatar, Tooltip } from '@mui/material';
-import Text from '../../Componentes/Text';
+import { Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -7,13 +6,9 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { EstruturaInterface } from '../../../../tambordog-backend/src/interfaces/EstruturaInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import { AtletaInterface } from '../../../../tambordog-backend/src/interfaces/atletaInterface';
-import { RacaInterface } from '../../../../tambordog-backend/src/interfaces/racaInterface';
-import { CategoriaInterface } from '../../../../tambordog-backend/src/interfaces/categoriaInterface';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
@@ -22,7 +17,9 @@ import InputText from '../../Componentes/InputText';
 import ShowText from '../../Componentes/ShowText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ComboBox from '../../Componentes/ComboBox';
-import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 
 
 interface PropsInterface {
@@ -31,11 +28,10 @@ interface PropsInterface {
 
 export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
 
-  const clsFormatacao: ClsFormatacao = new ClsFormatacao()
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
-  const ResetDados: EstruturaInterface = {
+  const ResetDados: DetalheEstruturaInterface = {
     idEstrutura: rsEstrutura.idEstrutura as number,
     idProduto: 0,
     idCor: 0,
@@ -51,30 +47,28 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<EstruturaInterface>>([])
   const [erros, setErros] = useState({})
-  const [cao, setCao] = useState<EstruturaInterface>(ResetDados)
-  const [rsRaca, setRsRaca] = useState<Array<RacaInterface>>([])
-  const [rsCategoria, setRsCategoria] = useState<Array<CategoriaInterface>>([])
+  const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados)
+  const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
+  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Nome',
+      cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'nome'
+      campo: 'nomeProduto'
     },
     {
-      cabecalho: 'Nascimento',
+      cabecalho: 'Cor',
       alinhamento: 'left',
-      campo: 'dataNascimento',
-      format: (data) => clsFormatacao.dataISOtoUser(data)
+      campo: 'nomeCor'
     },
     {
-      cabecalho: 'Ativo',
+      cabecalho: 'Qtd',
       alinhamento: 'left',
-      campo: 'ativo',
-      format: (v: boolean) => { return v ? 'Sim' : 'Não' }
+      campo: 'qtd'
     },
   ]
 
@@ -87,38 +81,38 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<EstruturaInterface> => {
+  const pesquisarID = (id: string | number): Promise<DetalheEstruturaInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "Cao",
+        entidade: "DetalheEstrutura",
         criterio: {
-          idCao: id,
+          idDetalheEstrutura: id,
         },
       })
-      .then((rsCao: Array<EstruturaInterface>) => {
-        return rsCao[0]
+      .then((rs: Array<DetalheEstruturaInterface>) => {
+        return rs[0]
       })
   }
 
   const onEditar = (id: string | number) => {
-    pesquisarID(id).then((rsCao) => {
-      setCao(rsCao)
+    pesquisarID(id).then((rs) => {
+      setDetalheEstrutura(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
   const onExcluir = (id: string | number) => {
-    pesquisarID(id).then((rsCao) => {
-      setCao(rsCao)
+    pesquisarID(id).then((rs) => {
+      setDetalheEstrutura(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
   const btIncluir = () => {
-    setCao(ResetDados)
+    setDetalheEstrutura(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
   const btCancelar = () => {
     setErros({})
-    setCao(ResetDados)
+    setDetalheEstrutura(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
@@ -126,11 +120,9 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('nome', cao, erros, retorno, 'Nome do Cão não pode ser vázio')
-    retorno = validaCampo.eData('dataNascimento', cao, erros, retorno, false)
-    retorno = validaCampo.naoVazio('idAtleta', cao, erros, retorno, 'Escolha um Atleta')
-    retorno = validaCampo.naoVazio('idCategoria', cao, erros, retorno, 'Escolha uma Categoria')
-    retorno = validaCampo.naoVazio('idRaca', cao, erros, retorno, 'Escolha uma Raça')
+    retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
+    retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
+    retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'A quantidade deve ser maior que 0')
     setErros(erros)
     return retorno
   }
@@ -141,8 +133,8 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
 
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
-          entidade: "Cao",
-          criterio: cao,
+          entidade: "DetalheEstrutura",
+          criterio: detalheEstrutura,
           localState: localState.action,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
@@ -163,9 +155,9 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
           })
       } else if (localState.action === actionTypes.excluindo) {
         clsCrud.excluir({
-          entidade: "Cao",
+          entidade: "DetalheEstrutura",
           criterio: {
-            idCao: cao.idCao
+            idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
           },
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
@@ -189,71 +181,88 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   const btPesquisar = () => {
+    const query = `
+    SELECT 
+        de.*,
+        p.nome AS nomeProduto,
+        c.nome AS nomeCor,
+    FROM 
+        detalheestruturas de
+    INNER JOIN 
+        estruturas e ON de.idEstrutura = e.idEstrutura
+    INNER JOIN 
+        produtos p ON de.idProduto = e.idProduto
+    INNER JOIN 
+        cores c ON de.idCor = e.idCor
+      WHERE 
+          de.idEstrutura = ${rsEstrutura.idEstrutura} ;
+    `;
     clsCrud
-      .pesquisar({
-        entidade: "Cao",
-        criterio: {
-          idAtleta: rsAtleta.idAtleta,
-        },
-        select: ["idCao", "nome", "dataNascimento", "ativo"],
-        msg: 'Pesquisando cães ...',
+      .query({
+        entidade: "Estrutura",
+        sql: query,
+        msg: 'Pesquisando Estruturas ...',
         setMensagemState: setMensagemState
       })
-      .then((rsCaes: Array<EstruturaInterface>) => {
-        setRsPesquisa(rsCaes)
+      .then((rs: Array<any>) => {
+        setRsPesquisa(rs)
       })
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "DetalheEstrutura",
+    //     criterio: {
+    //       idEstrutura: rsEstrutura.idEstrutura,
+    //     },
+    //     select: ["idDetalheEstrutura", "idEstrutura", "idProduto", "idCord", "qtd"],
+    //     msg: 'Pesquisando produtos ...',
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs: Array<any>) => {
+    //     setRsPesquisa(rs)
+    //   })
   }
 
   const BuscarDados = () => {
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "Atleta",
-    //     criterio: {
-    //       nome: "%".concat("%"),
-    //     },
-    //     camposLike: ["nome"],
-    //   })
-    //   .then((rsAtletas: Array<AtletaInterface>) => {
-    //     setRsAtleta(rsAtletas)
-    //   })
+      const query = `
+      SELECT 
+          p.*
+      FROM 
+          produtos p
+      INNER JOIN 
+          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
+      WHERE 
+          t.estrutura = true;
+      `;
+    clsCrud
+      .query({
+        entidade: "Produto",
+        sql: query,
+        msg: '',
+        setMensagemState: setMensagemState
+      })
+      .then((rsProdutos: Array<ProdutoInterface>) => {
+        setRsProduto(rsProdutos)
+      })
 
-    clsCrud
+      clsCrud
       .pesquisar({
-        entidade: "Categoria",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
+        entidade: "Cor",
       })
-      .then((rsCategorias: Array<CategoriaInterface>) => {
-        setRsCategoria(rsCategorias)
-      })
-    clsCrud
-      .pesquisar({
-        entidade: "Raca",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-      })
-      .then((rsRacas: Array<RacaInterface>) => {
-        setRsRaca(rsRacas)
+      .then((rsCores: Array<CorInterface>) => {
+        setRsCor(rsCores)
       })
   }
 
   const irpara = useNavigate()
   const btFechar = () => {
-    irpara('/Atleta')
+    irpara('/Estrutura')
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Cães',
-      pathTitulo: '/Atleta',
-      pathTituloAnterior: '/Atleta'
+      tituloAnterior: 'Composição do Produto',
+      pathTitulo: '/Estrutura',
+      pathTituloAnterior: '/Estrutura'
     })
   }
-  // if (localState.action !== actionTypes.pesquisando) {
-  //   BuscarDados()
-  // }
 
   useEffect(() => {
     BuscarDados()
@@ -264,16 +273,8 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
       <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
         <Grid item xs={12}>
           <ShowText
-            titulo="Atleta"
-            descricao={rsAtleta.nome} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <ShowText
-            titulo="WhatsAPP"
-            tipo="whatsapp"
-            descricao={rsAtleta.whatsapp}
-          />
+            titulo="itens da composição"
+            descricao={rsEstrutura.idProduto.toString()} />
         </Grid>
       </Paper>
       <Paper variant="outlined" sx={{ padding: 2 }}>
@@ -285,16 +286,16 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11} >
-              <Text
+              <InputText
                 label="Digite o nome"
-                tipo="text"
+                tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autofocus
+                autoFocus
               />
             </Grid>
             <Grid item xs={1}>
@@ -315,14 +316,14 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: EstruturaInterface) =>
-                      onEditar(rs.idCao as string),
+                    onAcionador: (rs: DetalheEstruturaInterface) =>
+                      onEditar(rs.idDetalheEstrutura as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: EstruturaInterface) =>
-                      onExcluir(rs.idCao as string),
+                    onAcionador: (rs: DetalheEstruturaInterface) =>
+                      onExcluir(rs.idDetalheEstrutura as number),
                     toolTip: "Excluir",
                   },
                 ]}
@@ -333,81 +334,41 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
-            <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
-              <InputText
-                label="Ativo"
-                tipo="checkbox"
-                dados={cao}
-                field="ativo"
-                setState={setCao}
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                mb: 3,
-                mt: 3
-              }} >
-              <Avatar
-                alt={cao.nome}
-                src={cao.avatar}
-                sx={{ width: 88, height: 88 }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Nome"
-                tipo="text"
-                dados={cao}
-                field="nome"
-                setState={setCao}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                autoFocus
-                maxLength={60}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Data de Nascimento"
-                setState={setCao}
-                dados={cao}
-                field="dataNascimento"
-                erros={erros}
-                type="tel"
-                tipo='date'
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
             <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={rsRaca}
+                opcoes={rsProduto}
                 campoDescricao="nome"
-                campoID="idRaca"
-                dados={cao}
-                mensagemPadraoCampoEmBranco="Escolha uma raça"
-                field="idRaca"
-                label="Raças"
+                campoID="idProduto"
+                dados={detalheEstrutura}
+                mensagemPadraoCampoEmBranco="Escolha um produto"
+                field="idProduto"
+                label="Produtos"
                 erros={erros}
-                setState={setCao}
+                setState={setDetalheEstrutura}
               />
             </Grid>
-            <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={rsCategoria}
+                opcoes={rsCor}
                 campoDescricao="nome"
-                campoID="idCategoria"
-                dados={cao}
-                mensagemPadraoCampoEmBranco="Escolha uma categoria"
-                field="idCategoria"
-                label="Categorias"
+                campoID="idCor"
+                dados={detalheEstrutura}
+                mensagemPadraoCampoEmBranco="Escolha uma cor"
+                field="idCor"
+                label="Cores"
                 erros={erros}
-                setState={setCao}
+                setState={setDetalheEstrutura}
+              />
+            </Grid>
+            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                type='number'
+                label="Qtd"
+                dados={detalheEstrutura}
+                field="qtd"
+                setState={setDetalheEstrutura}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

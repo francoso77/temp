@@ -18,6 +18,7 @@ import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import DetalheEstrutura from './DetalheEstrutura';
 
 
 export default function Estrutura() {
@@ -373,23 +374,6 @@ export default function Estrutura() {
                 erros={erros}
               />
             </Grid>
-            <Condicional condicao={localState.action === 'detalhes'}>
-              <Container maxWidth="md" sx={{ mt: 1 }}>
-
-                <Paper variant="outlined" sx={{ padding: 1 }}>
-
-                  <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-                    <Grid item xs={12} sx={{ textAlign: 'right' }}>
-                      <IconButton onClick={() => btFechar()}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Grid>
-
-                  </Grid>
-                </Paper>
-              </Container>
-            </Condicional>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
@@ -425,9 +409,13 @@ export default function Estrutura() {
               </Condicional>
             </Grid>
           </Condicional>
+          <Condicional condicao={localState.action === 'detalhes'}>
+              <Grid item xs={12}>
+                <DetalheEstrutura rsEstrutura={estrutura} />
+              </Grid>
+            </Condicional>
         </Grid>
       </Paper >
-      {/* {JSON.stringify(produto)} */}
     </Container >
   )
 }

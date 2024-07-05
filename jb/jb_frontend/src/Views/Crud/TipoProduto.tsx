@@ -26,6 +26,7 @@ export default function TipoProduto() {
 
   const ResetDados: TipoProdutoInterface = {
     nome: '',
+    estrutura: false
   }
   interface PesquisaInterface {
     nome: string
@@ -47,6 +48,13 @@ export default function TipoProduto() {
       alinhamento: 'left',
       campo: 'nome'
     },
+    {
+      cabecalho: 'Tem Estrutura?',
+      alinhamento: 'left',
+      campo: 'estrutura',
+      format: (e: boolean) => { return e ? 'Sim' : 'Não' }
+    },
+
   ]
 
   const handleRequestSort = (
@@ -66,7 +74,7 @@ export default function TipoProduto() {
           nome: "%".concat(pesquisa.nome).concat("%"),
         },
         camposLike: ["nome"],
-        select: ["idTipoProduto", "nome"],
+        select: ["idTipoProduto", "nome", "estrutura"],
         msg: 'Pesquisando tipos de Produtos ...',
         setMensagemState: setMensagemState
       })
@@ -278,6 +286,16 @@ export default function TipoProduto() {
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
+            <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
+              <InputText
+                label="Tem Estrutura?"
+                tipo="checkbox"
+                dados={tipoProduto}
+                field="estrutura"
+                setState={setTipoProduto}
+                disabled={localState.action === 'excluindo' ? true : false}
+              />
+            </Grid>
             <Grid item xs={12}>
               <InputText
                 label="Nome"

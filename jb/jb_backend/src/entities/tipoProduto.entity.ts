@@ -11,6 +11,9 @@ export default class TipoProduto implements TipoProdutoInterface {
   @Column({ length: 35 })
   nome: string
 
+  @Column()
+  estrutura: boolean
+
   @OneToMany(() => Produto, (produto) => produto.tipoProduto)
   produtos: Produto[]
 

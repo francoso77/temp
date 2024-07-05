@@ -23,6 +23,10 @@ var TipoProduto = /** @class */ (function () {
         __metadata("design:type", String)
     ], TipoProduto.prototype, "nome", void 0);
     __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Boolean)
+    ], TipoProduto.prototype, "estrutura", void 0);
+    __decorate([
         (0, typeorm_1.OneToMany)(function () { return produto_entity_1.default; }, function (produto) { return produto.tipoProduto; }),
         __metadata("design:type", Array)
     ], TipoProduto.prototype, "produtos", void 0);
