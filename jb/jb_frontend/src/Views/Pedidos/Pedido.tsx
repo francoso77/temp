@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -14,41 +14,37 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
-import ShowText from '../../Componentes/ShowText';
 import ComboBox from '../../Componentes/ComboBox';
-import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
+import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
+import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
 
 
-interface PropsInterface {
-  rsEstrutura: EstruturaInterface
-}
-
-export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
+export default function Pedido() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
-  const ResetDados: DetalheEstruturaInterface = {
-    idEstrutura: rsEstrutura.idEstrutura as number,
-    idProduto: 0,
-    idCor: 0,
-    qtd: 0,
+  const ResetDados: PedidoInterface = {
+    dataPedido: '',
+    observacao: '',
+    idPessoa_cliente: 0,
+    idPessoa_vendedor: 0,
+    idPrazoEntrega: 0,
+    statusPedido: StatusPedidoTypes.aberto
   }
-
   interface PesquisaInterface {
     nome: string
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<EstruturaInterface>>([])
-  const [nomeProduto, setNomeProduto] = useState<PesquisaInterface>({ nome: '' })
+  const [rsPesquisa, setRsPesquisa] = useState<Array<PedidoInterface>>([])
   const [erros, setErros] = useState({})
-  const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados)
-  const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
+  const [pedido, setPedido] = useState<PedidoInterface>(ResetDados)
+  const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
@@ -58,17 +54,17 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'nomeProduto'
+      campo: 'produto_nome'
     },
     {
-      cabecalho: 'Cor',
+      cabecalho: 'Unidade',
       alinhamento: 'left',
-      campo: 'nomeCor'
+      campo: 'unidadeMedida_sigla',
     },
     {
-      cabecalho: 'Qtd',
+      cabecalho: 'Qtd Base',
       alinhamento: 'left',
-      campo: 'qtd'
+      campo: 'qtdBase',
     },
   ]
 
@@ -81,38 +77,43 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<DetalheEstruturaInterface> => {
+  const pesquisarID = (id: string | number): Promise<PedidoInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "DetalheEstrutura",
+        entidade: "Pedido",
         criterio: {
-          idDetalheEstrutura: id,
+          idPedido: id,
         },
       })
-      .then((rs: Array<DetalheEstruturaInterface>) => {
+      .then((rs: Array<PedidoInterface>) => {
         return rs[0]
       })
   }
-
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setDetalheEstrutura(rs)
+      setPedido(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setDetalheEstrutura(rs)
+      setPedido(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
+  const onDetalhe = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setPedido(rs)
+      setLocalState({ action: actionTypes.detalhes })
+    })
+  }
   const btIncluir = () => {
-    setDetalheEstrutura(ResetDados)
+    setPedido(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
   const btCancelar = () => {
     setErros({})
-    setDetalheEstrutura(ResetDados)
+    setPedido(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
@@ -120,211 +121,186 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
-    retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'A quantidade deve ser maior que 0')
+    // retorno = validaCampo.naoVazio('qtdBase', pedido, erros, retorno, 'Informe uma quantidade Base')
+    // retorno = validaCampo.naoVazio('idUnidade', pedido, erros, retorno, 'Informe uma Unidade')
+    // retorno = validaCampo.naoVazio('idProduto', pedido, erros, retorno, 'Informe o Produto')
+
     setErros(erros)
     return retorno
   }
 
   const btConfirmar = () => {
 
-    if (validarDados()) {
+    clsCrud
+      .pesquisar({
+        entidade: "Pedido",
+        criterio: {
+          idPedido: pedido.idPedido,
+        },
+        msg: 'Pesquisando pedidos ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs) => {
+        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Item já cadastrado!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+        } else {
 
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-        clsCrud.incluir({
-          entidade: "DetalheEstrutura",
-          criterio: detalheEstrutura,
-          localState: localState.action,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
+          if (validarDados()) {
+
+            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+              clsCrud.incluir({
+                entidade: "Pedido",
+                criterio: pedido,
+                localState: localState.action,
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
               })
-            }
-          })
-      } else if (localState.action === actionTypes.excluindo) {
-        clsCrud.excluir({
-          entidade: "DetalheEstrutura",
-          criterio: {
-            idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
-          },
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
+            } else if (localState.action === actionTypes.excluindo) {
+              clsCrud.excluir({
+                entidade: "Pedido",
+                criterio: {
+                  idPedido: pedido.idPedido
+                },
+                cb: () => btPesquisar(),
+                setMensagemState: setMensagemState
               })
+                .then((rs) => {
+                  if (rs.ok) {
+                    setLocalState({ action: actionTypes.pesquisando })
+                  } else {
+                    setMensagemState({
+                      titulo: 'Erro...',
+                      exibir: true,
+                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      tipo: MensagemTipo.Error,
+                      exibirBotao: true,
+                      cb: null
+                    })
+                  }
+                })
             }
-          })
-      }
-    }
+          }
+        }
+      })
   }
 
   const btPesquisar = () => {
     const query = `
-    SELECT 
-        de.*,
-        p.nome AS nomeProduto,
-        c.nome AS nomeCor
-    FROM 
-        detalheestruturas de
-    INNER JOIN 
-        estruturas e ON e.idEstrutura = de.idEstrutura
-    INNER JOIN 
-        produtos p ON p.idProduto = de.idProduto
-    INNER JOIN 
-        cores c ON c.idCor = de.idCor
-    WHERE 
-        de.idEstrutura = ${rsEstrutura.idEstrutura};
-    `;
+      SELECT 
+          e.*,
+          p.nome AS produto_nome,
+          um.sigla AS unidadeMedida_sigla
+      FROM 
+          pedidos e
+      INNER JOIN 
+          produtos p ON e.idProduto = p.idProduto
+      INNER JOIN 
+          unidademedidas um ON e.idUnidade = um.idUnidade
+      WHERE 
+          p.nome LIKE '%${pesquisa.nome}%' ;
+      `;
     clsCrud
       .query({
-        entidade: "Estrutura",
+        entidade: "Pedido",
         sql: query,
-        msg: 'Pesquisando Estruturas ...',
+        msg: 'Pesquisando pedidos ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "DetalheEstrutura",
-    //     criterio: {
-    //       idEstrutura: rsEstrutura.idEstrutura,
-    //     },
-    //     select: ["idDetalheEstrutura", "idEstrutura", "idProduto", "idCord", "qtd"],
-    //     msg: 'Pesquisando produtos ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setRsPesquisa(rs)
-    //   })
+  }
+  const irPara = useNavigate()
+  const btFechar = () => {
+    setLayoutState({
+      titulo: '',
+      tituloAnterior: 'Cadastro de pedidos',
+      pathTitulo: '/',
+      pathTituloAnterior: '/Pedido'
+    })
+    irPara('/')
   }
 
   const BuscarDados = () => {
-
-    let query: string = `
-    SELECT 
-        e.*,
-        p.nome AS nomeProduto
-    FROM 
-        estruturas e
-    INNER JOIN 
-        produtos p ON p.idProduto = e.idProduto
-    WHERE 
-        e.idEstrutura = ${rsEstrutura.idEstrutura};
-    `;
-
     clsCrud
-      .query({
-        entidade: "Estrutura",
-        sql: query,
-        msg: '',
-        setMensagemState: setMensagemState
+      .pesquisar({
+        entidade: "UnidadeMedida",
+        criterio: {
+          nome: "%".concat("%"),
+        },
+        camposLike: ["nome"],
       })
-      .then((rs: Array<any>) => {
-        setNomeProduto({ nome: rs[0].nomeProduto })
-      })
-
-    query = `
-      SELECT 
-          p.*
-      FROM 
-          produtos p
-      INNER JOIN 
-          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
-      WHERE 
-          t.estrutura = true;
-      `;
-    clsCrud
-      .query({
-        entidade: "Produto",
-        sql: query,
-        msg: '',
-        setMensagemState: setMensagemState
-      })
-      .then((rsProdutos: Array<ProdutoInterface>) => {
-        setRsProduto(rsProdutos)
+      .then((rs: Array<UnidadeMedidaInterface>) => {
+        setRsUnidade(rs)
       })
 
     clsCrud
       .pesquisar({
-        entidade: "Cor",
+        entidade: "Produto",
+        criterio: {
+          nome: "%".concat("%"),
+        },
+        camposLike: ["nome"],
       })
-      .then((rsCores: Array<CorInterface>) => {
-        setRsCor(rsCores)
+      .then((rs: Array<ProdutoInterface>) => {
+        setRsProduto(rs)
       })
-  }
-
-  const irpara = useNavigate()
-  const btFechar = () => {
-    irpara('/Estrutura')
-    setLocalState({ action: actionTypes.pesquisando })
-
-    setLayoutState({
-      titulo: 'Cadasto de Estruturas',
-      tituloAnterior: 'Composição de Estrutura',
-      pathTitulo: '/Estrutura',
-      pathTituloAnterior: '/DetalheEstrutura'
-    })
   }
 
   useEffect(() => {
     BuscarDados()
-    setLayoutState({
-      titulo: 'Composição de Estrutura',
-      tituloAnterior: 'Cadasto de Estruturas',
-      pathTitulo: '/DetalheEstrutura',
-      pathTituloAnterior: '/Estrutura'
-    })
   }, [])
 
+  useEffect(() => {
+    if (layoutState.titulo === "Cadasto de Pedidos") {
+      setLocalState({ action: actionTypes.pesquisando })
+      setLayoutState({
+        titulo: 'Cadastro de Pedidos',
+        tituloAnterior: 'Detalhe pedido',
+        pathTitulo: '/Pedido',
+        pathTituloAnterior: '/DetalhePedido'
+      })
+    }
+  },)
+
+
   return (
-    <>
-      <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
-        <Grid item xs={6}>
-          <ShowText
-            titulo="Estrutura do produto"
-            descricao={nomeProduto.nome} />
-        </Grid>
-        <Grid item xs={6}>
-          <ShowText
-            titulo="Qtd Base"
-            descricao={rsEstrutura.qtdBase.toString()} />
-        </Grid>
-      </Paper>
+
+    <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
+
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+
           <Grid item xs={12} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11} >
+            <Grid item xs={11}>
               <InputText
-                label="Digite o nome"
+                label="Digite o nome do Produto"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
@@ -353,15 +329,21 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: DetalheEstruturaInterface) =>
-                      onEditar(rs.idDetalheEstrutura as number),
+                    onAcionador: (rs: PedidoInterface) =>
+                      onEditar(rs.idpedido as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: DetalheEstruturaInterface) =>
-                      onExcluir(rs.idDetalheEstrutura as number),
+                    onAcionador: (rs: PedidoInterface) =>
+                      onExcluir(rs.idpedido as number),
                     toolTip: "Excluir",
+                  },
+                  {
+                    icone: "auto_awesome_motion_outlined",
+                    onAcionador: (rs: DetalhePedidoInterface) =>
+                      onDetalhe(rs.idpedido as number),
+                    toolTip: "pedido",
                   },
                 ]}
                 order={order}
@@ -370,40 +352,40 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
               />
             </Grid>
           </Condicional>
-          <Condicional condicao={localState.action !== 'pesquisando'}>
+          <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
               <ComboBox
                 opcoes={rsProduto}
                 campoDescricao="nome"
                 campoID="idProduto"
-                dados={detalheEstrutura}
-                mensagemPadraoCampoEmBranco="Escolha um produto"
+                dados={pedido}
+                mensagemPadraoCampoEmBranco="Escolha um Tipo"
                 field="idProduto"
-                label="Produtos"
+                label="Produto"
                 erros={erros}
-                setState={setDetalheEstrutura}
+                setState={setPedido}
               />
             </Grid>
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={rsCor}
-                campoDescricao="nome"
-                campoID="idCor"
-                dados={detalheEstrutura}
-                mensagemPadraoCampoEmBranco="Escolha uma cor"
-                field="idCor"
-                label="Cores"
+                opcoes={rsUnidade}
+                campoDescricao="sigla"
+                campoID="idUnidade"
+                dados={pedido}
+                mensagemPadraoCampoEmBranco="Escolha uma unidade de medida"
+                field="idUnidade"
+                label="Unidade"
                 erros={erros}
-                setState={setDetalheEstrutura}
+                setState={setPedido}
               />
             </Grid>
             <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 type='number'
-                label="Qtd"
-                dados={detalheEstrutura}
-                field="qtd"
-                setState={setDetalheEstrutura}
+                label="Qtd Base"
+                dados={pedido}
+                field="qtdBase"
+                setState={setPedido}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
               />
@@ -443,8 +425,13 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
               </Condicional>
             </Grid>
           </Condicional>
+          <Condicional condicao={localState.action === 'detalhes'}>
+            <Grid item xs={12}>
+              <Detalhepedido rspedido={pedido} />
+            </Grid>
+          </Condicional>
         </Grid>
       </Paper >
-    </>
+    </Container >
   )
 }

@@ -19,7 +19,7 @@ export default function ShowText({
       <Typography variant="button" color="secondary" >
         {titulo.concat(': ')}
         <Condicional condicao={tipo === "texto"}>
-          <Typography variant="body2" color="primary" sx={{ ml: 1 }}>
+          <Typography variant="h6" color="primary" sx={{ ml: 1 }}>
             {descricao}
           </Typography>
         </Condicional>

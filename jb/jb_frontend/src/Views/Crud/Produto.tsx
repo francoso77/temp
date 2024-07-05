@@ -129,8 +129,6 @@ export default function Produto() {
     let erros: { [key: string]: string } = {}
 
     retorno = validaCampo.naoVazio('nome', produto, erros, retorno, 'Nome do produto não pode ser vázio')
-    retorno = validaCampo.naoVazio('largura', produto, erros, retorno, 'Informe a largura')
-    retorno = validaCampo.naoVazio('gm2', produto, erros, retorno, 'Informe a gramatura')
     retorno = validaCampo.naoVazio('idUnidade', produto, erros, retorno, 'Informe uma Unidade')
     retorno = validaCampo.naoVazio('idTipoProduto', produto, erros, retorno, 'Informe um Tipo')
 
@@ -217,34 +215,61 @@ export default function Produto() {
   }
 
   const btPesquisar = () => {
+    const query = `
+      SELECT 
+          p.*,
+          p.nome AS produto_nome,
+          um.sigla AS unidadeMedida_sigla,
+          t.nome AS tipoProduto_nome
+      FROM 
+          produtos p
+      INNER JOIN 
+          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
+      INNER JOIN 
+          unidademedidas um ON um.idUnidade = p.idUnidade
+      WHERE 
+          p.nome LIKE '%${pesquisa.nome}%' ;
+      `;
     clsCrud
       .query({
         entidade: "Produto",
-        criterio: {
-          nome: "%".concat(pesquisa.nome).concat("%"),
-        },
-        camposLike: ["nome"],
-        joins: [
-          { tabelaRelacao: 'produto.tipoProduto', relacao: 'tipoProduto' },
-          { tabelaRelacao: 'produto.unidadeMedida', relacao: 'unidadeMedida' },
-        ],
-        select: [
-          "idProduto",
-          "produto.nome",
-          "unidadeMedida.sigla",
-          "tipoProduto.nome",
-          "localizacao",
-          "largura",
-          "gm2",
-          "ativo",
-        ],
-        msg: 'Pesquisando produtos ...',
+        sql: query,
+        msg: 'Pesquisando Produtos ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
   }
+  // const btPesquisar = () => {
+  //   clsCrud
+  //     .query({
+  //       entidade: "Produto",
+  //       criterio: {
+  //         nome: "%".concat(pesquisa.nome).concat("%"),
+  //       },
+  //       camposLike: ["nome"],
+  //       joins: [
+  //         { tabelaRelacao: 'produto.tipoProduto', relacao: 'tipoProduto' },
+  //         { tabelaRelacao: 'produto.unidadeMedida', relacao: 'unidadeMedida' },
+  //       ],
+  //       select: [
+  //         "idProduto",
+  //         "produto.nome",
+  //         "unidadeMedida.sigla",
+  //         "tipoProduto.nome",
+  //         "localizacao",
+  //         "largura",
+  //         "gm2",
+  //         "ativo",
+  //       ],
+  //       msg: 'Pesquisando produtos ...',
+  //       setMensagemState: setMensagemState
+  //     })
+  //     .then((rs: Array<any>) => {
+  //       setRsPesquisa(rs)
+  //     })
+  // }
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -284,7 +309,7 @@ export default function Produto() {
 
   useEffect(() => {
     BuscarDados()
-  },[])
+  }, [])
 
   return (
 

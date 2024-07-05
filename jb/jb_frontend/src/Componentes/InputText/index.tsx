@@ -161,7 +161,7 @@ const TextMaskCustom = forwardRef((props: any, ref: any) => {
                   : mask === "cep"
                     ? "00.000-000"
                     : mask === "mac" || tipo === "mac"
-                      ? "mm:mm:mm:mm:mm:mm"
+                      ? "mmm:mmm:mmm:mmm:mmm:mmm"
                       : mask
       }
       definitions={MASK_DEFINITIONS}
@@ -394,7 +394,7 @@ export default function InputText({
             tipo: tipo,
             maxLength:
               tipo === "mac"
-                ? 17
+                ? 23
                 : tipo === "date"
                   ? 10
                   : tipo === "dateTime"

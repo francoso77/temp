@@ -226,7 +226,7 @@ export default function UnidadeMedida() {
             <Typography component="h5" variant="h5" align="left">
               {/* Informe aqui o nome técnico de cada raça */}
               <Typography variant="body2" gutterBottom>
-                Informe o nome da unidade de Medida
+                {/* Informe o nome da unidade de Medida */}
               </Typography>
             </Typography>
 

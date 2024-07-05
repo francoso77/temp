@@ -36,7 +36,7 @@ export default function Estrutura() {
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<EstruturaInterface>>([])
   const [erros, setErros] = useState({})
@@ -269,6 +269,19 @@ export default function Estrutura() {
     BuscarDados()
   }, [])
 
+  useEffect(() => {
+    if (layoutState.titulo === "Cadasto de Estruturas") {
+      setLocalState({ action: actionTypes.pesquisando })
+      setLayoutState({
+        titulo: 'Cadastro de Estruturas',
+        tituloAnterior: 'Cadastro de Estruturas de Produtos',
+        pathTitulo: '/Estrutura',
+        pathTituloAnterior: '/DetalheEstrutura'
+      })
+    }
+  },)
+
+
   return (
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -410,10 +423,10 @@ export default function Estrutura() {
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action === 'detalhes'}>
-              <Grid item xs={12}>
-                <DetalheEstrutura rsEstrutura={estrutura} />
-              </Grid>
-            </Condicional>
+            <Grid item xs={12}>
+              <DetalheEstrutura rsEstrutura={estrutura} />
+            </Grid>
+          </Condicional>
         </Grid>
       </Paper >
     </Container >

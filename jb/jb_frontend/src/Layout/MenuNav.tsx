@@ -15,7 +15,8 @@ import Menu from '@mui/material/Menu';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@mui/material';
 import PetsOutlinedIcon from '@mui/icons-material/PetsOutlined';
-import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
+// import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
+import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import menuCrud from '../Utils/menuCrud.json';
 
@@ -126,8 +127,9 @@ export default function MenuNav() {
       <Offset />
       <AppBar onLoad={fecharLoading} position="fixed" color='default' sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar>
-          <IconButton color="primary" aria-label="Dashboard" id="Dashboard" onClick={() => irPara('/EtapasRealizadas', 'Etapas Realizadas')}>
-            <MilitaryTechOutlinedIcon sx={{ width: 32, height: 32 }} />
+          <IconButton color="primary" aria-label="Dashboard" id="Dashboard" onClick={() => irPara('/Pedidos', 'Pedidos')}>
+            {/* <MilitaryTechOutlinedIcon sx={{ width: 32, height: 32 }} /> */}
+            <NoteAltOutlinedIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <Box sx={{ flexGrow: 0.25 }} />
           <IconButton color="primary" onClick={() => irPara('/Cao', 'Cão')}>

@@ -22,27 +22,34 @@
   },
   {
     "id": 4,
+    "menu": "Prazos de Entrega",
+    "icon": "calendar_month_rounded",
+    "path": "/PrazoEntrega",
+    "titulo": "Cadastro de Prazos"
+  },
+  {
+    "id": 5,
     "menu": "Máquinas",
     "icon": "miscellaneous_services",
     "path": "/Maquina",
     "titulo": "Cadastro de Máquinas"
   },
   {
-    "id": 5,
+    "id": 6,
     "menu": "Produtos",
     "icon": "category_rounded",
     "path": "/Produto",
     "titulo": "Cadastro de Produtos"
   },
   {
-    "id": 6,
+    "id": 7,
     "menu": "Tipos de Produto",
     "icon": "article_rounded",
     "path": "/TipoProduto",
     "titulo": "Cadastro de Tipos de produtos"
   },
   {
-    "id": 7,
+    "id": 8,
     "menu": "Unidades de Medida",
     "icon": "square_foot",
     "path": "/UnidadeMedida",

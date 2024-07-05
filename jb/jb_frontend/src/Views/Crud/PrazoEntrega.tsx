@@ -18,7 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 
 
-export default function prazoEntrega() {
+export default function PrazoEntrega() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -227,7 +227,7 @@ export default function prazoEntrega() {
             <Typography component="h5" variant="h5" align="left">
               {/* Informe aqui o nome técnico de cada raça */}
               <Typography variant="body2" gutterBottom>
-                Informe os prazos de entrega
+                {/* Informe os prazos de entrega */}
               </Typography>
             </Typography>
 
@@ -301,12 +301,13 @@ export default function prazoEntrega() {
             <Grid item xs={12}>
               <InputText
                 label="Qtd de Dias"
-                tipo="number"
+                tipo="mac"
                 dados={prazoEntrega}
                 field="dias"
                 setState={setPrazoEntrega}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
+                mask='000/000/000/000/000'
                 maxLength={35}
               />
             </Grid>

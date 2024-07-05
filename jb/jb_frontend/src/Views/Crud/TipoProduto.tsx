@@ -228,7 +228,7 @@ export default function TipoProduto() {
             <Typography component="h5" variant="h5" align="left">
               {/* Informe aqui o nome técnico de cada raça */}
               <Typography variant="body2" gutterBottom>
-                Informe o nome do tipo de produto
+                {/* Informe o nome do tipo de produto */}
               </Typography>
             </Typography>
 
