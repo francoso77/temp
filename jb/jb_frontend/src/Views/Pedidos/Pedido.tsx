@@ -330,19 +330,19 @@ export default function Pedido() {
                   {
                     icone: "edit",
                     onAcionador: (rs: PedidoInterface) =>
-                      onEditar(rs.idpedido as number),
+                      onEditar(rs.idPedido as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
                     onAcionador: (rs: PedidoInterface) =>
-                      onExcluir(rs.idpedido as number),
+                      onExcluir(rs.idPedido as number),
                     toolTip: "Excluir",
                   },
                   {
                     icone: "auto_awesome_motion_outlined",
                     onAcionador: (rs: DetalhePedidoInterface) =>
-                      onDetalhe(rs.idpedido as number),
+                      onDetalhe(rs.idPedido as number),
                     toolTip: "pedido",
                   },
                 ]}
@@ -425,11 +425,11 @@ export default function Pedido() {
               </Condicional>
             </Grid>
           </Condicional>
-          <Condicional condicao={localState.action === 'detalhes'}>
+          {/* <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
-              <Detalhepedido rspedido={pedido} />
+              <DetalhePedido rsPedido={pedido} />
             </Grid>
-          </Condicional>
+          </Condicional> */}
         </Grid>
       </Paper >
     </Container >

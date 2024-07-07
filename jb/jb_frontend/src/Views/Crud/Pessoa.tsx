@@ -407,6 +407,7 @@ export default function Pessoa() {
               selectedValue={selectedValue}
               open={open}
               onClose={handleClose}
+              tipo='pessoas'
             />
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>

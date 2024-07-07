@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Dialog, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
+import { SqlEstruturaInterface } from '../../../../jb_backend/src/interfaces/sqlEstruturaInterface';
 
 
 interface PropsInterface {
@@ -41,6 +42,13 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     nome: string
   }
 
+  const [open, setOpen] = useState(true);
+  const [selectedValue, setSelectedValue] = useState('');
+
+  const handleClose = (value: string) => {
+    setOpen(false);
+    setSelectedValue(value);
+  };
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
@@ -302,149 +310,151 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
 
   return (
     <>
-      <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
-        <Grid item xs={6}>
-          <ShowText
-            titulo="Estrutura do produto"
-            descricao={nomeProduto.nome} />
-        </Grid>
-        <Grid item xs={6}>
-          <ShowText
-            titulo="Qtd Base"
-            descricao={rsEstrutura.qtdBase.toString()} />
-        </Grid>
-      </Paper>
-      <Paper variant="outlined" sx={{ padding: 2 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+      <Dialog onClose={handleClose} open={open}>
+        <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
+          <Grid item xs={6}>
+            <ShowText
+              titulo="Estrutura do produto"
+              descricao={nomeProduto.nome} />
           </Grid>
-          <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11} >
-              <InputText
-                label="Digite o nome"
-                tipo="uppercase"
-                dados={pesquisa}
-                field="nome"
-                setState={setPesquisa}
-                iconeEnd='searchicon'
-                onClickIconeEnd={() => btPesquisar()}
-                mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autoFocus
-              />
+          <Grid item xs={6}>
+            <ShowText
+              titulo="Qtd Base"
+              descricao={rsEstrutura.qtdBase.toString()} />
+          </Grid>
+        </Paper>
+        <Paper variant="outlined" sx={{ padding: 2 }}>
+          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'right' }}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
             </Grid>
-            <Grid item xs={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={12}>
-              <DataTable
-                cabecalho={cabecalhoForm}
-                dados={rsPesquisa}
-                acoes={[
-                  {
-                    icone: "edit",
-                    onAcionador: (rs: DetalheEstruturaInterface) =>
-                      onEditar(rs.idDetalheEstrutura as number),
-                    toolTip: "Editar",
-                  },
-                  {
-                    icone: "delete",
-                    onAcionador: (rs: DetalheEstruturaInterface) =>
-                      onExcluir(rs.idDetalheEstrutura as number),
-                    toolTip: "Excluir",
-                  },
-                ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
-              />
-            </Grid>
-          </Condicional>
-          <Condicional condicao={localState.action !== 'pesquisando'}>
-            <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsProduto}
-                campoDescricao="nome"
-                campoID="idProduto"
-                dados={detalheEstrutura}
-                mensagemPadraoCampoEmBranco="Escolha um produto"
-                field="idProduto"
-                label="Produtos"
-                erros={erros}
-                setState={setDetalheEstrutura}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsCor}
-                campoDescricao="nome"
-                campoID="idCor"
-                dados={detalheEstrutura}
-                mensagemPadraoCampoEmBranco="Escolha uma cor"
-                field="idCor"
-                label="Cores"
-                erros={erros}
-                setState={setDetalheEstrutura}
-              />
-            </Grid>
-            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                type='number'
-                label="Qtd"
-                dados={detalheEstrutura}
-                field="qtd"
-                setState={setDetalheEstrutura}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-              <Tooltip title={'Cancelar'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 3, ml: 2 }}
-                  onClick={() => btCancelar()}
-                >
-                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                <Tooltip title={'Confirmar'}>
+            <Condicional condicao={localState.action === 'pesquisando'}>
+              <Grid item xs={11} >
+                <InputText
+                  label="Digite o nome"
+                  tipo="uppercase"
+                  dados={pesquisa}
+                  field="nome"
+                  setState={setPesquisa}
+                  iconeEnd='searchicon'
+                  onClickIconeEnd={() => btPesquisar()}
+                  mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={1}>
+                <Tooltip title={'Incluir'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
+                    onClick={() => btIncluir()}
+                  >
+                    <AddCircleIcon sx={{ fontSize: 50 }} />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={12}>
+                <DataTable
+                  cabecalho={cabecalhoForm}
+                  dados={rsPesquisa}
+                  acoes={[
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: DetalheEstruturaInterface) =>
+                        onEditar(rs.idDetalheEstrutura as number),
+                      toolTip: "Editar",
+                    },
+                    {
+                      icone: "delete",
+                      onAcionador: (rs: DetalheEstruturaInterface) =>
+                        onExcluir(rs.idDetalheEstrutura as number),
+                      toolTip: "Excluir",
+                    },
+                  ]}
+                  order={order}
+                  orderBy={orderBy}
+                  onRequestSort={handleRequestSort}
+                />
+              </Grid>
+            </Condicional>
+            <Condicional condicao={localState.action !== 'pesquisando'}>
+              <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+                <ComboBox
+                  opcoes={rsProduto}
+                  campoDescricao="nome"
+                  campoID="idProduto"
+                  dados={detalheEstrutura}
+                  mensagemPadraoCampoEmBranco="Escolha um produto"
+                  field="idProduto"
+                  label="Produtos"
+                  erros={erros}
+                  setState={setDetalheEstrutura}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+                <ComboBox
+                  opcoes={rsCor}
+                  campoDescricao="nome"
+                  campoID="idCor"
+                  dados={detalheEstrutura}
+                  mensagemPadraoCampoEmBranco="Escolha uma cor"
+                  field="idCor"
+                  label="Cores"
+                  erros={erros}
+                  setState={setDetalheEstrutura}
+                />
+              </Grid>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  type='number'
+                  label="Qtd"
+                  dados={detalheEstrutura}
+                  field="qtd"
+                  setState={setDetalheEstrutura}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                />
+              </Grid>
+              <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+                <Tooltip title={'Cancelar'}>
                   <IconButton
                     color="secondary"
                     sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
+                    onClick={() => btCancelar()}
                   >
-                    <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                    <CancelRoundedIcon sx={{ fontSize: 50 }} />
                   </IconButton>
                 </Tooltip>
-              </Condicional>
+                <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+                  <Tooltip title={'Confirmar'}>
+                    <IconButton
+                      color="secondary"
+                      sx={{ mt: 3, ml: 2 }}
+                      onClick={() => btConfirmar()}
+                    >
+                      <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Condicional>
 
-              <Condicional condicao={localState.action === 'excluindo'}>
-                <Tooltip title={'Excluir'}>
-                  <IconButton
-                    color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
-                  >
-                    <DeleteIcon sx={{ fontSize: 60 }} />
-                  </IconButton>
-                </Tooltip>
-              </Condicional>
-            </Grid>
-          </Condicional>
-        </Grid>
-      </Paper >
+                <Condicional condicao={localState.action === 'excluindo'}>
+                  <Tooltip title={'Excluir'}>
+                    <IconButton
+                      color="secondary"
+                      sx={{ mt: 3, ml: 2 }}
+                      onClick={() => btConfirmar()}
+                    >
+                      <DeleteIcon sx={{ fontSize: 60 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Condicional>
+              </Grid>
+            </Condicional>
+          </Grid>
+        </Paper >
+      </Dialog>
     </>
   )
 }

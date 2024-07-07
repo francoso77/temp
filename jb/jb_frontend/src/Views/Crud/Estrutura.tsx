@@ -18,7 +18,9 @@ import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { SqlEstruturaInterface } from '../../../../jb_backend/src/interfaces/sqlEstruturaInterface';
 import DetalheEstrutura from './DetalheEstrutura';
+import SimpleDialog from '../../Componentes/Dialog';
 
 
 export default function Estrutura() {
@@ -35,10 +37,19 @@ export default function Estrutura() {
     nome: string
   }
 
+  const [open, setOpen] = useState(true);
+  const [selectedValue, setSelectedValue] = useState("Aqui vai o nome do produto");
+
+  const handleClose = (value: string) => {
+    setOpen(false);
+    setSelectedValue(value);
+    setLocalState({ action: actionTypes.incluindo })
+  };
+
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<EstruturaInterface>>([])
+  const [rsPesquisa, setRsPesquisa] = useState<Array<SqlEstruturaInterface>>([])
   const [erros, setErros] = useState({})
   const [estrutura, setEstrutura] = useState<EstruturaInterface>(ResetDados)
   const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
@@ -101,6 +112,7 @@ export default function Estrutura() {
   const onDetalhe = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setEstrutura(rs)
+      setSelectedValue(rsPesquisa[0].produto_nome);
       setLocalState({ action: actionTypes.detalhes })
     })
   }
@@ -224,8 +236,9 @@ export default function Estrutura() {
         msg: 'Pesquisando Estruturas ...',
         setMensagemState: setMensagemState
       })
-      .then((rs: Array<any>) => {
+      .then((rs: Array<SqlEstruturaInterface>) => {
         setRsPesquisa(rs)
+        console.log(rs)
       })
   }
   const irPara = useNavigate()
@@ -425,6 +438,13 @@ export default function Estrutura() {
           <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
               <DetalheEstrutura rsEstrutura={estrutura} />
+              {/* <SimpleDialog
+              selectedValue={selectedValue}
+              open={open}
+              onClose={handleClose}
+              tipo='dados'
+              rsDados={rsPesquisa}
+            /> */}
             </Grid>
           </Condicional>
         </Grid>

@@ -9,6 +9,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import PersonIcon from '@mui/icons-material/Person';
 import { blue } from '@mui/material/colors';
+import Condicional from '../Condicional/Condicional';
+import { Typography } from '@mui/material';
 
 export const pessoas = [
   { nome: 'Cliente PF', codigo: 'C' },
@@ -24,10 +26,14 @@ export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;
   onClose: (value: string) => void;
+  rsDados?: {
+    [key: string]: string | number | readonly string[] | undefined | any
+  };
+  tipo: 'pessoas' | 'dados'
 }
 
 export default function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open } = props;
+  const { onClose, selectedValue, open, rsDados, tipo } = props;
 
   const handleClose = () => {
     onClose(selectedValue);
@@ -38,22 +44,35 @@ export default function SimpleDialog(props: SimpleDialogProps) {
   };
 
   return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Escolha o tipo de Pessoa</DialogTitle>
-      <List sx={{ pt: 0 }}>
-        {pessoas.map((pessoa) => (
-          <ListItem disableGutters key={pessoa.nome}>
-            <ListItemButton onClick={() => handleListItemClick(pessoa.codigo)}>
-              <ListItemAvatar>
-                <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
-                  <PersonIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={pessoa.nome} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Dialog>
+    <>
+      <Condicional condicao={tipo === 'pessoas'}>
+        <Dialog onClose={handleClose} open={open}>
+          <DialogTitle>Escolha o tipo de Pessoa</DialogTitle>
+          <List sx={{ pt: 0 }}>
+            {pessoas.map((pessoa) => (
+              <ListItem disableGutters key={pessoa.nome}>
+                <ListItemButton onClick={() => handleListItemClick(pessoa.codigo)}>
+                  <ListItemAvatar>
+                    <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
+                      <PersonIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary={pessoa.nome} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Dialog>
+      </Condicional>
+      <Condicional condicao={tipo === 'dados'}>
+        <Dialog onClose={handleClose} open={open}>
+          <DialogTitle>Estrutura de produtos</DialogTitle>
+            <Typography>
+                    {selectedValue}
+            </Typography>
+        </Dialog>
+        
+      </Condicional>
+    </>
   );
 }
