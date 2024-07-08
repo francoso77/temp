@@ -19,8 +19,8 @@ import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_ba
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { SqlEstruturaInterface } from '../../../../jb_backend/src/interfaces/sqlEstruturaInterface';
-import DetalheEstrutura from './DetalheEstrutura';
 import SimpleDialog from '../../Componentes/Dialog';
+import DetalheEstrutura from './DetalheEstrutura';
 
 
 export default function Estrutura() {
@@ -238,7 +238,6 @@ export default function Estrutura() {
       })
       .then((rs: Array<SqlEstruturaInterface>) => {
         setRsPesquisa(rs)
-        console.log(rs)
       })
   }
   const irPara = useNavigate()
