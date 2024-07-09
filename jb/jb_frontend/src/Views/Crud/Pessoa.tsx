@@ -15,8 +15,8 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { PessoaTypes } from '../../types/pessoaTypes';
-import SimpleDialog, { pessoas } from '../../Componentes/Dialog';
+import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
+import SimpleDialog from '../../Componentes/Dialog';
 import { THEME } from '../../Layout/Theme';
 
 
@@ -25,17 +25,16 @@ export default function Pessoa() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const [open, setOpen] = useState(true);
-  const [selectedValue, setSelectedValue] = useState(pessoas[1].codigo);
+  const [selectedValue, setSelectedValue] = useState(PessoaTypes[1].descricao);
 
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value);
-    value === 'C' ? pessoa.tipoPessoa = PessoaTypes.clienteFisica
-      : value === 'J' ? pessoa.tipoPessoa = PessoaTypes.clienteJuridica
-        : value === 'F' ? pessoa.tipoPessoa = PessoaTypes.fornecedor
-          : value === 'R' ? pessoa.tipoPessoa = PessoaTypes.revisador
-            : value === 'T' ? pessoa.tipoPessoa = PessoaTypes.tecelao : pessoa.tipoPessoa = PessoaTypes.vendedor
-
+    PessoaTypes.map((p) => {
+      if (p.idPessoaType === value) {
+        pessoa.tipoPessoa = p.idPessoaType
+      }
+    })
     setLocalState({ action: actionTypes.incluindo })
   };
 
@@ -53,7 +52,7 @@ export default function Pessoa() {
     whatsapp: '',
     email: '',
     comissao: 0,
-    tipoPessoa: PessoaTypes.clienteJuridica,
+    tipoPessoa: PessoaType.clienteJuridica,
     ativo: true
   }
   interface PesquisaInterface {
@@ -84,12 +83,13 @@ export default function Pessoa() {
       cabecalho: 'Tipo',
       alinhamento: 'left',
       campo: 'tipoPessoa',
-      format: (tipo) =>
-        tipo === 'C' ? 'CLIENTE PF'
-          : tipo === 'J' ? 'CLIENTE PJ'
-            : tipo === 'F' ? 'FORNECEDOR'
-              : tipo === 'R' ? 'REVISADOR'
-                : tipo === 'T' ? 'TECELÃO' : 'VENDEDOR'
+      format: (tipo: PessoaType) =>
+        tipo === PessoaTypes[0].idPessoaType ? PessoaTypes[0].descricao.toUpperCase()
+          : tipo === PessoaTypes[1].idPessoaType ? PessoaTypes[1].descricao.toUpperCase()
+            : tipo === PessoaTypes[2].idPessoaType ? PessoaTypes[2].descricao.toUpperCase()
+              : tipo === PessoaTypes[3].idPessoaType ? PessoaTypes[3].descricao.toUpperCase()
+                : tipo === PessoaTypes[4].idPessoaType ? PessoaTypes[4].descricao.toUpperCase() : PessoaTypes[5].descricao.toUpperCase()
+      // format: (data) => clsFormatacao.dataISOtoUser(data),
     },
     {
       cabecalho: 'Whatsapp',
@@ -423,11 +423,7 @@ export default function Pessoa() {
             </Grid>
             <Grid item xs={6} sm={6} md={6} sx={{ textAlign: 'right', color: THEME.cores.cinzaTexto }}>
               <Typography variant="h6" component="div">
-                Tipo de Pessoa: {pessoa.tipoPessoa === 'C' ? 'CLIENTE PF'
-                  : pessoa.tipoPessoa === 'J' ? 'CLIENTE PJ'
-                    : pessoa.tipoPessoa === 'F' ? 'FORNECEDOR'
-                      : pessoa.tipoPessoa === 'R' ? 'REVISADOR'
-                        : pessoa.tipoPessoa === 'T' ? 'TECELÃO' : 'VENDEDOR'}
+                Tipo de Pessoa: {PessoaTypes.map((p) => p.idPessoaType === selectedValue ? p.descricao : '')}
               </Typography>
             </Grid>
             <Grid item xs={12} md={['C', 'F', 'J'].includes(pessoa.tipoPessoa) ? 6 : 4} sx={{ mt: 2, pl: { md: 1 } }}>

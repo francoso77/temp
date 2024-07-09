@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
-import { StatusPedidoItemTypes } from '../types/statusPedidoItemTypes';
+import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
 import Pedido from './pedido.entity';
 
 @Entity({ name: 'detalhepedidos' })
@@ -33,5 +33,5 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   qtdAtendida: number
 
   @Column()
-  statusItem: StatusPedidoItemTypes;
+  statusItem: StatusPedidoItemType;
 }

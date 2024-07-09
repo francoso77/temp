@@ -11,16 +11,17 @@ import PersonIcon from '@mui/icons-material/Person';
 import { blue } from '@mui/material/colors';
 import Condicional from '../Condicional/Condicional';
 import { Typography } from '@mui/material';
+import { PessoaTypes } from '../../types/pessoaTypes';
 
-export const pessoas = [
-  { nome: 'Cliente PF', codigo: 'C' },
-  { nome: 'Cliente PJ', codigo: 'J' },
-  { nome: 'Fornecedor', codigo: 'F' },
-  { nome: 'Revisador', codigo: 'R' },
-  { nome: 'Tecelão', codigo: 'T' },
-  { nome: 'Vendedor', codigo: 'V' }
+// export const pessoas = [
+//   { nome: 'Cliente PF', codigo: 'C' },
+//   { nome: 'Cliente PJ', codigo: 'J' },
+//   { nome: 'Fornecedor', codigo: 'F' },
+//   { nome: 'Revisador', codigo: 'R' },
+//   { nome: 'Tecelão', codigo: 'T' },
+//   { nome: 'Vendedor', codigo: 'V' }
 
-];
+// ];
 
 export interface SimpleDialogProps {
   open: boolean;
@@ -49,15 +50,15 @@ export default function SimpleDialog(props: SimpleDialogProps) {
         <Dialog onClose={handleClose} open={open}>
           <DialogTitle>Escolha o tipo de Pessoa</DialogTitle>
           <List sx={{ pt: 0 }}>
-            {pessoas.map((pessoa) => (
-              <ListItem disableGutters key={pessoa.nome}>
-                <ListItemButton onClick={() => handleListItemClick(pessoa.codigo)}>
+            {PessoaTypes.map((pessoa) => (
+              <ListItem disableGutters key={pessoa.descricao}>
+                <ListItemButton onClick={() => handleListItemClick(pessoa.idPessoaType)}>
                   <ListItemAvatar>
                     <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
                       <PersonIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={pessoa.nome} />
+                  <ListItemText primary={pessoa.descricao} />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -67,11 +68,11 @@ export default function SimpleDialog(props: SimpleDialogProps) {
       <Condicional condicao={tipo === 'dados'}>
         <Dialog onClose={handleClose} open={open}>
           <DialogTitle>Estrutura de produtos</DialogTitle>
-            <Typography>
-                    {selectedValue}
-            </Typography>
+          <Typography>
+            {selectedValue}
+          </Typography>
         </Dialog>
-        
+
       </Condicional>
     </>
   );

@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
 import { ProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
-import { TipoColagemTypes } from '../types/tipoColagemTypes';
+import { TipoColagemType } from '../types/tipoColagemTypes';
 
 @Entity({ name: 'producaodublagens' })
 export default class ProducaoDublagem implements ProducaoDublagemInterface {
@@ -13,7 +13,7 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   dataProducao: string;
 
   @Column()
-  tipoColagem: TipoColagemTypes;
+  tipoColagem: TipoColagemType;
 
   @Column({ type: 'float', precision: 2 })
   qtdColagem: number

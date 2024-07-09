@@ -1,11 +1,11 @@
-import { TurnoTypes } from '../types/turnoTypes'
+import { TurnoType } from '../types/turnoTypes'
 
 export interface ProducaoMalhariaInterface {
   idPeca?: number
   idMaquina: number
   idProduto: number
   dataProducao: string
-  turno: TurnoTypes
+  turno: TurnoType
   peso: number
   localizacao?: string
   idPessoa_revisador: number

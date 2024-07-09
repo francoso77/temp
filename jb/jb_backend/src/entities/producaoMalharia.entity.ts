@@ -3,7 +3,7 @@ import Pessoa from './pessoa.entity';
 import { ProducaoMalhariaInterface } from '../interfaces/producaoMalhariaInterface';
 import Maquina from './maquina.entity';
 import Produto from './produto.entity';
-import { TurnoTypes } from '../types/turnoTypes';
+import { TurnoType } from '../types/turnoTypes';
 import DetalheTinturaria from './detalheTinturaria.entity';
 import Tinturaria from './tinturaria.entity';
 
@@ -31,7 +31,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   dataProducao: string;
 
   @Column()
-  turno: TurnoTypes;
+  turno: TurnoType;
 
   @Column({ type: 'float', precision: 2 })
   peso: number

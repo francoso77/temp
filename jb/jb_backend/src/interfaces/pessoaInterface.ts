@@ -1,4 +1,4 @@
-import { PessoaTypes } from '../types/pessoaTypes'
+import { PessoaType } from '../types/pessoaTypes'
 
 export interface PessoaInterface {
   idPessoa?: number
@@ -14,7 +14,7 @@ export interface PessoaInterface {
   telefone: string
   whatsapp: string
   email?: string
-  tipoPessoa: PessoaTypes
+  tipoPessoa: PessoaType
   comissao?: number
   ativo: boolean
 }

@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { PessoaInterface } from '../interfaces/pessoaInterface';
-import { PessoaTypes } from '../types/pessoaTypes';
+import { PessoaType } from '../types/pessoaTypes';
 import { Length } from 'class-validator';
 import Pedido from './pedido.entity';
 import Entrada from './entrada.entity';
@@ -57,7 +57,7 @@ export default class Pessoa implements PessoaInterface {
   comissao: number
 
   @Column({ length: 1 })
-  tipoPessoa: PessoaTypes;
+  tipoPessoa: PessoaType;
 
   @Column()
   ativo: boolean

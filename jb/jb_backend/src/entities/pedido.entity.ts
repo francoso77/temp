@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { PedidoInterface } from '../interfaces/pedidoInterface';
-import { StatusPedidoTypes } from '../types/statusPedidoTypes';
+import { StatusPedidoType } from '../types/statusPedidoTypes';
 import PrazoEntrega from './prazoEntrega.entity';
 import DetalhePedido from './detalhePedido.entity';
 import Pessoa from './pessoa.entity';
@@ -42,5 +42,5 @@ export default class Pedido implements PedidoInterface {
   detalhesPedido: DetalhePedido[];
 
   @Column({ length: 1 })
-  statusPedido: StatusPedidoTypes;
+  statusPedido: StatusPedidoType;
 }

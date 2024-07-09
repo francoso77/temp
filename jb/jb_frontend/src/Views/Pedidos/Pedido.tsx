@@ -18,7 +18,7 @@ import ComboBox from '../../Componentes/ComboBox';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { StatusPedidoType } from '../../types/statusPedidoTypes';
 
 
 export default function Pedido() {
@@ -32,7 +32,7 @@ export default function Pedido() {
     idPessoa_cliente: 0,
     idPessoa_vendedor: 0,
     idPrazoEntrega: 0,
-    statusPedido: StatusPedidoTypes.aberto
+    statusPedido: StatusPedidoType.aberto
   }
   interface PesquisaInterface {
     nome: string

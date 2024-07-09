@@ -1,5 +1,5 @@
-import { StatusPedidoItemTypes } from '../types/statusPedidoItemTypes'
-import { StatusPedidoTypes } from '../types/statusPedidoTypes'
+import { StatusPedidoItemType } from '../types/statusPedidoItemTypes'
+import { StatusPedidoType } from '../types/statusPedidoTypes'
 
 export interface PedidoInterface {
   idPedido?: number
@@ -8,7 +8,7 @@ export interface PedidoInterface {
   idPessoa_cliente: number
   idPessoa_vendedor: number
   idPrazoEntrega: number
-  statusPedido: StatusPedidoTypes
+  statusPedido: StatusPedidoType
 }
 
 export interface DetalhePedidoInterface {
@@ -18,5 +18,5 @@ export interface DetalhePedidoInterface {
   qtdPedida: number
   vrUnitario: number
   qtdAtendida: number
-  statusItem: StatusPedidoItemTypes
+  statusItem: StatusPedidoItemType
 }

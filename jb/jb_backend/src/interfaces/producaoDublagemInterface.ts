@@ -1,9 +1,9 @@
-import { TipoColagemTypes } from '../types/tipoColagemTypes';
+import { TipoColagemType } from '../types/tipoColagemTypes';
 
 export interface ProducaoDublagemInterface {
   idDublagem?: number
   dataProducao: string
-  tipoColagem: TipoColagemTypes
+  tipoColagem: TipoColagemType
   qtdColagem: number
 }
 
