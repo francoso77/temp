@@ -326,7 +326,7 @@ export default function Produto() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
               <InputText
-                label="Digite o nome"
+                label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
@@ -427,24 +427,26 @@ export default function Produto() {
             </Grid>
             <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                type='number'
+                tipo='currency'
                 label="Largura"
                 dados={produto}
                 field="largura"
                 setState={setProduto}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
+                scale={2}
               />
             </Grid>
             <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                type='number'
+                tipo='currency'
                 label="G/M²"
                 dados={produto}
                 field="gm2"
                 setState={setProduto}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
+                scale={2}
               />
             </Grid>
             <Grid item xs={12} md={3} sx={{ ml: 8, mt: 5 }}>

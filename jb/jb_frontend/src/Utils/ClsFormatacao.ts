@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { PessoaTypes } from "../types/pessoaTypes";
 
 export default class ClsFormatacao {
   public telefone(numero: string): null | string {
@@ -61,7 +62,9 @@ export default class ClsFormatacao {
     }
   }
 
+  //Retorna a data e a hora no formato "yyyy-MM-dd'T'HH:mm"
   public dataTimeZoneZtoLocalInput(data: string): string {
     return DateTime.fromISO(data).toFormat("yyyy-MM-dd'T'HH:mm")
   }
+
 }

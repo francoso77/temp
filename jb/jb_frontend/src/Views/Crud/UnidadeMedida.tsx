@@ -237,7 +237,7 @@ export default function UnidadeMedida() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
               <InputText
-                label="Digite o nome"
+                label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"

@@ -309,7 +309,7 @@ export default function Estrutura() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
               <InputText
-                label="Digite o nome do Produto"
+                label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"

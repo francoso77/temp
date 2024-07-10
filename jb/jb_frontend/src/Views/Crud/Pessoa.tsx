@@ -18,12 +18,15 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
 import SimpleDialog from '../../Componentes/Dialog';
 import { THEME } from '../../Layout/Theme';
+import ClsFormatacao from '../../Utils/ClsFormatacao';
 
 
 export default function Pessoa() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
+  const clsFormatacao = new ClsFormatacao()
+
   const [open, setOpen] = useState(true);
   const [selectedValue, setSelectedValue] = useState(PessoaTypes[1].descricao);
 
@@ -83,13 +86,7 @@ export default function Pessoa() {
       cabecalho: 'Tipo',
       alinhamento: 'left',
       campo: 'tipoPessoa',
-      format: (tipo: PessoaType) =>
-        tipo === PessoaTypes[0].idPessoaType ? PessoaTypes[0].descricao.toUpperCase()
-          : tipo === PessoaTypes[1].idPessoaType ? PessoaTypes[1].descricao.toUpperCase()
-            : tipo === PessoaTypes[2].idPessoaType ? PessoaTypes[2].descricao.toUpperCase()
-              : tipo === PessoaTypes[3].idPessoaType ? PessoaTypes[3].descricao.toUpperCase()
-                : tipo === PessoaTypes[4].idPessoaType ? PessoaTypes[4].descricao.toUpperCase() : PessoaTypes[5].descricao.toUpperCase()
-      // format: (data) => clsFormatacao.dataISOtoUser(data),
+      format: (tipo) => PessoaTypes.find(t => t.idPessoaType === tipo)?.descricao.toUpperCase()
     },
     {
       cabecalho: 'Whatsapp',
@@ -317,10 +314,10 @@ export default function Pessoa() {
       clsCrud.verificaCEP({ CEP: pessoa.cep, setMensagemState: setMensagemState })
         .then((temCep) => {
           if (temCep) {
-            pessoa.endereco = clsCrud.tmp_eCEP.logradouro
-            pessoa.bairro = clsCrud.tmp_eCEP.bairro
-            pessoa.cidade = clsCrud.tmp_eCEP.localidade
-            pessoa.uf = clsCrud.tmp_eCEP.uf
+            pessoa.endereco = clsCrud.tmp_eCEP.logradouro.toUpperCase()
+            pessoa.bairro = clsCrud.tmp_eCEP.bairro.toUpperCase()
+            pessoa.cidade = clsCrud.tmp_eCEP.localidade.toUpperCase()
+            pessoa.uf = clsCrud.tmp_eCEP.uf.toUpperCase()
           }
           else {
             pessoa.endereco = ''
@@ -356,7 +353,7 @@ export default function Pessoa() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
               <InputText
-                label="Digite o nome"
+                label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
@@ -481,7 +478,12 @@ export default function Pessoa() {
                   erros={erros}
                   iconeEnd='searchicon'
                   onClickIconeEnd={() => btBuscaCep()}
-                  mapKeyPress={[{ key: 'Enter', onKey: btBuscaCep }]}
+                  mapKeyPress={
+                    [
+                      { key: 'Enter', onKey: btBuscaCep },
+                      { key: 'Tab', onKey: btBuscaCep },
+                    ]
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={9} sx={{ mt: 2, pl: { md: 1 } }}>

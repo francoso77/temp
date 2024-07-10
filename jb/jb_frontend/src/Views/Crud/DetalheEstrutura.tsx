@@ -1,4 +1,4 @@
-import { Autocomplete, Container, Dialog, Grid, IconButton, InputLabel, Paper, Select, Tooltip } from '@mui/material';
+import { Autocomplete, Container, Dialog, FormControl, Grid, IconButton, InputLabel, OutlinedInput, Paper, Select, Tooltip, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Text from '../../Componentes/Text';
 import InputSelect from '../../Componentes/Select';
+import { useTheme } from "@mui/material";
+
 
 
 
@@ -44,6 +46,8 @@ const schemaDetalheEstrutura = z.object({
   }))
 })
 export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
+
+  const theme = useTheme()
 
   const { register, handleSubmit, formState: { errors }, control } = useForm<createDetalheEstrutura>({
     resolver: zodResolver(schemaDetalheEstrutura),
@@ -361,8 +365,17 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
             </IconButton>
           </Grid>
 
-          <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+          <Grid item xs={12} sm={11} sx={{ mt: 2 }}>
+          <Typography
+            variant='body2'
+            textAlign='left'
+            sx={{ mt: 1 }}
+          >
+            Produtos
+          </Typography>
+          </Grid>
 
+          <Grid item xs={12} sm={1} sx={{ mt: 2 }}>
             <Tooltip title={'Confirmar'}>
               <IconButton
                 color="secondary"
@@ -373,23 +386,27 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
               </IconButton>
             </Tooltip>
           </Grid>
+
           {fields.map((field, index) => {
             return (
               <>
-                <Grid key={field.id} item xs={12} sm={4} sx={{ mt: 2 }}>
-                  <ComboBox
-                    opcoes={rsProduto}
-                    campoDescricao="nome"
-                    campoID="idProduto"
+
+                <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+
+                  <InputSelect
+                    label=''
                     dados={detalheEstrutura}
-                    mensagemPadraoCampoEmBranco="Escolha um produto"
-                    field="idProduto"
-                    label="Produtos"
+                    field={'idProduto'}
+                    nomeCampoChaveOpcoes='idProduto'
+                    nomeCampoDescricaoOpcoes='nome'
                     erros={erros}
+                    opcoes={rsProduto}
                     setState={setDetalheEstrutura}
                     {...register(`detalhe.${index}.idProduto`)}
                   />
-                  {/* {errors.idProduto && <span>{errors.idProduto.message}</span>} */}
+
+                  {/* {errors.idCor && <span>{errors.idCor.message}</span>} */}
+
                 </Grid>
                 <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
 
@@ -408,13 +425,15 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                   {/* {errors.idCor && <span>{errors.idCor.message}</span>} */}
 
                 </Grid>
-                <Grid item xs={3} md={2} sx={{ mt: 2.5, pl: { md: 2 } }}>
-                  <input
+                <Grid item xs={3} md={2} sx={{ mt: 4 }}>
+                  <OutlinedInput
+                    sx={{ my: 0, py: 0, height: 40 }}
                     type='number'
                     disabled={localState.action === 'excluindo' ? true : false}
                     {...register(`detalhe.${index}.qtd`)}
                   />
                   {/* {errors.qtd && <span>{errors.qtd.message}</span>} */}
+
 
                 </Grid>
 

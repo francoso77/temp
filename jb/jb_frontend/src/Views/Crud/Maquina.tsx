@@ -239,24 +239,24 @@ export default function Maquina() {
           nome: "%".concat(pesquisa.nome).concat("%"),
         },
         camposLike: ["nome"],
-        select: [
-          "idMaquina",
-          "nome",
-          "marca",
-          "tipoTear",
-          "kitElastano",
-          "modelo",
-          "serie",
-          "qtdAgulhas",
-          "qtdAlimentadores",
-          "diametro",
-          "espessura",
-          "platina",
-          "correia",
-          "agulha",
-          "dataPreventiva",
-          "ativo",
-        ],
+        // select: [
+        //   "idMaquina",
+        //   "nome",
+        //   "marca",
+        //   "tipoTear",
+        //   "kitElastano",
+        //   "modelo",
+        //   "serie",
+        //   "qtdAgulhas",
+        //   "qtdAlimentadores",
+        //   "diametro",
+        //   "espessura",
+        //   "platina",
+        //   "correia",
+        //   "agulha",
+        //   "dataPreventiva",
+        //   "ativo",
+        // ],
         msg: 'Pesquisando máquinas ...',
         setMensagemState: setMensagemState
       })
@@ -290,7 +290,7 @@ export default function Maquina() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={11}>
               <InputText
-                label="Digite o nome"
+                label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
@@ -482,23 +482,25 @@ export default function Maquina() {
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 label="Diâmetro"
-                tipo="number"
+                tipo="currency"
                 dados={maquina}
                 field="diametro"
                 setState={setMaquina}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
+                scale={2}
               />
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 label="Espessura"
-                tipo="number"
+                tipo="currency"
                 dados={maquina}
                 field="espessura"
                 setState={setMaquina}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
+                scale={2}
               />
             </Grid>
             <Grid item xs={12} sm={3} md={3} sx={{ textAlign: 'left' }}>
