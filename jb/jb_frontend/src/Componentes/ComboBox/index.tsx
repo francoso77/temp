@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import FormControl from '@mui/material/FormControl'
-import { Typography, Autocomplete, TextField } from '@mui/material'
+import { Typography, Autocomplete, TextField, InputAdornment, IconButton, Icon } from '@mui/material'
 import { useTheme } from '@mui/material'
 import Condicional from '../Condicional/Condicional'
 
@@ -46,6 +46,8 @@ interface ComboBoxInterface<T> {
   permitirNovaOpcao?: boolean
   /** Formatação do valor apresentado como option - Caso contrário apresenta o campo option[campoDescricao] */
   formatarOption?: (opcao: T) => string
+  /* Quando Teclar ENTER ou clicar no ícone de pesquisa */
+  onClickPesquisa?: (v: string) => void
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -58,6 +60,24 @@ const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: 
       }
     }
   }
+}
+
+const exibirIconePesquisa = (posicao: "start" | "end", onclick: () => void) => {
+  return (
+    <InputAdornment position={posicao}>
+      <IconButton
+        sx={{ margin: 0, padding: 0 }}
+        onClick={() => {
+          if (onclick) {
+            console.log('oi')
+            // onclick()
+          }
+        }}
+      >
+        <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
+      </IconButton>
+    </InputAdornment>
+  )
 }
 
 export default function ComboBox<T>(
@@ -79,7 +99,8 @@ export default function ComboBox<T>(
     mensagemPadraoCampoEmBranco = 'Escolha Uma Opção',
     onKeyDown,
     permitirNovaOpcao = false,
-    formatarOption = undefined
+    formatarOption = undefined,
+    onClickPesquisa = () => { },
   }: ComboBoxInterface<T>) {
 
   const [pesquisa, setPesquisa] = useState('')
@@ -171,6 +192,10 @@ export default function ComboBox<T>(
               size="small"
               placeholder={placeholder}
               type="text"
+              InputProps={{
+                ...params.InputProps,
+                startAdornment: <>{exibirIconePesquisa('start', onClickPesquisa)}</>,
+              }}
               onKeyDown={(ev) => onKey(ev.key, mapKeyPress, pesquisa)}
             />
 

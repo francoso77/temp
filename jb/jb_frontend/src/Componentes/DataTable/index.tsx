@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon } from '@mui/material'
+import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon, TableFooter } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
@@ -35,6 +35,9 @@ export interface DataTableInterface {
   onRequestSort?: (event: React.MouseEvent<unknown>, property: keyof any) => void;
   order: Order;
   orderBy: string | number | symbol;
+  temTotal?: boolean;
+  colunaSoma?: string | undefined;
+  qtdColunas?: number;
 }
 
 export const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -60,6 +63,20 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     position: "sticky",
     left: 0,
     backgroundColor: "#FFFF",
+  },
+  [`&.${tableCellClasses.footer}`]: {
+    padding: 10,
+    backgroundColor: theme.palette.primary.main,
+    fontSize: 15,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
+    padding: 10,
+    backgroundColor: theme.palette.primary.main,
+    fontSize: 15,
+    color: theme.palette.common.white,
+    position: "sticky",
+    left: 0,
   },
 }))
 
@@ -111,6 +128,16 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
   return stabilizedThis.map((el) => el[0]);
 }
 
+//formatando o valor somado
+const formatNumber = (number: number, locale: string): string => {
+  return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, }).format(number);
+};
+
+//Somando a coluna informada para totalizar na tabela
+const sumColumn = (data: Array<any>, column: string): number => {
+  return data.reduce((sum, row) => sum + row[column], 0);
+};
+
 export default function DataTable<T>({
   dados = [],
   cabecalho = [],
@@ -120,6 +147,9 @@ export default function DataTable<T>({
   onRequestSort,
   order,
   orderBy,
+  temTotal,
+  colunaSoma = "",
+  qtdColunas
 }: DataTableInterface) {
 
   const theme = useTheme()
@@ -141,6 +171,9 @@ export default function DataTable<T>({
         onRequestSort(event, property);
       }
     }
+
+  const total = sumColumn(dados, colunaSoma)
+  const formattedTotal = formatNumber(total, 'pt-BR')
 
   return (
     <>
@@ -228,6 +261,16 @@ export default function DataTable<T>({
               </StyledTableRow>
             </Condicional>
           </TableBody>
+          <Condicional condicao={temTotal === true}>
+            <TableFooter>
+              <StyledTableRow>
+                <StyledTableCell colSpan={qtdColunas}>
+                  TOTAL {"(".concat(colunaSoma.toUpperCase()).concat(")")}
+                </StyledTableCell>
+                <StyledTableCell>{formattedTotal}</StyledTableCell>
+              </StyledTableRow>
+            </TableFooter>
+          </Condicional>
         </Table>
       </TableContainer>
       <TablePagination

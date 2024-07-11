@@ -341,7 +341,7 @@ export default function Produto() {
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
+                  sx={{ mt: 4, ml: { xs: 0, md: 2 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

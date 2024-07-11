@@ -127,7 +127,7 @@ export default function MenuNav() {
       <Offset />
       <AppBar onLoad={fecharLoading} position="fixed" color='default' sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar>
-          <IconButton color="primary" aria-label="Dashboard" id="Dashboard" onClick={() => irPara('/Pedidos', 'Pedidos')}>
+          <IconButton color="primary" aria-label="Dashboard" id="Dashboard" onClick={() => irPara('/Pedido', 'Pedidos')}>
             {/* <MilitaryTechOutlinedIcon sx={{ width: 32, height: 32 }} /> */}
             <NoteAltOutlinedIcon sx={{ width: 32, height: 32 }} />
           </IconButton>

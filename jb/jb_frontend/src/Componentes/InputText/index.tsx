@@ -182,7 +182,7 @@ const CurrencyMaskCustom = forwardRef((props: any, ref: any) => {
       {...other}
       mask={Number}
       scale={scale ? scale : 2}
-      signed={true}
+      // signed={true}
       padFractionalZeros={true}
       normalizeZeros={true}
       onAccept={(value: any) =>

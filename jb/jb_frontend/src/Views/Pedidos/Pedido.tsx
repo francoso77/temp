@@ -15,10 +15,10 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
-import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
+import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 
 
 export default function Pedido() {
@@ -41,11 +41,12 @@ export default function Pedido() {
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<PedidoInterface>>([])
+  const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [pedido, setPedido] = useState<PedidoInterface>(ResetDados)
-  const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
-  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
+  const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
+  const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
+  const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
@@ -104,6 +105,7 @@ export default function Pedido() {
   const onDetalhe = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
+      // setSelectedValue(rsPesquisa[0].produto_nome);
       setLocalState({ action: actionTypes.detalhes })
     })
   }
@@ -121,9 +123,10 @@ export default function Pedido() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    // retorno = validaCampo.naoVazio('qtdBase', pedido, erros, retorno, 'Informe uma quantidade Base')
-    // retorno = validaCampo.naoVazio('idUnidade', pedido, erros, retorno, 'Informe uma Unidade')
-    // retorno = validaCampo.naoVazio('idProduto', pedido, erros, retorno, 'Informe o Produto')
+    retorno = validaCampo.eData('dataPedido', pedido, erros, retorno)
+    retorno = validaCampo.naoVazio('idPessoa_cliente', pedido, erros, retorno, 'Informe um cliente')
+    retorno = validaCampo.naoVazio('idPessoa_vendedor', pedido, erros, retorno, 'Informe um vendedor')
+    retorno = validaCampo.naoVazio('idPrazoEntrega', pedido, erros, retorno, 'Defina um prazo')
 
     setErros(erros)
     return retorno
@@ -137,7 +140,7 @@ export default function Pedido() {
         criterio: {
           idPedido: pedido.idPedido,
         },
-        msg: 'Pesquisando pedidos ...',
+        msg: 'Pesquisando produtos ...',
         setMensagemState: setMensagemState
       })
       .then((rs) => {
@@ -208,15 +211,9 @@ export default function Pedido() {
   const btPesquisar = () => {
     const query = `
       SELECT 
-          e.*,
-          p.nome AS produto_nome,
-          um.sigla AS unidadeMedida_sigla
+          p.*
       FROM 
-          pedidos e
-      INNER JOIN 
-          produtos p ON e.idProduto = p.idProduto
-      INNER JOIN 
-          unidademedidas um ON e.idUnidade = um.idUnidade
+          Pessoas p
       WHERE 
           p.nome LIKE '%${pesquisa.nome}%' ;
       `;
@@ -224,7 +221,7 @@ export default function Pedido() {
       .query({
         entidade: "Pedido",
         sql: query,
-        msg: 'Pesquisando pedidos ...',
+        msg: 'Pesquisando Pedidos ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
@@ -235,7 +232,7 @@ export default function Pedido() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Cadastro de pedidos',
+      tituloAnterior: 'Cadastro de Pedidos',
       pathTitulo: '/',
       pathTituloAnterior: '/Pedido'
     })
@@ -245,26 +242,50 @@ export default function Pedido() {
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
-        entidade: "UnidadeMedida",
+        entidade: "PrazoEntrega",
         criterio: {
           nome: "%".concat("%"),
         },
         camposLike: ["nome"],
       })
-      .then((rs: Array<UnidadeMedidaInterface>) => {
-        setRsUnidade(rs)
+      .then((rs: Array<PrazoEntregaInterface>) => {
+        setRsPrazo(rs)
       })
 
+    let query: string = `
+      SELECT 
+          p.*
+      FROM 
+          pessoas p
+      WHERE 
+          p.tipoPessoa = 'J' OR
+          p.tipoPessoa = 'C';
+      `;
     clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
+      .query({
+        entidade: "Pessoa",
+        sql: query,
+        setMensagemState: setMensagemState
       })
-      .then((rs: Array<ProdutoInterface>) => {
-        setRsProduto(rs)
+      .then((rs: Array<PessoaInterface>) => {
+        setRsCliente(rs)
+      })
+    query = `
+      SELECT 
+          p.*
+      FROM 
+          pessoas p
+      WHERE 
+          p.tipoPessoa = 'V'
+      `;
+    clsCrud
+      .query({
+        entidade: "Pessoa",
+        sql: query,
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<PessoaInterface>) => {
+        setRsVendedor(rs)
       })
   }
 
@@ -273,15 +294,15 @@ export default function Pedido() {
   }, [])
 
   useEffect(() => {
-    if (layoutState.titulo === "Cadasto de Pedidos") {
-      setLocalState({ action: actionTypes.pesquisando })
-      setLayoutState({
-        titulo: 'Cadastro de Pedidos',
-        tituloAnterior: 'Detalhe pedido',
-        pathTitulo: '/Pedido',
-        pathTituloAnterior: '/DetalhePedido'
-      })
-    }
+    // if (layoutState.titulo === "Pedidos") {
+    //   setLocalState({ action: actionTypes.pesquisando })
+    //   setLayoutState({
+    //     titulo: 'Pedidos',
+    //     tituloAnterior: '',
+    //     pathTitulo: '/Pedido',
+    //     pathTituloAnterior: ''
+    //   })
+    // }
   },)
 
 
@@ -298,9 +319,9 @@ export default function Pedido() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            {/* <Grid item xs={11}>
               <InputText
-                label="Digite o nome do Produto"
+                label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="nome"
@@ -310,12 +331,25 @@ export default function Pedido() {
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
               />
+            </Grid> */}
+            <Grid item xs={12} sm={11} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsPesquisa}
+                campoDescricao=""
+                campoID=""
+                dados={pedido}
+                mensagemPadraoCampoEmBranco="Escolha um cliente"
+                field=""
+                label="Pesquisa"
+                erros={erros}
+                setState={setPedido}
+              />
             </Grid>
             <Grid item xs={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
+                  sx={{ mt: 6, mr: 1 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -343,7 +377,7 @@ export default function Pedido() {
                     icone: "auto_awesome_motion_outlined",
                     onAcionador: (rs: DetalhePedidoInterface) =>
                       onDetalhe(rs.idPedido as number),
-                    toolTip: "pedido",
+                    toolTip: "Pedido",
                   },
                 ]}
                 order={order}
@@ -353,38 +387,64 @@ export default function Pedido() {
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsProduto}
-                campoDescricao="nome"
-                campoID="idProduto"
+            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                type='tel'
+                tipo='date'
+                label="Data"
                 dados={pedido}
-                mensagemPadraoCampoEmBranco="Escolha um Tipo"
-                field="idProduto"
-                label="Produto"
+                field="dataPedido"
+                setState={setPedido}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+              />
+            </Grid>
+            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsCliente}
+                campoDescricao="nome"
+                campoID="idPessoa"
+                dados={pedido}
+                mensagemPadraoCampoEmBranco="Escolha um cliente"
+                field="idPessoa_cliente"
+                label="Cliente"
+                erros={erros}
+                setState={setPedido}
+              />
+            </Grid>
+            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsVendedor}
+                campoDescricao="nome"
+                campoID="idPessoa"
+                dados={pedido}
+                mensagemPadraoCampoEmBranco="Escolha um Vendedor"
+                field="idPessoa_vendedor"
+                label="Vendedor"
                 erros={erros}
                 setState={setPedido}
               />
             </Grid>
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={rsUnidade}
-                campoDescricao="sigla"
-                campoID="idUnidade"
+                opcoes={rsPrazo}
+                campoDescricao="nome"
+                campoID="idPrazoEntrega"
                 dados={pedido}
-                mensagemPadraoCampoEmBranco="Escolha uma unidade de medida"
-                field="idUnidade"
-                label="Unidade"
+                mensagemPadraoCampoEmBranco="Prazo de entrega"
+                field="idPrazoEntrega"
+                label="Prazo de entrega"
                 erros={erros}
                 setState={setPedido}
               />
             </Grid>
-            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                type='number'
-                label="Qtd Base"
+                type='text'
+                tipo='uppercase'
+                label="Observação"
                 dados={pedido}
-                field="qtdBase"
+                field="observacao"
                 setState={setPedido}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
@@ -425,11 +485,19 @@ export default function Pedido() {
               </Condicional>
             </Grid>
           </Condicional>
-          {/* <Condicional condicao={localState.action === 'detalhes'}>
+          <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
-              <DetalhePedido rsPedido={pedido} />
+              detalhe pedido
+              {/* <DetalhePedido rsPedido={Pedido} /> */}
+              {/* <SimpleDialog
+              selectedValue={selectedValue}
+              open={open}
+              onClose={handleClose}
+              tipo='dados'
+              rsDados={rsPesquisa}
+            /> */}
             </Grid>
-          </Condicional> */}
+          </Condicional>
         </Grid>
       </Paper >
     </Container >

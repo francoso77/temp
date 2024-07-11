@@ -223,12 +223,12 @@ export default function PrazoEntrega() {
 
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography component="h5" variant="h5" align="left">
-              {/* Informe aqui o nome técnico de cada raça */}
-              <Typography variant="body2" gutterBottom>
-                {/* Informe os prazos de entrega */}
-              </Typography>
+              {/*  Informe aqui o nome técnico de cada raça 
+           <Typography variant="body2" gutterBottom>
+               Informe os prazos de entrega 
+            </Typography>*/}
             </Typography>
 
             <IconButton onClick={() => btFechar()}>
@@ -253,7 +253,7 @@ export default function PrazoEntrega() {
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
+                  sx={{ mt: 4, mr: 1 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -348,6 +348,6 @@ export default function PrazoEntrega() {
           </Condicional>
         </Grid>
       </Paper>
-    </Container>
+    </Container >
   )
 }

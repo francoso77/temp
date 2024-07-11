@@ -43,12 +43,6 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   const [open, setOpen] = useState(true);
-  const [selectedValue, setSelectedValue] = useState('');
-
-  const handleClose = (value: string) => {
-    setOpen(false);
-    setSelectedValue(value);
-  };
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
@@ -58,10 +52,8 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados)
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
-  // const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  const dadosTabela: Array<DetalheEstruturaInterface> = [];
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -125,75 +117,124 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     setLocalState({ action: actionTypes.pesquisando })
   }
 
-  const recebeDados = () => {
-    dadosTabela.push(detalheEstrutura)
-    console.log(dadosTabela)
-    setRsPesquisa(dadosTabela)
-  }
-
   const validarDados = (): boolean => {
+
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
     retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
     retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
-    retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'A quantidade deve ser maior que 0')
+    retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'Valor maior que 0')
     setErros(erros)
     return retorno
   }
 
   const btConfirmar = () => {
 
-    if (validarDados()) {
+    const query = `
+    SELECT 
+    de.*
+    FROM 
+    detalheestruturas de
+    WHERE 
+    de.idProduto = ${detalheEstrutura.idProduto}
+    and de.idCor = ${detalheEstrutura.idCor};
+    `;
 
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-        clsCrud.incluir({
-          entidade: "DetalheEstrutura",
-          criterio: detalheEstrutura,
-          localState: localState.action,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
+    clsCrud
+      .query({
+        entidade: "DetalheEstrutura",
+        sql: query,
+        setMensagemState: setMensagemState,
+      })
+      .then((rs: Array<any>) => {
+        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Produto já cadastrado!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
           })
-      } else if (localState.action === actionTypes.excluindo) {
-        clsCrud.excluir({
-          entidade: "DetalheEstrutura",
-          criterio: {
-            idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
-          },
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
-          })
-      }
-    }
-    btPesquisar()
+        } else {
+
+          const query = `
+          SELECT de.idEstrutura, e.qtdBase, SUM(qtd) AS T
+          FROM detalheestruturas de
+          INNER JOIN estruturas e ON e.idEstrutura = de.idEstrutura
+          GROUP BY de.idEstrutura, e.qtdBase
+          HAVING (((SUM(de.qtd) + ${detalheEstrutura.qtd}) <= e.qtdBase));
+          `;
+
+          clsCrud
+            .query({
+              entidade: "DetalheEstrutura",
+              sql: query,
+              setMensagemState: setMensagemState,
+            })
+            .then((rs: Array<any>) => {
+              if (rs.length === 0 && localState.action === actionTypes.incluindo) {
+                setMensagemState({
+                  titulo: 'Erro...',
+                  exibir: true,
+                  mensagem: 'A quantidade total da estrutura deve ser menor que a quantidade básica informada!',
+                  tipo: MensagemTipo.Error,
+                  exibirBotao: true,
+                  cb: null
+                })
+              } else if (validarDados()) {
+
+                if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+                  clsCrud.incluir({
+                    entidade: "DetalheEstrutura",
+                    criterio: detalheEstrutura,
+                    localState: localState.action,
+                    cb: () => btPesquisar(),
+                    setMensagemState: setMensagemState
+                  })
+                    .then((rs) => {
+                      if (rs.ok) {
+                        setLocalState({ action: actionTypes.pesquisando })
+                      } else {
+                        setMensagemState({
+                          titulo: 'Erro...',
+                          exibir: true,
+                          mensagem: 'Erro no cadastro - Consulte Suporte',
+                          tipo: MensagemTipo.Error,
+                          exibirBotao: true,
+                          cb: null
+                        })
+                      }
+                    })
+                } else if (localState.action === actionTypes.excluindo) {
+                  clsCrud.excluir({
+                    entidade: "DetalheEstrutura",
+                    criterio: {
+                      idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
+                    },
+                    cb: () => btPesquisar(),
+                    setMensagemState: setMensagemState
+                  })
+                    .then((rs) => {
+                      if (rs.ok) {
+                        setLocalState({ action: actionTypes.pesquisando })
+                      } else {
+                        setMensagemState({
+                          titulo: 'Erro...',
+                          exibir: true,
+                          mensagem: 'Erro no cadastro - Consulte Suporte',
+                          tipo: MensagemTipo.Error,
+                          exibirBotao: true,
+                          cb: null
+                        })
+                      }
+                    })
+                }
+              }
+            })
+        }
+      })
   }
 
   const btPesquisar = () => {
@@ -223,19 +264,6 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "DetalheEstrutura",
-    //     criterio: {
-    //       idEstrutura: rsEstrutura.idEstrutura,
-    //     },
-    //     select: ["idDetalheEstrutura", "idEstrutura", "idProduto", "idCord", "qtd"],
-    //     msg: 'Pesquisando produtos ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setRsPesquisa(rs)
-    //   })
   }
 
   const BuscarDados = () => {
@@ -271,7 +299,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
       INNER JOIN 
           tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
       WHERE 
-          t.estrutura = true;
+          t.estrutura = true and p.idProduto <> ${rsEstrutura.idProduto};
       `;
     clsCrud
       .query({
@@ -295,6 +323,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
 
   const irpara = useNavigate()
   const btFechar = () => {
+    setOpen(false);
     irpara('/Estrutura')
     setLocalState({ action: actionTypes.pesquisando })
 
@@ -307,6 +336,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   useEffect(() => {
+    btPesquisar()
     BuscarDados()
     setLayoutState({
       titulo: 'Composição de Estrutura',
@@ -318,15 +348,15 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
 
   return (
     <>
-      <Dialog onClose={handleClose} open={open}>
+      <Dialog open={open}>
         <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
 
           <Grid item xs={4}>
             <ShowText
-              titulo="Estrutura do produto"
+              titulo="Produto"
               descricao={nomeProduto.nome} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={4} sx={{ textAlign: 'center' }}>
             <ShowText
               titulo="Qtd Base"
               descricao={rsEstrutura.qtdBase.toString()} />
@@ -341,6 +371,9 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
           <Paper sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
             <Grid item xs={11}>
               <DataTable
+                colunaSoma='qtd'
+                temTotal={true}
+                qtdColunas={2}
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
@@ -366,7 +399,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 1, ml: { xs: 0, md: 0.5 } }}
+                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -375,15 +408,9 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
             </Grid>
           </Paper>
         </Condicional>
-        <Condicional condicao={localState.action === 'incluindo'}>
+        <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              {/*
-            <Grid item xs={12} sx={{ textAlign: 'right' }}>
-              <IconButton onClick={() => btFechar()}>
-                <CloseIcon />
-              </IconButton>
-            </Grid>*/}
               <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
                 <ComboBox
                   opcoes={rsProduto}
@@ -412,7 +439,8 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
               </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
-                  type='number'
+                  tipo='currency'
+                  scale={2}
                   label="Qtd"
                   dados={detalheEstrutura}
                   field="qtd"
@@ -422,30 +450,6 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
-                {/* <Grid item xs={12}>
-                <DataTable
-                cabecalho={cabecalhoForm}
-                dados={rsPesquisa}
-                acoes={[
-                  {
-                    icone: "edit",
-                    onAcionador: (rs: DetalheEstruturaInterface) =>
-                    onEditar(rs.idDetalheEstrutura as number),
-                    toolTip: "Editar",
-                    },
-                    {
-                      icone: "delete",
-                      onAcionador: (rs: DetalheEstruturaInterface) =>
-                      onExcluir(rs.idDetalheEstrutura as number),
-                      toolTip: "Excluir",
-                      },
-                      ]}
-                      order={order}
-                  orderBy={orderBy}
-                  onRequestSort={handleRequestSort}
-                />
-              </Grid> */}
-
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>
                     <IconButton
@@ -461,7 +465,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                       <IconButton
                         color="secondary"
                         sx={{ mt: 3, ml: 2 }}
-                        onClick={() => recebeDados()}
+                        onClick={() => btConfirmar()}
                       >
                         <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
                       </IconButton>

@@ -10,7 +10,7 @@ export interface PropsInterface extends PadraoPesquisaInterface {
   localState?: actionTypes | undefined,
   msg?: string,
   cb?: null | ((res: boolean) => void),
-  setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
+  setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>,
 }
 
 interface cepInterface {
@@ -33,7 +33,7 @@ export default class ClsCrud {
     sql,
     msg = 'Pesquisando...',
     cb,
-    setMensagemState
+    setMensagemState,
   }: PropsInterface): Promise<Array<any>> {
     const dados: PadraoPesquisaInterface = {
       entidade: entidade,
