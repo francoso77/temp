@@ -20,7 +20,6 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import SearchAutocomplete from '../../Componentes/ComboBoxSearch';
 
 
 export default function Pedido() {
@@ -38,7 +37,7 @@ export default function Pedido() {
     statusPedido: StatusPedidoType.aberto
   }
   interface PesquisaInterface {
-    ItemPesquisa: string
+    itemPesquisa: string
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
@@ -50,7 +49,7 @@ export default function Pedido() {
   const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ ItemPesquisa: '' })
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
@@ -212,25 +211,20 @@ export default function Pedido() {
   }
 
   const btPesquisar = () => {
-    console.log('valor digitado', pesquisa.ItemPesquisa)
-    let pesq: string = clsFormatacao.dataISOtoDatetime(pesquisa.ItemPesquisa.trim())
-
-    console.log('é uma data', pesq)
-
-
     const query = `
       SELECT 
           p.*
       FROM 
-          Pessoas p
+          pedidos p
+      INNER JOIN
+          pessoas pe ON pe.idPessoa ON p.idPessoa_cliente
       WHERE 
-          p.nome LIKE '%${pesquisa.ItemPesquisa}%' ;
+          pe.nome LIKE '%${pesquisa.itemPesquisa}%' ;
       `;
     clsCrud
       .query({
         entidade: "Pedido",
         sql: query,
-        msg: 'Pesquisando Pedidos ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
@@ -328,19 +322,19 @@ export default function Pedido() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            {/* <Grid item xs={11}>
+            <Grid item xs={11}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
                 dados={pesquisa}
-                field="nome"
+                field="itemPesquisa"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
               />
-            </Grid> */}
+            </Grid>
             <Grid item xs={12} sm={11} sx={{ mt: 2 }}>
               {/* <ComboBox
                 opcoes={rsPesquisa}
@@ -354,7 +348,6 @@ export default function Pedido() {
                 setState={setPedido}
                 onClickPesquisa={btPesquisar}
               /> */}
-              <SearchAutocomplete />
             </Grid>
             <Grid item xs={1}>
               <Tooltip title={'Incluir'}>
