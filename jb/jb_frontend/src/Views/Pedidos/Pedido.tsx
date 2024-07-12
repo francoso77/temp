@@ -19,12 +19,15 @@ import { StatusPedidoType } from '../../types/statusPedidoTypes';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
+import ClsFormatacao from '../../Utils/ClsFormatacao';
+import SearchAutocomplete from '../../Componentes/ComboBoxSearch';
 
 
 export default function Pedido() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
+  const clsFormatacao = new ClsFormatacao()
 
   const ResetDados: PedidoInterface = {
     dataPedido: '',
@@ -35,7 +38,7 @@ export default function Pedido() {
     statusPedido: StatusPedidoType.aberto
   }
   interface PesquisaInterface {
-    nome: string
+    ItemPesquisa: string
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
@@ -47,7 +50,7 @@ export default function Pedido() {
   const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ ItemPesquisa: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
@@ -134,88 +137,94 @@ export default function Pedido() {
 
   const btConfirmar = () => {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Pedido",
-        criterio: {
-          idPedido: pedido.idPedido,
-        },
-        msg: 'Pesquisando produtos ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs) => {
-        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
-          setMensagemState({
-            titulo: 'Erro...',
-            exibir: true,
-            mensagem: 'Item já cadastrado!',
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null
-          })
-        } else {
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "Pedido",
+    //     criterio: {
+    //       idPedido: pedido.idPedido,
+    //     },
+    //     msg: 'Pesquisando produtos ...',
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs) => {
+    //     if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+    //       setMensagemState({
+    //         titulo: 'Erro...',
+    //         exibir: true,
+    //         mensagem: 'Item já cadastrado!',
+    //         tipo: MensagemTipo.Error,
+    //         exibirBotao: true,
+    //         cb: null
+    //       })
+    //     } else {
 
-          if (validarDados()) {
+    //     }
+    //   })
+    if (validarDados()) {
 
-            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-              clsCrud.incluir({
-                entidade: "Pedido",
-                criterio: pedido,
-                localState: localState.action,
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
+      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+        clsCrud.incluir({
+          entidade: "Pedido",
+          criterio: pedido,
+          localState: localState.action,
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
               })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
-            } else if (localState.action === actionTypes.excluindo) {
-              clsCrud.excluir({
-                entidade: "Pedido",
-                criterio: {
-                  idPedido: pedido.idPedido
-                },
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
-              })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
             }
-          }
-        }
-      })
+          })
+      } else if (localState.action === actionTypes.excluindo) {
+        clsCrud.excluir({
+          entidade: "Pedido",
+          criterio: {
+            idPedido: pedido.idPedido
+          },
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      }
+    }
   }
 
   const btPesquisar = () => {
+    console.log('valor digitado', pesquisa.ItemPesquisa)
+    let pesq: string = clsFormatacao.dataISOtoDatetime(pesquisa.ItemPesquisa.trim())
+
+    console.log('é uma data', pesq)
+
+
     const query = `
       SELECT 
           p.*
       FROM 
           Pessoas p
       WHERE 
-          p.nome LIKE '%${pesquisa.nome}%' ;
+          p.nome LIKE '%${pesquisa.ItemPesquisa}%' ;
       `;
     clsCrud
       .query({
@@ -333,17 +342,19 @@ export default function Pedido() {
               />
             </Grid> */}
             <Grid item xs={12} sm={11} sx={{ mt: 2 }}>
-              <ComboBox
+              {/* <ComboBox
                 opcoes={rsPesquisa}
                 campoDescricao=""
                 campoID=""
                 dados={pedido}
                 mensagemPadraoCampoEmBranco="Escolha um cliente"
-                field=""
+                field="ItemPesquisa"
                 label="Pesquisa"
                 erros={erros}
                 setState={setPedido}
-              />
+                onClickPesquisa={btPesquisar}
+              /> */}
+              <SearchAutocomplete />
             </Grid>
             <Grid item xs={1}>
               <Tooltip title={'Incluir'}>

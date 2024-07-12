@@ -47,7 +47,7 @@ interface ComboBoxInterface<T> {
   /** Formatação do valor apresentado como option - Caso contrário apresenta o campo option[campoDescricao] */
   formatarOption?: (opcao: T) => string
   /* Quando Teclar ENTER ou clicar no ícone de pesquisa */
-  onClickPesquisa?: (v: string) => void
+  onClickPesquisa?: () => void
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -62,23 +62,22 @@ const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: 
   }
 }
 
-const exibirIconePesquisa = (posicao: "start" | "end", onclick: () => void) => {
-  return (
-    <InputAdornment position={posicao}>
-      <IconButton
-        sx={{ margin: 0, padding: 0 }}
-        onClick={() => {
-          if (onclick) {
-            console.log('oi')
-            // onclick()
-          }
-        }}
-      >
-        <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
-      </IconButton>
-    </InputAdornment>
-  )
-}
+// const exibirIconePesquisa = (onclick: () => void) => {
+//   return (
+//     <InputAdornment position={'start'}>
+//       <IconButton
+//         sx={{ margin: 0, padding: 0 }}
+//         onClick={() => {
+//           if (onclick) {
+//             onclick()
+//           }
+//         }}
+//       >
+//         <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
+//       </IconButton>
+//     </InputAdornment>
+//   )
+// }
 
 export default function ComboBox<T>(
   {
@@ -100,7 +99,7 @@ export default function ComboBox<T>(
     onKeyDown,
     permitirNovaOpcao = false,
     formatarOption = undefined,
-    onClickPesquisa = () => { },
+    onClickPesquisa
   }: ComboBoxInterface<T>) {
 
   const [pesquisa, setPesquisa] = useState('')
@@ -175,36 +174,48 @@ export default function ComboBox<T>(
         onInputChange={(_event: React.SyntheticEvent, value: string, reason: string) => {
           if (value) { setPesquisa(value) } else { setPesquisa('') }
         }}
-        renderInput={(params) =>
+        renderInput=
+        {
+          (params) => (
 
-          <FormControl sx={{ width: '100%' }}>
-            <Condicional condicao={typeof label === 'string' && label.length > 0}>
-              <Typography
-                variant='body2'
-                textAlign='left'
-                sx={{ mt: theme.inputs.marginTop }}
-              >
-                {label}
-              </Typography>
-            </Condicional>
+            <FormControl sx={{ width: '100%' }}>
+              <Condicional condicao={typeof label === 'string' && label.length > 0}>
+                <Typography
+                  variant='body2'
+                  textAlign='left'
+                  sx={{ mt: theme.inputs.marginTop }}
+                >
+                  {label}
+                </Typography>
+              </Condicional>
 
-            <TextField {...params}
-              size="small"
-              placeholder={placeholder}
-              type="text"
-              InputProps={{
-                ...params.InputProps,
-                startAdornment: <>{exibirIconePesquisa('start', onClickPesquisa)}</>,
-              }}
-              onKeyDown={(ev) => onKey(ev.key, mapKeyPress, pesquisa)}
-            />
+              <TextField
+                {...params}
+                size="small"
+                placeholder={placeholder}
+                type="text"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment:
+                    <>
+                      <InputAdornment position={'start'}>
+                        <IconButton
+                          sx={{ margin: 0, padding: 0 }}
+                          onClick={onClickPesquisa}                        >
+                          <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
+                        </IconButton>
+                      </InputAdornment>
+                    </>,
+                }}
+                onKeyDown={(ev) => onKey(ev.key, mapKeyPress, pesquisa)}
+              />
 
-            <Condicional condicao={typeof erros[field] !== 'undefined'}>
-              <Typography variant='caption' textAlign='left' color='warning.main' >{erros[field]}</Typography>
-            </Condicional>
+              <Condicional condicao={typeof erros[field] !== 'undefined'}>
+                <Typography variant='caption' textAlign='left' color='warning.main' >{erros[field]}</Typography>
+              </Condicional>
 
-          </FormControl>
-        }
+            </FormControl>
+          )}
       />
     </>
   )

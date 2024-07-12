@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { PessoaTypes } from "../types/pessoaTypes";
 
 export default class ClsFormatacao {
   public telefone(numero: string): null | string {
@@ -37,6 +36,10 @@ export default class ClsFormatacao {
     return DateTime.fromFormat(data, 'yyyy-MM-dd').toFormat('dd/MM/yyyy')
   }
 
+  /** Converte dd/MM/yyyy para yyyy-MM-dd */
+  public dataISOtoDatetime(data: string): string {
+    return DateTime.fromFormat(data, 'dd/MM/yyyy').toFormat('yyyy-MM-dd')
+  }
   public dataEHora(data: string): string {
     const dd = new Date(data)
     return dd.toLocaleString()
