@@ -33,7 +33,7 @@ export default class ClsFormatacao {
 
   /** Converte yyyy-MM-dd para dd/MM/yyyy */
   public dataISOtoUser(data: string): string {
-    return DateTime.fromFormat(data, 'yyyy-MM-dd').toFormat('dd/MM/yyyy')
+    return DateTime.fromISO(data).toFormat('dd/MM/yyyy')
   }
 
   /** Converte dd/MM/yyyy para yyyy-MM-dd */

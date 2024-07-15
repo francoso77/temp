@@ -20,6 +20,7 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
+import DetalhePedido from './DetalhePedido';
 
 
 export default function Pedido() {
@@ -55,19 +56,20 @@ export default function Pedido() {
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Produto',
+      cabecalho: 'Data',
       alinhamento: 'left',
-      campo: 'produto_nome'
+      campo: 'dataPedido',
+      format: (data) => clsFormatacao.dataISOtoUser(data)
     },
     {
-      cabecalho: 'Unidade',
+      cabecalho: 'Cliente',
       alinhamento: 'left',
-      campo: 'unidadeMedida_sigla',
+      campo: 'nome_cliente',
     },
     {
-      cabecalho: 'Qtd Base',
+      cabecalho: 'Vendedor',
       alinhamento: 'left',
-      campo: 'qtdBase',
+      campo: 'nome_vendedor',
     },
   ]
 
@@ -89,7 +91,11 @@ export default function Pedido() {
         },
       })
       .then((rs: Array<PedidoInterface>) => {
-        return rs[0]
+        let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataPedido)
+        return {
+          ...rs[0],
+          dataPedido: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+        }
       })
   }
   const onEditar = (id: string | number) => {
@@ -213,13 +219,17 @@ export default function Pedido() {
   const btPesquisar = () => {
     const query = `
       SELECT 
-          p.*
+        p.*, 
+        pc.nome AS nome_cliente, 
+        pv.nome AS nome_vendedor
       FROM 
-          pedidos p
-      INNER JOIN
-          pessoas pe ON pe.idPessoa ON p.idPessoa_cliente
+        pedidos p
+      INNER JOIN 
+        pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+      INNER JOIN 
+        pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
       WHERE 
-          pe.nome LIKE '%${pesquisa.itemPesquisa}%' ;
+        pc.nome LIKE '%${pesquisa.itemPesquisa}%'
       `;
     clsCrud
       .query({
@@ -335,25 +345,11 @@ export default function Pedido() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} sm={11} sx={{ mt: 2 }}>
-              {/* <ComboBox
-                opcoes={rsPesquisa}
-                campoDescricao=""
-                campoID=""
-                dados={pedido}
-                mensagemPadraoCampoEmBranco="Escolha um cliente"
-                field="ItemPesquisa"
-                label="Pesquisa"
-                erros={erros}
-                setState={setPedido}
-                onClickPesquisa={btPesquisar}
-              /> */}
-            </Grid>
             <Grid item xs={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 6, mr: 1 }}
+                  sx={{ mt: 4, mr: 1 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -394,13 +390,14 @@ export default function Pedido() {
             <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 type='tel'
-                tipo='date'
+                tipo="date"
                 label="Data"
                 dados={pedido}
                 field="dataPedido"
                 setState={setPedido}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
+                autoFocus
               />
             </Grid>
             <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
@@ -491,15 +488,7 @@ export default function Pedido() {
           </Condicional>
           <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
-              detalhe pedido
-              {/* <DetalhePedido rsPedido={Pedido} /> */}
-              {/* <SimpleDialog
-              selectedValue={selectedValue}
-              open={open}
-              onClose={handleClose}
-              tipo='dados'
-              rsDados={rsPesquisa}
-            /> */}
+              <DetalhePedido rsPedido={pedido} />
             </Grid>
           </Condicional>
         </Grid>

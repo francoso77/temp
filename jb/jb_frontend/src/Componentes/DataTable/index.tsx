@@ -197,7 +197,6 @@ export default function DataTable<T>({
                   </TableSortLabel>
                 </StyledTableCell>
               ))}
-
               <Condicional condicao={acoes.length > 0}>
                 <StyledTableCell align='center'>
                   Opções

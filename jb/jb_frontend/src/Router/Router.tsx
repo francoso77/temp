@@ -13,6 +13,7 @@ import Pessoa from '../Views/Crud/Pessoa';
 import Estrutura from '../Views/Crud/Estrutura';
 import PrazoEntrega from '../Views/Crud/PrazoEntrega';
 import Pedido from '../Views/Pedidos/Pedido';
+import DetalhePedido from '../Views/Pedidos/DetalhePedido';
 
 export const router = createBrowserRouter([
   {
