@@ -17,8 +17,7 @@ import InputText from '../../Componentes/InputText';
 import ShowText from '../../Componentes/ShowText';
 import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
-import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
+import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
 import styled from 'styled-components';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 
@@ -33,13 +32,13 @@ const CustomDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 interface PropsInterface {
-  rsPedido: PedidoInterface
+  rsEntrada: EntradaInterface
 }
 
 interface rsSomatorioInterface {
   total: number
 }
-export default function DetalhePedido({ rsPedido }: PropsInterface) {
+export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -48,13 +47,19 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
   const SomatorioDados: rsSomatorioInterface = {
     total: 0
   }
-  const ResetDados: DetalhePedidoInterface = {
-    idPedido: rsPedido.idPedido as number,
+  const ResetDados: DetalheEntradaInterface = {
+    idEntrada: rsEntrada.idEntrada as number,
     idProduto: 0,
-    qtdPedida: 0,
+    idCor: 0,
+    qtdPecas: 0,
     vrUnitario: 0,
-    qtdAtendida: 0,
-    statusItem: StatusPedidoItemType.aberto
+    peso: 0,
+    metro: 0,
+    gm2: 0,
+    idPessoa_revisador: 0,
+    romaneio: '',
+    malharia: 0,
+    tinturaria: 0
   }
 
   interface PesquisaInterface {
@@ -65,10 +70,10 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalhePedidoInterface>>([])
+  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEntradaInterface>>([])
   const [nomeCliente, setNomeCliente] = useState<PesquisaInterface>({ nome: '' })
   const [erros, setErros] = useState({})
-  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
+  const [detalheEntrada, setDetalheEntrada] = useState<DetalheEntradaInterface>(ResetDados)
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [rsSomatorio, setRsSomatorio] = useState<Array<rsSomatorioInterface>>([SomatorioDados])
   const [order, setOrder] = useState<Order>('asc');
@@ -119,38 +124,38 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<DetalhePedidoInterface> => {
+  const pesquisarID = (id: string | number): Promise<DetalheEntradaInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "DetalhePedido",
+        entidade: "DetalheEntrada",
         criterio: {
-          idDetalhePedido: id,
+          idDetalheEntrada: id,
         },
       })
-      .then((rs: Array<DetalhePedidoInterface>) => {
+      .then((rs: Array<DetalheEntradaInterface>) => {
         return rs[0]
       })
   }
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setDetalhePedido(rs)
+      setDetalheEntrada(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setDetalhePedido(rs)
+      setDetalheEntrada(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
   const btIncluir = () => {
-    setDetalhePedido(ResetDados)
+    setDetalheEntrada(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
   const btCancelar = () => {
     setErros({})
-    setDetalhePedido(ResetDados)
+    setDetalheEntrada(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
@@ -159,9 +164,9 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('idProduto', detalhePedido, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('vrUnitario', detalhePedido, erros, retorno, 'Valor maior que 0')
-    retorno = validaCampo.naoVazio('qtdPedida', detalhePedido, erros, retorno, 'Valor maior que 0')
+    retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
+    retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
+    retorno = validaCampo.naoVazio('qtdPedida', detalheEntrada, erros, retorno, 'Valor maior que 0')
     setErros(erros)
     return retorno
   }
@@ -174,12 +179,12 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     FROM 
     detalhepedidos dp
     WHERE 
-    dp.idProduto = ${detalhePedido.idProduto};
+    dp.idProduto = ${detalheEntrada.idProduto};
     `;
 
     clsCrud
       .query({
-        entidade: "DetalhePedido",
+        entidade: "DetalheEntrada",
         sql: query,
         setMensagemState: setMensagemState,
       })
@@ -197,8 +202,8 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
 
           if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
             clsCrud.incluir({
-              entidade: "DetalhePedido",
-              criterio: detalhePedido,
+              entidade: "DetalheEntrada",
+              criterio: detalheEntrada,
               localState: localState.action,
               cb: () => btPesquisar(),
               setMensagemState: setMensagemState
@@ -219,9 +224,9 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
               })
           } else if (localState.action === actionTypes.excluindo) {
             clsCrud.excluir({
-              entidade: "DetalhePedido",
+              entidade: "DetalheEntrada",
               criterio: {
-                idDetalhePedido: detalhePedido.idDetalhePedido
+                idDetalheEntrada: detalheEntrada.idDetalheEntrada
               },
               cb: () => btPesquisar(),
               setMensagemState: setMensagemState
@@ -263,14 +268,14 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     INNER JOIN
 	      produtos pr ON pr.idProduto = dp.idProduto
     WHERE 
-        dp.idPedido = ${detalhePedido.idPedido};
+        dp.idPedido = ${detalheEntrada.idEntrada};
     `;
 
     clsCrud
       .query({
-        entidade: "Pedido",
+        entidade: "Entrada",
         sql: query,
-        msg: 'Pesquisando Pedidos ...',
+        msg: 'Pesquisando Entradas ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
@@ -288,12 +293,12 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     INNER JOIN 
         pedidos p ON p.idPedido = dp.idPedido
     WHERE 
-        dp.idPedido = ${detalhePedido.idPedido};
+        dp.idPedido = ${detalheEntrada.idEntrada};
     `;
 
     clsCrud
       .query({
-        entidade: "DetalhePedido",
+        entidade: "DetalheEntrada",
         sql: query,
         setMensagemState: setMensagemState
       })
@@ -313,12 +318,12 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     INNER JOIN 
         pessoas pe ON pe.idPessoa = p.idPessoa_cliente
     WHERE 
-        p.idPedido = ${rsPedido.idPedido};
+        p.idPedido = ${rsEntrada.idEntrada};
     `;
 
     clsCrud
       .query({
-        entidade: "Pedido",
+        entidade: "Entrada",
         sql: query,
         setMensagemState: setMensagemState
       })
@@ -334,7 +339,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
       INNER JOIN 
           tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
       WHERE 
-          t.estrutura = true and p.idProduto <> ${rsPedido.idPedido};
+          t.estrutura = true and p.idProduto <> ${rsEntrada.idEntrada};
       `;
     clsCrud
       .query({
@@ -355,10 +360,10 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     setLocalState({ action: actionTypes.pesquisando })
 
     setLayoutState({
-      titulo: 'Pedidos',
-      tituloAnterior: 'Itens do Pedido',
-      pathTitulo: '/Pedido',
-      pathTituloAnterior: '/DetalhePedido'
+      titulo: 'Entradas',
+      tituloAnterior: 'Itens da Entrada',
+      pathTitulo: '/Entrada',
+      pathTituloAnterior: '/DetalheEntrada'
     })
   }
 
@@ -366,10 +371,10 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     btPesquisar()
     BuscarDados()
     setLayoutState({
-      titulo: 'Itens Pedido',
-      tituloAnterior: 'Pedidos',
-      pathTitulo: '/DetalhePedido',
-      pathTituloAnterior: '/Pedido'
+      titulo: 'Itens da Entrada',
+      tituloAnterior: 'Entradas',
+      pathTitulo: '/DetalheEntrada',
+      pathTituloAnterior: '/Entrada'
     })
   }, [])
 
@@ -386,7 +391,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
           <Grid item xs={4} sx={{ textAlign: 'center' }}>
             <ShowText
               titulo="Data"
-              descricao={dataFormatada(rsPedido.dataPedido)} />
+              descricao={dataFormatada(rsEntrada.dataEmissao)} />
           </Grid>
           <Grid item xs={4} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
@@ -404,14 +409,14 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: DetalhePedidoInterface) =>
-                      onEditar(rs.idDetalhePedido as number),
+                    onAcionador: (rs: DetalheEntradaInterface) =>
+                      onEditar(rs.idDetalheEntrada as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: DetalhePedidoInterface) =>
-                      onExcluir(rs.idDetalhePedido as number),
+                    onAcionador: (rs: DetalheEntradaInterface) =>
+                      onExcluir(rs.idDetalheEntrada as number),
                     toolTip: "Excluir",
                   },
                 ]}
@@ -441,7 +446,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   label="Qtd Total"
                   dados={rsSomatorio[0]}
                   field="totalQtdPedida"
-                  setState={setDetalhePedido}
+                  setState={setDetalheEntrada}
                   disabled={true}
                 />
               </Grid>
@@ -450,7 +455,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   label="Total Pedido"
                   dados={rsSomatorio[0]}
                   field="total"
-                  setState={setDetalhePedido}
+                  setState={setDetalheEntrada}
                   disabled={true}
                 />
               </Grid>
@@ -465,12 +470,12 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   opcoes={rsProduto}
                   campoDescricao="nome"
                   campoID="idProduto"
-                  dados={detalhePedido}
+                  dados={detalheEntrada}
                   mensagemPadraoCampoEmBranco="Escolha um produto"
                   field="idProduto"
                   label="Produtos"
                   erros={erros}
-                  setState={setDetalhePedido}
+                  setState={setDetalheEntrada}
                 />
               </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
@@ -478,9 +483,9 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   tipo='currency'
                   scale={2}
                   label="Qtd Pedida"
-                  dados={detalhePedido}
+                  dados={detalheEntrada}
                   field="qtdPedida"
-                  setState={setDetalhePedido}
+                  setState={setDetalheEntrada}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
                 />
@@ -490,9 +495,9 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   tipo='currency'
                   scale={2}
                   label="Vr Unitário"
-                  dados={detalhePedido}
+                  dados={detalheEntrada}
                   field="vrUnitario"
-                  setState={setDetalhePedido}
+                  setState={setDetalheEntrada}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
                 />

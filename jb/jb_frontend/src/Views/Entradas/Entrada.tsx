@@ -16,26 +16,24 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
+import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import DetalhePedido from './DetalhePedido';
+import DetalhePedido from './DetalheEntrada';
 
 
-export default function Pedido() {
+export default function Entrada() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const ResetDados: PedidoInterface = {
-    dataPedido: '',
+  const ResetDados: EntradaInterface = {
+    dataEmissao: '',
     observacao: '',
-    idPessoa_cliente: 0,
-    idPessoa_vendedor: 0,
-    idPrazoEntrega: 0,
-    statusPedido: StatusPedidoType.aberto
+    notaFiscal: '',
+    idPessoa_fornecedor: 0
   }
   interface PesquisaInterface {
     itemPesquisa: string
@@ -46,7 +44,7 @@ export default function Pedido() {
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
-  const [pedido, setPedido] = useState<PedidoInterface>(ResetDados)
+  const [entrada, setEntrada] = useState<EntradaInterface>(ResetDados)
   const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
@@ -82,47 +80,47 @@ export default function Pedido() {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<PedidoInterface> => {
+  const pesquisarID = (id: string | number): Promise<EntradaInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "Pedido",
+        entidade: "Entrada",
         criterio: {
-          idPedido: id,
+          idEntrada: id,
         },
       })
-      .then((rs: Array<PedidoInterface>) => {
-        let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataPedido)
+      .then((rs: Array<EntradaInterface>) => {
+        let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataEmissao)
         return {
           ...rs[0],
-          dataPedido: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+          dataEmissao: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
         }
       })
   }
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setPedido(rs)
+      setEntrada(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setPedido(rs)
+      setEntrada(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
   const onDetalhe = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setPedido(rs)
+      setEntrada(rs)
       setLocalState({ action: actionTypes.detalhes })
     })
   }
   const btIncluir = () => {
-    setPedido(ResetDados)
+    setEntrada(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
   const btCancelar = () => {
     setErros({})
-    setPedido(ResetDados)
+    setEntrada(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
@@ -130,10 +128,10 @@ export default function Pedido() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.eData('dataPedido', pedido, erros, retorno)
-    retorno = validaCampo.naoVazio('idPessoa_cliente', pedido, erros, retorno, 'Informe um cliente')
-    retorno = validaCampo.naoVazio('idPessoa_vendedor', pedido, erros, retorno, 'Informe um vendedor')
-    retorno = validaCampo.naoVazio('idPrazoEntrega', pedido, erros, retorno, 'Defina um prazo')
+    retorno = validaCampo.eData('dataPedido', entrada, erros, retorno)
+    retorno = validaCampo.naoVazio('idPessoa_cliente', entrada, erros, retorno, 'Informe um cliente')
+    retorno = validaCampo.naoVazio('idPessoa_vendedor', entrada, erros, retorno, 'Informe um vendedor')
+    retorno = validaCampo.naoVazio('idPrazoEntrega', entrada, erros, retorno, 'Defina um prazo')
 
     setErros(erros)
     return retorno
@@ -145,8 +143,8 @@ export default function Pedido() {
 
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
-          entidade: "Pedido",
-          criterio: pedido,
+          entidade: "Entrada",
+          criterio: entrada,
           localState: localState.action,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
@@ -167,9 +165,9 @@ export default function Pedido() {
           })
       } else if (localState.action === actionTypes.excluindo) {
         clsCrud.excluir({
-          entidade: "Pedido",
+          entidade: "Entrada",
           criterio: {
-            idPedido: pedido.idPedido
+            idEntrada: entrada.idEntrada
           },
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
@@ -209,7 +207,7 @@ export default function Pedido() {
       `;
     clsCrud
       .query({
-        entidade: "Pedido",
+        entidade: "Entrada",
         sql: query,
         setMensagemState: setMensagemState
       })
@@ -221,9 +219,9 @@ export default function Pedido() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Cadastro de Pedidos',
+      tituloAnterior: 'Entradas de produtos',
       pathTitulo: '/',
-      pathTituloAnterior: '/Pedido'
+      pathTituloAnterior: '/Entrada'
     })
     irPara('/')
   }
@@ -283,13 +281,13 @@ export default function Pedido() {
   }, [])
 
   useEffect(() => {
-    if (layoutState.titulo === "Pedidos") {
+    if (layoutState.titulo === "Entradas") {
       setLocalState({ action: actionTypes.pesquisando })
       setLayoutState({
-        titulo: 'Pedidos',
-        tituloAnterior: 'Itens Pedido',
-        pathTitulo: '/Pedido',
-        pathTituloAnterior: '/DetalhePedido'
+        titulo: 'Entradas',
+        tituloAnterior: 'Itens da Entrada',
+        pathTitulo: '/Entrada',
+        pathTituloAnterior: '/DetalheEntrada'
       })
     }
   },)
@@ -338,20 +336,20 @@ export default function Pedido() {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: PedidoInterface) =>
-                      onEditar(rs.idPedido as number),
+                    onAcionador: (rs: EntradaInterface) =>
+                      onEditar(rs.idEntrada as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: PedidoInterface) =>
-                      onExcluir(rs.idPedido as number),
+                    onAcionador: (rs: EntradaInterface) =>
+                      onExcluir(rs.idEntrada as number),
                     toolTip: "Excluir",
                   },
                   {
                     icone: "auto_awesome_motion_outlined",
-                    onAcionador: (rs: DetalhePedidoInterface) =>
-                      onDetalhe(rs.idPedido as number),
+                    onAcionador: (rs: DetalheEntradaInterface) =>
+                      onDetalhe(rs.idEntrada as number),
                     toolTip: "Itens",
                   },
                 ]}
@@ -367,9 +365,9 @@ export default function Pedido() {
                 type='tel'
                 tipo="date"
                 label="Data"
-                dados={pedido}
+                dados={entrada}
                 field="dataPedido"
-                setState={setPedido}
+                setState={setEntrada}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
                 autoFocus
@@ -380,12 +378,12 @@ export default function Pedido() {
                 opcoes={rsCliente}
                 campoDescricao="nome"
                 campoID="idPessoa"
-                dados={pedido}
+                dados={entrada}
                 mensagemPadraoCampoEmBranco="Escolha um cliente"
                 field="idPessoa_cliente"
                 label="Cliente"
                 erros={erros}
-                setState={setPedido}
+                setState={setEntrada}
               />
             </Grid>
             <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
@@ -393,12 +391,12 @@ export default function Pedido() {
                 opcoes={rsVendedor}
                 campoDescricao="nome"
                 campoID="idPessoa"
-                dados={pedido}
+                dados={entrada}
                 mensagemPadraoCampoEmBranco="Escolha um Vendedor"
                 field="idPessoa_vendedor"
                 label="Vendedor"
                 erros={erros}
-                setState={setPedido}
+                setState={setEntrada}
               />
             </Grid>
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
@@ -406,12 +404,12 @@ export default function Pedido() {
                 opcoes={rsPrazo}
                 campoDescricao="nome"
                 campoID="idPrazoEntrega"
-                dados={pedido}
+                dados={entrada}
                 mensagemPadraoCampoEmBranco="Prazo de entrega"
                 field="idPrazoEntrega"
                 label="Prazo de entrega"
                 erros={erros}
-                setState={setPedido}
+                setState={setEntrada}
               />
             </Grid>
             <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
@@ -419,9 +417,9 @@ export default function Pedido() {
                 type='text'
                 tipo='uppercase'
                 label="Observação"
-                dados={pedido}
+                dados={entrada}
                 field="observacao"
-                setState={setPedido}
+                setState={setEntrada}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
               />
@@ -463,7 +461,7 @@ export default function Pedido() {
           </Condicional>
           <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
-              <DetalhePedido rsPedido={pedido} />
+              <DetalhePedido rsEntrada={entrada} />
             </Grid>
           </Condicional>
         </Grid>

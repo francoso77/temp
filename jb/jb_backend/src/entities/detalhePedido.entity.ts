@@ -3,6 +3,7 @@ import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
 import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
 import Pedido from './pedido.entity';
+import Cor from './cor.entity';
 
 @Entity({ name: 'detalhepedidos' })
 export default class DetalhePedido implements DetalhePedidoInterface {

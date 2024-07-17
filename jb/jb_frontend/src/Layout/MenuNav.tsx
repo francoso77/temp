@@ -14,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@mui/material';
-import PetsOutlinedIcon from '@mui/icons-material/PetsOutlined';
+import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 // import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
@@ -132,8 +132,8 @@ export default function MenuNav() {
             <NoteAltOutlinedIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <Box sx={{ flexGrow: 0.25 }} />
-          <IconButton color="primary" onClick={() => irPara('/Cao', 'Cão')}>
-            <PetsOutlinedIcon sx={{ width: 32, height: 32 }} />
+          <IconButton color="primary" onClick={() => irPara('/Entrada', 'Entrada')}>
+            <AddShoppingCartOutlinedIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <StyledFab color="primary" aria-label="add">
             <Tooltip title="Open Menu" onClick={handleOpenUserMenu} sx={{ p: 0 }} >

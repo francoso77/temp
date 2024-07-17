@@ -13,16 +13,6 @@ import Condicional from '../Condicional/Condicional';
 import { Typography } from '@mui/material';
 import { PessoaTypes } from '../../types/pessoaTypes';
 
-// export const pessoas = [
-//   { nome: 'Cliente PF', codigo: 'C' },
-//   { nome: 'Cliente PJ', codigo: 'J' },
-//   { nome: 'Fornecedor', codigo: 'F' },
-//   { nome: 'Revisador', codigo: 'R' },
-//   { nome: 'Tecelão', codigo: 'T' },
-//   { nome: 'Vendedor', codigo: 'V' }
-
-// ];
-
 export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;

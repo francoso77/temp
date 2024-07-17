@@ -39,19 +39,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
 var data_source_1 = require("./data-source");
+var dotenv = require("dotenv");
+dotenv.config();
 function iniciandoBD() {
     return __awaiter(this, void 0, void 0, function () {
-        var app;
+        var corsOrigin, app;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
+                case 0:
+                    corsOrigin = process.env.CORS_ORIGIN || '*';
+                    return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
                 case 1:
                     app = _a.sent();
-                    app.enableCors({ origin: ["http://localhost:3000"] });
+                    app.enableCors({ origin: [corsOrigin] });
                     return [4 /*yield*/, data_source_1.AppDataSource.initialize()];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, app.listen(4000)];
+                    return [4 /*yield*/, app.listen(process.env.REACT_APP_BACKEND_PORTA)];
                 case 3:
                     _a.sent();
                     return [2 /*return*/];
