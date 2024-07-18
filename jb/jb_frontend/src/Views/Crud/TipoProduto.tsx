@@ -1,5 +1,4 @@
-import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
-// import { styled } from '@mui/system';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';

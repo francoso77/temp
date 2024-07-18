@@ -15,7 +15,6 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { StatusPedidoType } from '../../types/statusPedidoTypes';
 import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
@@ -45,9 +44,7 @@ export default function Entrada() {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [entrada, setEntrada] = useState<EntradaInterface>(ResetDados)
-  const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
-  const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
-  const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
+  const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
@@ -56,18 +53,19 @@ export default function Entrada() {
     {
       cabecalho: 'Data',
       alinhamento: 'left',
-      campo: 'dataPedido',
+      campo: 'dataEmissao',
       format: (data) => clsFormatacao.dataISOtoUser(data)
     },
     {
-      cabecalho: 'Cliente',
+      cabecalho: 'Nota Fiscal',
       alinhamento: 'left',
-      campo: 'nome_cliente',
+      campo: 'notaFiscal',
+      format: (nota) => clsFormatacao.notaFiscal(nota)
     },
     {
-      cabecalho: 'Vendedor',
+      cabecalho: 'Fornecedor',
       alinhamento: 'left',
-      campo: 'nome_vendedor',
+      campo: 'nome_fornecedor',
     },
   ]
 
@@ -128,10 +126,9 @@ export default function Entrada() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.eData('dataPedido', entrada, erros, retorno)
-    retorno = validaCampo.naoVazio('idPessoa_cliente', entrada, erros, retorno, 'Informe um cliente')
-    retorno = validaCampo.naoVazio('idPessoa_vendedor', entrada, erros, retorno, 'Informe um vendedor')
-    retorno = validaCampo.naoVazio('idPrazoEntrega', entrada, erros, retorno, 'Defina um prazo')
+    retorno = validaCampo.eData('dataEmissao', entrada, erros, retorno)
+    retorno = validaCampo.naoVazio('idPessoa_fornecedor', entrada, erros, retorno, 'Informe um fornecedor')
+    retorno = validaCampo.naoVazio('notaFiscal', entrada, erros, retorno, 'Deve conter o número da nota fiscal')
 
     setErros(erros)
     return retorno
@@ -193,17 +190,14 @@ export default function Entrada() {
   const btPesquisar = () => {
     const query = `
       SELECT 
-        p.*, 
-        pc.nome AS nome_cliente, 
-        pv.nome AS nome_vendedor
+        e.*, 
+        f.nome AS nome_fornecedor
       FROM 
-        pedidos p
+        entradas e
       INNER JOIN 
-        pessoas pc ON pc.idPessoa = p.idPessoa_cliente
-      INNER JOIN 
-        pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
+        pessoas f ON f.idPessoa = e.idPessoa_fornecedor
       WHERE 
-        pc.nome LIKE '%${pesquisa.itemPesquisa}%'
+        e.notaFiscal LIKE '%${pesquisa.itemPesquisa}%'
       `;
     clsCrud
       .query({
@@ -227,26 +221,13 @@ export default function Entrada() {
   }
 
   const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "PrazoEntrega",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-      })
-      .then((rs: Array<PrazoEntregaInterface>) => {
-        setRsPrazo(rs)
-      })
-
     let query: string = `
       SELECT 
           p.*
       FROM 
           pessoas p
       WHERE 
-          p.tipoPessoa = 'J' OR
-          p.tipoPessoa = 'C';
+          p.tipoPessoa = 'F'
       `;
     clsCrud
       .query({
@@ -255,24 +236,7 @@ export default function Entrada() {
         setMensagemState: setMensagemState
       })
       .then((rs: Array<PessoaInterface>) => {
-        setRsCliente(rs)
-      })
-    query = `
-      SELECT 
-          p.*
-      FROM 
-          pessoas p
-      WHERE 
-          p.tipoPessoa = 'V'
-      `;
-    clsCrud
-      .query({
-        entidade: "Pessoa",
-        sql: query,
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<PessoaInterface>) => {
-        setRsVendedor(rs)
+        setRsFornecedor(rs)
       })
   }
 
@@ -284,7 +248,7 @@ export default function Entrada() {
     if (layoutState.titulo === "Entradas") {
       setLocalState({ action: actionTypes.pesquisando })
       setLayoutState({
-        titulo: 'Entradas',
+        titulo: 'Entradas de produtos',
         tituloAnterior: 'Itens da Entrada',
         pathTitulo: '/Entrada',
         pathTituloAnterior: '/DetalheEntrada'
@@ -322,7 +286,7 @@ export default function Entrada() {
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, mr: 1 }}
+                  sx={{ mt: 4, ml: 1 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -366,7 +330,7 @@ export default function Entrada() {
                 tipo="date"
                 label="Data"
                 dados={entrada}
-                field="dataPedido"
+                field="dataEmissao"
                 setState={setEntrada}
                 disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
@@ -375,41 +339,28 @@ export default function Entrada() {
             </Grid>
             <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={rsCliente}
+                opcoes={rsFornecedor}
                 campoDescricao="nome"
                 campoID="idPessoa"
                 dados={entrada}
-                mensagemPadraoCampoEmBranco="Escolha um cliente"
-                field="idPessoa_cliente"
-                label="Cliente"
+                mensagemPadraoCampoEmBranco="Escolha um fornecedor"
+                field="idPessoa_fornecedor"
+                label="Fornecedor"
                 erros={erros}
                 setState={setEntrada}
               />
             </Grid>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsVendedor}
-                campoDescricao="nome"
-                campoID="idPessoa"
+            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                type='text'
+                mask='nf'
+                tipo='mac'
+                label="Nota Fiscal"
                 dados={entrada}
-                mensagemPadraoCampoEmBranco="Escolha um Vendedor"
-                field="idPessoa_vendedor"
-                label="Vendedor"
-                erros={erros}
+                field="notaFiscal"
                 setState={setEntrada}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsPrazo}
-                campoDescricao="nome"
-                campoID="idPrazoEntrega"
-                dados={entrada}
-                mensagemPadraoCampoEmBranco="Prazo de entrega"
-                field="idPrazoEntrega"
-                label="Prazo de entrega"
+                disabled={localState.action === 'excluindo' ? true : false}
                 erros={erros}
-                setState={setEntrada}
               />
             </Grid>
             <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>

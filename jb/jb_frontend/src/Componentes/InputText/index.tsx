@@ -50,7 +50,7 @@ interface InputTextInterface {
   | "currency"
   | "mac"
   maxLength?: number | null
-  mask?: "tel" | "cnpj" | "cpf" | "cep" | "uf" | "mac" | string
+  mask?: "tel" | "cnpj" | "cpf" | "cep" | "uf" | "mac" | "nf" | string
   autoFocus?: boolean
   unmask?: boolean
   onChange?: (v: any) => void
@@ -148,21 +148,23 @@ const TextMaskCustom = forwardRef((props: any, ref: any) => {
     <IMaskInput
       {...other}
       mask={
-        mask === "uf"
-          ? "aa"
-          : tipo === "date"
-            ? "00/00/0000"
-            : tipo === "dateTime"
-              ? "00/00/0000 00:00:00"
-              : mask === "cnpj"
-                ? "00.000.000/0000-00"
-                : mask === "cpf"
-                  ? "000.000.000-00"
-                  : mask === "cep"
-                    ? "00.000-000"
-                    : mask === "mac" || tipo === "mac"
-                      ? "mmm:mmm:mmm:mmm:mmm:mmm"
-                      : mask
+        mask === "nf"
+          ? "000.000.000"
+          : mask === "uf"
+            ? "aa"
+            : tipo === "date"
+              ? "00/00/0000"
+              : tipo === "dateTime"
+                ? "00/00/0000 00:00:00"
+                : mask === "cnpj"
+                  ? "00.000.000/0000-00"
+                  : mask === "cpf"
+                    ? "000.000.000-00"
+                    : mask === "cep"
+                      ? "00.000-000"
+                      : mask === "mac" || tipo === "mac"
+                        ? "mmm:mmm:mmm:mmm:mmm:mmm"
+                        : mask
       }
       definitions={MASK_DEFINITIONS}
       inputRef={ref}
@@ -399,17 +401,19 @@ export default function InputText({
                   ? 10
                   : tipo === "dateTime"
                     ? 19
-                    : mask === "uf"
-                      ? 2
-                      : mask === "tel"
-                        ? 15
-                        : mask === "cnpj"
-                          ? 18
-                          : mask === "cpf"
-                            ? 14
-                            : mask === "cep"
-                              ? 10
-                              : maxLength,
+                    : mask === "nf"
+                      ? 11
+                      : mask === "uf"
+                        ? 2
+                        : mask === "tel"
+                          ? 15
+                          : mask === "cnpj"
+                            ? 18
+                            : mask === "cpf"
+                              ? 14
+                              : mask === "cep"
+                                ? 10
+                                : maxLength,
             mask: mask,
             min: min,
             max: max,

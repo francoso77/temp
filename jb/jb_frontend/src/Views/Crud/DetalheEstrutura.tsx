@@ -24,9 +24,10 @@ import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface'
 
 interface PropsInterface {
   rsEstrutura: EstruturaInterface
+  setEstruturaState: React.Dispatch<React.SetStateAction<ActionInterface>>,
 }
 
-export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
+export default function DetalheEstrutura({ rsEstrutura, setEstruturaState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -178,7 +179,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                 setMensagemState({
                   titulo: 'Erro...',
                   exibir: true,
-                  mensagem: 'A quantidade total da estrutura deve ser menor que a quantidade básica informada!',
+                  mensagem: 'A quantidade total da composição deve ser menor que a quantidade base informada!',
                   tipo: MensagemTipo.Error,
                   exibirBotao: true,
                   cb: null
@@ -326,10 +327,10 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     setOpen(false);
     irpara('/Estrutura')
     setLocalState({ action: actionTypes.pesquisando })
-
+    setEstruturaState({ action: actionTypes.pesquisando })
     setLayoutState({
-      titulo: 'Cadasto de Estruturas',
-      tituloAnterior: 'Composição de Estrutura',
+      titulo: 'Estruturas de Produtos',
+      tituloAnterior: 'Composição de estrutura',
       pathTitulo: '/Estrutura',
       pathTituloAnterior: '/DetalheEstrutura'
     })
@@ -338,19 +339,12 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   useEffect(() => {
     btPesquisar()
     BuscarDados()
-    setLayoutState({
-      titulo: 'Composição de Estrutura',
-      tituloAnterior: 'Cadasto de Estruturas',
-      pathTitulo: '/DetalheEstrutura',
-      pathTituloAnterior: '/Estrutura'
-    })
   }, [])
 
   return (
     <>
       <Dialog open={open}>
         <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
-
           <Grid item xs={4}>
             <ShowText
               titulo="Produto"
@@ -368,8 +362,19 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
           </Grid>
         </Paper>
         <Condicional condicao={localState.action === 'pesquisando'}>
-          <Paper sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
-            <Grid item xs={11}>
+          <Paper sx={{ m: 1, padding: 1.5 }}>
+            <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
+              <Tooltip title={'Incluir'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
+                  onClick={() => btIncluir()}
+                >
+                  <AddCircleIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
               <DataTable
                 colunaSoma='qtd'
                 temTotal={true}
@@ -394,17 +399,6 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
               />
-            </Grid>
-            <Grid item xs={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
             </Grid>
           </Paper>
         </Condicional>
@@ -447,6 +441,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                   setState={setDetalheEstrutura}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>

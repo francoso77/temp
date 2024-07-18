@@ -132,7 +132,7 @@ export default function MenuNav() {
             <NoteAltOutlinedIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <Box sx={{ flexGrow: 0.25 }} />
-          <IconButton color="primary" onClick={() => irPara('/Entrada', 'Entrada')}>
+          <IconButton color="primary" onClick={() => irPara('/Entrada', 'Entradas de Produtos')}>
             <AddShoppingCartOutlinedIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <StyledFab color="primary" aria-label="add">

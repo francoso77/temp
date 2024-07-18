@@ -17,14 +17,11 @@ export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;
   onClose: (value: string) => void;
-  rsDados?: {
-    [key: string]: string | number | readonly string[] | undefined | any
-  };
   tipo: 'pessoas' | 'dados'
 }
 
 export default function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open, rsDados, tipo } = props;
+  const { onClose, selectedValue, open, tipo } = props;
 
   const handleClose = () => {
     onClose(selectedValue);

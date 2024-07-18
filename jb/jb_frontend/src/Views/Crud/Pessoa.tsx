@@ -18,14 +18,12 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
 import SimpleDialog from '../../Componentes/Dialog';
 import { THEME } from '../../Layout/Theme';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
 
 
 export default function Pessoa() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
-  const clsFormatacao = new ClsFormatacao()
 
   const [open, setOpen] = useState(true);
   const [selectedValue, setSelectedValue] = useState(PessoaTypes[1].descricao);
@@ -634,17 +632,6 @@ export default function Pessoa() {
           </Condicional>
         </Grid>
       </Paper >
-      {/* {JSON.stringify(pessoa)} */}
     </Container >
   )
 }
-
-{/* <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
-      <InputMultiline
-        label="Dados adicionais..."
-        setState={setPessoa}
-        dados={pessoa}
-        field="adicionais"
-        disabled={localState.action === 'excluindo' ? true : false}
-      />
-    </Grid> */}

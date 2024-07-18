@@ -1,7 +1,7 @@
 @echo off
 cls
 
-cd C:\temp\React\fleek\td-fleek-nest
+cd C:\temp\jb\jb_backend
 
 start cmd /k npm run start:dev
 

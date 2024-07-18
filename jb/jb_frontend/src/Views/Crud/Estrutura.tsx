@@ -20,6 +20,7 @@ import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/un
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { SqlEstruturaInterface } from '../../../../jb_backend/src/interfaces/sqlEstruturaInterface';
 import DetalheEstrutura from './DetalheEstrutura';
+import ShowText from '../../Componentes/ShowText';
 
 
 export default function Estrutura() {
@@ -36,17 +37,9 @@ export default function Estrutura() {
     nome: string
   }
 
-  const [open, setOpen] = useState(true);
-  const [selectedValue, setSelectedValue] = useState("Aqui vai o nome do produto");
-
-  const handleClose = (value: string) => {
-    setOpen(false);
-    setSelectedValue(value);
-    setLocalState({ action: actionTypes.incluindo })
-  };
-
+  const [selectedValue, setSelectedValue] = useState("");
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<SqlEstruturaInterface>>([])
   const [erros, setErros] = useState({})
@@ -113,6 +106,12 @@ export default function Estrutura() {
       setEstrutura(rs)
       setSelectedValue(rsPesquisa[0].produto_nome);
       setLocalState({ action: actionTypes.detalhes })
+      setLayoutState({
+        titulo: 'Composição de Estrutura',
+        tituloAnterior: 'Estruturas de Produtos',
+        pathTitulo: '/DetalheEstrutura',
+        pathTituloAnterior: '/Estrutura'
+      })
     })
   }
   const btIncluir = () => {
@@ -243,7 +242,7 @@ export default function Estrutura() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Cadastro de Estruturas',
+      tituloAnterior: 'Estruturas de Produtos',
       pathTitulo: '/',
       pathTituloAnterior: '/Estruturas'
     })
@@ -280,24 +279,10 @@ export default function Estrutura() {
     BuscarDados()
   }, [])
 
-  useEffect(() => {
-    if (layoutState.titulo === "Cadasto de Estruturas") {
-      setLocalState({ action: actionTypes.pesquisando })
-      setLayoutState({
-        titulo: 'Cadastro de Estruturas',
-        tituloAnterior: 'Cadastro de Estruturas de Produtos',
-        pathTitulo: '/Estrutura',
-        pathTituloAnterior: '/DetalheEstrutura'
-      })
-    }
-  },)
-
-
   return (
 
-    <Container maxWidth="md" sx={{ mt: 5 }}>
+    <Container maxWidth="md" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
           <Grid item xs={12} sx={{ textAlign: 'right' }}>
@@ -306,7 +291,7 @@ export default function Estrutura() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            <Grid item xs={10}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -319,11 +304,11 @@ export default function Estrutura() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={2}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, mr: 1 }}
+                  sx={{ mt: 4, ml: 1 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -435,14 +420,11 @@ export default function Estrutura() {
           </Condicional>
           <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
-              <DetalheEstrutura rsEstrutura={estrutura} />
-              {/* <SimpleDialog
-              selectedValue={selectedValue}
-              open={open}
-              onClose={handleClose}
-              tipo='dados'
-              rsDados={rsPesquisa}
-            /> */}
+              <ShowText
+                titulo='Estrutura do Produto'
+                descricao={selectedValue}
+              />
+              <DetalheEstrutura rsEstrutura={estrutura} setEstruturaState={setLocalState} />
             </Grid>
           </Condicional>
         </Grid>

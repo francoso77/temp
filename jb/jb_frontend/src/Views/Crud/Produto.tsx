@@ -449,7 +449,7 @@ export default function Produto() {
                 scale={2}
               />
             </Grid>
-            <Grid item xs={12} md={3} sx={{ ml: 8, mt: 5 }}>
+            <Grid item xs={3} md={3} sx={{ ml: 8, mt: 5 }}>
               <InputText
                 label="Ativo"
                 tipo="checkbox"

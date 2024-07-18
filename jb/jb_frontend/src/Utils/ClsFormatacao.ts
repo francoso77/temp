@@ -70,4 +70,9 @@ export default class ClsFormatacao {
     return DateTime.fromISO(data).toFormat("yyyy-MM-dd'T'HH:mm")
   }
 
+  //Retorna formatação para número de nota fiscal no modelo 000.000.000
+  public notaFiscal(nota: string): string {
+    const notaComZeros = nota.padStart(9, '0');
+    return notaComZeros.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
 }

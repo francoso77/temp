@@ -2,7 +2,6 @@ import React, { useEffect, useRef, forwardRef, useState } from 'react';
 import { OutlinedInput, Typography, InputAdornment, FormControl, FormControlLabel, Checkbox, IconButton, Icon } from '@mui/material';
 import Condicional from '../Condicional/Condicional';
 import { IMaskInput } from 'react-imask';
-// import * as Styled from './styles';
 import VisibilityIcon from "@mui/icons-material/Visibility"
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 

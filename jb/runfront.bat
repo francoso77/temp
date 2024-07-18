@@ -1,7 +1,7 @@
 @echo off
 cls
 
-cd C:\temp\React\fleek\jb-frontend
+cd C:\temp\jb\jb_frontend
 
 start cmd /k npm run start
 

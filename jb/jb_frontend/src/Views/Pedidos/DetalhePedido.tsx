@@ -25,8 +25,8 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 
 const CustomDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
-    width: '80%', // Ajuste esta porcentagem conforme necessário
-    height: '80vh', // Ajuste esta altura conforme necessário
+    width: '85%', // Ajuste esta porcentagem conforme necessário
+    height: '85vh', // Ajuste esta altura conforme necessário
     maxWidth: 'none',
     maxHeight: 'none',
   },
@@ -34,12 +34,13 @@ const CustomDialog = styled(Dialog)(({ theme }) => ({
 
 interface PropsInterface {
   rsPedido: PedidoInterface
+  setPedidoState: React.Dispatch<React.SetStateAction<ActionInterface>>,
 }
 
 interface rsSomatorioInterface {
   total: number
 }
-export default function DetalhePedido({ rsPedido }: PropsInterface) {
+export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -277,8 +278,6 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
         setRsPesquisa(rs)
       })
 
-    // SUM(dp.qtdPedida * dp.vrUnitario) AS total,
-    // SUM(dp.qtdPedida) AS totalQtdPedida
     query = `
       SELECT 
       FORMAT(SUM(dp.qtdPedida * dp.vrUnitario),2,'de_DE') AS total,
@@ -353,7 +352,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
     setOpen(false);
     irpara('/Pedido')
     setLocalState({ action: actionTypes.pesquisando })
-
+    setPedidoState({ action: actionTypes.pesquisando })
     setLayoutState({
       titulo: 'Pedidos',
       tituloAnterior: 'Itens do Pedido',
@@ -365,12 +364,6 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
   useEffect(() => {
     btPesquisar()
     BuscarDados()
-    setLayoutState({
-      titulo: 'Itens Pedido',
-      tituloAnterior: 'Pedidos',
-      pathTitulo: '/DetalhePedido',
-      pathTituloAnterior: '/Pedido'
-    })
   }, [])
 
   return (
@@ -395,8 +388,19 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
           </Grid>
         </Paper>
         <Condicional condicao={localState.action === 'pesquisando'}>
-          <Paper sx={{ display: 'flex', m: 1, padding: 1.5 }}>
-            <Grid item xs={11}>
+          <Paper sx={{ m: 1, padding: 1.5 }}>
+            <Grid item xs={12} sx={{ mb: 2, textAlign: 'center' }}>
+              <Tooltip title={'Incluir'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
+                  onClick={() => btIncluir()}
+                >
+                  <AddCircleIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
               <DataTable
                 temTotal={false}
                 cabecalho={cabecalhoForm}
@@ -420,23 +424,12 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                 onRequestSort={handleRequestSort}
               />
             </Grid>
-            <Grid item xs={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-            </Grid>
           </Paper>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
 
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
-              <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Qtd Total"
                   dados={rsSomatorio[0]}
@@ -445,7 +438,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   disabled={true}
                 />
               </Grid>
-              <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Total Pedido"
                   dados={rsSomatorio[0]}
@@ -473,7 +466,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   setState={setDetalhePedido}
                 />
               </Grid>
-              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={6} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   tipo='currency'
                   scale={2}
@@ -483,9 +476,10 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   setState={setDetalhePedido}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                 />
               </Grid>
-              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={6} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   tipo='currency'
                   scale={2}
@@ -495,6 +489,7 @@ export default function DetalhePedido({ rsPedido }: PropsInterface) {
                   setState={setDetalhePedido}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>

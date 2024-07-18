@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon, TableFooter } from '@mui/material'
-import TablePagination from '@mui/material/TablePagination'
+import TablePagination, { tablePaginationClasses } from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import Condicional from '../Condicional/Condicional';
@@ -42,38 +42,64 @@ export interface DataTableInterface {
 
 export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    padding: 10,
+    padding: '1px',
+    fontSize: '0.60rem',
+    [theme.breakpoints.up('md')]: {
+      padding: '2px',
+      fontSize: '0.80rem',
+    },
     backgroundColor: theme.palette.primary.main,
-    fontSize: 15,
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
-    padding: 10,
+    padding: '1px',
+    fontSize: '0.60rem',
+    [theme.breakpoints.up('md')]: {
+      padding: '2px',
+      fontSize: '0.80rem',
+    },
     backgroundColor: theme.palette.primary.main,
-    fontSize: 15,
     color: theme.palette.common.white,
     position: "sticky",
     left: 0,
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+    padding: '1px',
+    fontSize: '0.55rem',
+    [theme.breakpoints.up('md')]: {
+      padding: '2px',
+      fontSize: '0.70rem',
+    },
   },
   [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
-    fontSize: 14,
+    padding: '1px',
+    fontSize: '0.55rem',
+    [theme.breakpoints.up('md')]: {
+      padding: '2px',
+      fontSize: '0.70rem',
+    },
     position: "sticky",
     left: 0,
     backgroundColor: "#FFFF",
   },
   [`&.${tableCellClasses.footer}`]: {
-    padding: 10,
+    padding: '1px',
+    fontSize: '0.55rem',
+    [theme.breakpoints.up('md')]: {
+      padding: '2px',
+      fontSize: '0.80rem',
+    },
     backgroundColor: theme.palette.primary.main,
-    fontSize: 15,
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
-    padding: 10,
+    padding: '1px',
+    fontSize: '0.55rem',
+    [theme.breakpoints.up('md')]: {
+      padding: '2px',
+      fontSize: '0.80rem',
+    },
     backgroundColor: theme.palette.primary.main,
-    fontSize: 15,
     color: theme.palette.common.white,
     position: "sticky",
     left: 0,
@@ -178,7 +204,7 @@ export default function DataTable<T>({
   return (
     <>
       <TableContainer component={Paper}>
-        <Table size='small'>
+        <Table >
           <TableHead>
             <StyledTableRow>
               {cabecalho.map((coluna, indice) => (
@@ -235,7 +261,15 @@ export default function DataTable<T>({
                                 sx={{ mx: 0, px: 0 }}
                               >
                                 <Icon
-                                  sx={{ color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main }}
+                                  sx={{
+                                    color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main,
+                                    fontSize: '0.95rem',
+                                    mx: 0,
+                                    px: 0,
+                                    [theme.breakpoints.up('md')]: {
+                                      fontSize: '1.25rem',
+                                    },
+                                  }}
                                 >
                                   {acao.icone}
                                 </Icon>
@@ -283,6 +317,45 @@ export default function DataTable<T>({
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          '& .MuiTablePagination-toolbar': {
+            padding: theme.spacing(1),
+            [theme.breakpoints.down('sm')]: {
+              padding: theme.spacing(0.5),
+            },
+            [theme.breakpoints.up('md')]: {
+              padding: theme.spacing(1.5),
+            },
+            [theme.breakpoints.up('lg')]: {
+              padding: theme.spacing(2),
+            },
+          },
+          '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+            fontSize: '0.75rem',
+            [theme.breakpoints.down('sm')]: {
+              fontSize: '0.55rem',
+            },
+            [theme.breakpoints.up('md')]: {
+              fontSize: '1rem',
+            },
+            [theme.breakpoints.up('lg')]: {
+              fontSize: '1.125rem',
+            },
+          },
+          '& .MuiTablePagination-select': {
+            fontSize: '0.75rem',
+            [theme.breakpoints.down('sm')]: {
+              fontSize: '0.55rem',
+            },
+            [theme.breakpoints.up('md')]: {
+              fontSize: '1rem',
+            },
+            [theme.breakpoints.up('lg')]: {
+              fontSize: '1.125rem',
+            },
+          },
+
+        }}
       />
     </>
   )

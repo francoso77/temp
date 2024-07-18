@@ -26,6 +26,14 @@ interface dadosCepInterface {
   tem: boolean
 }
 
+const URL_BACKEND: string = (
+  process.env.REACT_APP_BACKEND_PROTOCOLO as string
+).concat(
+  process.env.REACT_APP_BACKEND_HOST as string,
+  ":",
+  process.env.REACT_APP_BACKEND_PORTA as string
+)
+
 export default class ClsCrud {
 
   public query({
@@ -59,7 +67,7 @@ export default class ClsCrud {
     }
     return axios
       .post<RespostaPadraoInterface<Array<any>>>(
-        "http://localhost:4000/query",
+        URL_BACKEND.concat("/query"),
         dados,
         config
       )
@@ -122,7 +130,7 @@ export default class ClsCrud {
     }
     return axios
       .post<RespostaPadraoInterface<Array<any>>>(
-        "http://localhost:4000/pesquisar",
+        URL_BACKEND.concat("/pesquisar"),
         dados,
         config
       )
@@ -180,7 +188,7 @@ export default class ClsCrud {
     }
     return axios
       .post<RespostaPadraoInterface<Array<any>>>(
-        "http://localhost:4000/incluir",
+        URL_BACKEND.concat("/incluir"),
         dados,
         config
       )
@@ -239,7 +247,7 @@ export default class ClsCrud {
 
     return axios
       .delete<RespostaPadraoInterface<Array<any>>>(
-        "http://localhost:4000/excluir",
+        URL_BACKEND.concat("/excluir"),
         config
       )
       .then((rs) => {

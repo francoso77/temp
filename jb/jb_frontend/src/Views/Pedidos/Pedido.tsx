@@ -56,15 +56,15 @@ export default function Pedido() {
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
+      cabecalho: 'Cliente',
+      alinhamento: 'left',
+      campo: 'nome_cliente',
+    },
+    {
       cabecalho: 'Data',
       alinhamento: 'left',
       campo: 'dataPedido',
       format: (data) => clsFormatacao.dataISOtoUser(data)
-    },
-    {
-      cabecalho: 'Cliente',
-      alinhamento: 'left',
-      campo: 'nome_cliente',
     },
     {
       cabecalho: 'Vendedor',
@@ -114,6 +114,12 @@ export default function Pedido() {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
       setLocalState({ action: actionTypes.detalhes })
+      setLayoutState({
+        titulo: 'Itens Pedido',
+        tituloAnterior: 'Pedidos',
+        pathTitulo: '/DetalhePedido',
+        pathTituloAnterior: '/Pedido'
+      })
     })
   }
   const btIncluir = () => {
@@ -282,18 +288,6 @@ export default function Pedido() {
     BuscarDados()
   }, [])
 
-  useEffect(() => {
-    if (layoutState.titulo === "Pedidos") {
-      setLocalState({ action: actionTypes.pesquisando })
-      setLayoutState({
-        titulo: 'Pedidos',
-        tituloAnterior: 'Itens Pedido',
-        pathTitulo: '/Pedido',
-        pathTituloAnterior: '/DetalhePedido'
-      })
-    }
-  },)
-
   return (
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -307,7 +301,7 @@ export default function Pedido() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            <Grid item xs={10}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -320,11 +314,11 @@ export default function Pedido() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={2}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, mr: 1 }}
+                  sx={{ mt: 4, mr: 0.5 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -463,7 +457,7 @@ export default function Pedido() {
           </Condicional>
           <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
-              <DetalhePedido rsPedido={pedido} />
+              <DetalhePedido rsPedido={pedido} setPedidoState={setLocalState} />
             </Grid>
           </Condicional>
         </Grid>

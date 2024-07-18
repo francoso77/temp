@@ -1,5 +1,4 @@
-import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
-// import { styled } from '@mui/system';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -210,25 +209,16 @@ export default function Cor() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 5 }}>
+    <Container maxWidth="md" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-            <Typography component="h5" variant="h5" align="left">
-              {/* Informe aqui o nome técnico de cada raça */}
-              <Typography variant="body2" gutterBottom>
-                {/* Informe o nome da cor */}
-              </Typography>
-            </Typography>
-
+        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            <Grid item xs={10}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -241,11 +231,11 @@ export default function Cor() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={2}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, mr: 1 }}
+                  sx={{ mt: 4, ml: 1 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

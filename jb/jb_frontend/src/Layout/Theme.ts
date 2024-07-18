@@ -40,7 +40,17 @@ export const THEME = createTheme({
       defaultProps: {
         color: 'secondary',
         style: { height: '35px', width: '35px' }
-      }
+      },
+      styleOverrides: {
+        root: {
+          color: 'secondary', //' #DC7B3F', // cor padrão
+          '&:hover': {
+            color: 'white', // cor ao passar o mouse
+            backgroundColor: '#ffcc80', // fundo ao passar o mouse
+          },
+          style: { height: '35px', width: '35px' }
+        },
+      },
     }
   },
   cores: {
