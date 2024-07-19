@@ -17,7 +17,6 @@ import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import DetalhePedido from './DetalheEntrada';
 
@@ -58,7 +57,7 @@ export default function Entrada() {
     },
     {
       cabecalho: 'Nota Fiscal',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'notaFiscal',
       format: (nota) => clsFormatacao.notaFiscal(nota)
     },
@@ -269,7 +268,7 @@ export default function Entrada() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            <Grid item xs={10}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -282,11 +281,11 @@ export default function Entrada() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={2}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, ml: 1 }}
+                  sx={{ mt: 4, ml: 2 }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -324,7 +323,7 @@ export default function Entrada() {
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 type='tel'
                 tipo="date"
@@ -337,7 +336,7 @@ export default function Entrada() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
               <ComboBox
                 opcoes={rsFornecedor}
                 campoDescricao="nome"
@@ -350,7 +349,7 @@ export default function Entrada() {
                 setState={setEntrada}
               />
             </Grid>
-            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 type='text'
                 mask='nf'
@@ -363,7 +362,7 @@ export default function Entrada() {
                 erros={erros}
               />
             </Grid>
-            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 type='text'
                 tipo='uppercase'

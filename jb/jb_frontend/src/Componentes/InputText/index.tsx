@@ -277,6 +277,11 @@ export default function InputText({
           ),
         })
       }
+    } else if (mask === "nf") {
+      setState({
+        ...dados,
+        [field]: clsFormatos.notaFiscal(dados[field])
+      })
     }
   }
 

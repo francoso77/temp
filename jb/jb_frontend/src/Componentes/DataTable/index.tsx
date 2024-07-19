@@ -64,18 +64,18 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     left: 0,
   },
   [`&.${tableCellClasses.body}`]: {
-    padding: '1px',
+    padding: '0px',
     fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
-      padding: '2px',
+      padding: '0px',
       fontSize: '0.70rem',
     },
   },
   [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
-    padding: '1px',
+    padding: '0px',
     fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
-      padding: '2px',
+      padding: '0px',
       fontSize: '0.70rem',
     },
     position: "sticky",
@@ -243,6 +243,7 @@ export default function DataTable<T>({
                       cabecalho.map((coluna, indice) => {
                         return (
                           <StyledTableCell
+                            sx={{ m: 0, p: 0 }}
                             key={indice}
                             align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
                             {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
@@ -251,7 +252,8 @@ export default function DataTable<T>({
                       })
                     }
                     <Condicional condicao={acoes.length > 0}>
-                      <StyledTableCell align='center'>
+                      <StyledTableCell align='center' sx={{ mx: 0, px: 0 }}
+                      >
                         {acoes.map((acao, index) => (
                           <Tooltip title={acao.toolTip} key={index}>
                             <span>

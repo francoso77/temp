@@ -56,7 +56,7 @@ export default function Header() {
           </Tooltip>
           <Box sx={{ flexGrow: 1 }} />
           <Box >
-            <Typography variant="h6" gutterBottom sx={{ margin: '20px' }}>
+            <Typography variant="body1" gutterBottom sx={{ margin: '20px' }}>
               {layoutState.titulo}
             </Typography>
           </Box>

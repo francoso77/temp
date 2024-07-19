@@ -130,23 +130,6 @@ export default class ClsValidacao {
 
   }
 
-
-  /**
-   * Valida se o campo é um número inteiro ou decimal
-   * @param _eNUMERO number
-   * @returns Retorna se é um número inteiro ou decimal correto
-   */
-  public eNUMERO(_eNUMERO: number): boolean {
-    if (!_eNUMERO) {
-      return false
-    }
-    else {
-      return true
-    }
-
-  }
-
-
   /**
    * Verifica se é um telefone válido - padrão BR | 11 ou 12 dígitos (com DDD)
    * @param campo Nome do campo a ser testado
@@ -174,8 +157,35 @@ export default class ClsValidacao {
 
   }
 
+  //     /**
+  //  * Verifica se é um número de nota fiscal válido - padrão 000.000.000
+  //  * @param campo Nome do campo a ser testado
+  //  * @param dados Objeto de conjunto de dados
+  //  * @param erros Objeto de conjunto de erros
+  //  * @param retorno retorno atualmente "setado" - sempre retorna negativo se este campo vier negativo
+  //  * @param permiteVazio retorna verdadeiro ( @param retorno ) caso campo seja vazio
+  //  * @param mensagemErro conteúdo de erro caso seja inválido o telefone
+  //  * @param mensagemErroVazio conteúdo de erro caso seja vazio e não permitido vazio
+  //  * @returns 
+  //  */
+  //     public eNF(campo: string,
+  //       dados: { [key: string]: any },
+  //       erros: { [key: string]: string },
+  //       retorno: boolean,
+  //       permiteVazio: boolean = false,
+  //       mensagemErro: string = 'Email Inválido',
+  //       mensagemErroVazio: string = 'Forneça um Email Válido'
+  //     ): boolean {
+
+  //       //eslint-disable-next-line
+  //       const regExpNF: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+
+  //       return this.validarComRegEx(regExpEmail, campo, dados, erros, retorno, permiteVazio, mensagemErro, mensagemErroVazio)
+
+  //     }
+
   /**
- * Verifica se é um telefone válido - padrão BR | 11 ou 12 dígitos (com DDD)
+ * Verifica se é uma conta de e-mail válido
  * @param campo Nome do campo a ser testado
  * @param dados Objeto de conjunto de dados
  * @param erros Objeto de conjunto de erros

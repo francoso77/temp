@@ -72,7 +72,8 @@ export default class ClsFormatacao {
 
   //Retorna formatação para número de nota fiscal no modelo 000.000.000
   public notaFiscal(nota: string): string {
-    const notaComZeros = nota.padStart(9, '0');
+    const notaLimpa = nota.replace(/\./g, '')
+    const notaComZeros = notaLimpa.padStart(9, '0');
     return notaComZeros.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 }

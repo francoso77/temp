@@ -24,7 +24,7 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 
 const CustomDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
-    width: '80%', // Ajuste esta porcentagem conforme necessário
+    width: '95%', // Ajuste esta porcentagem conforme necessário
     height: '80vh', // Ajuste esta altura conforme necessário
     maxWidth: 'none',
     maxHeight: 'none',
@@ -36,7 +36,8 @@ interface PropsInterface {
 }
 
 interface rsSomatorioInterface {
-  total: number
+  totalPedido: number
+  totalQtd: number
 }
 export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
@@ -45,7 +46,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const clsFormatcao = new ClsFormatacao()
 
   const SomatorioDados: rsSomatorioInterface = {
-    total: 0
+    totalPedido: 0,
+    totalQtd: 0
   }
   const ResetDados: DetalheEntradaInterface = {
     idEntrada: rsEntrada.idEntrada as number,
@@ -75,7 +77,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const [erros, setErros] = useState({})
   const [detalheEntrada, setDetalheEntrada] = useState<DetalheEntradaInterface>(ResetDados)
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
-  const [rsSomatorio, setRsSomatorio] = useState<Array<rsSomatorioInterface>>([SomatorioDados])
+  const [rsSomatorio, setRsSomatorio] = useState<rsSomatorioInterface>(SomatorioDados)
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
@@ -286,8 +288,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     // SUM(dp.qtdPedida) AS totalQtdPedida
     query = `
       SELECT 
-      FORMAT(SUM(dp.qtdPedida * dp.vrUnitario),2,'de_DE') AS total,
-      FORMAT(SUM(dp.qtdPedida),2,'de_DE') AS totalQtdPedida
+      FORMAT(SUM(dp.qtdPedida * dp.vrUnitario),2,'de_DE') AS totalPedido,
+      FORMAT(SUM(dp.qtdPedida),2,'de_DE') AS totalQtd
     FROM 
         detalhepedidos dp
     INNER JOIN 
@@ -303,7 +305,10 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         setMensagemState: setMensagemState
       })
       .then((rs: Array<rsSomatorioInterface>) => {
-        setRsSomatorio(rs)
+        setRsSomatorio({
+          totalPedido: rs[0].totalPedido,
+          totalQtd: rs[0].totalQtd
+        })
       })
   }
 
@@ -444,8 +449,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
               <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Qtd Total"
-                  dados={rsSomatorio[0]}
-                  field="totalQtdPedida"
+                  dados={rsSomatorio}
+                  field="totalQtd"
                   setState={setDetalheEntrada}
                   disabled={true}
                 />
@@ -453,8 +458,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
               <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Total Pedido"
-                  dados={rsSomatorio[0]}
-                  field="total"
+                  dados={rsSomatorio}
+                  field="totalPedido"
                   setState={setDetalheEntrada}
                   disabled={true}
                 />
