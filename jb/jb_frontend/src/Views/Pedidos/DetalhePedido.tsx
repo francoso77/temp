@@ -369,22 +369,23 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
   return (
     <>
       <CustomDialog open={open} >
-        <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
-
-          <Grid item xs={4}>
-            <ShowText
-              titulo="Cliente"
-              descricao={nomeCliente.nome} />
-          </Grid>
-          <Grid item xs={4} sx={{ textAlign: 'center' }}>
-            <ShowText
-              titulo="Data"
-              descricao={dataFormatada(rsPedido.dataPedido)} />
-          </Grid>
-          <Grid item xs={4} sx={{ textAlign: 'right' }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+        <Paper variant="outlined" sx={{ display: 'flex', m: 1, padding: 1 }}>
+          <Grid container >
+            <Grid item xs={10}>
+              <ShowText
+                titulo="Cliente"
+                descricao={nomeCliente.nome} />
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={12} >
+              <ShowText
+                titulo="Data"
+                descricao={dataFormatada(rsPedido.dataPedido)} />
+            </Grid>
           </Grid>
         </Paper>
         <Condicional condicao={localState.action === 'pesquisando'}>

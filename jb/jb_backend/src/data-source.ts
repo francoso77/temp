@@ -19,7 +19,6 @@ import ProducaoMalharia from './entities/producaoMalharia.entity'
 import Produto from './entities/produto.entity'
 import Programacao from './entities/programacao.entity'
 import Tinturaria from './entities/tinturaria.entity'
-import TipoProduto from './entities/tipoProduto.entity'
 import UnidadeMedida from './entities/unidadeMedida.entity'
 import { User } from './entities/user.entity'
 
@@ -54,7 +53,6 @@ export const AppDataSource = new DataSource({
     Produto,
     Programacao,
     Tinturaria,
-    TipoProduto,
     UnidadeMedida,
     User
   ],

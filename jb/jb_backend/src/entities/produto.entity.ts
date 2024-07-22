@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ProdutoInterface } from '../interfaces/produtoInterface';
-import TipoProduto from './tipoProduto.entity';
 import Estrutura from './estrutura.entity';
 import Pedido from './pedido.entity';
 import DetalhePedido from './detalhePedido.entity';
@@ -10,6 +9,7 @@ import ProducaoMalharia from './producaoMalharia.entity';
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
 import Estoque from './estoque.entity';
 import DetalheProgramacao from './detalheProgramacao.entity';
+import { TipoProdutoType } from '../types/tipoProdutoypes';
 
 @Entity({ name: 'produtos' })
 export default class Produto implements ProdutoInterface {
@@ -40,11 +40,7 @@ export default class Produto implements ProdutoInterface {
   ativo: boolean
 
   @Column()
-  idTipoProduto: number
-
-  @JoinColumn({ name: 'idTipoProduto' })
-  @ManyToOne(() => TipoProduto, (tipoProduto) => tipoProduto.produtos)
-  tipoProduto: TipoProduto
+  tipoProduto: TipoProdutoType
 
   @OneToMany(() => DetalheProducaoDublagem, (detalheProducaoDublagem) => detalheProducaoDublagem.produto)
   producaoDublagens: DetalheProducaoDublagem[]

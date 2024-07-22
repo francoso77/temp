@@ -31,19 +31,19 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   @ManyToOne(() => Cor, (cor) => cor.corDetalheEntradas)
   cor: Cor
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   qtdPecas: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   vrUnitario: number
 
-  @Column({ type: 'float', precision: 2 })
-  peso: number
+  @Column({ type: 'float', precision: 4 })
+  qtd: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   metro: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   gm2: number
 
   @Column()

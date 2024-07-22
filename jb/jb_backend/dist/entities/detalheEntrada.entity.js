@@ -48,23 +48,23 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", cor_entity_1.default)
     ], DetalheEntrada.prototype, "cor", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "qtdPecas", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "vrUnitario", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
-    ], DetalheEntrada.prototype, "peso", void 0);
+    ], DetalheEntrada.prototype, "qtd", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "metro", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "gm2", void 0);
     __decorate([

@@ -48,6 +48,9 @@ interface ComboBoxInterface<T> {
   formatarOption?: (opcao: T) => string
   /* Quando Teclar ENTER ou clicar no ícone de pesquisa */
   onClickPesquisa?: () => void
+  //teste
+  onSelect?: (v: any) => void
+
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -99,7 +102,8 @@ export default function ComboBox<T>(
     onKeyDown,
     permitirNovaOpcao = false,
     formatarOption = undefined,
-    onClickPesquisa
+    onClickPesquisa,
+    onSelect
   }: ComboBoxInterface<T>) {
 
   const [pesquisa, setPesquisa] = useState('')
@@ -111,6 +115,11 @@ export default function ComboBox<T>(
   return (
     <>
       <Autocomplete
+        onSelect={(e) => {
+          if (onSelect) {
+            onSelect(e)
+          }
+        }}
         clearOnEscape
         disabled={disabled}
         value={dados[field]}

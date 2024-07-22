@@ -22,7 +22,6 @@ var producaoMalharia_entity_1 = require("./entities/producaoMalharia.entity");
 var produto_entity_1 = require("./entities/produto.entity");
 var programacao_entity_1 = require("./entities/programacao.entity");
 var tinturaria_entity_1 = require("./entities/tinturaria.entity");
-var tipoProduto_entity_1 = require("./entities/tipoProduto.entity");
 var unidadeMedida_entity_1 = require("./entities/unidadeMedida.entity");
 var user_entity_1 = require("./entities/user.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
@@ -55,7 +54,6 @@ exports.AppDataSource = new typeorm_1.DataSource({
         produto_entity_1.default,
         programacao_entity_1.default,
         tinturaria_entity_1.default,
-        tipoProduto_entity_1.default,
         unidadeMedida_entity_1.default,
         user_entity_1.User
     ],

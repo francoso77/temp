@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var tipoProduto_entity_1 = require("./tipoProduto.entity");
 var estrutura_entity_1 = require("./estrutura.entity");
 var detalhePedido_entity_1 = require("./detalhePedido.entity");
 var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
@@ -19,6 +18,7 @@ var producaoMalharia_entity_1 = require("./producaoMalharia.entity");
 var detalheProducaoDublagem_entity_1 = require("./detalheProducaoDublagem.entity");
 var estoque_entity_1 = require("./estoque.entity");
 var detalheProgramacao_entity_1 = require("./detalheProgramacao.entity");
+var tipoProdutoypes_1 = require("../types/tipoProdutoypes");
 var Produto = /** @class */ (function () {
     function Produto() {
     }
@@ -58,11 +58,6 @@ var Produto = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
-    ], Produto.prototype, "idTipoProduto", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idTipoProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return tipoProduto_entity_1.default; }, function (tipoProduto) { return tipoProduto.produtos; }),
-        __metadata("design:type", tipoProduto_entity_1.default)
     ], Produto.prototype, "tipoProduto", void 0);
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) { return detalheProducaoDublagem.produto; }),

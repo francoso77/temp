@@ -43,13 +43,6 @@
   },
   {
     "id": 7,
-    "menu": "Tipos de Produto",
-    "icon": "article_rounded",
-    "path": "/TipoProduto",
-    "titulo": "Cadastro de Tipos de produtos"
-  },
-  {
-    "id": 8,
     "menu": "Unidades de Medida",
     "icon": "square_foot",
     "path": "/UnidadeMedida",

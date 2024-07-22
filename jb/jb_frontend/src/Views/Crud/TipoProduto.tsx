@@ -6,7 +6,6 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { TipoProdutoInterface } from '../../../../jb_backend/src/interfaces/tipoProdutoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
@@ -19,7 +18,7 @@ import InputText from '../../Componentes/InputText';
 
 
 export default function TipoProduto() {
-
+  {/*
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
@@ -340,4 +339,5 @@ export default function TipoProduto() {
       </Paper>
     </Container>
   )
+    */}
 }

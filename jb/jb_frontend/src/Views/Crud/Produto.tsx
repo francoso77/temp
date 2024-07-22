@@ -17,7 +17,7 @@ import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
-import { TipoProdutoInterface } from '../../../../jb_backend/src/interfaces/tipoProdutoInterface';
+import { TipoProdutoType, TipoProdutoTypes } from '../../types/tipoProdutoypes';
 
 
 export default function Produto() {
@@ -32,7 +32,7 @@ export default function Produto() {
     largura: 0,
     gm2: 0,
     ativo: false,
-    idTipoProduto: 0,
+    tipoProduto: TipoProdutoType.tecidoTinto
 
   }
   interface PesquisaInterface {
@@ -46,7 +46,6 @@ export default function Produto() {
   const [erros, setErros] = useState({})
   const [produto, setProduto] = useState<ProdutoInterface>(ResetDados)
   const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
-  const [rsTipoProduto, setRsTipoProduto] = useState<Array<TipoProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
@@ -65,7 +64,8 @@ export default function Produto() {
     {
       cabecalho: 'Tipo Produto',
       alinhamento: 'left',
-      campo: 'tipoProduto_nome',
+      campo: 'tipoProduto',
+      format: (tipo) => TipoProdutoTypes.find(t => t.idTipoProduto === tipo)?.descricao
     },
     {
       cabecalho: 'Localização',
@@ -130,7 +130,7 @@ export default function Produto() {
 
     retorno = validaCampo.naoVazio('nome', produto, erros, retorno, 'Nome do produto não pode ser vázio')
     retorno = validaCampo.naoVazio('idUnidade', produto, erros, retorno, 'Informe uma Unidade')
-    retorno = validaCampo.naoVazio('idTipoProduto', produto, erros, retorno, 'Informe um Tipo')
+    retorno = validaCampo.naoVazio('tipoProduto', produto, erros, retorno, 'Informe um Tipo')
 
     setErros(erros)
     return retorno
@@ -220,11 +220,9 @@ export default function Produto() {
           p.*,
           p.nome AS produto_nome,
           um.sigla AS unidadeMedida_sigla,
-          t.nome AS tipoProduto_nome
+          p.tipoProduto AS tipoProduto
       FROM 
           produtos p
-      INNER JOIN 
-          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
       INNER JOIN 
           unidademedidas um ON um.idUnidade = p.idUnidade
       WHERE 
@@ -294,17 +292,6 @@ export default function Produto() {
         setRsUnidade(rs)
       })
 
-    clsCrud
-      .pesquisar({
-        entidade: "TipoProduto",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-      })
-      .then((rs: Array<TipoProdutoInterface>) => {
-        setRsTipoProduto(rs)
-      })
   }
 
   useEffect(() => {
@@ -402,12 +389,12 @@ export default function Produto() {
             </Grid>
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={rsTipoProduto}
-                campoDescricao="nome"
+                opcoes={TipoProdutoTypes}
+                campoDescricao="descricao"
                 campoID="idTipoProduto"
                 dados={produto}
                 mensagemPadraoCampoEmBranco="Escolha um Tipo"
-                field="idTipoProduto"
+                field="tipoProduto"
                 label="Tipo de Produto"
                 erros={erros}
                 setState={setProduto}

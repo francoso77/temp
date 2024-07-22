@@ -1,4 +1,4 @@
-import { Dialog, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Dialog, Grid, IconButton, Paper, TextField, Tooltip } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,8 @@ import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoI
 import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
 import styled from 'styled-components';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
+import { TipoProdutoType } from '../../types/tipoProdutoypes';
+import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 
 
 const CustomDialog = styled(Dialog)(({ theme }) => ({
@@ -55,7 +57,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     idCor: 0,
     qtdPecas: 0,
     vrUnitario: 0,
-    peso: 0,
+    qtd: 0,
     metro: 0,
     gm2: 0,
     idPessoa_revisador: 0,
@@ -73,10 +75,12 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEntradaInterface>>([])
-  const [nomeCliente, setNomeCliente] = useState<PesquisaInterface>({ nome: '' })
+  const [nomeFornecedor, setNomeFornecedor] = useState<PesquisaInterface>({ nome: '' })
   const [erros, setErros] = useState({})
+  const [tipo, setTipo] = useState<TipoProdutoType>()
   const [detalheEntrada, setDetalheEntrada] = useState<DetalheEntradaInterface>(ResetDados)
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
+  const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
   const [rsSomatorio, setRsSomatorio] = useState<rsSomatorioInterface>(SomatorioDados)
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
@@ -161,14 +165,19 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     setLocalState({ action: actionTypes.pesquisando })
   }
 
+  const pegaTipo = () => {
+    let auxTipo: number | undefined = rsProduto.
+      find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
+    setTipo(auxTipo)
+  }
   const validarDados = (): boolean => {
 
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
-    retorno = validaCampo.naoVazio('qtdPedida', detalheEntrada, erros, retorno, 'Valor maior que 0')
+    // retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
+    // retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
+    // retorno = validaCampo.naoVazio('qtdPedida', detalheEntrada, erros, retorno, 'Valor maior que 0')
     setErros(erros)
     return retorno
   }
@@ -177,11 +186,11 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
     const query = `
     SELECT 
-    dp.*
+    de.*
     FROM 
-    detalhepedidos dp
+    detalheentradas de
     WHERE 
-    dp.idProduto = ${detalheEntrada.idProduto};
+    de.idProduto = ${detalheEntrada.idProduto};
     `;
 
     clsCrud
@@ -316,14 +325,14 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
     let query: string = `
     SELECT 
-        p.*,
-        pe.nome AS nomeCliente
+        e.*,
+        pe.nome AS nomeFornecedor
     FROM 
-        pedidos p
+        entradas e
     INNER JOIN 
-        pessoas pe ON pe.idPessoa = p.idPessoa_cliente
+        pessoas pe ON pe.idPessoa = e.idPessoa_fornecedor
     WHERE 
-        p.idPedido = ${rsEntrada.idEntrada};
+        e.idEntrada = ${rsEntrada.idEntrada};
     `;
 
     clsCrud
@@ -333,28 +342,29 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
-        setNomeCliente({ nome: rs[0].nomeCliente })
+        setNomeFornecedor({ nome: rs[0].nomeFornecedor })
       })
 
-    query = `
-      SELECT 
-          p.*
-      FROM 
-          produtos p
-      INNER JOIN 
-          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
-      WHERE 
-          t.estrutura = true and p.idProduto <> ${rsEntrada.idEntrada};
-      `;
+    query = `SELECT p.* FROM produtos p;`;
     clsCrud
       .query({
         entidade: "Produto",
         sql: query,
-        msg: '',
         setMensagemState: setMensagemState
       })
       .then((rsProdutos: Array<ProdutoInterface>) => {
         setRsProduto(rsProdutos)
+      })
+
+    query = `SELECT c.* FROM cores c;`;
+    clsCrud
+      .query({
+        entidade: "Cor",
+        sql: query,
+        setMensagemState: setMensagemState
+      })
+      .then((rsCores: Array<CorInterface>) => {
+        setRsCor(rsCores)
       })
   }
 
@@ -386,27 +396,44 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   return (
     <>
       <CustomDialog open={open} >
-        <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
-
-          <Grid item xs={4}>
-            <ShowText
-              titulo="Cliente"
-              descricao={nomeCliente.nome} />
-          </Grid>
-          <Grid item xs={4} sx={{ textAlign: 'center' }}>
-            <ShowText
-              titulo="Data"
-              descricao={dataFormatada(rsEntrada.dataEmissao)} />
-          </Grid>
-          <Grid item xs={4} sx={{ textAlign: 'right' }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+        <Paper variant="outlined" sx={{ display: 'flex', m: 1, padding: 1 }}>
+          <Grid container >
+            <Grid item xs={10}>
+              <ShowText
+                titulo="Fornecedor"
+                descricao={nomeFornecedor.nome} />
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={6} >
+              <ShowText
+                titulo="Nota Fiscal"
+                descricao={rsEntrada.notaFiscal} />
+            </Grid>
+            <Grid item xs={6} >
+              <ShowText
+                titulo="Emissão"
+                descricao={dataFormatada(rsEntrada.dataEmissao)} />
+            </Grid>
           </Grid>
         </Paper>
         <Condicional condicao={localState.action === 'pesquisando'}>
-          <Paper sx={{ display: 'flex', m: 1, padding: 1.5 }}>
-            <Grid item xs={11}>
+          <Paper sx={{ m: 1, padding: 1.5 }}>
+            <Grid item xs={12} sx={{ mb: 2, textAlign: 'center' }}>
+              <Tooltip title={'Incluir'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
+                  onClick={() => btIncluir()}
+                >
+                  <AddCircleIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
               <DataTable
                 temTotal={false}
                 cabecalho={cabecalhoForm}
@@ -429,17 +456,6 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
               />
-            </Grid>
-            <Grid item xs={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
             </Grid>
           </Paper>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
@@ -481,30 +497,84 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                   label="Produtos"
                   erros={erros}
                   setState={setDetalheEntrada}
+                  onSelect={pegaTipo}
                 />
               </Grid>
+              <Condicional condicao={![1, 4, 9].includes(tipo as number)}>
+
+                <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+                  <ComboBox
+                    opcoes={rsCor}
+                    campoDescricao="nome"
+                    campoID="idCor"
+                    dados={detalheEntrada}
+                    mensagemPadraoCampoEmBranco="Escolha uma cor"
+                    field="idCor"
+                    label="Cores"
+                    erros={erros}
+                    setState={setDetalheEntrada}
+                    onSelect={pegaTipo}
+                  />
+                </Grid>
+              </Condicional>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   tipo='currency'
-                  scale={2}
-                  label="Qtd Pedida"
+                  scale={4}
+                  label="Qtd"
                   dados={detalheEntrada}
-                  field="qtdPedida"
+                  field="qtd"
                   setState={setDetalheEntrada}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                 />
               </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   tipo='currency'
-                  scale={2}
+                  scale={4}
                   label="Vr Unitário"
                   dados={detalheEntrada}
                   field="vrUnitario"
                   setState={setDetalheEntrada}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
+                />
+              </Grid>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+
+                <TextField
+                  label='Total Item'
+                  disabled={false}
+                  value={detalheEntrada.qtd * detalheEntrada.vrUnitario}
+                />
+              </Grid>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  tipo='currency'
+                  scale={4}
+                  label="Metros"
+                  dados={detalheEntrada}
+                  field="metro"
+                  setState={setDetalheEntrada}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                />
+              </Grid>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  tipo='number'
+                  scale={0}
+                  label="Qtd Peças"
+                  dados={detalheEntrada}
+                  field="qtdPecas"
+                  setState={setDetalheEntrada}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
@@ -544,6 +614,21 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                 </Grid>
               </Condicional>
             </Grid>
+            <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+
+              <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+                <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+                  <InputText
+                    label="Total Item"
+                    dados={rsSomatorio}
+                    field="totalPedido"
+                    setState={setDetalheEntrada}
+                    disabled={true}
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
+
           </Paper >
         </Condicional>
       </CustomDialog>

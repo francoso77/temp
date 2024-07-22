@@ -1,3 +1,5 @@
+import { TipoProdutoType } from '../types/tipoProdutoypes'
+
 export interface ProdutoInterface {
   idProduto?: number
   nome: string
@@ -5,6 +7,6 @@ export interface ProdutoInterface {
   largura?: number
   gm2?: number
   localizacao?: string
-  idTipoProduto: number
+  tipoProduto: TipoProdutoType
   ativo: boolean
 }

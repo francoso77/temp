@@ -297,10 +297,8 @@ export default function DetalheEstrutura({ rsEstrutura, setEstruturaState }: Pro
           p.*
       FROM 
           produtos p
-      INNER JOIN 
-          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
       WHERE 
-          t.estrutura = true and p.idProduto <> ${rsEstrutura.idProduto};
+          p.idProduto <> ${rsEstrutura.idProduto};
       `;
     clsCrud
       .query({

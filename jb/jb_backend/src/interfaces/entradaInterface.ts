@@ -13,7 +13,7 @@ export interface DetalheEntradaInterface {
   idCor: number
   qtdPecas: number
   vrUnitario: number
-  peso: number
+  qtd: number
   metro: number
   gm2: number
   idPessoa_revisador: number

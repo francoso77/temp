@@ -16,10 +16,10 @@ export default function ShowText({
 }: PropsInterface) {
   return (
     <>
-      <Typography variant="body1" color="secondary" >
+      <Typography variant="subtitle2" color="secondary" >
         {titulo.concat(': ')}
         <Condicional condicao={tipo === "texto"}>
-          <Typography variant="body2" color="primary" sx={{ ml: 1 }}>
+          <Typography variant="subtitle2" color="primary" sx={{ ml: 1 }}>
             {descricao}
           </Typography>
         </Condicional>
@@ -29,7 +29,7 @@ export default function ShowText({
               new ClsFormatacao().somenteNumeros(descricao)
             )} sx={{ ml: 1 }}
           >
-            <Typography variant="body2" color="primary" sx={{ ml: 1 }}>
+            <Typography variant="caption" color="primary" sx={{ ml: 1 }}>
               {descricao}
             </Typography>
           </Link>
