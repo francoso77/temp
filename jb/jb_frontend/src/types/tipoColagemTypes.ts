@@ -1,8 +1,8 @@
 export enum TipoColagemType {
-  cola = 0,
-  filme = 1,
-  smell = 2,
-  fogo = 3
+  cola = 1,
+  filme = 2,
+  smell = 3,
+  fogo = 4
 }
 
 export const TipoColagemTypes = [

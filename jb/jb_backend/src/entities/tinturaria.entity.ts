@@ -4,6 +4,7 @@ import { TinturariaInterface } from '../interfaces/tinturariaInterface';
 import DetalheTinturaria from './detalheTinturaria.entity';
 import ProducaoMalharia from './producaoMalharia.entity';
 import Programacao from './programacao.entity';
+import DetalheEntrada from './detalheEntrada.entity';
 
 @Entity({ name: 'tinturarias' })
 export default class Tinturaria implements TinturariaInterface {
@@ -36,5 +37,8 @@ export default class Tinturaria implements TinturariaInterface {
 
   @OneToMany(() => Programacao, programacao => programacao.tinturaria)
   programacoes: Programacao[];
+
+  @OneToMany(() => DetalheEntrada, detalheEntrada => detalheEntrada.romaneio)
+  romaneioDetalheEntradas: DetalheEntrada[];
 
 }

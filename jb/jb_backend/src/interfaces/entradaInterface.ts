@@ -17,7 +17,7 @@ export interface DetalheEntradaInterface {
   metro: number
   gm2: number
   idPessoa_revisador: number
-  romaneio: string
-  malharia: number
-  tinturaria: number
+  idTinturaria: number
+  perdaMalharia: number
+  perdaTinturaria: number
 }

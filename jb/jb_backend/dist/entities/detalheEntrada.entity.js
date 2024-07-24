@@ -14,6 +14,7 @@ var produto_entity_1 = require("./produto.entity");
 var entrada_entity_1 = require("./entrada.entity");
 var cor_entity_1 = require("./cor.entity");
 var pessoa_entity_1 = require("./pessoa.entity");
+var tinturaria_entity_1 = require("./tinturaria.entity");
 var DetalheEntrada = /** @class */ (function () {
     function DetalheEntrada() {
     }
@@ -77,17 +78,22 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", pessoa_entity_1.default)
     ], DetalheEntrada.prototype, "revisador", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 10 }),
-        __metadata("design:type", String)
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], DetalheEntrada.prototype, "idTinturaria", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
+        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }, function (tinturaria) { return tinturaria.romaneioDetalheEntradas; }),
+        __metadata("design:type", tinturaria_entity_1.default)
     ], DetalheEntrada.prototype, "romaneio", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
-    ], DetalheEntrada.prototype, "malharia", void 0);
+    ], DetalheEntrada.prototype, "perdaMalharia", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
-    ], DetalheEntrada.prototype, "tinturaria", void 0);
+    ], DetalheEntrada.prototype, "perdaTinturaria", void 0);
     DetalheEntrada = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalheentradas' })
     ], DetalheEntrada);

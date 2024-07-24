@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusPedidoItemTypes = exports.StatusPedidoItemType = void 0;
 var StatusPedidoItemType;
 (function (StatusPedidoItemType) {
-    StatusPedidoItemType[StatusPedidoItemType["aberto"] = 0] = "aberto";
-    StatusPedidoItemType[StatusPedidoItemType["fechado"] = 1] = "fechado";
-    StatusPedidoItemType[StatusPedidoItemType["parcial"] = 2] = "parcial";
-    StatusPedidoItemType[StatusPedidoItemType["programado"] = 3] = "programado";
+    StatusPedidoItemType[StatusPedidoItemType["aberto"] = 1] = "aberto";
+    StatusPedidoItemType[StatusPedidoItemType["fechado"] = 2] = "fechado";
+    StatusPedidoItemType[StatusPedidoItemType["parcial"] = 3] = "parcial";
+    StatusPedidoItemType[StatusPedidoItemType["programado"] = 4] = "programado";
 })(StatusPedidoItemType || (exports.StatusPedidoItemType = StatusPedidoItemType = {}));
 exports.StatusPedidoItemTypes = [
     {

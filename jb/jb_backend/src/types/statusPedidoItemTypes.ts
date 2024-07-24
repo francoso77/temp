@@ -1,8 +1,8 @@
 export enum StatusPedidoItemType {
-  aberto = 0,
-  fechado = 1,
-  parcial = 2,
-  programado = 3
+  aberto = 1,
+  fechado = 2,
+  parcial = 3,
+  programado = 4
 }
 
 export const StatusPedidoItemTypes = [

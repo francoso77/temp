@@ -4,6 +4,7 @@ import { DetalheEntradaInterface } from '../interfaces/entradaInterface';
 import Entrada from './entrada.entity';
 import Cor from './cor.entity';
 import Pessoa from './pessoa.entity';
+import Tinturaria from './tinturaria.entity';
 
 @Entity({ name: 'detalheentradas' })
 export default class DetalheEntrada implements DetalheEntradaInterface {
@@ -53,12 +54,16 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.revisadorDetalheEntradas)
   revisador: Pessoa
 
-  @Column({ length: 10 })
-  romaneio: string;
+  @Column()
+  idTinturaria: number
 
-  @Column({ type: 'float', precision: 2 })
-  malharia: number
+  @JoinColumn({ name: 'idTinturaria' })
+  @ManyToOne(() => Tinturaria, (tinturaria) => tinturaria.romaneioDetalheEntradas)
+  romaneio: Tinturaria
 
-  @Column({ type: 'float', precision: 2 })
-  tinturaria: number
+  @Column({ type: 'float', precision: 4 })
+  perdaMalharia: number
+
+  @Column({ type: 'float', precision: 4 })
+  perdaTinturaria: number
 }

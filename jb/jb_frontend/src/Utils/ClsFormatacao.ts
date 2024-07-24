@@ -76,4 +76,16 @@ export default class ClsFormatacao {
     const notaComZeros = notaLimpa.padStart(9, '0');
     return notaComZeros.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
+
+
+  //Retorno da data do banco formata como dd/mm/yyyy
+  public dataFormatada(dateString: string): string {
+    if (dateString.length !== 8) {
+      throw new Error("Data Inválida. Use o formato DDMMYYYY");
+    }
+    const day = dateString.substring(0, 2)
+    const month = dateString.substring(2, 4)
+    const year = dateString.substring(4, 8)
+    return `${day}/${month}/${year}`
+  }
 }

@@ -14,6 +14,7 @@ var pessoa_entity_1 = require("./pessoa.entity");
 var detalheTinturaria_entity_1 = require("./detalheTinturaria.entity");
 var producaoMalharia_entity_1 = require("./producaoMalharia.entity");
 var programacao_entity_1 = require("./programacao.entity");
+var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var Tinturaria = /** @class */ (function () {
     function Tinturaria() {
     }
@@ -55,6 +56,10 @@ var Tinturaria = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return programacao_entity_1.default; }, function (programacao) { return programacao.tinturaria; }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "programacoes", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) { return detalheEntrada.romaneio; }),
+        __metadata("design:type", Array)
+    ], Tinturaria.prototype, "romaneioDetalheEntradas", void 0);
     Tinturaria = __decorate([
         (0, typeorm_1.Entity)({ name: 'tinturarias' })
     ], Tinturaria);
