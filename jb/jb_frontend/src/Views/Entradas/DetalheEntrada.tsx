@@ -1,5 +1,5 @@
-import { Dialog, Grid, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Box, Dialog, Grid, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -88,6 +88,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const [rsSomatorio, setRsSomatorio] = useState<rsSomatorioInterface>(SomatorioDados)
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -159,11 +160,26 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     setLocalState({ action: actionTypes.pesquisando })
   }
 
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    // console.log('passou aqui')
+    // console.log('Evento: ', event)
+    // console.log('Index: ', index)
+    console.log(fieldRefs)
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
+
   const pegaTipo = () => {
     let auxTipo: number | undefined = rsProduto.
       find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
     setTipo(auxTipo)
-    console.log(auxTipo)
   }
   const validarDados = (): boolean => {
 
@@ -310,12 +326,28 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
       })
       .then((rs: Array<rsSomatorioInterface>) => {
         setRsSomatorio({
-          totalEntrada: rs[0].totalEntrada ? rs[0].totalEntrada: 0,
-          totalQtd: rs[0].totalQtd? rs[0].totalQtd : 0
+          totalEntrada: rs[0].totalEntrada ? rs[0].totalEntrada : 0,
+          totalQtd: rs[0].totalQtd ? rs[0].totalQtd : 0
         })
       })
   }
 
+  const pesquisarProdutos = (nome: string) => {
+    clsCrud
+      .pesquisar({
+        entidade: "Produto",
+        criterio: {
+          nome: "%".concat(nome, "%"),
+        },
+        camposLike: ["nome"],
+        select: ["idProduto", "nome"],
+        msg: "Pesquisando produtos",
+        setMensagemState: setMensagemState,
+      })
+      .then((rsProdutos: Array<ProdutoInterface>) => {
+        setRsProduto(rsProdutos)
+      })
+  }
   const BuscarDados = () => {
 
     let query: string = `
@@ -340,7 +372,11 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         setNomeFornecedor({ nome: rs[0].nomeFornecedor })
       })
 
-    query = `SELECT p.* FROM produtos p;`;
+    query = `
+    SELECT p.idProduto, p.nome, p.tipoProduto 
+    FROM produtos p
+    ORDER BY p.nome ASC;
+    `;
     clsCrud
       .query({
         entidade: "Produto",
@@ -351,7 +387,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         setRsProduto(rsProdutos)
       })
 
-    query = `SELECT c.* FROM cores c;`;
+    query = `SELECT c.* FROM cores c ORDER BY c.nome ASC;`;
     clsCrud
       .query({
         entidade: "Cor",
@@ -375,11 +411,12 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
     query = `
         SELECT 
-            p.*
+            p.idPessoa, p.nome, p.tipoPessoa
         FROM 
             pessoas p
         WHERE 
             p.tipoPessoa = 'R'
+        ORDER BY p.nome ASC;
         `;
     clsCrud
       .query({
@@ -395,7 +432,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const irpara = useNavigate()
   const btFechar = () => {
     setOpen(false);
-    irpara('/Pedido')
+    irpara('/Entrada')
     setLocalState({ action: actionTypes.pesquisando })
 
     setLayoutState({
@@ -407,6 +444,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   }
 
   useEffect(() => {
+    fieldRefs.current = fieldRefs.current.slice(0, 10)
     btPesquisar()
     BuscarDados()
     setLayoutState({
@@ -510,61 +548,76 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-                <ComboBox
-                  opcoes={rsProduto}
-                  campoDescricao="nome"
-                  campoID="idProduto"
-                  dados={detalheEntrada}
-                  mensagemPadraoCampoEmBranco="Escolha um produto"
-                  field="idProduto"
-                  label="Produtos"
-                  erros={erros}
-                  setState={setDetalheEntrada}
-                  onSelect={pegaTipo}
-                />
-              </Grid>
-              <Condicional condicao={![10].includes(tipo as number)}>
-
-                <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+              <Grid item xs={12} sm={4} sx={{ mt: 2 }} >
+                <Box>
                   <ComboBox
-                    opcoes={rsCor}
+                    opcoes={rsProduto}
                     campoDescricao="nome"
-                    campoID="idCor"
+                    campoID="idProduto"
                     dados={detalheEntrada}
-                    mensagemPadraoCampoEmBranco="Escolha uma cor"
-                    field="idCor"
-                    label="Cores"
+                    mensagemPadraoCampoEmBranco="Escolha um produto"
+                    field="idProduto"
+                    label="Produtos"
                     erros={erros}
                     setState={setDetalheEntrada}
+                    onSelect={pegaTipo}
+                    // onClickPesquisa={(rs) => pesquisarProdutos(rs)}
+                    onKeyDown={(event) => btPulaCampo(event, 0)}
+                    autoFocus
                   />
+                </Box>
+              </Grid>
+              <Condicional condicao={tipo === 10}>
+                <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+                  <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                    <ComboBox
+                      opcoes={rsCor}
+                      campoDescricao="nome"
+                      campoID="idCor"
+                      dados={detalheEntrada}
+                      mensagemPadraoCampoEmBranco="Qual cor"
+                      field="idCor"
+                      label="Cores"
+                      erros={erros}
+                      setState={setDetalheEntrada}
+                      onSelect={pegaTipo}
+                      onFocus={(e) => e.target.select()}
+                      onKeyDown={(event) => btPulaCampo(event, 1)}
+                    />
+                  </Box>
                 </Grid>
               </Condicional>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={4}
-                  label="Qtd"
-                  dados={detalheEntrada}
-                  field="qtd"
-                  setState={setDetalheEntrada}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                />
+                <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                  <InputText
+                    tipo='currency'
+                    scale={4}
+                    label="Qtd"
+                    dados={detalheEntrada}
+                    field="qtd"
+                    setState={setDetalheEntrada}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                  />
+                </Box>
               </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={4}
-                  label="Vr Unitário"
-                  dados={detalheEntrada}
-                  field="vrUnitario"
-                  setState={setDetalheEntrada}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                />
+                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                  <InputText
+                    tipo='currency'
+                    scale={4}
+                    label="Vr Unitário"
+                    dados={detalheEntrada}
+                    field="vrUnitario"
+                    setState={setDetalheEntrada}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                  />
+                </Box>
               </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
 
@@ -578,108 +631,129 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                 />
               </Grid>
               <Condicional condicao={tipo === 10}>
-              <Grid item xs={12} md={12} sx={{ mt: 2 }}>
-                <Typography>
-                  Detalhes de Tinturaria
-                </Typography>
+                <Grid item xs={12} md={12} sx={{ mt: 2 }}>
+                  <Typography>
+                    Detalhes de Tinturaria
+                  </Typography>
 
-              </Grid>
-              <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-                <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                    <InputText
-                      tipo='number'
-                      scale={0}
-                      label="Qtd Peças"
-                      dados={detalheEntrada}
-                      field="qtdPecas"
-                      setState={setDetalheEntrada}
-                      disabled={localState.action === 'excluindo' ? true : false}
-                      erros={erros}
-                      onFocus={(e) => e.target.select()}
-                    />
-                  </Grid>
-                  <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                    <InputText
-                      tipo='currency'
-                      scale={4}
-                      label="Metros"
-                      dados={detalheEntrada}
-                      field="metro"
-                      setState={setDetalheEntrada}
-                      disabled={localState.action === 'excluindo' ? true : false}
-                      erros={erros}
-                      onFocus={(e) => e.target.select()}
-                    />
-                  </Grid>
-                  <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                    <InputText
-                      tipo='currency'
-                      scale={4}
-                      label="Gm²"
-                      dados={detalheEntrada}
-                      field="gm2"
-                      setState={setDetalheEntrada}
-                      disabled={localState.action === 'excluindo' ? true : false}
-                      erros={erros}
-                      onFocus={(e) => e.target.select()}
-                    />
-                  </Grid>
-                  <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-                    <InputText
-                      tipo='currency'
-                      scale={4}
-                      label="Perda Malharia"
-                      dados={detalheEntrada}
-                      field="perdaMalharia"
-                      setState={setDetalheEntrada}
-                      disabled={localState.action === 'excluindo' ? true : false}
-                      erros={erros}
-                      onFocus={(e) => e.target.select()}
-                    />
-                  </Grid>
-                  <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-                    <InputText
-                      tipo='currency'
-                      scale={4}
-                      label="Perda Tinturaria"
-                      dados={detalheEntrada}
-                      field="perdaTinturaria"
-                      setState={setDetalheEntrada}
-                      disabled={localState.action === 'excluindo' ? true : false}
-                      erros={erros}
-                      onFocus={(e) => e.target.select()}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-                    <ComboBox
-                      opcoes={rsRevisador}
-                      campoDescricao="nome"
-                      campoID="idPessoa"
-                      dados={detalheEntrada}
-                      mensagemPadraoCampoEmBranco="Escolha um revisador"
-                      field="idPessoa_revisador"
-                      label="Revisadores"
-                      erros={erros}
-                      setState={setDetalheEntrada}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-                    <ComboBox
-                      opcoes={rsTinturaria}
-                      campoDescricao="idTinturaria"
-                      campoID="idTinturaria"
-                      dados={detalheEntrada}
-                      mensagemPadraoCampoEmBranco="Escolha um romaneio"
-                      field="idTinturaria"
-                      label="Romaneio"
-                      erros={erros}
-                      setState={setDetalheEntrada}
-                    />
-                  </Grid>
                 </Grid>
-              </Paper>
-                </Condicional>
+                <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+                  <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                      <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                        <InputText
+                          tipo='number'
+                          scale={0}
+                          label="Qtd Peças"
+                          dados={detalheEntrada}
+                          field="qtdPecas"
+                          setState={setDetalheEntrada}
+                          disabled={localState.action === 'excluindo' ? true : false}
+                          erros={erros}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                      <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                        <InputText
+                          tipo='currency'
+                          scale={4}
+                          label="Metros"
+                          dados={detalheEntrada}
+                          field="metro"
+                          setState={setDetalheEntrada}
+                          disabled={localState.action === 'excluindo' ? true : false}
+                          erros={erros}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                      <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                        <InputText
+                          tipo='currency'
+                          scale={4}
+                          label="Gm²"
+                          dados={detalheEntrada}
+                          field="gm2"
+                          setState={setDetalheEntrada}
+                          disabled={localState.action === 'excluindo' ? true : false}
+                          erros={erros}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 6)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+                      <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                        <InputText
+                          tipo='currency'
+                          scale={4}
+                          label="Perda Malharia"
+                          dados={detalheEntrada}
+                          field="perdaMalharia"
+                          setState={setDetalheEntrada}
+                          disabled={localState.action === 'excluindo' ? true : false}
+                          erros={erros}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+                      <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
+                        <InputText
+                          tipo='currency'
+                          scale={4}
+                          label="Perda Tinturaria"
+                          dados={detalheEntrada}
+                          field="perdaTinturaria"
+                          setState={setDetalheEntrada}
+                          disabled={localState.action === 'excluindo' ? true : false}
+                          erros={erros}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 8)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
+                        <ComboBox
+                          opcoes={rsRevisador}
+                          campoDescricao="nome"
+                          campoID="idPessoa"
+                          dados={detalheEntrada}
+                          mensagemPadraoCampoEmBranco="Escolha um revisador"
+                          field="idPessoa_revisador"
+                          label="Revisadores"
+                          erros={erros}
+                          setState={setDetalheEntrada}
+                          onKeyDown={(event: any) => btPulaCampo(event, 9)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[9] = el)}>
+                        <ComboBox
+                          opcoes={rsTinturaria}
+                          campoDescricao="idTinturaria"
+                          campoID="idTinturaria"
+                          dados={detalheEntrada}
+                          mensagemPadraoCampoEmBranco="Escolha um romaneio"
+                          field="idTinturaria"
+                          label="Romaneio"
+                          erros={erros}
+                          setState={setDetalheEntrada}
+                          onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Condicional>
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>

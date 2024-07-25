@@ -10,6 +10,8 @@ interface mapKeyPressInterface {
 }
 
 interface ComboBoxInterface<T> {
+  /** Recebe o foco automático */
+  autoFocus?: boolean
   /** identificador do componente */
   id?: string
   /** Descrição que irá aparecer no campo. */
@@ -47,9 +49,13 @@ interface ComboBoxInterface<T> {
   /** Formatação do valor apresentado como option - Caso contrário apresenta o campo option[campoDescricao] */
   formatarOption?: (opcao: T) => string
   /* Quando Teclar ENTER ou clicar no ícone de pesquisa */
-  onClickPesquisa?: () => void
+  onClickPesquisa?: (v: string) => void
   //teste
   onSelect?: (v: any) => void
+  //usando referência
+  Ref?: React.Ref<unknown> | undefined
+  /**Quando o componente recebe o foco */
+  onFocus?: (v: any) => void
 
 }
 
@@ -65,25 +71,10 @@ const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: 
   }
 }
 
-// const exibirIconePesquisa = (onclick: () => void) => {
-//   return (
-//     <InputAdornment position={'start'}>
-//       <IconButton
-//         sx={{ margin: 0, padding: 0 }}
-//         onClick={() => {
-//           if (onclick) {
-//             onclick()
-//           }
-//         }}
-//       >
-//         <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
-//       </IconButton>
-//     </InputAdornment>
-//   )
-// }
 
 export default function ComboBox<T>(
   {
+    autoFocus,
     id,
     label,
     dados,
@@ -102,22 +93,47 @@ export default function ComboBox<T>(
     onKeyDown,
     permitirNovaOpcao = false,
     formatarOption = undefined,
-    onClickPesquisa,
-    onSelect
+    onClickPesquisa = undefined,
+    onSelect,
+    Ref,
+    onFocus = undefined,
   }: ComboBoxInterface<T>) {
 
+
+  const exibirIconePesquisa = () => {
+    return (
+      <InputAdornment position={'start'}>
+        <IconButton
+          sx={{ margin: 0, padding: 0 }}
+          onClick={() => {
+            if (onClickPesquisa) {
+              onClickPesquisa(pesquisa)
+            }
+          }}
+        >
+          <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
+        </IconButton>
+      </InputAdornment>
+    )
+  }
+
   const [pesquisa, setPesquisa] = useState('')
-
   const theme = useTheme()
-
   const chaveLista = useRef(0)
 
   return (
     <>
       <Autocomplete
+        autoFocus={autoFocus}
+        ref={Ref}
         onSelect={(e) => {
           if (onSelect) {
             onSelect(e)
+          }
+        }}
+        onFocus={(e) => {
+          if (onFocus) {
+            onFocus(e)
           }
         }}
         clearOnEscape
@@ -205,16 +221,8 @@ export default function ComboBox<T>(
                 type="text"
                 InputProps={{
                   ...params.InputProps,
-                  startAdornment: onClickPesquisa ? 
-                    <>
-                      <InputAdornment position={'start'}>
-                        <IconButton
-                          sx={{ margin: 0, padding: 0 }}
-                          onClick={onClickPesquisa}                        >
-                          <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
-                        </IconButton>
-                      </InputAdornment>
-                    </> : <></>
+                  startAdornment: onClickPesquisa ?
+                    <>{exibirIconePesquisa()}</> : <></>
                 }}
                 onKeyDown={(ev) => onKey(ev.key, mapKeyPress, pesquisa)}
               />

@@ -21,6 +21,7 @@ interface mapKeyPressInterface {
 }
 
 interface InputTextInterface {
+  inputRef?: React.Ref<any> | undefined
   label: string
   disabled?: boolean
   type?: string
@@ -38,6 +39,8 @@ interface InputTextInterface {
   onClickIconeEnd?: () => void
   iconeStart?: string
   onClickIconeStart?: () => void
+  /** Função pra Detecção de KeyDown */
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined
   mapKeyPress?: Array<mapKeyPressInterface>
   tipo?:
   | "text"
@@ -235,6 +238,7 @@ const converterEmAnoMesDia = (valor: string): string => {
 }
 
 export default function InputText({
+  inputRef,
   label,
   dados,
   field,
@@ -246,6 +250,7 @@ export default function InputText({
   onClickIconeStart = () => { },
   iconeEnd = "",
   onClickIconeEnd = () => { },
+  onKeyDown,
   mapKeyPress = [],
   tipo = "text",
   erros = {},
@@ -336,6 +341,7 @@ export default function InputText({
           {label}
         </Typography>
         <OutlinedInput
+          inputRef={inputRef}
           name={field}
           onBlur={(e) => formatarDadosAoSair(e)}
           autoFocus={autoFocus}
@@ -396,7 +402,8 @@ export default function InputText({
           }}
           endAdornment={exibirIcone("end", iconeEnd, onClickIconeEnd)}
           startAdornment={exibirIcone("start", iconeStart, onClickIconeStart)}
-          onKeyDown={(ev) => onKey(ev.key, mapKeyPress)}
+          onKeyDown={onKeyDown ? onKeyDown : (ev) => onKey(ev.key, mapKeyPress)}
+          // onKeyDown={onKeyDown}
           inputProps={{
             tipo: tipo,
             maxLength:
