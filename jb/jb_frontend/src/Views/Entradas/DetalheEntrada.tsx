@@ -40,7 +40,7 @@ interface PropsInterface {
 }
 
 interface rsSomatorioInterface {
-  totalPedido: number
+  totalEntrada: number
   totalQtd: number
 }
 export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
@@ -50,7 +50,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const clsFormatacao = new ClsFormatacao()
 
   const SomatorioDados: rsSomatorioInterface = {
-    totalPedido: 0,
+    totalEntrada: 0,
     totalQtd: 0
   }
   const ResetDados: DetalheEntradaInterface = {
@@ -163,6 +163,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     let auxTipo: number | undefined = rsProduto.
       find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
     setTipo(auxTipo)
+    console.log(auxTipo)
   }
   const validarDados = (): boolean => {
 
@@ -258,22 +259,22 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const btPesquisar = () => {
     let query = `
     SELECT 
-        dp.idDetalhePedido, 
-        dp.idPedido, 
-        dp.qtdPedida AS qtd, 
-        dp.vrUnitario AS vr, 
-        dp.idProduto, 
-        pr.nome AS nomeProduto,
-        (dp.qtdPedida * dp.vrUnitario) AS vrTotal
+        de.idDetalheEntrada, 
+        de.idEntrada, 
+        de.qtd, 
+        de.vrUnitario AS vr, 
+        de.idProduto, 
+        p.nome AS nomeProduto,
+        (de.qtd * de.vrUnitario) AS vrTotal
         
     FROM 
-        detalhepedidos dp
+        detalheentradas de
     INNER JOIN 
-	      pedidos p ON p.idPedido = dp.idPedido
+	      entradas e ON e.idEntrada = de.idEntrada
     INNER JOIN
-	      produtos pr ON pr.idProduto = dp.idProduto
+	      produtos p ON p.idProduto = de.idProduto
     WHERE 
-        dp.idPedido = ${detalheEntrada.idEntrada};
+        de.idEntrada = ${detalheEntrada.idEntrada};
     `;
 
     clsCrud
@@ -291,14 +292,14 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     // SUM(dp.qtdPedida) AS totalQtdPedida
     query = `
       SELECT 
-      FORMAT(SUM(dp.qtdPedida * dp.vrUnitario),2,'de_DE') AS totalPedido,
-      FORMAT(SUM(dp.qtdPedida),2,'de_DE') AS totalQtd
+      FORMAT(SUM(de.qtd * de.vrUnitario),2,'de_DE') AS totalEntrada,
+      FORMAT(SUM(de.qtd),2,'de_DE') AS totalQtd
     FROM 
-        detalhepedidos dp
+        detalheentradas de
     INNER JOIN 
-        pedidos p ON p.idPedido = dp.idPedido
+        entradas e ON e.idEntrada = de.idEntrada
     WHERE 
-        dp.idPedido = ${detalheEntrada.idEntrada};
+        de.idEntrada = ${detalheEntrada.idEntrada};
     `;
 
     clsCrud
@@ -309,8 +310,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
       })
       .then((rs: Array<rsSomatorioInterface>) => {
         setRsSomatorio({
-          totalPedido: rs[0].totalPedido,
-          totalQtd: rs[0].totalQtd
+          totalEntrada: rs[0].totalEntrada ? rs[0].totalEntrada: 0,
+          totalQtd: rs[0].totalQtd? rs[0].totalQtd : 0
         })
       })
   }
@@ -361,7 +362,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         setRsCor(rsCores)
       })
 
-    query = `SELECT idTinturaria FROM tinturarias ORDER BY t.idTinturaria ASC;`;
+    query = `SELECT idTinturaria FROM tinturarias ORDER BY idTinturaria ASC;`;
     clsCrud
       .query({
         entidade: "Tinturaria",
@@ -496,9 +497,9 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
               </Grid>
               <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
-                  label="Total Pedido"
+                  label="Total Entrada"
                   dados={rsSomatorio}
-                  field="totalPedido"
+                  field="totalEntrada"
                   setState={setDetalheEntrada}
                   disabled={true}
                 />
@@ -523,7 +524,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                   onSelect={pegaTipo}
                 />
               </Grid>
-              <Condicional condicao={![1, 4, 9].includes(tipo as number)}>
+              <Condicional condicao={![10].includes(tipo as number)}>
 
                 <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
                   <ComboBox
@@ -576,6 +577,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
                 />
               </Grid>
+              <Condicional condicao={tipo === 10}>
               <Grid item xs={12} md={12} sx={{ mt: 2 }}>
                 <Typography>
                   Detalhes de Tinturaria
@@ -586,11 +588,11 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                 <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
                   <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                     <InputText
-                      tipo='currency'
-                      scale={4}
-                      label="Metros"
+                      tipo='number'
+                      scale={0}
+                      label="Qtd Peças"
                       dados={detalheEntrada}
-                      field="metro"
+                      field="qtdPecas"
                       setState={setDetalheEntrada}
                       disabled={localState.action === 'excluindo' ? true : false}
                       erros={erros}
@@ -599,11 +601,11 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                   </Grid>
                   <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                     <InputText
-                      tipo='number'
-                      scale={0}
-                      label="Qtd Peças"
+                      tipo='currency'
+                      scale={4}
+                      label="Metros"
                       dados={detalheEntrada}
-                      field="qtdPecas"
+                      field="metro"
                       setState={setDetalheEntrada}
                       disabled={localState.action === 'excluindo' ? true : false}
                       erros={erros}
@@ -623,7 +625,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       onFocus={(e) => e.target.select()}
                     />
                   </Grid>
-                  <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                  <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                     <InputText
                       tipo='currency'
                       scale={4}
@@ -636,7 +638,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       onFocus={(e) => e.target.select()}
                     />
                   </Grid>
-                  <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                  <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                     <InputText
                       tipo='currency'
                       scale={4}
@@ -649,7 +651,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       onFocus={(e) => e.target.select()}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+                  <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
                     <ComboBox
                       opcoes={rsRevisador}
                       campoDescricao="nome"
@@ -662,7 +664,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       setState={setDetalheEntrada}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+                  <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
                     <ComboBox
                       opcoes={rsTinturaria}
                       campoDescricao="idTinturaria"
@@ -677,6 +679,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                   </Grid>
                 </Grid>
               </Paper>
+                </Condicional>
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>

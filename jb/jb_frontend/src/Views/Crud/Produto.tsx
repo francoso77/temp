@@ -142,7 +142,7 @@ export default function Produto() {
       .pesquisar({
         entidade: "Produto",
         criterio: {
-          nome: "%".concat(produto.nome).concat("%"),
+          nome: produto.nome,
         },
         camposLike: ["nome"],
         select: ["nome"],

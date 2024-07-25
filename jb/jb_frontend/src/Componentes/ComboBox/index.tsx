@@ -205,7 +205,7 @@ export default function ComboBox<T>(
                 type="text"
                 InputProps={{
                   ...params.InputProps,
-                  startAdornment:
+                  startAdornment: onClickPesquisa ? 
                     <>
                       <InputAdornment position={'start'}>
                         <IconButton
@@ -214,7 +214,7 @@ export default function ComboBox<T>(
                           <Icon sx={{ margin: 0, padding: 0 }}>search</Icon>
                         </IconButton>
                       </InputAdornment>
-                    </>,
+                    </> : <></>
                 }}
                 onKeyDown={(ev) => onKey(ev.key, mapKeyPress, pesquisa)}
               />
