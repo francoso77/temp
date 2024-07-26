@@ -10,14 +10,14 @@ export interface DetalheEntradaInterface {
   idDetalheEntrada?: number
   idEntrada: number
   idProduto: number
-  idCor: number
-  qtdPecas: number
+  idCor?: number | null
+  qtdPecas?: number
   vrUnitario: number
   qtd: number
-  metro: number
-  gm2: number
-  idPessoa_revisador: number
-  idTinturaria: number
-  perdaMalharia: number
-  perdaTinturaria: number
+  metro?: number
+  gm2?: number
+  idPessoa_revisador?: number | null
+  idTinturaria?: number | null
+  perdaMalharia?: number
+  perdaTinturaria?: number
 }

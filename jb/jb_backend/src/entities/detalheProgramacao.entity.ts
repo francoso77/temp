@@ -30,13 +30,13 @@ export default class DetalheProgramacao implements DetalheProgramacaoInterface {
   @ManyToOne(() => Cor, (cor) => cor.corDetalheProgramacoes)
   cor: Cor
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   peso: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   gm2: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   largura: number
 
   @Column({ type: 'int' })

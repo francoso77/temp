@@ -31,7 +31,7 @@ var Tinturaria = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Tinturaria.prototype, "idPessoa_cliente", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaCliente' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.clienteTinturarias; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Tinturaria.prototype, "cliente", void 0);
@@ -40,7 +40,7 @@ var Tinturaria = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Tinturaria.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaFornecedor' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.fornecedorTinturarias; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Tinturaria.prototype, "fornecedor", void 0);

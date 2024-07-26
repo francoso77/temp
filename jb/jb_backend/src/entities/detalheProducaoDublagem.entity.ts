@@ -22,7 +22,7 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   @ManyToOne(() => Produto, (produto) => produto.producaoDublagens)
   produto: Produto
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   metro: number
 
 }

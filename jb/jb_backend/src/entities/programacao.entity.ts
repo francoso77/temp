@@ -29,7 +29,7 @@ export default class Programacao implements ProgramacaoInterface {
   @Column()
   idPessoa_cliente: number
 
-  @JoinColumn({ name: 'idPessoaCliente' })
+  @JoinColumn({ name: 'idPessoa_cliente' })
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.clienteProgramacoes)
   cliente: Pessoa
 

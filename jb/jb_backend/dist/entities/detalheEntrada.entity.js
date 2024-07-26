@@ -40,7 +40,7 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", produto_entity_1.default)
     ], DetalheEntrada.prototype, "produto", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idCor", void 0);
     __decorate([
@@ -49,7 +49,7 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", cor_entity_1.default)
     ], DetalheEntrada.prototype, "cor", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4, nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "qtdPecas", void 0);
     __decorate([
@@ -61,24 +61,24 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "qtd", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4, nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "metro", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4, nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "gm2", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idPessoa_revisador", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaRevisador' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_revisador' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.revisadorDetalheEntradas; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], DetalheEntrada.prototype, "revisador", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idTinturaria", void 0);
     __decorate([
@@ -87,11 +87,11 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", tinturaria_entity_1.default)
     ], DetalheEntrada.prototype, "romaneio", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4, nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "perdaMalharia", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4, nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "perdaTinturaria", void 0);
     DetalheEntrada = __decorate([

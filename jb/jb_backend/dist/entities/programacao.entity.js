@@ -46,7 +46,7 @@ var Programacao = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Programacao.prototype, "idPessoa_cliente", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaCliente' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.clienteProgramacoes; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Programacao.prototype, "cliente", void 0);

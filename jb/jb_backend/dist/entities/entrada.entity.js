@@ -36,7 +36,7 @@ var Entrada = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Entrada.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaFornecedor' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.fornecedorEntradas; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Entrada.prototype, "fornecedor", void 0);

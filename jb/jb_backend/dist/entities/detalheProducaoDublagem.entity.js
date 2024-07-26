@@ -37,7 +37,7 @@ var DetalheProducaoDublagem = /** @class */ (function () {
         __metadata("design:type", produto_entity_1.default)
     ], DetalheProducaoDublagem.prototype, "produto", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheProducaoDublagem.prototype, "metro", void 0);
     DetalheProducaoDublagem = __decorate([

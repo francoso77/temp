@@ -30,10 +30,10 @@ export default class Produto implements ProdutoInterface {
   @Column({ nullable: true, length: 10 })
   localizacao: string
 
-  @Column({ nullable: true, type: 'float', precision: 2 })
+  @Column({ nullable: true, type: 'float', precision: 4 })
   largura: number
 
-  @Column({ nullable: true, type: 'float', precision: 2 })
+  @Column({ nullable: true, type: 'float', precision: 4 })
   gm2: number
 
   @Column({ nullable: false })

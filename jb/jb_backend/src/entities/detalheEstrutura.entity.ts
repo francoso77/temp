@@ -30,6 +30,6 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   @ManyToOne(() => Cor, (cor) => cor.corDetalheEstruturas)
   cor: Cor
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   qtd: number
 }

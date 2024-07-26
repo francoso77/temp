@@ -24,6 +24,8 @@ import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 import InputCalc from '../../Componentes/InputCalc';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
+import Entrada from './Entrada';
 
 
 const CustomDialog = styled(Dialog)(({ theme }) => ({
@@ -56,18 +58,24 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   const ResetDados: DetalheEntradaInterface = {
     idEntrada: rsEntrada.idEntrada as number,
     idProduto: 0,
-    idCor: 0,
-    qtdPecas: 0,
-    vrUnitario: 0,
     qtd: 0,
+    vrUnitario: 0,
+    idCor: null,
+    qtdPecas: 0,
     metro: 0,
     gm2: 0,
-    idPessoa_revisador: 0,
-    idTinturaria: 0,
+    idPessoa_revisador: null,
+    idTinturaria: null,
     perdaMalharia: 0,
     perdaTinturaria: 0
   }
 
+  const MovimentaEstoque: EstoqueInterface = {
+    idProduto: 0,
+    idPessoa_fornecedor: 0,
+    idCor: null,
+    qtd: 0
+  }
   interface PesquisaInterface {
     nome: string
   }
@@ -95,6 +103,11 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
       cabecalho: 'Produto',
       alinhamento: 'left',
       campo: 'nomeProduto'
+    },
+    {
+      cabecalho: 'Cor',
+      alinhamento: 'left',
+      campo: 'nomeCor'
     },
     {
       cabecalho: 'Qtd',
@@ -140,6 +153,33 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      console.log('entrou aqui')
+      const query = `
+      UPDATE estoques  
+      SET qtd = (qtd - ${detalheEntrada.qtd})
+      WHERE 
+        idProduto = ${detalheEntrada.idProduto} AND 
+        idCor = ${detalheEntrada.idCor};
+      `;
+
+      clsCrud
+        .query({
+          entidade: "Estoque",
+          sql: query,
+        })
+        .then((rs: Array<any>) => {
+          if (rs.length > 0) {
+            setMensagemState({
+              titulo: 'Erro...',
+              exibir: true,
+              mensagem: 'Deu Certo!',
+              tipo: MensagemTipo.Error,
+              exibirBotao: true,
+              cb: null
+            })
+          }
+        })
+
       setDetalheEntrada(rs)
       setLocalState({ action: actionTypes.editando })
     })
@@ -161,10 +201,6 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
-    // console.log('passou aqui')
-    // console.log('Evento: ', event)
-    // console.log('Index: ', index)
-    console.log(fieldRefs)
     if (event.key === 'Enter') {
       const nextField = fieldRefs.current[index];
       if (nextField) {
@@ -186,9 +222,20 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    // retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
-    // retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
-    // retorno = validaCampo.naoVazio('qtdPedida', detalheEntrada, erros, retorno, 'Valor maior que 0')
+    retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
+    retorno = validaCampo.naoVazio('qtd', detalheEntrada, erros, retorno, 'Quantudade maior que 0')
+    retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
+    if (tipo === 10) {
+      retorno = validaCampo.naoVazio('idCor', detalheEntrada, erros, retorno, 'Defina uma cor')
+      retorno = validaCampo.naoVazio('qtdPecas', detalheEntrada, erros, retorno, 'Informe a quantidade peças')
+      retorno = validaCampo.naoVazio('metro', detalheEntrada, erros, retorno, 'Qual a metragem')
+      retorno = validaCampo.naoVazio('gm2', detalheEntrada, erros, retorno, 'Qual a gramatura')
+      retorno = validaCampo.naoVazio('idPessoa_revisador', detalheEntrada, erros, retorno, 'Defina um revisador')
+      retorno = validaCampo.naoVazio('idTinturaria', detalheEntrada, erros, retorno, 'Defina uma tinturaria')
+      retorno = validaCampo.naoVazio('perdaMalharia', detalheEntrada, erros, retorno, 'Qtd perdida em malharia')
+      retorno = validaCampo.naoVazio('perdaTinturaria', detalheEntrada, erros, retorno, 'Qtd perdida em tinturaria')
+
+    }
     setErros(erros)
     return retorno
   }
@@ -201,7 +248,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     FROM 
     detalheentradas de
     WHERE 
-    de.idProduto = ${detalheEntrada.idProduto};
+    de.idProduto = ${detalheEntrada.idProduto} AND 
+    de.idCor = ${detalheEntrada.idCor};
     `;
 
     clsCrud
@@ -232,6 +280,14 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
             })
               .then((rs) => {
                 if (rs.ok) {
+                  MovimentaEstoque.idProduto = detalheEntrada.idProduto
+                  MovimentaEstoque.idCor = detalheEntrada.idCor ? detalheEntrada.idCor : null
+                  MovimentaEstoque.idPessoa_fornecedor = rsEntrada.idPessoa_fornecedor
+                  MovimentaEstoque.qtd = detalheEntrada.qtd
+                  clsCrud.incluir({
+                    entidade: "Estoque",
+                    criterio: MovimentaEstoque,
+                  })
                   setLocalState({ action: actionTypes.pesquisando })
                 } else {
                   setMensagemState({
@@ -281,7 +337,8 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         de.vrUnitario AS vr, 
         de.idProduto, 
         p.nome AS nomeProduto,
-        (de.qtd * de.vrUnitario) AS vrTotal
+        c.nome AS nomeCor,
+        FORMAT((de.qtd * de.vrUnitario),2) AS vrTotal
         
     FROM 
         detalheentradas de
@@ -289,8 +346,11 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
 	      entradas e ON e.idEntrada = de.idEntrada
     INNER JOIN
 	      produtos p ON p.idProduto = de.idProduto
+    LEFT JOIN
+        cores c ON c.idCor = de.idCor
     WHERE 
-        de.idEntrada = ${detalheEntrada.idEntrada};
+        de.idEntrada = ${detalheEntrada.idEntrada}
+    ORDER BY nomeProduto ASC;
     `;
 
     clsCrud
@@ -304,8 +364,6 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
         setRsPesquisa(rs)
       })
 
-    // SUM(dp.qtdPedida * dp.vrUnitario) AS total,
-    // SUM(dp.qtdPedida) AS totalQtdPedida
     query = `
       SELECT 
       FORMAT(SUM(de.qtd * de.vrUnitario),2,'de_DE') AS totalEntrada,
@@ -332,22 +390,22 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
       })
   }
 
-  const pesquisarProdutos = (nome: string) => {
-    clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        criterio: {
-          nome: "%".concat(nome, "%"),
-        },
-        camposLike: ["nome"],
-        select: ["idProduto", "nome"],
-        msg: "Pesquisando produtos",
-        setMensagemState: setMensagemState,
-      })
-      .then((rsProdutos: Array<ProdutoInterface>) => {
-        setRsProduto(rsProdutos)
-      })
-  }
+  // const pesquisarProdutos = (nome: string) => {
+  //   clsCrud
+  //     .pesquisar({
+  //       entidade: "Produto",
+  //       criterio: {
+  //         nome: "%".concat(nome, "%"),
+  //       },
+  //       camposLike: ["nome"],
+  //       select: ["idProduto", "nome"],
+  //       msg: "Pesquisando produtos",
+  //       setMensagemState: setMensagemState,
+  //     })
+  //     .then((rsProdutos: Array<ProdutoInterface>) => {
+  //       setRsProduto(rsProdutos)
+  //     })
+  // }
   const BuscarDados = () => {
 
     let query: string = `
@@ -444,7 +502,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
   }
 
   useEffect(() => {
-    fieldRefs.current = fieldRefs.current.slice(0, 10)
+    fieldRefs.current = fieldRefs.current.slice(0, 11)
     btPesquisar()
     BuscarDados()
     setLayoutState({
@@ -521,9 +579,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
             </Grid>
           </Paper>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-
-            <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
+            <Grid container spacing={1.2} justifyContent='flex-end' sx={{ display: 'flex', alignItems: 'center' }}>
               <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Qtd Total"
@@ -549,7 +605,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
               <Grid item xs={12} sm={4} sx={{ mt: 2 }} >
-                <Box>
+                <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
                   <ComboBox
                     opcoes={rsProduto}
                     campoDescricao="nome"
@@ -562,14 +618,17 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                     setState={setDetalheEntrada}
                     onSelect={pegaTipo}
                     // onClickPesquisa={(rs) => pesquisarProdutos(rs)}
-                    onKeyDown={(event) => btPulaCampo(event, 0)}
+                    onKeyDown={
+                      tipo === 10 ? (event) => btPulaCampo(event, 1)
+                        : (event) => btPulaCampo(event, 2)
+                    }
                     autoFocus
                   />
                 </Box>
               </Grid>
-              <Condicional condicao={tipo === 10}>
+              <Condicional condicao={[2, 3, 6, 10, 11].includes(tipo as number)}>
                 <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                  <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                     <ComboBox
                       opcoes={rsCor}
                       campoDescricao="nome"
@@ -582,13 +641,13 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       setState={setDetalheEntrada}
                       onSelect={pegaTipo}
                       onFocus={(e) => e.target.select()}
-                      onKeyDown={(event) => btPulaCampo(event, 1)}
+                      onKeyDown={(event) => btPulaCampo(event, 2)}
                     />
                   </Box>
                 </Grid>
               </Condicional>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                   <InputText
                     tipo='currency'
                     scale={4}
@@ -599,12 +658,12 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                     disabled={localState.action === 'excluindo' ? true : false}
                     erros={erros}
                     onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                    onKeyDown={(event: any) => btPulaCampo(event, 3)}
                   />
                 </Box>
               </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                   <InputText
                     tipo='currency'
                     scale={4}
@@ -615,7 +674,10 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                     disabled={localState.action === 'excluindo' ? true : false}
                     erros={erros}
                     onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                    onKeyDown={
+                      tipo === 10 ? (event: any) => btPulaCampo(event, 4)
+                        : (event: any) => btPulaCampo(event, 0)
+                    }
                   />
                 </Box>
               </Grid>
@@ -640,29 +702,13 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                 <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
                   <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
                     <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                      <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                      <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                         <InputText
                           tipo='number'
                           scale={0}
                           label="Qtd Peças"
                           dados={detalheEntrada}
                           field="qtdPecas"
-                          setState={setDetalheEntrada}
-                          disabled={localState.action === 'excluindo' ? true : false}
-                          erros={erros}
-                          onFocus={(e) => e.target.select()}
-                          onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                      <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-                        <InputText
-                          tipo='currency'
-                          scale={4}
-                          label="Metros"
-                          dados={detalheEntrada}
-                          field="metro"
                           setState={setDetalheEntrada}
                           disabled={localState.action === 'excluindo' ? true : false}
                           erros={erros}
@@ -676,9 +722,9 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                         <InputText
                           tipo='currency'
                           scale={4}
-                          label="Gm²"
+                          label="Metros"
                           dados={detalheEntrada}
-                          field="gm2"
+                          field="metro"
                           setState={setDetalheEntrada}
                           disabled={localState.action === 'excluindo' ? true : false}
                           erros={erros}
@@ -687,14 +733,14 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                         />
                       </Box>
                     </Grid>
-                    <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+                    <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                       <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
                         <InputText
                           tipo='currency'
                           scale={4}
-                          label="Perda Malharia"
+                          label="Gm²"
                           dados={detalheEntrada}
-                          field="perdaMalharia"
+                          field="gm2"
                           setState={setDetalheEntrada}
                           disabled={localState.action === 'excluindo' ? true : false}
                           erros={erros}
@@ -708,9 +754,9 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                         <InputText
                           tipo='currency'
                           scale={4}
-                          label="Perda Tinturaria"
+                          label="Perda Malharia"
                           dados={detalheEntrada}
-                          field="perdaTinturaria"
+                          field="perdaMalharia"
                           setState={setDetalheEntrada}
                           disabled={localState.action === 'excluindo' ? true : false}
                           erros={erros}
@@ -719,8 +765,24 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                         />
                       </Box>
                     </Grid>
-                    <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+                    <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                       <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
+                        <InputText
+                          tipo='currency'
+                          scale={4}
+                          label="Perda Tinturaria"
+                          dados={detalheEntrada}
+                          field="perdaTinturaria"
+                          setState={setDetalheEntrada}
+                          disabled={localState.action === 'excluindo' ? true : false}
+                          erros={erros}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 9)}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[9] = el)}>
                         <ComboBox
                           opcoes={rsRevisador}
                           campoDescricao="nome"
@@ -731,12 +793,12 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                           label="Revisadores"
                           erros={erros}
                           setState={setDetalheEntrada}
-                          onKeyDown={(event: any) => btPulaCampo(event, 9)}
+                          onKeyDown={(event: any) => btPulaCampo(event, 10)}
                         />
                       </Box>
                     </Grid>
                     <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-                      <Box ref={(el: any) => (fieldRefs.current[9] = el)}>
+                      <Box ref={(el: any) => (fieldRefs.current[10] = el)}>
                         <ComboBox
                           opcoes={rsTinturaria}
                           campoDescricao="idTinturaria"
@@ -791,21 +853,6 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                 </Grid>
               </Condicional>
             </Grid>
-            {/* <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-
-              <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-                <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-                  <InputText
-                    label="Total Item"
-                    dados={rsSomatorio}
-                    field="totalPedido"
-                    setState={setDetalheEntrada}
-                    disabled={true}
-                  />
-                </Grid>
-              </Grid>
-            </Paper> */}
-
           </Paper >
         </Condicional>
       </CustomDialog>

@@ -47,7 +47,7 @@ var DetalheEstrutura = /** @class */ (function () {
         __metadata("design:type", cor_entity_1.default)
     ], DetalheEstrutura.prototype, "cor", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "qtd", void 0);
     DetalheEstrutura = __decorate([

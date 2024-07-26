@@ -28,7 +28,7 @@ var ProducaoDublagem = /** @class */ (function () {
         __metadata("design:type", Number)
     ], ProducaoDublagem.prototype, "tipoColagem", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], ProducaoDublagem.prototype, "qtdColagem", void 0);
     __decorate([

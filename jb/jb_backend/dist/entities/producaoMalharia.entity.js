@@ -50,7 +50,7 @@ var ProducaoMalharia = /** @class */ (function () {
         __metadata("design:type", Number)
     ], ProducaoMalharia.prototype, "turno", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], ProducaoMalharia.prototype, "peso", void 0);
     __decorate([
@@ -62,7 +62,7 @@ var ProducaoMalharia = /** @class */ (function () {
         __metadata("design:type", Number)
     ], ProducaoMalharia.prototype, "idPessoa_revisador", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaRevisador' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_revisador' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.revisadorProducaoMalharias; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], ProducaoMalharia.prototype, "revisador", void 0);

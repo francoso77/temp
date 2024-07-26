@@ -44,11 +44,11 @@ var Produto = /** @class */ (function () {
         __metadata("design:type", String)
     ], Produto.prototype, "localizacao", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true, type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ nullable: true, type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], Produto.prototype, "largura", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true, type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ nullable: true, type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], Produto.prototype, "gm2", void 0);
     __decorate([

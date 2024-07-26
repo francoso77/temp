@@ -43,7 +43,7 @@ var Pedido = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Pedido.prototype, "idPessoa_cliente", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaCliente' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.clientePedidos; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Pedido.prototype, "cliente", void 0);
@@ -52,7 +52,7 @@ var Pedido = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Pedido.prototype, "idPessoa_vendedor", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaVendedor' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_vendedor' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.vendedorPedidos; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Pedido.prototype, "vendedor", void 0);

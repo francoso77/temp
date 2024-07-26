@@ -42,7 +42,7 @@ export default function Pedido() {
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})

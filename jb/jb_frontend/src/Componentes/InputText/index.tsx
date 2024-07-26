@@ -403,7 +403,6 @@ export default function InputText({
           endAdornment={exibirIcone("end", iconeEnd, onClickIconeEnd)}
           startAdornment={exibirIcone("start", iconeStart, onClickIconeStart)}
           onKeyDown={onKeyDown ? onKeyDown : (ev) => onKey(ev.key, mapKeyPress)}
-          // onKeyDown={onKeyDown}
           inputProps={{
             tipo: tipo,
             maxLength:

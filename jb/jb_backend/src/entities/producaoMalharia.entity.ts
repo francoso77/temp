@@ -33,7 +33,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   @Column()
   turno: TurnoType;
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   peso: number
 
   @Column({ nullable: true, length: 10 })
@@ -42,7 +42,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   @Column()
   idPessoa_revisador: number
 
-  @JoinColumn({ name: 'idPessoaRevisador' })
+  @JoinColumn({ name: 'idPessoa_revisador' })
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.revisadorProducaoMalharias)
   revisador: Pessoa
 

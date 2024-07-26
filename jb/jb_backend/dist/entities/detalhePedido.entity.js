@@ -38,15 +38,15 @@ var DetalhePedido = /** @class */ (function () {
         __metadata("design:type", produto_entity_1.default)
     ], DetalhePedido.prototype, "produto", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "qtdPedida", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "vrUnitario", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "qtdAtendida", void 0);
     __decorate([

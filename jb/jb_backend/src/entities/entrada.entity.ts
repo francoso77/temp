@@ -21,7 +21,7 @@ export default class Entrada implements EntradaInterface {
   @Column()
   idPessoa_fornecedor: number
 
-  @JoinColumn({ name: 'idPessoaFornecedor' })
+  @JoinColumn({ name: 'idPessoa_fornecedor' })
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.fornecedorEntradas)
   fornecedor: Pessoa
 

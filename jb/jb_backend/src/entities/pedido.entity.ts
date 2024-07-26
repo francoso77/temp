@@ -27,14 +27,14 @@ export default class Pedido implements PedidoInterface {
   @Column()
   idPessoa_cliente: number
 
-  @JoinColumn({ name: 'idPessoaCliente' })
+  @JoinColumn({ name: 'idPessoa_cliente' })
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.clientePedidos)
   cliente: Pessoa
 
   @Column()
   idPessoa_vendedor: number
 
-  @JoinColumn({ name: 'idPessoaVendedor' })
+  @JoinColumn({ name: 'idPessoa_vendedor' })
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.vendedorPedidos)
   vendedor: Pessoa
 

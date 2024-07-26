@@ -1,7 +1,7 @@
 export interface EstoqueInterface {
   idEstoque?: number
   idProduto: number
-  idPessoa_Fornecedor: number
-  idCor: number
-  metro: number
+  idPessoa_fornecedor: number
+  idCor?: number | null
+  qtd: number
 }

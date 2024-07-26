@@ -15,7 +15,7 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   @Column()
   tipoColagem: TipoColagemType;
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   qtdColagem: number
 
   @OneToMany(() => DetalheProducaoDublagem, detalheProducaoDublagem => detalheProducaoDublagem.ProducaoDublagem)

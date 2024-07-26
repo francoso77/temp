@@ -1,5 +1,5 @@
-import { Dialog, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Box, Dialog, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -21,6 +21,7 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import styled from 'styled-components';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
+import InputCalc from '../../Componentes/InputCalc';
 
 
 const CustomDialog = styled(Dialog)(({ theme }) => ({
@@ -44,7 +45,7 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
-  const clsFormatcao = new ClsFormatacao()
+  const clsFormatacao = new ClsFormatacao()
 
   const SomatorioDados: rsSomatorioInterface = {
     total: 0
@@ -74,6 +75,8 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
   const [rsSomatorio, setRsSomatorio] = useState<Array<rsSomatorioInterface>>([SomatorioDados])
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -85,31 +88,21 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
       cabecalho: 'Qtd',
       alinhamento: 'right',
       campo: 'qtd',
-      format: (qtd) => clsFormatcao.currency(qtd)
+      format: (qtd) => clsFormatacao.currency(qtd)
     },
     {
       cabecalho: 'Vr Unitário',
       alinhamento: 'right',
       campo: 'vr',
-      format: (vr) => clsFormatcao.currency(vr)
+      format: (vr) => clsFormatacao.currency(vr)
     },
     {
       cabecalho: 'Total Item',
       alinhamento: 'right',
       campo: 'vrTotal',
-      format: (vrTotal) => clsFormatcao.currency(vrTotal)
+      format: (vrTotal) => clsFormatacao.currency(vrTotal)
     },
   ]
-
-  function dataFormatada(dateString: string): string {
-    if (dateString.length !== 8) {
-      throw new Error("Data Inválida. Use o formato DDMMYYYY");
-    }
-    const day = dateString.substring(0, 2)
-    const month = dateString.substring(2, 4)
-    const year = dateString.substring(4, 8)
-    return `${day}/${month}/${year}`
-  }
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -153,6 +146,18 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
     setErros({})
     setDetalhePedido(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
+  }
+
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
   }
 
   const validarDados = (): boolean => {
@@ -330,10 +335,8 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
           p.*
       FROM 
           produtos p
-      INNER JOIN 
-          tipoprodutos t ON t.idTipoProduto = p.idTipoProduto
       WHERE 
-          t.estrutura = true and p.idProduto <> ${rsPedido.idPedido};
+          p.idProduto <> ${rsPedido.idPedido};
       `;
     clsCrud
       .query({
@@ -384,7 +387,7 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
             <Grid item xs={12} >
               <ShowText
                 titulo="Data"
-                descricao={dataFormatada(rsPedido.dataPedido)} />
+                descricao={clsFormatacao.dataFormatada(rsPedido.dataPedido)} />
             </Grid>
           </Grid>
         </Paper>
@@ -427,10 +430,8 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
             </Grid>
           </Paper>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-
-            <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-              <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid container spacing={1.2} justifyContent='flex-end' sx={{ display: 'flex', alignItems: 'center' }}>
+              <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Qtd Total"
                   dados={rsSomatorio[0]}
@@ -439,7 +440,7 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
                   disabled={true}
                 />
               </Grid>
-              <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Total Pedido"
                   dados={rsSomatorio[0]}
@@ -455,42 +456,62 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
               <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-                <ComboBox
-                  opcoes={rsProduto}
-                  campoDescricao="nome"
-                  campoID="idProduto"
-                  dados={detalhePedido}
-                  mensagemPadraoCampoEmBranco="Escolha um produto"
-                  field="idProduto"
-                  label="Produtos"
-                  erros={erros}
-                  setState={setDetalhePedido}
-                />
+                <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                  <ComboBox
+                    opcoes={rsProduto}
+                    campoDescricao="nome"
+                    campoID="idProduto"
+                    dados={detalhePedido}
+                    mensagemPadraoCampoEmBranco="Escolha um produto"
+                    field="idProduto"
+                    label="Produtos"
+                    erros={erros}
+                    setState={setDetalhePedido}
+                    onKeyDown={(event) => btPulaCampo(event, 1)}
+                  />
+                </Box>
               </Grid>
               <Grid item xs={6} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={2}
-                  label="Qtd Pedida"
-                  dados={detalhePedido}
-                  field="qtdPedida"
-                  setState={setDetalhePedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                />
+                <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                  <InputText
+                    tipo='currency'
+                    scale={4}
+                    label="Qtd Pedida"
+                    dados={detalhePedido}
+                    field="qtdPedida"
+                    setState={setDetalhePedido}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                  />
+                </Box>
               </Grid>
               <Grid item xs={6} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
+                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                  <InputText
+                    tipo='currency'
+                    scale={4}
+                    label="Vr Unitário"
+                    dados={detalhePedido}
+                    field="vrUnitario"
+                    setState={setDetalhePedido}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+
+                <InputCalc
+                  label='Total Item'
                   tipo='currency'
-                  scale={2}
-                  label="Vr Unitário"
-                  dados={detalhePedido}
-                  field="vrUnitario"
-                  setState={setDetalhePedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
+                  scale={4}
+                  disabled={false}
+                  value={(detalhePedido.qtdPedida * detalhePedido.vrUnitario).toString()}
+
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>

@@ -47,15 +47,15 @@ var DetalheProgramacao = /** @class */ (function () {
         __metadata("design:type", cor_entity_1.default)
     ], DetalheProgramacao.prototype, "cor", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "peso", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "gm2", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "largura", void 0);
     __decorate([

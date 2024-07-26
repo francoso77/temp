@@ -18,17 +18,17 @@ export default class Estoque implements EstoqueInterface {
   produto: Produto
 
   @Column()
-  idPessoa_Fornecedor: number
+  idPessoa_fornecedor: number
 
-  @JoinColumn({ name: 'idPessoaFornecedor' })
+  @JoinColumn({ name: 'idPessoa_fornecedor' })
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.fornecedorEstoques)
   fornecedor: Pessoa
 
-  @Column({ type: 'float', precision: 2 })
-  metro: number
+  @Column({ type: 'float', precision: 4 })
+  qtd: number
 
-  @Column()
-  idCor: number;
+  @Column({ nullable: true })
+  idCor: number | null;
 
   @JoinColumn({ name: 'idCor' })
   @ManyToOne(() => Cor, (cor) => cor.corEstoques)

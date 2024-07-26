@@ -3,7 +3,6 @@ import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
 import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
 import Pedido from './pedido.entity';
-import Cor from './cor.entity';
 
 @Entity({ name: 'detalhepedidos' })
 export default class DetalhePedido implements DetalhePedidoInterface {
@@ -24,13 +23,13 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   @ManyToOne(() => Produto, (produto) => produto.pedidos)
   produto: Produto
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   qtdPedida: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   vrUnitario: number
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'float', precision: 4 })
   qtdAtendida: number
 
   @Column()

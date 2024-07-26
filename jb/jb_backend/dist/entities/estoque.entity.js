@@ -32,18 +32,18 @@ var Estoque = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
-    ], Estoque.prototype, "idPessoa_Fornecedor", void 0);
+    ], Estoque.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaFornecedor' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.fornecedorEstoques; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Estoque.prototype, "fornecedor", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
-    ], Estoque.prototype, "metro", void 0);
+    ], Estoque.prototype, "qtd", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], Estoque.prototype, "idCor", void 0);
     __decorate([
