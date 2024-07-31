@@ -13,6 +13,7 @@ import Estrutura from '../Views/Crud/Estrutura';
 import PrazoEntrega from '../Views/Crud/PrazoEntrega';
 import Pedido from '../Views/Pedidos/Pedido';
 import Entrada from '../Views/Entradas/Entrada';
+import PedidoForm from '../Views/testes/testes';
 
 export const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
       {
         path: "/Entrada",
         element: <Entrada />,
+      },
+      {
+        path: "/Testes",
+        element: <PedidoForm />,
       },
     ]
   },

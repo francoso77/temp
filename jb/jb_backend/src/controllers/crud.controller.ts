@@ -7,6 +7,23 @@ import ClsCrudController from '../services/crud.controller.cls';
 export class CrudController {
   constructor() { }
 
+  @Post("incluirComDetalhe")
+  incluirComDetalhe(
+    @Body("master") master: Record<string, any>,
+    @Body("detalhes") detalhes: Record<string, any>[],
+    @Body("entidadeMaster") entidadeMaster: string,
+    @Body("entidadeDetalhe") entidadeDetalhe: string,
+    @Body("id") id: string,
+  ) {
+    return new ClsCrudController().incluirComDetalhe(
+      master,
+      entidadeMaster,
+      detalhes,
+      entidadeDetalhe,
+      id,
+    );
+  }
+
   @Post("incluir")
   incluir(
     @Body("criterio") criterio: Record<string, any>,

@@ -4,6 +4,36 @@ import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/
 
 export default class ClsCrudController {
 
+  public async incluirComDetalhe(
+    master: Record<string, any>,
+    entidadeMaster: string,
+    detalhes: Record<string, any>[],
+    entidadeDetalhe: string,
+    id: string) {
+
+    AppDataSource.manager.transaction(async transactionEntityManager => {
+      const newMaster = await transactionEntityManager.save(entidadeMaster, master);
+      console.log(newMaster)
+      console.log('id: ', newMaster[id])
+      detalhes.forEach(detalhe => detalhe[id] = newMaster[id]);
+      console.log(detalhes)
+      await transactionEntityManager.save(entidadeDetalhe, detalhes)
+        .then((rs) => {
+          return {
+            ok: true,
+            mensagem: "Registro salvo com Sucesso.",
+            dados: rs,
+          };
+        })
+        .catch((e) => {
+          return {
+            ok: false,
+            mensagem: e.message,
+          };
+        })
+    })
+  }
+
   public async incluir(criterio: Record<string, any>, entidade: string) {
     return AppDataSource.getRepository(entidade)
       .save(criterio)

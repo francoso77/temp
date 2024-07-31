@@ -18,6 +18,9 @@ var crud_controller_cls_1 = require("../services/crud.controller.cls");
 var CrudController = /** @class */ (function () {
     function CrudController() {
     }
+    CrudController.prototype.incluirComDetalhe = function (master, detalhes, entidadeMaster, entidadeDetalhe, id) {
+        return new crud_controller_cls_1.default().incluirComDetalhe(master, entidadeMaster, detalhes, entidadeDetalhe, id);
+    };
     CrudController.prototype.incluir = function (criterio, entidade) {
         return new crud_controller_cls_1.default().incluir(criterio, entidade);
     };
@@ -41,6 +44,17 @@ var CrudController = /** @class */ (function () {
     CrudController.prototype.excluir = function (entidade, criterio) {
         return new crud_controller_cls_1.default().excluir(criterio, entidade);
     };
+    __decorate([
+        (0, common_1.Post)("incluirComDetalhe"),
+        __param(0, (0, common_1.Body)("master")),
+        __param(1, (0, common_1.Body)("detalhes")),
+        __param(2, (0, common_1.Body)("entidadeMaster")),
+        __param(3, (0, common_1.Body)("entidadeDetalhe")),
+        __param(4, (0, common_1.Body)("id")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Array, String, String, String]),
+        __metadata("design:returntype", void 0)
+    ], CrudController.prototype, "incluirComDetalhe", null);
     __decorate([
         (0, common_1.Post)("incluir"),
         __param(0, (0, common_1.Body)("criterio")),
