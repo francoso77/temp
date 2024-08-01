@@ -38,7 +38,7 @@ var DetalheEstrutura = /** @class */ (function () {
         __metadata("design:type", produto_entity_1.default)
     ], DetalheEstrutura.prototype, "produto", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "idCor", void 0);
     __decorate([

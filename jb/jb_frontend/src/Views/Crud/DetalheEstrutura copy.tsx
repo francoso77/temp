@@ -19,16 +19,15 @@ import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
-import { TipoProdutoType } from '../../types/tipoProdutoypes';
 
 
 
 interface PropsInterface {
   rsEstrutura: EstruturaInterface
-  // setEstruturaState: React.Dispatch<React.SetStateAction<ActionInterface>>,
+  setEstruturaState: React.Dispatch<React.SetStateAction<ActionInterface>>,
 }
 
-export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
+export default function DetalheEstrutura({ rsEstrutura, setEstruturaState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -44,21 +43,18 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     nome: string
   }
 
-  const [open, setOpen] = useState(false);
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface;
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
-  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEstruturaInterface>>([]);
-  const [nomeProduto, setNomeProduto] = useState<PesquisaInterface>({ nome: '' });
-  const [erros, setErros] = useState({});
-  const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
-  const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
-  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
+  const [open, setOpen] = useState(true);
+  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
+  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEstruturaInterface>>([])
+  const [nomeProduto, setNomeProduto] = useState<PesquisaInterface>({ nome: '' })
+  const [erros, setErros] = useState({})
+  const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados)
+  const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
+  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
-  const [tipo, setTipo] = useState<TipoProdutoType>()
-
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -87,18 +83,6 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     setOrderBy(property);
   };
 
-  const validarDados = (): boolean => {
-
-    let retorno: boolean = true
-    let erros: { [key: string]: string } = {}
-
-    retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
-    retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'Valor maior que 0')
-    setErros(erros)
-    return retorno
-  }
-
   const pesquisarID = (id: string | number): Promise<DetalheEstruturaInterface> => {
     return clsCrud
       .pesquisar({
@@ -125,34 +109,25 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     })
   }
   const btIncluir = () => {
-    if (rsEstrutura.idProduto !== 0 && rsEstrutura.idUnidade !== 0 && rsEstrutura.qtdBase !== 0) {
-      setOpen(true)
-      BuscarDados()
-      setDetalheEstrutura(ResetDados)
-      setLocalState({ action: actionTypes.incluindo })
-    } else {
-      setMensagemState({
-        titulo: 'Atenção',
-        exibir: true,
-        mensagem: 'Informe os dados do Produto base!',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
-    }
+    setDetalheEstrutura(ResetDados)
+    setLocalState({ action: actionTypes.incluindo })
   }
   const btCancelar = () => {
-    setOpen(false)
     setErros({})
     setDetalheEstrutura(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
-  const pegaTipo = () => {
-    let auxTipo: number | undefined = rsProduto.
-      find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
-    setTipo(auxTipo)
-    console.log(rsProduto)
+  const validarDados = (): boolean => {
+
+    let retorno: boolean = true
+    let erros: { [key: string]: string } = {}
+
+    retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
+    retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
+    retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'Valor maior que 0')
+    setErros(erros)
+    return retorno
   }
 
   const btConfirmar = () => {
@@ -293,38 +268,37 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   const BuscarDados = () => {
-    let query: string = ''
-    // query = `
-    // SELECT 
-    //     e.*,
-    //     p.nome AS nomeProduto
-    // FROM 
-    //     estruturas e
-    // INNER JOIN 
-    //     produtos p ON p.idProduto = e.idProduto
-    // WHERE 
-    //     e.idEstrutura = ${rsEstrutura.idEstrutura};
-    // `;
 
-    // clsCrud
-    //   .query({
-    //     entidade: "Estrutura",
-    //     sql: query,
-    //     msg: '',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setNomeProduto({ nome: rs[0].nomeProduto })
-    //   })
+    let query: string = `
+    SELECT 
+        e.*,
+        p.nome AS nomeProduto
+    FROM 
+        estruturas e
+    INNER JOIN 
+        produtos p ON p.idProduto = e.idProduto
+    WHERE 
+        e.idEstrutura = ${rsEstrutura.idEstrutura};
+    `;
+
+    clsCrud
+      .query({
+        entidade: "Estrutura",
+        sql: query,
+        msg: '',
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<any>) => {
+        setNomeProduto({ nome: rs[0].nomeProduto })
+      })
 
     query = `
       SELECT 
-          p.idProduto, p.nome, p.tipoProduto
+          p.*
       FROM 
           produtos p
       WHERE 
-          p.idProduto <> ${rsEstrutura.idProduto}
-      ORDER BY p.nome ASC;
+          p.idProduto <> ${rsEstrutura.idProduto};
       `;
     clsCrud
       .query({
@@ -351,7 +325,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     setOpen(false);
     irpara('/Estrutura')
     setLocalState({ action: actionTypes.pesquisando })
-    // setEstruturaState({ action: actionTypes.pesquisando })
+    setEstruturaState({ action: actionTypes.pesquisando })
     setLayoutState({
       titulo: 'Estruturas de Produtos',
       tituloAnterior: 'Composição de estrutura',
@@ -361,14 +335,14 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   useEffect(() => {
-    // btPesquisar()
+    btPesquisar()
     BuscarDados()
   }, [])
 
   return (
     <>
       <Dialog open={open}>
-        {/* <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
+        <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
           <Grid item xs={4}>
             <ShowText
               titulo="Produto"
@@ -384,7 +358,48 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
               <CloseIcon />
             </IconButton>
           </Grid>
-        </Paper> */}
+        </Paper>
+        <Condicional condicao={localState.action === 'pesquisando'}>
+          <Paper sx={{ m: 1, padding: 1.5 }}>
+            <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
+              <Tooltip title={'Incluir'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
+                  onClick={() => btIncluir()}
+                >
+                  <AddCircleIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
+              <DataTable
+                colunaSoma='qtd'
+                temTotal={true}
+                qtdColunas={2}
+                cabecalho={cabecalhoForm}
+                dados={rsPesquisa}
+                acoes={[
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: DetalheEstruturaInterface) =>
+                      onEditar(rs.idDetalheEstrutura as number),
+                    toolTip: "Editar",
+                  },
+                  {
+                    icone: "delete",
+                    onAcionador: (rs: DetalheEstruturaInterface) =>
+                      onExcluir(rs.idDetalheEstrutura as number),
+                    toolTip: "Excluir",
+                  },
+                ]}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+            </Grid>
+          </Paper>
+        </Condicional>
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -399,25 +414,21 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
                   label="Produtos"
                   erros={erros}
                   setState={setDetalheEstrutura}
-                  onSelect={pegaTipo}
-                  autoFocus
                 />
               </Grid>
-              <Condicional condicao={[2, 3, 6, 10, 11].includes(tipo as number)}>
-                <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-                  <ComboBox
-                    opcoes={rsCor}
-                    campoDescricao="nome"
-                    campoID="idCor"
-                    dados={detalheEstrutura}
-                    mensagemPadraoCampoEmBranco="Escolha uma cor"
-                    field="idCor"
-                    label="Cores"
-                    erros={erros}
-                    setState={setDetalheEstrutura}
-                  />
-                </Grid>
-              </Condicional>
+              <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+                <ComboBox
+                  opcoes={rsCor}
+                  campoDescricao="nome"
+                  campoID="idCor"
+                  dados={detalheEstrutura}
+                  mensagemPadraoCampoEmBranco="Escolha uma cor"
+                  field="idCor"
+                  label="Cores"
+                  erros={erros}
+                  setState={setDetalheEstrutura}
+                />
+              </Grid>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   tipo='currency'
@@ -471,46 +482,6 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
           </Paper >
         </Condicional>
       </Dialog>
-      <Paper sx={{ m: 0, p: 0 }}>
-        <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
-          <Tooltip title={'Incluir'}>
-            <IconButton
-              color="secondary"
-              sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}
-              onClick={() => btIncluir()}
-            >
-              <AddCircleIcon sx={{ fontSize: 50 }} />
-            </IconButton>
-          </Tooltip>
-        </Grid>
-        <Grid item xs={12}>
-          <DataTable
-            colunaSoma='qtd'
-            temTotal={true}
-            qtdColunas={2}
-            cabecalho={cabecalhoForm}
-            dados={rsPesquisa}
-            // acoes={[
-            //   {
-            //     icone: "edit",
-            //     onAcionador: (rs: DetalheEstruturaInterface) =>
-            //       onEditar(rs.idDetalheEstrutura as number),
-            //     toolTip: "Editar",
-            //   },
-            //   {
-            //     icone: "delete",
-            //     onAcionador: (rs: DetalheEstruturaInterface) =>
-            //       onExcluir(rs.idDetalheEstrutura as number),
-            //     toolTip: "Excluir",
-            //   },
-            // ]}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
-          />
-        </Grid>
-      </Paper>
-
     </>
   )
 }

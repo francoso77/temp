@@ -23,7 +23,7 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   @ManyToOne(() => Produto, (produto) => produto.estruturas)
   produto: Produto
 
-  @Column()
+  @Column({ nullable: true })
   idCor: number;
 
   @JoinColumn({ name: 'idCor' })

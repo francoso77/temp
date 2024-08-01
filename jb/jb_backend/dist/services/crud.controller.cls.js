@@ -56,41 +56,56 @@ var ClsCrudController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                data_source_1.AppDataSource.manager.transaction(function (transactionEntityManager) { return __awaiter(_this, void 0, void 0, function () {
-                    var newMaster;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, transactionEntityManager.save(entidadeMaster, master)];
-                            case 1:
-                                newMaster = _a.sent();
-                                console.log(newMaster);
-                                console.log('id: ', newMaster[id]);
-                                detalhes.forEach(function (detalhe) { return detalhe[id] = newMaster[id]; });
-                                console.log(detalhes);
-                                return [4 /*yield*/, transactionEntityManager.save(entidadeDetalhe, detalhes)
-                                        .then(function (rs) {
-                                        return {
-                                            ok: true,
-                                            mensagem: "Registro salvo com Sucesso.",
-                                            dados: rs,
-                                        };
-                                    })
-                                        .catch(function (e) {
-                                        return {
-                                            ok: false,
-                                            mensagem: e.message,
-                                        };
-                                    })];
-                            case 2:
-                                _a.sent();
-                                return [2 /*return*/];
-                        }
-                    });
-                }); });
-                return [2 /*return*/];
+                return [2 /*return*/, data_source_1.AppDataSource.transaction(function (entity) { return __awaiter(_this, void 0, void 0, function () {
+                        var newMaster;
+                        return __generator(this, function (_a) {
+                            newMaster = entity.save(entidadeMaster, master);
+                            detalhes.forEach(function (detalhe) { return detalhe[id] = newMaster[id]; });
+                            entity.save(entidadeDetalhe, detalhes);
+                            return [2 /*return*/];
+                        });
+                    }); })
+                        .then(function (rs) {
+                        return {
+                            ok: true,
+                            mensagem: "Registro salvo com Sucesso.",
+                            dados: rs,
+                        };
+                    })
+                        .catch(function (e) {
+                        return {
+                            ok: false,
+                            mensagem: e.message,
+                        };
+                    })];
             });
         });
     };
+    // public async incluirComDetalhe1(
+    //   master: Record<string, any>,
+    //   entidadeMaster: string,
+    //   detalhes: Record<string, any>[],
+    //   entidadeDetalhe: string,
+    //   id: string) {
+    //   AppDataSource.manager.transaction(async transactionEntityManager => {
+    //     const newMaster = await transactionEntityManager.save(entidadeMaster, master);
+    //     detalhes.forEach(detalhe => detalhe[id] = newMaster[id]);
+    //     await transactionEntityManager.save(entidadeDetalhe, detalhes)
+    //       .then((rs) => {
+    //         return {
+    //           ok: true,
+    //           mensagem: "Registro salvo com Sucesso.",
+    //           dados: rs,
+    //         };
+    //       })
+    //       .catch((e) => {
+    //         return {
+    //           ok: false,
+    //           mensagem: e.message,
+    //         };
+    //       })
+    //   })
+    // }
     ClsCrudController.prototype.incluir = function (criterio, entidade) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {

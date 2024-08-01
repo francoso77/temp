@@ -9,6 +9,6 @@ export interface DetalheEstruturaInterface {
   idDetalheEstrutura?: number;
   idEstrutura: number;
   idProduto: number;
-  idCor: number;
+  idCor?: number;
   qtd: number;
 }

@@ -383,6 +383,9 @@ export default function Estrutura() {
                 erros={erros}
               />
             </Grid>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <DetalheEstrutura rsEstrutura={estrutura} />
+            </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
@@ -418,7 +421,7 @@ export default function Estrutura() {
               </Condicional>
             </Grid>
           </Condicional>
-          <Condicional condicao={localState.action === 'detalhes'}>
+          {/* <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
               <ShowText
                 titulo='Estrutura do Produto'
@@ -426,7 +429,7 @@ export default function Estrutura() {
               />
               <DetalheEstrutura rsEstrutura={estrutura} setEstruturaState={setLocalState} />
             </Grid>
-          </Condicional>
+          </Condicional> */}
         </Grid>
       </Paper >
     </Container >
