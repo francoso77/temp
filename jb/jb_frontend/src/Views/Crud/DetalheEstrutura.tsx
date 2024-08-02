@@ -1,5 +1,5 @@
-import { Dialog, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -40,16 +40,12 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     qtd: 0,
   }
 
-  interface PesquisaInterface {
-    nome: string
-  }
 
   const [open, setOpen] = useState(false);
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface;
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
   const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEstruturaInterface>>([]);
-  const [nomeProduto, setNomeProduto] = useState<PesquisaInterface>({ nome: '' });
   const [erros, setErros] = useState({});
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
@@ -58,7 +54,8 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
   const [tipo, setTipo] = useState<TipoProdutoType>()
-
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+  let query: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -152,20 +149,43 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     let auxTipo: number | undefined = rsProduto.
       find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
     setTipo(auxTipo)
-    console.log(rsProduto)
+    console.log(auxTipo)
+  }
+
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
   }
 
   const btConfirmar = () => {
 
-    const query = `
-    SELECT 
-    de.*
-    FROM 
-    detalheestruturas de
-    WHERE 
-    de.idProduto = ${detalheEstrutura.idProduto}
-    and de.idCor = ${detalheEstrutura.idCor};
-    `;
+    if (detalheEstrutura.idCor) {
+      query = `
+      SELECT 
+      de.*
+      FROM 
+      detalheestruturas de
+      WHERE 
+      de.idProduto = ${detalheEstrutura.idProduto}
+      and de.idCor = ${detalheEstrutura.idCor};
+      `;
+    } else {
+      query = `
+      SELECT 
+      de.*
+      FROM 
+      detalheestruturas de
+      WHERE 
+      de.idProduto = ${detalheEstrutura.idProduto};
+      `;
+    }
 
     clsCrud
       .query({
@@ -185,7 +205,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
           })
         } else {
 
-          const query = `
+          query = `
           SELECT de.idEstrutura, e.qtdBase, SUM(qtd) AS T
           FROM detalheestruturas de
           INNER JOIN estruturas e ON e.idEstrutura = de.idEstrutura
@@ -264,58 +284,56 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   const btPesquisar = () => {
-    // const query = `
-    // SELECT 
-    //     de.*,
-    //     p.nome AS nomeProduto,
-    //     c.nome AS nomeCor
-    // FROM 
-    //     detalheestruturas de
-    // INNER JOIN 
-    //     estruturas e ON e.idEstrutura = de.idEstrutura
-    // INNER JOIN 
-    //     produtos p ON p.idProduto = de.idProduto
-    // INNER JOIN 
-    //     cores c ON c.idCor = de.idCor
-    // WHERE 
-    //     de.idEstrutura = ${rsEstrutura.idEstrutura};
-    // `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Estrutura",
-    //     sql: query,
-    //     msg: 'Pesquisando Estruturas ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setRsPesquisa(rs)
-    //   })
+    const query = `
+    SELECT 
+        de.*,
+        p.nome AS nomeProduto,
+        c.nome AS nomeCor
+    FROM 
+        detalheestruturas de
+    INNER JOIN 
+        estruturas e ON e.idEstrutura = de.idEstrutura
+    INNER JOIN 
+        produtos p ON p.idProduto = de.idProduto
+    INNER JOIN 
+        cores c ON c.idCor = de.idCor
+    WHERE 
+        de.idEstrutura = ${rsEstrutura.idEstrutura};
+    `;
+    clsCrud
+      .query({
+        entidade: "Estrutura",
+        sql: query,
+        msg: 'Pesquisando Estruturas ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<any>) => {
+        setRsPesquisa(rs)
+      })
   }
 
   const BuscarDados = () => {
-    let query: string = ''
-    // query = `
-    // SELECT 
-    //     e.*,
-    //     p.nome AS nomeProduto
-    // FROM 
-    //     estruturas e
-    // INNER JOIN 
-    //     produtos p ON p.idProduto = e.idProduto
-    // WHERE 
-    //     e.idEstrutura = ${rsEstrutura.idEstrutura};
-    // `;
+    query = `
+    SELECT 
+        de.*
+    FROM 
+        detalheestruturas de
+    INNER JOIN 
+        estruturas e ON e.idEstrutura = de.idEstrutura
+    WHERE 
+        de.idEstrutura = ${rsEstrutura.idEstrutura};
+    `;
 
-    // clsCrud
-    //   .query({
-    //     entidade: "Estrutura",
-    //     sql: query,
-    //     msg: '',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setNomeProduto({ nome: rs[0].nomeProduto })
-    //   })
+    clsCrud
+      .query({
+        entidade: "Estrutura",
+        sql: query,
+        msg: '',
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<DetalheEstruturaInterface>) => {
+        setRsDetalheEstrutura(rs)
+      })
 
     query = `
       SELECT 
@@ -361,75 +379,84 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   useEffect(() => {
-    // btPesquisar()
+    btPesquisar()
     BuscarDados()
   }, [])
 
   return (
     <>
-      <Dialog open={open}>
-        {/* <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
-          <Grid item xs={4}>
-            <ShowText
-              titulo="Produto"
-              descricao={nomeProduto.nome} />
+      <Dialog open={open} sx={{
+        width: '95%', // Ajuste esta porcentagem conforme necessário
+        height: '80vh', // Ajuste esta altura conforme necessário
+        maxWidth: 'none',
+        maxHeight: 'none',
+      }}>
+        <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
+          <Grid item xs={12} sx={{ textAlign: 'center' }}>
+            <Typography>
+              Item da estrutura do produto
+            </Typography>
           </Grid>
-          <Grid item xs={4} sx={{ textAlign: 'center' }}>
-            <ShowText
-              titulo="Qtd Base"
-              descricao={rsEstrutura.qtdBase.toString()} />
-          </Grid>
-          <Grid item xs={4} sx={{ textAlign: 'right' }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
-          </Grid>
-        </Paper> */}
+        </Paper>
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
               <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-                <ComboBox
-                  opcoes={rsProduto}
-                  campoDescricao="nome"
-                  campoID="idProduto"
-                  dados={detalheEstrutura}
-                  mensagemPadraoCampoEmBranco="Escolha um produto"
-                  field="idProduto"
-                  label="Produtos"
-                  erros={erros}
-                  setState={setDetalheEstrutura}
-                  onSelect={pegaTipo}
-                  autoFocus
-                />
+                <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                  <ComboBox
+                    opcoes={rsProduto}
+                    campoDescricao="nome"
+                    campoID="idProduto"
+                    dados={detalheEstrutura}
+                    mensagemPadraoCampoEmBranco="Escolha um produto"
+                    field="idProduto"
+                    label="Produtos"
+                    erros={erros}
+                    setState={setDetalheEstrutura}
+                    onSelect={pegaTipo}
+                    onKeyDown={
+                      tipo === 10 ? (event) => btPulaCampo(event, 1)
+                        : (event) => btPulaCampo(event, 2)
+                    }
+                    autoFocus
+                  />
+                </Box>
               </Grid>
               <Condicional condicao={[2, 3, 6, 10, 11].includes(tipo as number)}>
                 <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-                  <ComboBox
-                    opcoes={rsCor}
-                    campoDescricao="nome"
-                    campoID="idCor"
-                    dados={detalheEstrutura}
-                    mensagemPadraoCampoEmBranco="Escolha uma cor"
-                    field="idCor"
-                    label="Cores"
-                    erros={erros}
-                    setState={setDetalheEstrutura}
-                  />
+                  <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                    <ComboBox
+                      opcoes={rsCor}
+                      campoDescricao="nome"
+                      campoID="idCor"
+                      dados={detalheEstrutura}
+                      mensagemPadraoCampoEmBranco="Escolha uma cor"
+                      field="idCor"
+                      label="Cores"
+                      erros={erros}
+                      setState={setDetalheEstrutura}
+                      onSelect={pegaTipo}
+                      onFocus={(e) => e.target.select()}
+                      onKeyDown={(event) => btPulaCampo(event, 2)}
+                    />
+                  </Box>
                 </Grid>
               </Condicional>
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={2}
-                  label="Qtd"
-                  dados={detalheEstrutura}
-                  field="qtd"
-                  setState={setDetalheEstrutura}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                />
+                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                  <InputText
+                    tipo='currency'
+                    scale={2}
+                    label="Qtd"
+                    dados={detalheEstrutura}
+                    field="qtd"
+                    setState={setDetalheEstrutura}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                  />
+                </Box>
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

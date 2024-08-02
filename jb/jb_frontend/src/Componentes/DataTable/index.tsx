@@ -64,18 +64,18 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     left: 0,
   },
   [`&.${tableCellClasses.body}`]: {
-    padding: '0px',
+    padding: '1px',
     fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
-      padding: '0px',
+      padding: '2px',
       fontSize: '0.70rem',
     },
   },
   [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
-    padding: '0px',
+    padding: '1px',
     fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
-      padding: '0px',
+      padding: '2px',
       fontSize: '0.70rem',
     },
     position: "sticky",
