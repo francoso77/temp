@@ -49,6 +49,8 @@ export default function Estrutura() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -162,9 +164,12 @@ export default function Estrutura() {
           if (validarDados()) {
 
             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-              clsCrud.incluir({
-                entidade: "Estrutura",
-                criterio: estrutura,
+              clsCrud.incluirComDetalhe({
+                entidadeMaster: "Estrutura",
+                master: estrutura,
+                entidadeDetalhe: "DetalheEstrutura",
+                detalhes: rsDetalheEstrutura,
+                id: "idEstrutura",
                 localState: localState.action,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
@@ -384,7 +389,11 @@ export default function Estrutura() {
               />
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <DetalheEstrutura rsEstrutura={estrutura} />
+              <DetalheEstrutura
+                rsEstrutura={estrutura}
+                rsDetalhe={rsDetalheEstrutura}
+                setDetalheState={setRsDetalheEstrutura}
+              />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>

@@ -10,5 +10,10 @@ export interface PadraoPesquisaInterface {
   camposLike?: Array<any>,
   select?: Array<any>,
   joins?: { tabelaRelacao: string, relacao: string }[],
-  sql?: string
+  sql?: string,
+  entidadeMaster?: string,
+  master?: Record<string, any>,
+  entidadeDetalhe?: string,
+  detalhes?: Record<string, any>,
+  id?: string
 }

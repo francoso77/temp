@@ -21,20 +21,28 @@ import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoI
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 
-
+interface DetalheInterface {
+  idEstrutura: 0,
+  idProduto: 0,
+  nomeProduto: "",
+  idCor: 0,
+  nomeCor: "",
+  qtd: 0,
+}
 
 interface PropsInterface {
   rsEstrutura: EstruturaInterface
-  // setEstruturaState: React.Dispatch<React.SetStateAction<ActionInterface>>,
+  rsDetalhe: DetalheEstruturaInterface[]
+  setDetalheState: React.Dispatch<React.SetStateAction<DetalheEstruturaInterface[]>>,
 }
 
-export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
+export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
   const ResetDados: DetalheEstruturaInterface = {
-    idEstrutura: 0,
+    idEstrutura: rsEstrutura.idEstrutura as number,
     idProduto: 0,
     idCor: 0,
     qtd: 0,
@@ -52,7 +60,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
+  // const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
   let query: string = ''
@@ -61,12 +69,14 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'nomeProduto'
+      campo: 'idProduto',
+      // format: (produtos) => rsProduto.find(produtos => produtos.idProduto === detalheEstrutura.idProduto)?.nome
     },
     {
       cabecalho: 'Cor',
       alinhamento: 'left',
-      campo: 'nomeCor'
+      campo: 'idCor',
+      // format: (cores) => rsCor.find(cores => cores.idCor === detalheEstrutura.idCor)?.nome
     },
     {
       cabecalho: 'Qtd',
@@ -89,8 +99,10 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
+    if (detalheEstrutura.idCor) {
+      retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
+    }
     retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('idCor', detalheEstrutura, erros, retorno, 'Escolha uma cor')
     retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'Valor maior que 0')
     setErros(erros)
     return retorno
@@ -140,9 +152,9 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
   const btCancelar = () => {
     setOpen(false)
-    setErros({})
-    setDetalheEstrutura(ResetDados)
-    setLocalState({ action: actionTypes.pesquisando })
+    // setErros({})
+    // setDetalheEstrutura(ResetDados)
+    // setLocalState({ action: actionTypes.pesquisando })
   }
 
   const pegaTipo = () => {
@@ -164,127 +176,187 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
     }
   }
 
-  const btConfirmar = () => {
+  const podeIncluirDetalhe = () => {
+    const indice = rsDetalhe.findIndex(
+      (i) => i.idProduto === detalheEstrutura.idProduto
+    )
 
-    if (detalheEstrutura.idCor) {
-      query = `
-      SELECT 
-      de.*
-      FROM 
-      detalheestruturas de
-      WHERE 
-      de.idProduto = ${detalheEstrutura.idProduto}
-      and de.idCor = ${detalheEstrutura.idCor};
-      `;
-    } else {
-      query = `
-      SELECT 
-      de.*
-      FROM 
-      detalheestruturas de
-      WHERE 
-      de.idProduto = ${detalheEstrutura.idProduto};
-      `;
+    if (indice >= 0) {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Produto já cadastrado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
     }
 
-    clsCrud
-      .query({
-        entidade: "DetalheEstrutura",
-        sql: query,
-        setMensagemState: setMensagemState,
+    return indice < 0;
+
+  }
+
+  const testaSoma = (): boolean => {
+    let somaQtd = 0.0
+    rsDetalhe.forEach((i) => somaQtd = somaQtd + i.qtd)
+    somaQtd = somaQtd + detalheEstrutura.qtd
+
+    if (somaQtd > rsEstrutura.qtdBase) {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'A soma das quantidades informadas é de '.concat(somaQtd.toLocaleString()).concat('! A soma das quantidades deve ser menor ou igual a Qtd Base.'),
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
       })
-      .then((rs: Array<any>) => {
-        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
-          setMensagemState({
-            titulo: 'Erro...',
-            exibir: true,
-            mensagem: 'Produto já cadastrado!',
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null
-          })
-        } else {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  const btConfirmar = () => {
+    // console.log('teste do testaSoma: ', testaSoma())
+    // console.log('teste do pode incluir: ', podeIncluirDetalhe())
 
-          query = `
-          SELECT de.idEstrutura, e.qtdBase, SUM(qtd) AS T
-          FROM detalheestruturas de
-          INNER JOIN estruturas e ON e.idEstrutura = de.idEstrutura
-          GROUP BY de.idEstrutura, e.qtdBase
-          HAVING (((SUM(de.qtd) + ${detalheEstrutura.qtd}) <= e.qtdBase));
-          `;
+    if (validarDados() && podeIncluirDetalhe() && testaSoma()) {
 
-          clsCrud
-            .query({
-              entidade: "DetalheEstrutura",
-              sql: query,
-              setMensagemState: setMensagemState,
-            })
-            .then((rs: Array<any>) => {
-              if (rs.length === 0 && localState.action === actionTypes.incluindo) {
-                setMensagemState({
-                  titulo: 'Erro...',
-                  exibir: true,
-                  mensagem: 'A quantidade total da composição deve ser menor que a quantidade base informada!',
-                  tipo: MensagemTipo.Error,
-                  exibirBotao: true,
-                  cb: null
-                })
-              } else if (validarDados()) {
-
-                if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-                  clsCrud.incluir({
-                    entidade: "DetalheEstrutura",
-                    criterio: detalheEstrutura,
-                    localState: localState.action,
-                    cb: () => btPesquisar(),
-                    setMensagemState: setMensagemState
-                  })
-                    .then((rs) => {
-                      if (rs.ok) {
-                        setLocalState({ action: actionTypes.pesquisando })
-                      } else {
-                        setMensagemState({
-                          titulo: 'Erro...',
-                          exibir: true,
-                          mensagem: 'Erro no cadastro - Consulte Suporte',
-                          tipo: MensagemTipo.Error,
-                          exibirBotao: true,
-                          cb: null
-                        })
-                      }
-                    })
-                } else if (localState.action === actionTypes.excluindo) {
-                  clsCrud.excluir({
-                    entidade: "DetalheEstrutura",
-                    criterio: {
-                      idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
-                    },
-                    cb: () => btPesquisar(),
-                    setMensagemState: setMensagemState
-                  })
-                    .then((rs) => {
-                      if (rs.ok) {
-                        setLocalState({ action: actionTypes.pesquisando })
-                      } else {
-                        setMensagemState({
-                          titulo: 'Erro...',
-                          exibir: true,
-                          mensagem: 'Erro no cadastro - Consulte Suporte',
-                          tipo: MensagemTipo.Error,
-                          exibirBotao: true,
-                          cb: null
-                        })
-                      }
-                    })
-                }
-              }
-            })
-        }
+      rsDetalhe.push({
+        idEstrutura: detalheEstrutura.idEstrutura,
+        idProduto: detalheEstrutura.idProduto,
+        idCor: detalheEstrutura.idCor,
+        qtd: detalheEstrutura.qtd,
       })
+      // console.log('entrou aqui')
+      // setRsDetalheEstrutura([...rsDetalheEstrutura, {
+      //   idEstrutura: detalheEstrutura.idEstrutura,
+      //   idProduto: detalheEstrutura.idProduto,
+      //   idCor: detalheEstrutura.idCor,
+      //   qtd: detalheEstrutura.qtd,
+      // },
+      // ])
+      console.log(rsDetalhe)
+      setOpen(false)
+    }
+    // if (detalheEstrutura.idCor) {
+    //   query = `
+    //   SELECT 
+    //   de.*
+    //   FROM 
+    //   detalheestruturas de
+    //   WHERE 
+    //   de.idProduto = ${detalheEstrutura.idProduto}
+    //   and de.idCor = ${detalheEstrutura.idCor};
+    //   `;
+    // } else {
+    //   query = `
+    //   SELECT 
+    //   de.*
+    //   FROM 
+    //   detalheestruturas de
+    //   WHERE 
+    //   de.idProduto = ${detalheEstrutura.idProduto};
+    //   `;
+    // }
+
+    // clsCrud
+    //   .query({
+    //     entidade: "DetalheEstrutura",
+    //     sql: query,
+    //     setMensagemState: setMensagemState,
+    //   })
+    //   .then((rs: Array<any>) => {
+    //     if (rs.length > 0 && localState.action === actionTypes.incluindo) {
+    //       setMensagemState({
+    //         titulo: 'Erro...',
+    //         exibir: true,
+    //         mensagem: 'Produto já cadastrado!',
+    //         tipo: MensagemTipo.Error,
+    //         exibirBotao: true,
+    //         cb: null
+    //       })
+    //     } else {
+
+    //       query = `
+    //       SELECT de.idEstrutura, e.qtdBase, SUM(qtd) AS T
+    //       FROM detalheestruturas de
+    //       INNER JOIN estruturas e ON e.idEstrutura = de.idEstrutura
+    //       GROUP BY de.idEstrutura, e.qtdBase
+    //       HAVING (((SUM(de.qtd) + ${detalheEstrutura.qtd}) <= e.qtdBase));
+    //       `;
+
+    //       clsCrud
+    //         .query({
+    //           entidade: "DetalheEstrutura",
+    //           sql: query,
+    //           setMensagemState: setMensagemState,
+    //         })
+    //         .then((rs: Array<any>) => {
+    //           if (rs.length === 0 && localState.action === actionTypes.incluindo) {
+    //             setMensagemState({
+    //               titulo: 'Erro...',
+    //               exibir: true,
+    //               mensagem: 'A quantidade total da composição deve ser menor que a quantidade base informada!',
+    //               tipo: MensagemTipo.Error,
+    //               exibirBotao: true,
+    //               cb: null
+    //             })
+    //           } else if (validarDados()) {
+
+    //             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+    //               clsCrud.incluir({
+    //                 entidade: "DetalheEstrutura",
+    //                 criterio: detalheEstrutura,
+    //                 localState: localState.action,
+    //                 cb: () => btPesquisar(),
+    //                 setMensagemState: setMensagemState
+    //               })
+    //                 .then((rs) => {
+    //                   if (rs.ok) {
+    //                     setLocalState({ action: actionTypes.pesquisando })
+    //                   } else {
+    //                     setMensagemState({
+    //                       titulo: 'Erro...',
+    //                       exibir: true,
+    //                       mensagem: 'Erro no cadastro - Consulte Suporte',
+    //                       tipo: MensagemTipo.Error,
+    //                       exibirBotao: true,
+    //                       cb: null
+    //                     })
+    //                   }
+    //                 })
+    //             } else if (localState.action === actionTypes.excluindo) {
+    //               clsCrud.excluir({
+    //                 entidade: "DetalheEstrutura",
+    //                 criterio: {
+    //                   idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
+    //                 },
+    //                 cb: () => btPesquisar(),
+    //                 setMensagemState: setMensagemState
+    //               })
+    //                 .then((rs) => {
+    //                   if (rs.ok) {
+    //                     setLocalState({ action: actionTypes.pesquisando })
+    //                   } else {
+    //                     setMensagemState({
+    //                       titulo: 'Erro...',
+    //                       exibir: true,
+    //                       mensagem: 'Erro no cadastro - Consulte Suporte',
+    //                       tipo: MensagemTipo.Error,
+    //                       exibirBotao: true,
+    //                       cb: null
+    //                     })
+    //                   }
+    //                 })
+    //             }
+    //           }
+    //         })
+    //     }
+    //   })
   }
 
   const btPesquisar = () => {
-    const query = `
+    query = `
     SELECT 
         de.*,
         p.nome AS nomeProduto,
@@ -308,33 +380,12 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
+        // setRsPesquisa(rs)
+        setDetalheState(rs)
       })
   }
 
   const BuscarDados = () => {
-    query = `
-    SELECT 
-        de.*
-    FROM 
-        detalheestruturas de
-    INNER JOIN 
-        estruturas e ON e.idEstrutura = de.idEstrutura
-    WHERE 
-        de.idEstrutura = ${rsEstrutura.idEstrutura};
-    `;
-
-    clsCrud
-      .query({
-        entidade: "Estrutura",
-        sql: query,
-        msg: '',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<DetalheEstruturaInterface>) => {
-        setRsDetalheEstrutura(rs)
-      })
-
     query = `
       SELECT 
           p.idProduto, p.nome, p.tipoProduto
@@ -379,8 +430,11 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
   }
 
   useEffect(() => {
-    btPesquisar()
-    BuscarDados()
+    if (rsEstrutura.idEstrutura !== undefined) {
+
+      btPesquisar()
+    }
+    // BuscarDados()
   }, [])
 
   return (
@@ -516,7 +570,7 @@ export default function DetalheEstrutura({ rsEstrutura }: PropsInterface) {
             temTotal={true}
             qtdColunas={2}
             cabecalho={cabecalhoForm}
-            dados={rsPesquisa}
+            dados={rsDetalhe}
             // acoes={[
             //   {
             //     icone: "edit",

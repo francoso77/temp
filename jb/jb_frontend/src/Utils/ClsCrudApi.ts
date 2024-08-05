@@ -216,6 +216,70 @@ export default class ClsCrud {
       })
   }
 
+  public incluirComDetalhe({
+    entidadeMaster,
+    master,
+    entidadeDetalhe,
+    detalhes,
+    id,
+    localState,
+    cb,
+    setMensagemState
+  }: PropsInterface): Promise<RespostaPadraoInterface<any>> {
+    const dados: PadraoPesquisaInterface = {
+      entidadeMaster: entidadeMaster,
+      master: master,
+      entidadeDetalhe,
+      detalhes,
+      id
+    }
+
+    const config: AxiosRequestConfig = {
+      maxBodyLength: Infinity,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+    if (setMensagemState) {
+      setMensagemState({
+        titulo: '',
+        exibir: true,
+        mensagem: localState === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
+        tipo: MensagemTipo.Info,
+        exibirBotao: false,
+        cb: null
+      })
+    }
+    return axios
+      .post<RespostaPadraoInterface<Array<any>>>(
+        URL_BACKEND.concat("/incluirComDetalhe"),
+        dados,
+        config
+      )
+      .then((rs) => {
+        if (rs.data.ok && setMensagemState) {
+          setMensagemState({
+            titulo: 'Cadastro...',
+            exibir: true,
+            mensagem: localState === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
+            tipo: localState === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
+            exibirBotao: true,
+            cb: cb ? cb : null
+          })
+        } else if (!rs.data.ok && setMensagemState) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: localState === actionTypes.incluindo ? 'Erro ao incluir!' : 'Erro ao alterar!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+        }
+        return rs.data
+      })
+  }
+
   public excluir({
     entidade,
     criterio,
