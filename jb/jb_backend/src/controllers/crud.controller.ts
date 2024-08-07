@@ -57,12 +57,14 @@ export class CrudController {
     @Body("criterio") criterio: Record<string, any>,
     @Body("camposLike") camposLike: Array<string>,
     @Body("select") select: Array<string>,
+    @Body("relations") relations: Array<string>,
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({
       entidade: entidade,
       criterio: criterio,
       camposLike: camposLike ? camposLike : [],
       select: select ? select : [],
+      relations: relations ? relations : [],
     });
   }
 

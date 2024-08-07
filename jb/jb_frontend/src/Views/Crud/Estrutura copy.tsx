@@ -24,7 +24,7 @@ import ShowText from '../../Componentes/ShowText';
 
 
 export default function Estrutura() {
-
+  {/** 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
@@ -50,7 +50,7 @@ export default function Estrutura() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  // const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
+  const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
 
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -165,11 +165,12 @@ export default function Estrutura() {
           if (validarDados()) {
 
             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-
-              console.log('estrutura antes de incluir: ', estrutura)
-              clsCrud.incluir({
-                entidade: "Estrutura",
-                criterio: estrutura,
+              clsCrud.incluirComDetalhe({
+                entidadeMaster: "Estrutura",
+                master: estrutura,
+                entidadeDetalhe: "DetalheEstrutura",
+                detalhes: rsDetalheEstrutura,
+                id: "idEstrutura",
                 localState: localState.action,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
@@ -188,30 +189,6 @@ export default function Estrutura() {
                     })
                   }
                 })
-              // clsCrud.incluirComDetalhe({
-              //   entidadeMaster: "Estrutura",
-              //   master: estrutura,
-              //   entidadeDetalhe: "DetalheEstrutura",
-              //   detalhes: rsDetalheEstrutura,
-              //   id: "idEstrutura",
-              //   localState: localState.action,
-              //   cb: () => btPesquisar(),
-              //   setMensagemState: setMensagemState
-              // })
-              //   .then((rs) => {
-              //     if (rs.ok) {
-              //       setLocalState({ action: actionTypes.pesquisando })
-              //     } else {
-              //       setMensagemState({
-              //         titulo: 'Erro...',
-              //         exibir: true,
-              //         mensagem: 'Erro no cadastro - Consulte Suporte',
-              //         tipo: MensagemTipo.Error,
-              //         exibirBotao: true,
-              //         cb: null
-              //       })
-              //     }
-              //   })
             } else if (localState.action === actionTypes.excluindo) {
               clsCrud.excluir({
                 entidade: "Estrutura",
@@ -242,46 +219,30 @@ export default function Estrutura() {
   }
 
   const btPesquisar = () => {
-
+    const query = `
+      SELECT 
+          e.*,
+          p.nome AS produto_nome,
+          um.sigla AS unidadeMedida_sigla
+      FROM 
+          estruturas e
+      INNER JOIN 
+          produtos p ON e.idProduto = p.idProduto
+      INNER JOIN 
+          unidademedidas um ON e.idUnidade = um.idUnidade
+      WHERE 
+          p.nome LIKE '%${pesquisa.nome}%' ;
+      `;
     clsCrud
-      .pesquisar({
+      .query({
         entidade: "Estrutura",
-        relations: ["detalheEstruturas", "produto", "unidadeMedida"],
-        criterio: {
-          idEstrutura: "%".concat(pesquisa.nome).concat("%"),
-        },
-        camposLike: ["idEstrutura"],
-        msg: 'Pesquisando máquinas ...',
+        sql: query,
+        msg: 'Pesquisando Estruturas ...',
         setMensagemState: setMensagemState
       })
-      .then((rs: Array<any>) => {
-        console.log('qual rs veio: ', JSON.stringify(rs), rs)
+      .then((rs: Array<SqlEstruturaInterface>) => {
         setRsPesquisa(rs)
       })
-    // const query = `
-    //   SELECT 
-    //       e.*,
-    //       p.nome AS produto_nome,
-    //       um.sigla AS unidadeMedida_sigla
-    //   FROM 
-    //       estruturas e
-    //   INNER JOIN 
-    //       produtos p ON e.idProduto = p.idProduto
-    //   INNER JOIN 
-    //       unidademedidas um ON e.idUnidade = um.idUnidade
-    //   WHERE 
-    //       p.nome LIKE '%${pesquisa.nome}%' ;
-    //   `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Estrutura",
-    //     sql: query,
-    //     msg: 'Pesquisando Estruturas ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<SqlEstruturaInterface>) => {
-    //     setRsPesquisa(rs)
-    //   })
   }
   const irPara = useNavigate()
   const btFechar = () => {
@@ -430,8 +391,9 @@ export default function Estrutura() {
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <DetalheEstrutura
-                rsMaster={estrutura}
-                setRsMaster={setEstrutura}
+                rsEstrutura={estrutura}
+                rsDetalhe={rsDetalheEstrutura}
+                setDetalheState={setRsDetalheEstrutura}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
@@ -477,9 +439,10 @@ export default function Estrutura() {
               />
               <DetalheEstrutura rsEstrutura={estrutura} setEstruturaState={setLocalState} />
             </Grid>
-          </Condicional> */}
+          </Condicional> //////
         </Grid>
       </Paper >
     </Container >
   )
+  */}
 }

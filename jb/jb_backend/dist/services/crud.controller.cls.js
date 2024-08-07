@@ -81,31 +81,6 @@ var ClsCrudController = /** @class */ (function () {
             });
         });
     };
-    // public async incluirComDetalhe1(
-    //   master: Record<string, any>,
-    //   entidadeMaster: string,
-    //   detalhes: Record<string, any>[],
-    //   entidadeDetalhe: string,
-    //   id: string) {
-    //   AppDataSource.manager.transaction(async transactionEntityManager => {
-    //     const newMaster = await transactionEntityManager.save(entidadeMaster, master);
-    //     detalhes.forEach(detalhe => detalhe[id] = newMaster[id]);
-    //     await transactionEntityManager.save(entidadeDetalhe, detalhes)
-    //       .then((rs) => {
-    //         return {
-    //           ok: true,
-    //           mensagem: "Registro salvo com Sucesso.",
-    //           dados: rs,
-    //         };
-    //       })
-    //       .catch((e) => {
-    //         return {
-    //           ok: false,
-    //           mensagem: e.message,
-    //         };
-    //       })
-    //   })
-    // }
     ClsCrudController.prototype.incluir = function (criterio, entidade) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -175,10 +150,10 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.pesquisar = function (_a) {
-        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select;
+        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b;
         return __awaiter(this, void 0, void 0, function () {
             var where;
-            return __generator(this, function (_b) {
+            return __generator(this, function (_c) {
                 where = {};
                 where = __assign({}, criterio);
                 camposLike.forEach(function (campo) {
@@ -187,7 +162,8 @@ var ClsCrudController = /** @class */ (function () {
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(entidade)
                         .find({
                         where: where,
-                        select: select
+                        select: select,
+                        relations: relations,
                     })
                         .then(function (rs) {
                         return {

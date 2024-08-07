@@ -3,12 +3,13 @@ export interface EstruturaInterface {
   idProduto: number
   idUnidade: number
   qtdBase: number
+  detalheEstruturas: Array<DetalheEstruturaInterface>
 }
 
 export interface DetalheEstruturaInterface {
   idDetalheEstrutura?: number;
-  idEstrutura: number;
+  idEstrutura: number | null;
   idProduto: number;
-  idCor?: number;
+  idCor?: number | null;
   qtd: number;
 }

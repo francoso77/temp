@@ -32,33 +32,6 @@ export default class ClsCrudController {
       })
   }
 
-  // public async incluirComDetalhe1(
-  //   master: Record<string, any>,
-  //   entidadeMaster: string,
-  //   detalhes: Record<string, any>[],
-  //   entidadeDetalhe: string,
-  //   id: string) {
-
-  //   AppDataSource.manager.transaction(async transactionEntityManager => {
-  //     const newMaster = await transactionEntityManager.save(entidadeMaster, master);
-  //     detalhes.forEach(detalhe => detalhe[id] = newMaster[id]);
-  //     await transactionEntityManager.save(entidadeDetalhe, detalhes)
-  //       .then((rs) => {
-  //         return {
-  //           ok: true,
-  //           mensagem: "Registro salvo com Sucesso.",
-  //           dados: rs,
-  //         };
-  //       })
-  //       .catch((e) => {
-  //         return {
-  //           ok: false,
-  //           mensagem: e.message,
-  //         };
-  //       })
-  //   })
-  // }
-
   public async incluir(criterio: Record<string, any>, entidade: string) {
     return AppDataSource.getRepository(entidade)
       .save(criterio)
@@ -127,7 +100,7 @@ export default class ClsCrudController {
       })
   }
 
-  public async pesquisar({ entidade, criterio, camposLike, select }: PadraoPesquisaInterface):
+  public async pesquisar({ entidade, criterio, camposLike, select, relations = [] }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
 
     let where: Record<string, any> = {}
@@ -140,7 +113,8 @@ export default class ClsCrudController {
     return AppDataSource.getRepository(entidade)
       .find({
         where: where,
-        select: select
+        select: select,
+        relations: relations,
       })
       .then((rs) => {
         return {

@@ -25,6 +25,7 @@ var DetalheEstrutura = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "idEstrutura", void 0);
     __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idEstrutura' }),
         (0, typeorm_1.ManyToOne)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.detalheEstruturas; }),
         __metadata("design:type", estrutura_entity_1.default)
     ], DetalheEstrutura.prototype, "estrutura", void 0);

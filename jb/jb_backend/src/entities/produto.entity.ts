@@ -42,24 +42,31 @@ export default class Produto implements ProdutoInterface {
   @Column()
   tipoProduto: TipoProdutoType
 
-  @OneToMany(() => DetalheProducaoDublagem, (detalheProducaoDublagem) => detalheProducaoDublagem.produto)
+  @OneToMany(() => DetalheProducaoDublagem, (detalheProducaoDublagem) =>
+    detalheProducaoDublagem.produto, { cascade: true, eager: true })
   producaoDublagens: DetalheProducaoDublagem[]
 
-  @OneToMany(() => Estrutura, (estrutura) => estrutura.produto)
+  @OneToMany(() => Estrutura, (estrutura) =>
+    estrutura.produto, { cascade: true, eager: true })
   estruturas: Estrutura[]
 
-  @OneToMany(() => DetalhePedido, (detalhePedido) => detalhePedido.produto)
+  @OneToMany(() => DetalhePedido, (detalhePedido) =>
+    detalhePedido.produto, { cascade: true, eager: true })
   pedidos: Pedido[]
 
-  @OneToMany(() => DetalheEntrada, (entrada) => entrada.produto)
+  @OneToMany(() => DetalheEntrada, (entrada) =>
+    entrada.produto, { cascade: true, eager: true })
   entradas: DetalheEntrada[]
 
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) => producaoMalharia.produto)
+  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
+    producaoMalharia.produto, { cascade: true, eager: true })
   producaoMalharias: ProducaoMalharia[]
 
-  @OneToMany(() => Estoque, (estoque) => estoque.produto)
+  @OneToMany(() => Estoque, (estoque) =>
+    estoque.produto, { cascade: true, eager: true })
   estoques: Estoque[]
 
-  @OneToMany(() => DetalheProgramacao, (detalheProgramacao) => detalheProgramacao.produto)
+  @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>
+    detalheProgramacao.produto, { cascade: true, eager: true })
   detalheProgramacoes: DetalheProgramacao[]
 }

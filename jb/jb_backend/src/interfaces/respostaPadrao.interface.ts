@@ -15,5 +15,6 @@ export interface PadraoPesquisaInterface {
   master?: Record<string, any>,
   entidadeDetalhe?: string,
   detalhes?: Record<string, any>,
-  id?: string
+  id?: string,
+  relations?: Array<string>,
 }

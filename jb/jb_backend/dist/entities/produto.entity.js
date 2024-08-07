@@ -60,31 +60,45 @@ var Produto = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Produto.prototype, "tipoProduto", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) { return detalheProducaoDublagem.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) {
+            return detalheProducaoDublagem.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "producaoDublagens", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return estrutura_entity_1.default; }, function (estrutura) {
+            return estrutura.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "estruturas", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalhePedido_entity_1.default; }, function (detalhePedido) { return detalhePedido.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return detalhePedido_entity_1.default; }, function (detalhePedido) {
+            return detalhePedido.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "pedidos", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (entrada) { return entrada.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (entrada) {
+            return entrada.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "entradas", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) { return producaoMalharia.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
+            return producaoMalharia.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "producaoMalharias", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) { return estoque.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) {
+            return estoque.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "estoques", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) { return detalheProgramacao.produto; }),
+        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) {
+            return detalheProgramacao.produto;
+        }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "detalheProgramacoes", void 0);
     Produto = __decorate([

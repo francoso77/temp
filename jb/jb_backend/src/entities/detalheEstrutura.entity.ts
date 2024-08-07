@@ -13,6 +13,7 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   @PrimaryColumn()
   idEstrutura: number;
 
+  @JoinColumn({ name: 'idEstrutura' })
   @ManyToOne(() => Estrutura, estrutura => estrutura.detalheEstruturas)
   estrutura: Estrutura;
 

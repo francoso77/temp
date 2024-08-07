@@ -33,12 +33,13 @@ var CrudController = /** @class */ (function () {
             sql: sql ? sql : ''
         });
     };
-    CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select) {
+    CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select, relations) {
         return new crud_controller_cls_1.default().pesquisar({
             entidade: entidade,
             criterio: criterio,
             camposLike: camposLike ? camposLike : [],
             select: select ? select : [],
+            relations: relations ? relations : [],
         });
     };
     CrudController.prototype.excluir = function (entidade, criterio) {
@@ -85,8 +86,10 @@ var CrudController = /** @class */ (function () {
         __param(1, (0, common_1.Body)("criterio")),
         __param(2, (0, common_1.Body)("camposLike")),
         __param(3, (0, common_1.Body)("select")),
+        __param(4, (0, common_1.Body)("relations")),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Object, Array,
+            Array,
             Array]),
         __metadata("design:returntype", Promise)
     ], CrudController.prototype, "pesquisar", null);

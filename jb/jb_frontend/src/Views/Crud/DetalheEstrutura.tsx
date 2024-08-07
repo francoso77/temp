@@ -31,20 +31,19 @@ interface DetalheInterface {
 }
 
 interface PropsInterface {
-  rsEstrutura: EstruturaInterface
-  rsDetalhe: DetalheEstruturaInterface[]
-  setDetalheState: React.Dispatch<React.SetStateAction<DetalheEstruturaInterface[]>>,
+  rsMaster: EstruturaInterface
+  setRsMaster: React.Dispatch<React.SetStateAction<EstruturaInterface>>,
 }
 
-export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheState }: PropsInterface) {
+export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
   const ResetDados: DetalheEstruturaInterface = {
-    idEstrutura: rsEstrutura.idEstrutura as number,
+    idEstrutura: null,
     idProduto: 0,
-    idCor: 0,
+    idCor: null,
     qtd: 0,
   }
 
@@ -53,14 +52,12 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface;
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
-  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEstruturaInterface>>([]);
   const [erros, setErros] = useState({});
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  // const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
   let query: string = ''
@@ -134,7 +131,7 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
     })
   }
   const btIncluir = () => {
-    if (rsEstrutura.idProduto !== 0 && rsEstrutura.idUnidade !== 0 && rsEstrutura.qtdBase !== 0) {
+    if (rsMaster.idProduto !== 0 && rsMaster.idUnidade !== 0 && rsMaster.qtdBase !== 0) {
       setOpen(true)
       BuscarDados()
       setDetalheEstrutura(ResetDados)
@@ -177,7 +174,7 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
   }
 
   const podeIncluirDetalhe = () => {
-    const indice = rsDetalhe.findIndex(
+    const indice = rsMaster.detalheEstruturas.findIndex(
       (i) => i.idProduto === detalheEstrutura.idProduto
     )
 
@@ -198,10 +195,10 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
 
   const testaSoma = (): boolean => {
     let somaQtd = 0.0
-    rsDetalhe.forEach((i) => somaQtd = somaQtd + i.qtd)
+    rsMaster.detalheEstruturas.forEach((i) => somaQtd = somaQtd + i.qtd)
     somaQtd = somaQtd + detalheEstrutura.qtd
 
-    if (somaQtd > rsEstrutura.qtdBase) {
+    if (somaQtd > rsMaster.qtdBase) {
       setMensagemState({
         titulo: 'Aviso',
         exibir: true,
@@ -221,21 +218,27 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
 
     if (validarDados() && podeIncluirDetalhe() && testaSoma()) {
 
-      rsDetalhe.push({
-        idEstrutura: detalheEstrutura.idEstrutura,
-        idProduto: detalheEstrutura.idProduto,
-        idCor: detalheEstrutura.idCor,
-        qtd: detalheEstrutura.qtd,
-      })
-      // console.log('entrou aqui')
-      // setRsDetalheEstrutura([...rsDetalheEstrutura, {
+      // rsDetalhe.push({
       //   idEstrutura: detalheEstrutura.idEstrutura,
       //   idProduto: detalheEstrutura.idProduto,
       //   idCor: detalheEstrutura.idCor,
       //   qtd: detalheEstrutura.qtd,
-      // },
-      // ])
-      console.log(rsDetalhe)
+      // })
+      // console.log('entrou aqui')
+      setRsMaster({
+        ...rsMaster, detalheEstruturas:
+          [
+            ...rsMaster.detalheEstruturas,
+            {
+              idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
+              idProduto: detalheEstrutura.idProduto,
+              idCor: detalheEstrutura.idCor,
+              qtd: detalheEstrutura.qtd,
+            }
+          ]
+      })
+
+      console.log(rsMaster)
       setOpen(false)
     }
     // if (detalheEstrutura.idCor) {
@@ -356,33 +359,33 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
   }
 
   const btPesquisar = () => {
-    query = `
-    SELECT 
-        de.*,
-        p.nome AS nomeProduto,
-        c.nome AS nomeCor
-    FROM 
-        detalheestruturas de
-    INNER JOIN 
-        estruturas e ON e.idEstrutura = de.idEstrutura
-    INNER JOIN 
-        produtos p ON p.idProduto = de.idProduto
-    INNER JOIN 
-        cores c ON c.idCor = de.idCor
-    WHERE 
-        de.idEstrutura = ${rsEstrutura.idEstrutura};
-    `;
-    clsCrud
-      .query({
-        entidade: "Estrutura",
-        sql: query,
-        msg: 'Pesquisando Estruturas ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        // setRsPesquisa(rs)
-        setDetalheState(rs)
-      })
+    // query = `
+    // SELECT 
+    //     de.*,
+    //     p.nome AS nomeProduto,
+    //     c.nome AS nomeCor
+    // FROM 
+    //     detalheestruturas de
+    // INNER JOIN 
+    //     estruturas e ON e.idEstrutura = de.idEstrutura
+    // INNER JOIN 
+    //     produtos p ON p.idProduto = de.idProduto
+    // INNER JOIN 
+    //     cores c ON c.idCor = de.idCor
+    // WHERE 
+    //     de.idEstrutura = ${rsMaster.idEstrutura};
+    // `;
+    // clsCrud
+    //   .query({
+    //     entidade: "Estrutura",
+    //     sql: query,
+    //     msg: 'Pesquisando Estruturas ...',
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs: Array<any>) => {
+    //     // setRsPesquisa(rs)
+    //     setRsMaster(rs)
+    //   })
   }
 
   const BuscarDados = () => {
@@ -392,7 +395,7 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
       FROM 
           produtos p
       WHERE 
-          p.idProduto <> ${rsEstrutura.idProduto}
+          p.idProduto <> ${rsMaster.idProduto}
       ORDER BY p.nome ASC;
       `;
     clsCrud
@@ -430,7 +433,7 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
   }
 
   useEffect(() => {
-    if (rsEstrutura.idEstrutura !== undefined) {
+    if (rsMaster.idEstrutura !== undefined) {
 
       btPesquisar()
     }
@@ -570,7 +573,7 @@ export default function DetalheEstrutura({ rsEstrutura, rsDetalhe, setDetalheSta
             temTotal={true}
             qtdColunas={2}
             cabecalho={cabecalhoForm}
-            dados={rsDetalhe}
+            dados={rsMaster.detalheEstruturas}
             // acoes={[
             //   {
             //     icone: "edit",

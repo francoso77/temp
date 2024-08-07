@@ -43,7 +43,8 @@ var Estrutura = /** @class */ (function () {
         __metadata("design:type", produto_entity_1.default)
     ], Estrutura.prototype, "produto", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheEstrutura_entity_1.default; }, function (detalheEstrutura) { return detalheEstrutura.estrutura; }),
+        (0, typeorm_1.JoinColumn)({ name: "idEstrutura" }),
+        (0, typeorm_1.OneToMany)(function () { return detalheEstrutura_entity_1.default; }, function (detalheEstrutura) { return detalheEstrutura.estrutura; }, { cascade: true, eager: true }),
         __metadata("design:type", Array)
     ], Estrutura.prototype, "detalheEstruturas", void 0);
     Estrutura = __decorate([
