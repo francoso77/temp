@@ -44,6 +44,14 @@ var Entrada = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) { return detalheEntrada.entrada; }),
         __metadata("design:type", Array)
     ], Entrada.prototype, "detalheEntradas", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Entrada.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Entrada.prototype, "updateAD", void 0);
     Entrada = __decorate([
         (0, typeorm_1.Entity)({ name: 'entradas' })
     ], Entrada);

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UserInterface } from '../interfaces/userInterface';
 
 @Entity({ name: 'users' })
@@ -24,4 +24,9 @@ export class User implements UserInterface {
   @Column({ nullable: true })
   ativo: boolean
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { DetalheTinturariaInterface } from '../interfaces/tinturariaInterface';
 import Tinturaria from './tinturaria.entity';
 import ProducaoMalharia from './producaoMalharia.entity';
@@ -22,4 +22,9 @@ export default class DetalheTinturaria implements DetalheTinturariaInterface {
   @ManyToOne(() => ProducaoMalharia, (produtoMalharia) => produtoMalharia.detalheTinturarias)
   peca: ProducaoMalharia
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

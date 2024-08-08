@@ -64,6 +64,14 @@ var Pedido = /** @class */ (function () {
         (0, typeorm_1.Column)({ length: 1 }),
         __metadata("design:type", String)
     ], Pedido.prototype, "statusPedido", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Pedido.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Pedido.prototype, "updateAD", void 0);
     Pedido = __decorate([
         (0, typeorm_1.Entity)({ name: 'pedidos' })
     ], Pedido);

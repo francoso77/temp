@@ -35,7 +35,7 @@ var DetalheEstrutura = /** @class */ (function () {
     ], DetalheEstrutura.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.estruturas; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], DetalheEstrutura.prototype, "produto", void 0);
     __decorate([
@@ -44,13 +44,21 @@ var DetalheEstrutura = /** @class */ (function () {
     ], DetalheEstrutura.prototype, "idCor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idCor' }),
-        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }, function (cor) { return cor.corDetalheEstruturas; }),
+        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }),
         __metadata("design:type", cor_entity_1.default)
     ], DetalheEstrutura.prototype, "cor", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "qtd", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheEstrutura.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheEstrutura.prototype, "updateAD", void 0);
     DetalheEstrutura = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalheestruturas' })
     ], DetalheEstrutura);

@@ -41,6 +41,14 @@ var User = /** @class */ (function () {
         (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Boolean)
     ], User.prototype, "ativo", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], User.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], User.prototype, "updateAD", void 0);
     User = __decorate([
         (0, typeorm_1.Entity)({ name: 'users' })
     ], User);

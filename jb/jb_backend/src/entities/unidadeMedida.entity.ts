@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UnidadeMedidaInterface } from '../interfaces/unidadeMedidaInteface';
 import Produto from './produto.entity';
 import Estrutura from './estrutura.entity';
@@ -15,10 +15,14 @@ export default class UnidadeMedida implements UnidadeMedidaInterface {
   @Column({ length: 35 })
   nome: string
 
-  @OneToMany(() => Produto, (produto) => produto.unidadeMedida)
+  @JoinColumn({ name: 'idUnidade' })
+  @OneToMany(() => Produto, (produto) =>
+    produto.unidadeMedida, { cascade: true })
   produtos: Produto[]
 
-  @OneToMany(() => Estrutura, (estrutura) => estrutura.unidadeMedida)
-  estruturas: Estrutura[]
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
 
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

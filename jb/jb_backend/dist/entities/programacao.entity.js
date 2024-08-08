@@ -54,6 +54,14 @@ var Programacao = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) { return detalheProgramacao.programacao; }),
         __metadata("design:type", Array)
     ], Programacao.prototype, "detalheProgramacoes", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Programacao.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Programacao.prototype, "updateAD", void 0);
     Programacao = __decorate([
         (0, typeorm_1.Entity)({ name: 'programacoes' })
     ], Programacao);

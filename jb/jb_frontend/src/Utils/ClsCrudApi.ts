@@ -100,6 +100,7 @@ export default class ClsCrud {
     criterio,
     camposLike,
     select,
+    relations,
     msg = 'Pesquisando...',
     cb,
     setMensagemState
@@ -109,6 +110,7 @@ export default class ClsCrud {
       criterio: criterio,
       camposLike: camposLike,
       select: select,
+      relations: relations,
     }
 
     const config: AxiosRequestConfig = {

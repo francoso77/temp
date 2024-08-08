@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { ProducaoMalhariaInterface } from '../interfaces/producaoMalhariaInterface';
 import Maquina from './maquina.entity';
@@ -69,4 +69,9 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   @OneToMany(() => DetalheTinturaria, (detalheTinturaria) => detalheTinturaria.peca)
   detalheTinturarias: DetalheTinturaria[]
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

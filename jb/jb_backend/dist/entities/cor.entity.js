@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var estoque_entity_1 = require("./estoque.entity");
-var detalheEstrutura_entity_1 = require("./detalheEstrutura.entity");
 var detalheProgramacao_entity_1 = require("./detalheProgramacao.entity");
 var Cor = /** @class */ (function () {
     function Cor() {
@@ -26,21 +25,34 @@ var Cor = /** @class */ (function () {
         __metadata("design:type", String)
     ], Cor.prototype, "nome", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) { return detalheEntrada.cor; }),
+        (0, typeorm_1.JoinColumn)({ name: "idCor" }),
+        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) {
+            return detalheEntrada.cor;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Cor.prototype, "corDetalheEntradas", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheEstrutura_entity_1.default; }, function (detalheEstrutura) { return detalheEstrutura.cor; }),
-        __metadata("design:type", Array)
-    ], Cor.prototype, "corDetalheEstruturas", void 0);
-    __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) { return detalheProgramacao.cor; }),
+        (0, typeorm_1.JoinColumn)({ name: "idCor" }),
+        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) {
+            return detalheProgramacao.cor;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Cor.prototype, "corDetalheProgramacoes", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) { return estoque.cor; }),
+        (0, typeorm_1.JoinColumn)({ name: "idCor" }),
+        (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) {
+            return estoque.cor;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Cor.prototype, "corEstoques", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Cor.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Cor.prototype, "updateAD", void 0);
     Cor = __decorate([
         (0, typeorm_1.Entity)({ name: 'cores' })
     ], Cor);

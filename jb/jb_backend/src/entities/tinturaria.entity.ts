@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { TinturariaInterface } from '../interfaces/tinturariaInterface';
 import DetalheTinturaria from './detalheTinturaria.entity';
@@ -30,15 +30,26 @@ export default class Tinturaria implements TinturariaInterface {
   fornecedor: Pessoa
 
   @OneToMany(() => DetalheTinturaria, detalheTinturaria => detalheTinturaria.tinturaria)
-  detalheTinturarias: DetalheTinturaria[];
+  detalheTinturarias: DetalheTinturaria[]
 
-  @OneToMany(() => ProducaoMalharia, ProducaoMalharia => ProducaoMalharia.tinturaria)
-  producaoMalharias: ProducaoMalharia[];
+  @JoinColumn({ name: 'idTinturaria' })
+  @OneToMany(() => ProducaoMalharia, ProducaoMalharia =>
+    ProducaoMalharia.tinturaria, { cascade: true })
+  producaoMalharias: ProducaoMalharia[]
 
-  @OneToMany(() => Programacao, programacao => programacao.tinturaria)
-  programacoes: Programacao[];
+  @JoinColumn({ name: 'idTinturaria' })
+  @OneToMany(() => Programacao, programacao =>
+    programacao.tinturaria, { cascade: true })
+  programacoes: Programacao[]
 
-  @OneToMany(() => DetalheEntrada, detalheEntrada => detalheEntrada.romaneio)
-  romaneioDetalheEntradas: DetalheEntrada[];
+  @JoinColumn({ name: 'idTinturaria' })
+  @OneToMany(() => DetalheEntrada, detalheEntrada =>
+    detalheEntrada.romaneio, { cascade: true })
+  romaneioDetalheEntradas: DetalheEntrada[]
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

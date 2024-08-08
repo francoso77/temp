@@ -49,17 +49,34 @@ var Tinturaria = /** @class */ (function () {
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "detalheTinturarias", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (ProducaoMalharia) { return ProducaoMalharia.tinturaria; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
+        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (ProducaoMalharia) {
+            return ProducaoMalharia.tinturaria;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "producaoMalharias", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return programacao_entity_1.default; }, function (programacao) { return programacao.tinturaria; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
+        (0, typeorm_1.OneToMany)(function () { return programacao_entity_1.default; }, function (programacao) {
+            return programacao.tinturaria;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "programacoes", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) { return detalheEntrada.romaneio; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
+        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) {
+            return detalheEntrada.romaneio;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "romaneioDetalheEntradas", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Tinturaria.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Tinturaria.prototype, "updateAD", void 0);
     Tinturaria = __decorate([
         (0, typeorm_1.Entity)({ name: 'tinturarias' })
     ], Tinturaria);

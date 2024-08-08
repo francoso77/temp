@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PessoaInterface } from '../interfaces/pessoaInterface';
 import { PessoaType } from '../types/pessoaTypes';
 import { Length } from 'class-validator';
@@ -62,33 +62,59 @@ export default class Pessoa implements PessoaInterface {
   @Column()
   ativo: boolean
 
-  @OneToMany(() => DetalheEntrada, (detalheEntrada) => detalheEntrada.revisador)
+  @JoinColumn({ name: 'idPessoa_revisador' })
+  @OneToMany(() => DetalheEntrada, (detalheEntrada) =>
+    detalheEntrada.revisador, { cascade: true })
   revisadorDetalheEntradas: DetalheEntrada[]
 
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) => producaoMalharia.revisador)
+  @JoinColumn({ name: 'idPessoa_revisador' })
+  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
+    producaoMalharia.revisador, { cascade: true })
   revisadorProducaoMalharias: ProducaoMalharia[]
 
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) => producaoMalharia.tecelao)
+  @JoinColumn({ name: 'idPessoaTecelao' })
+  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
+    producaoMalharia.tecelao, { cascade: true })
   tecelaoProducaoMalharias: ProducaoMalharia[]
 
-  @OneToMany(() => Pedido, (pedido) => pedido.cliente)
+  @JoinColumn({ name: 'idPessoa_cliente' })
+  @OneToMany(() => Pedido, (pedido) =>
+    pedido.cliente, { cascade: true })
   clientePedidos: Pedido[]
 
-  @OneToMany(() => Pedido, (pedido) => pedido.vendedor)
+  @JoinColumn({ name: 'idPessoa_vendedor' })
+  @OneToMany(() => Pedido, (pedido) =>
+    pedido.vendedor, { cascade: true })
   vendedorPedidos: Pedido[]
 
-  @OneToMany(() => Entrada, (entrada) => entrada.fornecedor)
+  @JoinColumn({ name: 'idPessoa_fornecedor' })
+  @OneToMany(() => Entrada, (entrada) =>
+    entrada.fornecedor, { cascade: true })
   fornecedorEntradas: Pedido[]
 
-  @OneToMany(() => Tinturaria, (tinturaria) => tinturaria.cliente)
+  @JoinColumn({ name: 'idPessoa_cliente' })
+  @OneToMany(() => Tinturaria, (tinturaria) =>
+    tinturaria.cliente, { cascade: true })
   clienteTinturarias: Tinturaria[]
 
-  @OneToMany(() => Programacao, (programacao) => programacao.cliente)
+  @JoinColumn({ name: 'idPessoa_cliente' })
+  @OneToMany(() => Programacao, (programacao) =>
+    programacao.cliente, { cascade: true })
   clienteProgramacoes: Programacao[]
 
-  @OneToMany(() => Tinturaria, (tinturaria) => tinturaria.fornecedor)
+  @JoinColumn({ name: 'idPessoa_fornecedor' })
+  @OneToMany(() => Tinturaria, (tinturaria) =>
+    tinturaria.fornecedor, { cascade: true })
   fornecedorTinturarias: Tinturaria[]
 
-  @OneToMany(() => Estoque, (estoque) => estoque.fornecedor)
+  @JoinColumn({ name: 'idPessoa_fornecedor' })
+  @OneToMany(() => Estoque, (estoque) =>
+    estoque.fornecedor, { cascade: true })
   fornecedorEstoques: Estoque[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

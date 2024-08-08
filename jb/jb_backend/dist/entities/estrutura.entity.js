@@ -26,7 +26,7 @@ var Estrutura = /** @class */ (function () {
     ], Estrutura.prototype, "idUnidade", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idUnidade' }),
-        (0, typeorm_1.ManyToOne)(function () { return unidadeMedida_entity_1.default; }, function (unidadeMedida) { return unidadeMedida.estruturas; }),
+        (0, typeorm_1.ManyToOne)(function () { return unidadeMedida_entity_1.default; }),
         __metadata("design:type", unidadeMedida_entity_1.default)
     ], Estrutura.prototype, "unidadeMedida", void 0);
     __decorate([
@@ -39,14 +39,22 @@ var Estrutura = /** @class */ (function () {
     ], Estrutura.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.estruturas; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], Estrutura.prototype, "produto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: "idEstrutura" }),
-        (0, typeorm_1.OneToMany)(function () { return detalheEstrutura_entity_1.default; }, function (detalheEstrutura) { return detalheEstrutura.estrutura; }, { cascade: true, eager: true }),
+        (0, typeorm_1.OneToMany)(function () { return detalheEstrutura_entity_1.default; }, function (detalheEstrutura) { return detalheEstrutura.estrutura; }, { cascade: true }),
         __metadata("design:type", Array)
     ], Estrutura.prototype, "detalheEstruturas", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Estrutura.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Estrutura.prototype, "updateAD", void 0);
     Estrutura = __decorate([
         (0, typeorm_1.Entity)({ name: 'estruturas' })
     ], Estrutura);

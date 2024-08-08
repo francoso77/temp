@@ -94,6 +94,14 @@ var DetalheEntrada = /** @class */ (function () {
         (0, typeorm_1.Column)({ type: 'float', precision: 4, nullable: true }),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "perdaTinturaria", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheEntrada.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheEntrada.prototype, "updateAD", void 0);
     DetalheEntrada = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalheentradas' })
     ], DetalheEntrada);

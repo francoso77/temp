@@ -53,6 +53,14 @@ var DetalhePedido = /** @class */ (function () {
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "statusItem", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalhePedido.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalhePedido.prototype, "updateAD", void 0);
     DetalhePedido = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalhepedidos' })
     ], DetalhePedido);

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { MaquinaInterface } from '../interfaces/maquinaInterface';
 import ProducaoMalharia from './producaoMalharia.entity';
 
@@ -53,6 +53,14 @@ export default class Maquina implements MaquinaInterface {
   @Column({ nullable: false })
   ativo: boolean
 
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) => producaoMalharia.maquina)
+  @JoinColumn({ name: 'idMaquina' })
+  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
+    producaoMalharia.maquina, { cascade: true })
   ProducaoMalharias: ProducaoMalharia[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

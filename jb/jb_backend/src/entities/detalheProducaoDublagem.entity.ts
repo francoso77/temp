@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import ProducaoDublagem from './producaoDublagem.entity';
 import Produto from './produto.entity';
 import { DetalheProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
@@ -25,4 +25,9 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   @Column({ type: 'float', precision: 4 })
   metro: number
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

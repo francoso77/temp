@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
 import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
@@ -33,5 +33,11 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   qtdAtendida: number
 
   @Column()
-  statusItem: StatusPedidoItemType;
+  statusItem: StatusPedidoItemType
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

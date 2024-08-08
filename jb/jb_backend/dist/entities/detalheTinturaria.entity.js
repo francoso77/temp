@@ -36,6 +36,14 @@ var DetalheTinturaria = /** @class */ (function () {
         (0, typeorm_1.ManyToOne)(function () { return producaoMalharia_entity_1.default; }, function (produtoMalharia) { return produtoMalharia.detalheTinturarias; }),
         __metadata("design:type", producaoMalharia_entity_1.default)
     ], DetalheTinturaria.prototype, "peca", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheTinturaria.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheTinturaria.prototype, "updateAD", void 0);
     DetalheTinturaria = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalhetinturarias' })
     ], DetalheTinturaria);

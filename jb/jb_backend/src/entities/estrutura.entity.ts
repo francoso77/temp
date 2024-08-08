@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { EstruturaInterface } from '../interfaces/estruturaInterface';
 import Produto from './produto.entity';
 import DetalheEstrutura from './detalheEstrutura.entity';
@@ -14,7 +14,7 @@ export default class Estrutura implements EstruturaInterface {
   idUnidade: number
 
   @JoinColumn({ name: 'idUnidade' })
-  @ManyToOne(() => UnidadeMedida, (unidadeMedida) => unidadeMedida.estruturas)
+  @ManyToOne(() => UnidadeMedida)
   unidadeMedida: UnidadeMedida
 
   @Column({ type: 'float', precision: 2 })
@@ -24,11 +24,17 @@ export default class Estrutura implements EstruturaInterface {
   idProduto: number
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.estruturas)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @JoinColumn({ name: "idEstrutura" })
   @OneToMany(() => DetalheEstrutura,
-    detalheEstrutura => detalheEstrutura.estrutura, { cascade: true, eager: true })
-  detalheEstruturas: DetalheEstrutura[];
+    detalheEstrutura => detalheEstrutura.estrutura, { cascade: true })
+  detalheEstruturas: DetalheEstrutura[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

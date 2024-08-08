@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { DetalheProgramacaoInterface } from '../interfaces/programacaoInterface';
 import Programacao from './programacao.entity';
 import Produto from './produto.entity';
@@ -41,4 +41,10 @@ export default class DetalheProgramacao implements DetalheProgramacaoInterface {
 
   @Column({ type: 'int' })
   qtdPeca: number
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { ProgramacaoInterface } from '../interfaces/programacaoInterface';
 import Tinturaria from './tinturaria.entity';
@@ -34,6 +34,12 @@ export default class Programacao implements ProgramacaoInterface {
   cliente: Pessoa
 
   @OneToMany(() => DetalheProgramacao, detalheProgramacao => detalheProgramacao.programacao)
-  detalheProgramacoes: DetalheProgramacao[];
+  detalheProgramacoes: DetalheProgramacao[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 
 }

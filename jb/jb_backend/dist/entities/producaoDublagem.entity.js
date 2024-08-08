@@ -35,6 +35,14 @@ var ProducaoDublagem = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) { return detalheProducaoDublagem.ProducaoDublagem; }),
         __metadata("design:type", Array)
     ], ProducaoDublagem.prototype, "detalheProducaoDublagens", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], ProducaoDublagem.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], ProducaoDublagem.prototype, "updateAD", void 0);
     ProducaoDublagem = __decorate([
         (0, typeorm_1.Entity)({ name: 'producaodublagens' })
     ], ProducaoDublagem);

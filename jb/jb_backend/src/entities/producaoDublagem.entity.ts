@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
 import { ProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
 import { TipoColagemType } from '../types/tipoColagemTypes';
@@ -19,5 +19,11 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   qtdColagem: number
 
   @OneToMany(() => DetalheProducaoDublagem, detalheProducaoDublagem => detalheProducaoDublagem.ProducaoDublagem)
-  detalheProducaoDublagens: DetalheProducaoDublagem[];
+  detalheProducaoDublagens: DetalheProducaoDublagem[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

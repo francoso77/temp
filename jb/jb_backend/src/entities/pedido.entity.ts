@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PedidoInterface } from '../interfaces/pedidoInterface';
 import { StatusPedidoType } from '../types/statusPedidoTypes';
 import PrazoEntrega from './prazoEntrega.entity';
@@ -39,8 +39,14 @@ export default class Pedido implements PedidoInterface {
   vendedor: Pessoa
 
   @OneToMany(() => DetalhePedido, detalhePedido => detalhePedido.pedido)
-  detalhesPedido: DetalhePedido[];
+  detalhesPedido: DetalhePedido[]
 
   @Column({ length: 1 })
-  statusPedido: StatusPedidoType;
+  statusPedido: StatusPedidoType
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

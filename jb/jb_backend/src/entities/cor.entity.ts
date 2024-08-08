@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { CorInterface } from '../interfaces/corInteface';
 import DetalheEntrada from './detalheEntrada.entity';
 import Estoque from './estoque.entity';
@@ -14,15 +14,24 @@ export default class Cor implements CorInterface {
   @Column({ length: 35 })
   nome: string
 
-  @OneToMany(() => DetalheEntrada, (detalheEntrada) => detalheEntrada.cor)
+  @JoinColumn({ name: "idCor" })
+  @OneToMany(() => DetalheEntrada, (detalheEntrada) =>
+    detalheEntrada.cor, { cascade: true })
   corDetalheEntradas: DetalheEntrada[]
 
-  @OneToMany(() => DetalheEstrutura, (detalheEstrutura) => detalheEstrutura.cor)
-  corDetalheEstruturas: DetalheEstrutura[]
-
-  @OneToMany(() => DetalheProgramacao, (detalheProgramacao) => detalheProgramacao.cor)
+  @JoinColumn({ name: "idCor" })
+  @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>
+    detalheProgramacao.cor, { cascade: true })
   corDetalheProgramacoes: DetalheProgramacao[]
 
-  @OneToMany(() => Estoque, (estoque) => estoque.cor)
+  @JoinColumn({ name: "idCor" })
+  @OneToMany(() => Estoque, (estoque) =>
+    estoque.cor, { cascade: true })
   corEstoques: Estoque[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date;
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date;
 }

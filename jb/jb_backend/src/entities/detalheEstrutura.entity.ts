@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import Estrutura from './estrutura.entity';
 import Produto from './produto.entity';
 import { DetalheEstruturaInterface } from '../interfaces/estruturaInterface';
@@ -21,16 +21,22 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.estruturas)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @Column({ nullable: true })
   idCor: number;
 
   @JoinColumn({ name: 'idCor' })
-  @ManyToOne(() => Cor, (cor) => cor.corDetalheEstruturas)
+  @ManyToOne(() => Cor)
   cor: Cor
 
   @Column({ type: 'float', precision: 4 })
   qtd: number
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

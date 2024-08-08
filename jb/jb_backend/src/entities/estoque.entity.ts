@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { EstoqueInterface } from '../interfaces/estoqueInterface';
 import Produto from './produto.entity';
@@ -34,4 +34,9 @@ export default class Estoque implements EstoqueInterface {
   @ManyToOne(() => Cor, (cor) => cor.corEstoques)
   cor: Cor
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

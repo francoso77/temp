@@ -79,9 +79,20 @@ var Maquina = /** @class */ (function () {
         __metadata("design:type", Boolean)
     ], Maquina.prototype, "ativo", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) { return producaoMalharia.maquina; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idMaquina' }),
+        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
+            return producaoMalharia.maquina;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Maquina.prototype, "ProducaoMalharias", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Maquina.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Maquina.prototype, "updateAD", void 0);
     Maquina = __decorate([
         (0, typeorm_1.Entity)({ name: 'maquinas' })
     ], Maquina);

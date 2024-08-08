@@ -57,12 +57,14 @@ export default function Estrutura() {
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'produto_nome'
+      campo: 'idProduto',
+      format: (_v, rs: any) => rs.produto.nome
     },
     {
       cabecalho: 'Unidade',
       alinhamento: 'left',
-      campo: 'unidadeMedida_sigla',
+      campo: 'idUnidade',
+      format: (_v, rs: any) => rs.unidadeMedida.sigla
     },
     {
       cabecalho: 'Qtd Base',
@@ -84,6 +86,13 @@ export default function Estrutura() {
     return clsCrud
       .pesquisar({
         entidade: "Estrutura",
+        relations: [
+          "produto",
+          "unidadeMedida",
+          "detalheEstruturas",
+          "detalheEstruturas.produto",
+          "detalheEstruturas.cor"
+        ],
         criterio: {
           idEstrutura: id,
         },
@@ -94,6 +103,7 @@ export default function Estrutura() {
   }
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      console.log(rs)
       setEstrutura(rs)
       setLocalState({ action: actionTypes.editando })
     })
@@ -246,16 +256,21 @@ export default function Estrutura() {
     clsCrud
       .pesquisar({
         entidade: "Estrutura",
-        relations: ["detalheEstruturas", "produto", "unidadeMedida"],
+        relations: [
+          "produto",
+          "unidadeMedida",
+          "detalheEstruturas",
+          "detalheEstruturas.produto",
+          "detalheEstruturas.cor"
+        ],
         criterio: {
           idEstrutura: "%".concat(pesquisa.nome).concat("%"),
         },
         camposLike: ["idEstrutura"],
-        msg: 'Pesquisando máquinas ...',
+        msg: 'Pesquisando estruturas ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
-        console.log('qual rs veio: ', JSON.stringify(rs), rs)
         setRsPesquisa(rs)
       })
     // const query = `

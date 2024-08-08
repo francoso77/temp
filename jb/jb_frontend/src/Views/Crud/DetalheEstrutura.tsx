@@ -21,18 +21,19 @@ import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoI
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 
-interface DetalheInterface {
-  idEstrutura: 0,
-  idProduto: 0,
-  nomeProduto: "",
-  idCor: 0,
-  nomeCor: "",
-  qtd: 0,
-}
 
 interface PropsInterface {
   rsMaster: EstruturaInterface
   setRsMaster: React.Dispatch<React.SetStateAction<EstruturaInterface>>,
+}
+
+interface DetalheInterface {
+  idEstrutura: null,
+  idProduto: 0,
+  nomeProduto: '',
+  idCor: null,
+  nomeCor: '',
+  qtd: 0,
 }
 
 export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterface) {
@@ -56,24 +57,27 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
+  const [rsDetalhe, setRsDetalhe] = useState<Array<any>>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
   let query: string = ''
+  let nomeProduto: string = ''
+  let nomeCor: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'idProduto',
-      // format: (produtos) => rsProduto.find(produtos => produtos.idProduto === detalheEstrutura.idProduto)?.nome
+      campo: 'nomeProduto',
+      // format: (_v, rs: any) => rs.produto.nome
     },
     {
       cabecalho: 'Cor',
       alinhamento: 'left',
-      campo: 'idCor',
-      // format: (cores) => rsCor.find(cores => cores.idCor === detalheEstrutura.idCor)?.nome
+      campo: 'nomeCor',
+      // format: (_v, rs: any) => rs.idCor === null ? 'sem cor' : rs.cor.nome
     },
     {
       cabecalho: 'Qtd',
@@ -158,7 +162,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     let auxTipo: number | undefined = rsProduto.
       find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
     setTipo(auxTipo)
-    console.log(auxTipo)
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -213,152 +216,65 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     }
   }
   const btConfirmar = () => {
-    // console.log('teste do testaSoma: ', testaSoma())
-    // console.log('teste do pode incluir: ', podeIncluirDetalhe())
 
     if (validarDados() && podeIncluirDetalhe() && testaSoma()) {
-
-      // rsDetalhe.push({
-      //   idEstrutura: detalheEstrutura.idEstrutura,
-      //   idProduto: detalheEstrutura.idProduto,
-      //   idCor: detalheEstrutura.idCor,
-      //   qtd: detalheEstrutura.qtd,
+      // setRsMaster({
+      //   ...rsMaster, detalheEstruturas:
+      //     [
+      //       ...rsMaster.detalheEstruturas,
+      //       {
+      //         idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
+      //         idProduto: detalheEstrutura.idProduto,
+      //         idCor: detalheEstrutura.idCor,
+      //         qtd: detalheEstrutura.qtd,
+      //       }
+      //     ]
       // })
-      // console.log('entrou aqui')
-      setRsMaster({
-        ...rsMaster, detalheEstruturas:
-          [
-            ...rsMaster.detalheEstruturas,
-            {
-              idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
-              idProduto: detalheEstrutura.idProduto,
-              idCor: detalheEstrutura.idCor,
-              qtd: detalheEstrutura.qtd,
-            }
-          ]
-      })
 
-      console.log(rsMaster)
+      rsDetalhe.push({
+        idEstrutura: detalheEstrutura.idEstrutura,
+        idProduto: detalheEstrutura.idProduto,
+        idCor: detalheEstrutura.idCor,
+        qtd: detalheEstrutura.qtd,
+      })
+      console.log('entrou aqui')
       setOpen(false)
     }
-    // if (detalheEstrutura.idCor) {
-    //   query = `
-    //   SELECT 
-    //   de.*
-    //   FROM 
-    //   detalheestruturas de
-    //   WHERE 
-    //   de.idProduto = ${detalheEstrutura.idProduto}
-    //   and de.idCor = ${detalheEstrutura.idCor};
-    //   `;
-    // } else {
-    //   query = `
-    //   SELECT 
-    //   de.*
-    //   FROM 
-    //   detalheestruturas de
-    //   WHERE 
-    //   de.idProduto = ${detalheEstrutura.idProduto};
-    //   `;
-    // }
-
-    // clsCrud
-    //   .query({
-    //     entidade: "DetalheEstrutura",
-    //     sql: query,
-    //     setMensagemState: setMensagemState,
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     if (rs.length > 0 && localState.action === actionTypes.incluindo) {
-    //       setMensagemState({
-    //         titulo: 'Erro...',
-    //         exibir: true,
-    //         mensagem: 'Produto já cadastrado!',
-    //         tipo: MensagemTipo.Error,
-    //         exibirBotao: true,
-    //         cb: null
-    //       })
-    //     } else {
-
-    //       query = `
-    //       SELECT de.idEstrutura, e.qtdBase, SUM(qtd) AS T
-    //       FROM detalheestruturas de
-    //       INNER JOIN estruturas e ON e.idEstrutura = de.idEstrutura
-    //       GROUP BY de.idEstrutura, e.qtdBase
-    //       HAVING (((SUM(de.qtd) + ${detalheEstrutura.qtd}) <= e.qtdBase));
-    //       `;
-
-    //       clsCrud
-    //         .query({
-    //           entidade: "DetalheEstrutura",
-    //           sql: query,
-    //           setMensagemState: setMensagemState,
-    //         })
-    //         .then((rs: Array<any>) => {
-    //           if (rs.length === 0 && localState.action === actionTypes.incluindo) {
-    //             setMensagemState({
-    //               titulo: 'Erro...',
-    //               exibir: true,
-    //               mensagem: 'A quantidade total da composição deve ser menor que a quantidade base informada!',
-    //               tipo: MensagemTipo.Error,
-    //               exibirBotao: true,
-    //               cb: null
-    //             })
-    //           } else if (validarDados()) {
-
-    //             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-    //               clsCrud.incluir({
-    //                 entidade: "DetalheEstrutura",
-    //                 criterio: detalheEstrutura,
-    //                 localState: localState.action,
-    //                 cb: () => btPesquisar(),
-    //                 setMensagemState: setMensagemState
-    //               })
-    //                 .then((rs) => {
-    //                   if (rs.ok) {
-    //                     setLocalState({ action: actionTypes.pesquisando })
-    //                   } else {
-    //                     setMensagemState({
-    //                       titulo: 'Erro...',
-    //                       exibir: true,
-    //                       mensagem: 'Erro no cadastro - Consulte Suporte',
-    //                       tipo: MensagemTipo.Error,
-    //                       exibirBotao: true,
-    //                       cb: null
-    //                     })
-    //                   }
-    //                 })
-    //             } else if (localState.action === actionTypes.excluindo) {
-    //               clsCrud.excluir({
-    //                 entidade: "DetalheEstrutura",
-    //                 criterio: {
-    //                   idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
-    //                 },
-    //                 cb: () => btPesquisar(),
-    //                 setMensagemState: setMensagemState
-    //               })
-    //                 .then((rs) => {
-    //                   if (rs.ok) {
-    //                     setLocalState({ action: actionTypes.pesquisando })
-    //                   } else {
-    //                     setMensagemState({
-    //                       titulo: 'Erro...',
-    //                       exibir: true,
-    //                       mensagem: 'Erro no cadastro - Consulte Suporte',
-    //                       tipo: MensagemTipo.Error,
-    //                       exibirBotao: true,
-    //                       cb: null
-    //                     })
-    //                   }
-    //                 })
-    //             }
-    //           }
-    //         })
-    //     }
-    //   })
   }
 
   const btPesquisar = () => {
+
+    clsCrud
+      .pesquisar({
+        entidade: "DetalheEstrutura",
+        relations: ["produto", "cor"],
+        criterio: {
+          idEstrutura: rsMaster.idEstrutura,
+        },
+        camposLike: ["idEstrutura"],
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<any>) => {
+        let det: Array<DetalheInterface> = []
+        rs.forEach((x) => {
+
+          console.log('Produto: ', x.idProduto)
+          console.log('Nome Produto: ', x.produto.nome)
+          console.log('Cor: ', x.idCor)
+          console.log('Nome Cor: ', x.cor.nome)
+          console.log('Qtd: ', x.qtd)
+          det.push({
+            idEstrutura: x.idEstrutura,
+            nomeProduto: x.produto.nome,
+            idProduto: x.idProduto,
+            idCor: x.idCor,
+            nomeCor: x.idCor === null ? null : x.cor.nome,
+            qtd: x.qtd,
+          })
+
+        })
+        setRsDetalhe(det)
+      })
     // query = `
     // SELECT 
     //     de.*,
@@ -433,11 +349,8 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   }
 
   useEffect(() => {
-    if (rsMaster.idEstrutura !== undefined) {
+    btPesquisar()
 
-      btPesquisar()
-    }
-    // BuscarDados()
   }, [])
 
   return (
@@ -573,7 +486,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
             temTotal={true}
             qtdColunas={2}
             cabecalho={cabecalhoForm}
-            dados={rsMaster.detalheEstruturas}
+            dados={rsDetalhe}
             // acoes={[
             //   {
             //     icone: "edit",

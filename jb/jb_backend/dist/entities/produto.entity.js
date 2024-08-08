@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var estrutura_entity_1 = require("./estrutura.entity");
 var detalhePedido_entity_1 = require("./detalhePedido.entity");
 var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var unidadeMedida_entity_1 = require("./unidadeMedida.entity");
@@ -62,45 +61,52 @@ var Produto = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) {
             return detalheProducaoDublagem.produto;
-        }, { cascade: true, eager: true }),
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "producaoDublagens", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return estrutura_entity_1.default; }, function (estrutura) {
-            return estrutura.produto;
-        }, { cascade: true, eager: true }),
-        __metadata("design:type", Array)
-    ], Produto.prototype, "estruturas", void 0);
-    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return detalhePedido_entity_1.default; }, function (detalhePedido) {
             return detalhePedido.produto;
-        }, { cascade: true, eager: true }),
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "pedidos", void 0);
     __decorate([
+        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (entrada) {
             return entrada.produto;
-        }, { cascade: true, eager: true }),
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "entradas", void 0);
     __decorate([
+        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
             return producaoMalharia.produto;
-        }, { cascade: true, eager: true }),
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "producaoMalharias", void 0);
     __decorate([
+        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) {
             return estoque.produto;
-        }, { cascade: true, eager: true }),
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "estoques", void 0);
     __decorate([
+        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) {
             return detalheProgramacao.produto;
-        }, { cascade: true, eager: true }),
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "detalheProgramacoes", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Produto.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], Produto.prototype, "updateAD", void 0);
     Produto = __decorate([
         (0, typeorm_1.Entity)({ name: 'produtos' })
     ], Produto);

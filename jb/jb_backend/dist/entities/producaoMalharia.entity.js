@@ -96,6 +96,14 @@ var ProducaoMalharia = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return detalheTinturaria_entity_1.default; }, function (detalheTinturaria) { return detalheTinturaria.peca; }),
         __metadata("design:type", Array)
     ], ProducaoMalharia.prototype, "detalheTinturarias", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], ProducaoMalharia.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], ProducaoMalharia.prototype, "updateAD", void 0);
     ProducaoMalharia = __decorate([
         (0, typeorm_1.Entity)({ name: 'producaomalharia' })
     ], ProducaoMalharia);

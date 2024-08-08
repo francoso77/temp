@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { EntradaInterface } from '../interfaces/entradaInterface';
 import DetalheEntrada from './detalheEntrada.entity';
@@ -28,4 +28,9 @@ export default class Entrada implements EntradaInterface {
   @OneToMany(() => DetalheEntrada, detalheEntrada => detalheEntrada.entrada)
   detalheEntradas: DetalheEntrada[];
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

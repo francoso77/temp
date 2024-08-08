@@ -27,9 +27,20 @@ var PrazoEntrega = /** @class */ (function () {
         __metadata("design:type", String)
     ], PrazoEntrega.prototype, "dias", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return pedido_entity_1.default; }, function (pedido) { return pedido.prazoEntrega; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPrazoEntrega' }),
+        (0, typeorm_1.OneToMany)(function () { return pedido_entity_1.default; }, function (pedido) {
+            return pedido.prazoEntrega;
+        }, { cascade: true }),
         __metadata("design:type", Array)
     ], PrazoEntrega.prototype, "pedidos", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], PrazoEntrega.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], PrazoEntrega.prototype, "updateAD", void 0);
     PrazoEntrega = __decorate([
         (0, typeorm_1.Entity)({ name: 'prazoentregas' })
     ], PrazoEntrega);

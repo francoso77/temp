@@ -62,6 +62,14 @@ var DetalheProgramacao = /** @class */ (function () {
         (0, typeorm_1.Column)({ type: 'int' }),
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "qtdPeca", void 0);
+    __decorate([
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheProgramacao.prototype, "createAD", void 0);
+    __decorate([
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        __metadata("design:type", Date)
+    ], DetalheProgramacao.prototype, "updateAD", void 0);
     DetalheProgramacao = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalheprogramacoes' })
     ], DetalheProgramacao);

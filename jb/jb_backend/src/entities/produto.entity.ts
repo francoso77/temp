@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProdutoInterface } from '../interfaces/produtoInterface';
 import Estrutura from './estrutura.entity';
 import Pedido from './pedido.entity';
@@ -43,30 +43,37 @@ export default class Produto implements ProdutoInterface {
   tipoProduto: TipoProdutoType
 
   @OneToMany(() => DetalheProducaoDublagem, (detalheProducaoDublagem) =>
-    detalheProducaoDublagem.produto, { cascade: true, eager: true })
+    detalheProducaoDublagem.produto, { cascade: true })
   producaoDublagens: DetalheProducaoDublagem[]
 
-  @OneToMany(() => Estrutura, (estrutura) =>
-    estrutura.produto, { cascade: true, eager: true })
-  estruturas: Estrutura[]
-
+  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => DetalhePedido, (detalhePedido) =>
-    detalhePedido.produto, { cascade: true, eager: true })
+    detalhePedido.produto, { cascade: true })
   pedidos: Pedido[]
 
+  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => DetalheEntrada, (entrada) =>
-    entrada.produto, { cascade: true, eager: true })
+    entrada.produto, { cascade: true })
   entradas: DetalheEntrada[]
 
+  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
-    producaoMalharia.produto, { cascade: true, eager: true })
+    producaoMalharia.produto, { cascade: true })
   producaoMalharias: ProducaoMalharia[]
 
+  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => Estoque, (estoque) =>
-    estoque.produto, { cascade: true, eager: true })
+    estoque.produto, { cascade: true })
   estoques: Estoque[]
 
+  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>
-    detalheProgramacao.produto, { cascade: true, eager: true })
+    detalheProgramacao.produto, { cascade: true })
   detalheProgramacoes: DetalheProgramacao[]
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

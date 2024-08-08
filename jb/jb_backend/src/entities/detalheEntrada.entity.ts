@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import Produto from './produto.entity';
 import { DetalheEntradaInterface } from '../interfaces/entradaInterface';
 import Entrada from './entrada.entity';
@@ -66,4 +66,10 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
 
   @Column({ type: 'float', precision: 4, nullable: true })
   perdaTinturaria: number
+
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }

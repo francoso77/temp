@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PrazoEntregaInterface } from '../interfaces/prazoEntregaInterface';
 import Pedido from './pedido.entity';
 
@@ -14,7 +14,14 @@ export default class PrazoEntrega implements PrazoEntregaInterface {
   @Column({ length: 35 })
   dias: string
 
-  @OneToMany(() => Pedido, (pedido) => pedido.prazoEntrega)
+  @JoinColumn({ name: 'idPrazoEntrega' })
+  @OneToMany(() => Pedido, (pedido) =>
+    pedido.prazoEntrega, { cascade: true })
   pedidos: Pedido[]
 
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  createAD: Date
+
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  updateAD: Date
 }
