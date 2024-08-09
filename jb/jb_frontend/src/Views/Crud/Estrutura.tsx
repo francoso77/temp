@@ -149,6 +149,29 @@ export default function Estrutura() {
     return retorno
   }
 
+  const testaSoma = (): boolean => {
+    let somaQtd = 0.0
+    console.log('estrutura detalhe: ', estrutura.detalheEstruturas)
+
+    estrutura.detalheEstruturas.forEach((i) => {
+      console.log('quantidade...: ', i.idDetalheEstrutura, i.idProduto, i.qtd)
+      somaQtd = somaQtd + i.qtd
+    }
+    )
+    console.log('quantidade somada: ', somaQtd)
+    if (somaQtd < estrutura.qtdBase) {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'A soma das quantidades informadas deve ser igual Qtd Base.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
+    return somaQtd * 1.0 === estrutura.qtdBase * 1.0;
+  }
+
   const btConfirmar = () => {
 
     clsCrud
@@ -171,8 +194,8 @@ export default function Estrutura() {
             cb: null
           })
         } else {
-
-          if (validarDados()) {
+          console.log('resultado do teste da soma: ', testaSoma())
+          if (validarDados() && testaSoma()) {
 
             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
 
