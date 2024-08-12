@@ -1,7 +1,5 @@
 import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
@@ -14,7 +12,6 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
-import ShowText from '../../Componentes/ShowText';
 import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
@@ -67,6 +64,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   const [nomeProduto, setNomeProduto] = useState<string | undefined>('')
   const [nomeCor, setNomeCor] = useState<string | undefined>('')
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   let query: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -113,33 +111,34 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     return retorno
   }
 
-  const pesquisarID = (id: string | number): Promise<DetalheEstruturaInterface> => {
-    return clsCrud
-      .pesquisar({
-        entidade: "DetalheEstrutura",
-        criterio: {
-          idDetalheEstrutura: id,
-        },
-      })
-      .then((rs: Array<DetalheEstruturaInterface>) => {
-        return rs[0]
-      })
+  const pesquisarID = (id: string | number) => {
+
+    rsDetalhe.find((detalhe) => {
+      if (detalhe.idDetalheEstrutura === id) {
+        setDetalheEstrutura({
+          ...detalheEstrutura,
+          idEstrutura: detalhe.idEstrutura,
+          idDetalheEstrutura: detalhe.idDetalheEstrutura,
+          idProduto: detalhe.idProduto,
+          idCor: detalhe.idCor,
+          qtd: detalhe.qtd
+        })
+      }
+    })
   }
 
   const onEditar = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setDetalheEstrutura(rs)
-      setLocalState({ action: actionTypes.editando })
-      setOpen(true)
-    })
+    pesquisarID(id)
+    setLocalState({ action: actionTypes.editando })
+    setOpen(true)
   }
+
   const onExcluir = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setDetalheEstrutura(rs)
-      setLocalState({ action: actionTypes.excluindo })
-      setOpen(true)
-    })
+    pesquisarID(id)
+    setLocalState({ action: actionTypes.excluindo })
+    setOpen(true)
   }
+
   const btIncluir = () => {
     if (rsMaster.idProduto !== 0 && rsMaster.idUnidade !== 0 && rsMaster.qtdBase !== 0) {
       setOpen(true)
@@ -159,9 +158,9 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   }
   const btCancelar = () => {
     setOpen(false)
-    // setErros({})
-    // setDetalheEstrutura(ResetDados)
-    // setLocalState({ action: actionTypes.pesquisando })
+    setErros({})
+    setDetalheEstrutura(ResetDados)
+    setLocalState({ action: actionTypes.pesquisando })
   }
 
   const pegaTipo = () => {
@@ -208,34 +207,12 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     return indice < 0;
   }
 
-  const testaSoma = (): boolean => {
-    let somaQtd = detalheEstrutura.qtd
-
-    rsDetalhe.forEach((i) => {
-      somaQtd = somaQtd + i.qtd
-    })
-
-    if (somaQtd > rsMaster.qtdBase) {
-      setMensagemState({
-        titulo: 'Aviso',
-        exibir: true,
-        mensagem: 'A soma das quantidades informadas é de '.concat(somaQtd.toLocaleString()).concat('! A soma das quantidades deve ser menor ou igual a Qtd Base.'),
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
-    }
-    return somaQtd <= rsMaster.qtdBase;
-  }
-
   const btConfirmar = () => {
 
-    if (
+    if (localState.action === actionTypes.incluindo &&
       validarDados() &&
-      podeIncluirDetalhe() &&
-      testaSoma() &&
-      localState.action === actionTypes.incluindo) {
-
+      podeIncluirDetalhe()
+    ) {
       rsDetalhe.push({
         idEstrutura: detalheEstrutura.idEstrutura,
         idProduto: detalheEstrutura.idProduto,
@@ -245,51 +222,70 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
         qtd: detalheEstrutura.qtd,
       })
 
-      if (rsMaster.detalheEstruturas.length === 0) {
-        rsMaster.detalheEstruturas.push({
-          idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
-          idProduto: detalheEstrutura.idProduto,
-          idCor: detalheEstrutura.idCor,
-          qtd: detalheEstrutura.qtd,
-        })
-      } else {
+      setRsMaster({
+        ...rsMaster, detalheEstruturas:
+          [
+            ...rsMaster.detalheEstruturas,
+            {
+              idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
+              idProduto: detalheEstrutura.idProduto,
+              idCor: detalheEstrutura.idCor,
+              qtd: detalheEstrutura.qtd,
+            }
+          ]
+      })
 
+    } else if (localState.action === actionTypes.editando && validarDados()) {
+
+      rsDetalhe.find((item) => {
+        if (item.idProduto === detalheEstrutura.idProduto) {
+          item.qtd = detalheEstrutura.qtd
+        }
+      })
+
+      setRsMaster({
+        ...rsMaster,
+        detalheEstruturas: rsMaster.detalheEstruturas.map(detalhe =>
+          detalhe.idDetalheEstrutura === detalheEstrutura.idDetalheEstrutura
+            ? { ...detalhe, qtd: detalheEstrutura.qtd }
+            : detalhe
+        )
+      })
+
+    } else if (localState.action === actionTypes.excluindo) {
+
+      const index = rsDetalhe.findIndex(detalhe => detalhe.idDetalheEstrutura === detalheEstrutura.idDetalheEstrutura)
+
+      if (index !== -1) {
+        rsDetalhe.splice(index, 1)
         setRsMaster({
-          ...rsMaster, detalheEstruturas:
-            [
-              ...rsMaster.detalheEstruturas,
-              {
-                idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
-                idProduto: detalheEstrutura.idProduto,
-                idCor: detalheEstrutura.idCor,
-                qtd: detalheEstrutura.qtd,
-              }
-            ]
-        })
+          ...rsMaster,
+          detalheEstruturas: rsMaster.detalheEstruturas.filter(detalhe => detalhe.idDetalheEstrutura !== detalheEstrutura.idDetalheEstrutura)
+        });
       }
-    } else {
-      if (validarDados() && localState.action === actionTypes.editando) {
-
-        rsDetalhe.find((item) => {
-          if (item.idProduto === detalheEstrutura.idProduto) {
-            item.qtd = detalheEstrutura.qtd
+      clsCrud.excluir({
+        entidade: "DetalheEstrutura",
+        criterio: {
+          idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
+        },
+        cb: () => btPesquisar(),
+        setMensagemState: setMensagemState
+      })
+        .then((rs) => {
+          if (rs.ok) {
+            setLocalState({ action: actionTypes.pesquisando })
+          } else {
+            setMensagemState({
+              titulo: 'Erro...',
+              exibir: true,
+              mensagem: 'Erro no cadastro - Consulte Suporte',
+              tipo: MensagemTipo.Error,
+              exibirBotao: true,
+              cb: null
+            })
           }
         })
-      }
-      if (testaSoma()) {
-        setRsMaster({
-          ...rsMaster, detalheEstruturas:
-            [
-              ...rsMaster.detalheEstruturas,
-              {
-                // idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
-                // idProduto: detalheEstrutura.idProduto,
-                // idCor: detalheEstrutura.idCor,
-                qtd: detalheEstrutura.qtd,
-              }
-            ]
-        })
-      }
+
     }
     setOpen(false)
   }
@@ -352,18 +348,18 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
       })
   }
 
-  const irpara = useNavigate()
-  const btFechar = () => {
-    setOpen(false);
-    irpara('/Estrutura')
-    setLocalState({ action: actionTypes.pesquisando })
-    setLayoutState({
-      titulo: 'Estruturas de Produtos',
-      tituloAnterior: 'Composição de estrutura',
-      pathTitulo: '/Estrutura',
-      pathTituloAnterior: '/DetalheEstrutura'
-    })
-  }
+  // const irpara = useNavigate()
+  // const btFechar = () => {
+  //   setOpen(false);
+  //   irpara('/Estrutura')
+  //   setLocalState({ action: actionTypes.pesquisando })
+  //   setLayoutState({
+  //     titulo: 'Estruturas de Produtos',
+  //     tituloAnterior: 'Composição de estrutura',
+  //     pathTitulo: '/Estrutura',
+  //     pathTituloAnterior: '/DetalheEstrutura'
+  //   })
+  // }
 
   useEffect(() => {
     btPesquisar()
@@ -378,9 +374,16 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
         maxWidth: 'none',
         maxHeight: 'none',
       }}>
-        <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', m: 1, padding: 1.5 }}>
+        <Paper variant="outlined"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            m: 1,
+            p: 1.5,
+            backgroundColor: '#3c486b'
+          }}>
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
-            <Typography>
+            <Typography sx={{ color: 'white' }}>
               Item da estrutura do produto
             </Typography>
           </Grid>
@@ -405,7 +408,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
                       tipo === 10 ? (event) => btPulaCampo(event, 1)
                         : (event) => btPulaCampo(event, 2)
                     }
-                    autoFocus
                   />
                 </Box>
               </Grid>
@@ -425,6 +427,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
                       onSelect={pegaTipo}
                       onFocus={(e) => e.target.select()}
                       onKeyDown={(event) => btPulaCampo(event, 2)}
+                      autoFocus
                     />
                   </Box>
                 </Grid>
@@ -484,7 +487,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
             </Grid>
           </Paper >
         </Condicional>
-      </Dialog>
+      </Dialog >
       <Paper sx={{ m: 0, p: 0 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
           <Tooltip title={'Incluir'}>

@@ -15,12 +15,11 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { SqlEstruturaInterface } from '../../../../jb_backend/src/interfaces/sqlEstruturaInterface';
 import DetalheEstrutura from './DetalheEstrutura';
-import ShowText from '../../Componentes/ShowText';
 
 
 export default function Estrutura() {
@@ -38,7 +37,6 @@ export default function Estrutura() {
     nome: string
   }
 
-  const [selectedValue, setSelectedValue] = useState("");
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
@@ -50,7 +48,6 @@ export default function Estrutura() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  // const [rsDetalheEstrutura, setRsDetalheEstrutura] = useState<Array<DetalheEstruturaInterface>>([]);
 
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -103,7 +100,6 @@ export default function Estrutura() {
   }
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      console.log(rs)
       setEstrutura(rs)
       setLocalState({ action: actionTypes.editando })
     })
@@ -114,19 +110,19 @@ export default function Estrutura() {
       setLocalState({ action: actionTypes.excluindo })
     })
   }
-  const onDetalhe = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setEstrutura(rs)
-      setSelectedValue(rsPesquisa[0].produto_nome);
-      setLocalState({ action: actionTypes.detalhes })
-      setLayoutState({
-        titulo: 'Composição de Estrutura',
-        tituloAnterior: 'Estruturas de Produtos',
-        pathTitulo: '/DetalheEstrutura',
-        pathTituloAnterior: '/Estrutura'
-      })
-    })
-  }
+  // const onDetalhe = (id: string | number) => {
+  //   pesquisarID(id).then((rs) => {
+  //     setEstrutura(rs)
+  //     setSelectedValue(rsPesquisa[0].produto_nome);
+  //     setLocalState({ action: actionTypes.detalhes })
+  //     setLayoutState({
+  //       titulo: 'Composição de Estrutura',
+  //       tituloAnterior: 'Estruturas de Produtos',
+  //       pathTitulo: '/DetalheEstrutura',
+  //       pathTituloAnterior: '/Estrutura'
+  //     })
+  //   })
+  // }
   const btIncluir = () => {
     setEstrutura(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
@@ -151,15 +147,11 @@ export default function Estrutura() {
 
   const testaSoma = (): boolean => {
     let somaQtd = 0.0
-    console.log('estrutura detalhe: ', estrutura.detalheEstruturas)
-
     estrutura.detalheEstruturas.forEach((i) => {
-      console.log('quantidade...: ', i.idDetalheEstrutura, i.idProduto, i.qtd)
       somaQtd = somaQtd + i.qtd
     }
     )
-    console.log('quantidade somada: ', somaQtd)
-    if (somaQtd < estrutura.qtdBase) {
+    if (somaQtd !== estrutura.qtdBase) {
       setMensagemState({
         titulo: 'Aviso',
         exibir: true,
@@ -169,7 +161,7 @@ export default function Estrutura() {
         cb: null
       })
     }
-    return somaQtd * 1.0 === estrutura.qtdBase * 1.0;
+    return somaQtd === estrutura.qtdBase;
   }
 
   const btConfirmar = () => {
@@ -194,12 +186,10 @@ export default function Estrutura() {
             cb: null
           })
         } else {
-          console.log('resultado do teste da soma: ', testaSoma())
+
           if (validarDados() && testaSoma()) {
 
             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-
-              console.log('estrutura antes de incluir: ', estrutura)
               clsCrud.incluir({
                 entidade: "Estrutura",
                 criterio: estrutura,
@@ -296,31 +286,8 @@ export default function Estrutura() {
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
-    // const query = `
-    //   SELECT 
-    //       e.*,
-    //       p.nome AS produto_nome,
-    //       um.sigla AS unidadeMedida_sigla
-    //   FROM 
-    //       estruturas e
-    //   INNER JOIN 
-    //       produtos p ON e.idProduto = p.idProduto
-    //   INNER JOIN 
-    //       unidademedidas um ON e.idUnidade = um.idUnidade
-    //   WHERE 
-    //       p.nome LIKE '%${pesquisa.nome}%' ;
-    //   `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Estrutura",
-    //     sql: query,
-    //     msg: 'Pesquisando Estruturas ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<SqlEstruturaInterface>) => {
-    //     setRsPesquisa(rs)
-    //   })
   }
+
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -415,12 +382,12 @@ export default function Estrutura() {
                       onExcluir(rs.idEstrutura as number),
                     toolTip: "Excluir",
                   },
-                  {
-                    icone: "auto_awesome_motion_outlined",
-                    onAcionador: (rs: DetalheEstruturaInterface) =>
-                      onDetalhe(rs.idEstrutura as number),
-                    toolTip: "Estrutura",
-                  },
+                  // {
+                  //   icone: "auto_awesome_motion_outlined",
+                  //   onAcionador: (rs: DetalheEstruturaInterface) =>
+                  //     onDetalhe(rs.idEstrutura as number),
+                  //   toolTip: "Estrutura",
+                  // },
                 ]}
                 order={order}
                 orderBy={orderBy}
