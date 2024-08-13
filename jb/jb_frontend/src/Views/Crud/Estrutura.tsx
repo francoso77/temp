@@ -190,6 +190,9 @@ export default function Estrutura() {
           if (validarDados() && testaSoma()) {
 
             if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+
+              console.log(estrutura)
+
               clsCrud.incluir({
                 entidade: "Estrutura",
                 criterio: estrutura,

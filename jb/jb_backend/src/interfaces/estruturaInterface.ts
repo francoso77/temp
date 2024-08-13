@@ -1,3 +1,6 @@
+import { CorInterface } from './corInteface'
+import { ProdutoInterface } from './produtoInterface'
+
 export interface EstruturaInterface {
   idEstrutura?: number
   idProduto: number
@@ -7,9 +10,11 @@ export interface EstruturaInterface {
 }
 
 export interface DetalheEstruturaInterface {
-  idDetalheEstrutura?: number;
-  idEstrutura: number | null;
-  idProduto: number;
-  idCor?: number | null;
-  qtd: number;
+  idDetalheEstrutura?: number
+  idEstrutura: number | null
+  idProduto: number
+  idCor?: number | null
+  qtd: number
+  produto: ProdutoInterface
+  cor: CorInterface
 }

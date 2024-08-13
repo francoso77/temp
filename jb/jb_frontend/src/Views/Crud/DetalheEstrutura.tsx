@@ -25,15 +25,6 @@ interface PropsInterface {
   setRsMaster: React.Dispatch<React.SetStateAction<EstruturaInterface>>,
 }
 
-interface DetalheInterface {
-  idEstrutura: null,
-  idDetalheEstrutura: 0,
-  idProduto: 0,
-  nomeProduto: '',
-  idCor: null,
-  nomeCor: '',
-  qtd: 0,
-}
 
 export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterface) {
 
@@ -46,9 +37,21 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     idProduto: 0,
     idCor: null,
     qtd: 0,
+    produto: {
+      nome: '',
+      idUnidade: 0,
+      localizacao: '',
+      largura: 0,
+      gm2: 0,
+      ativo: false,
+      tipoProduto: TipoProdutoType.tecidoTinto
+    },
+    cor: {
+      nome: ''
+    }
   }
 
-
+  const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false);
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface;
@@ -57,12 +60,9 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
-  const [rsDetalhe, setRsDetalhe] = useState<Array<any>>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const [tipo, setTipo] = useState<TipoProdutoType>()
-  const [nomeProduto, setNomeProduto] = useState<string | undefined>('')
-  const [nomeCor, setNomeCor] = useState<string | undefined>('')
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   let query: string = ''
@@ -71,14 +71,14 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'nomeProduto',
-      // format: (_v, rs: any) => rs.produto.nome
+      campo: 'idProduto',
+      format: (_v, rs: any) => rs.produto.nome
     },
     {
       cabecalho: 'Cor',
       alinhamento: 'left',
-      campo: 'nomeCor',
-      // format: (_v, rs: any) => rs.idCor === null ? 'sem cor' : rs.cor.nome
+      campo: 'idCor',
+      format: (_v, rs: any) => rs.idCor === null ? 'sem cor' : rs.cor.nome
     },
     {
       cabecalho: 'Qtd',
@@ -98,7 +98,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   };
 
   const validarDados = (): boolean => {
-
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
@@ -111,36 +110,27 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     return retorno
   }
 
-  const pesquisarID = (id: string | number) => {
+  const onEditar = (rs: DetalheEstruturaInterface, indice: number) => {
+    setLocalState({ action: actionTypes.editando })
+    setIndiceEdicao(indice)
+    setDetalheEstrutura(rs)
+    setOpen(true)
 
-    rsDetalhe.find((detalhe) => {
-      if (detalhe.idDetalheEstrutura === id) {
-        setDetalheEstrutura({
-          ...detalheEstrutura,
-          idEstrutura: detalhe.idEstrutura,
-          idDetalheEstrutura: detalhe.idDetalheEstrutura,
-          idProduto: detalhe.idProduto,
-          idCor: detalhe.idCor,
-          qtd: detalhe.qtd
-        })
+  }
+
+  const onExcluir = (rs: DetalheEstruturaInterface) => {
+    let tmpDetalhe: Array<DetalheEstruturaInterface> = []
+    rsMaster.detalheEstruturas.forEach(det => {
+      if (det.idProduto !== rs.idProduto) {
+        tmpDetalhe.push(det)
       }
     })
-  }
-
-  const onEditar = (id: string | number) => {
-    pesquisarID(id)
-    setLocalState({ action: actionTypes.editando })
-    setOpen(true)
-  }
-
-  const onExcluir = (id: string | number) => {
-    pesquisarID(id)
-    setLocalState({ action: actionTypes.excluindo })
-    setOpen(true)
+    setRsMaster({ ...rsMaster, detalheEstruturas: tmpDetalhe })
   }
 
   const btIncluir = () => {
     if (rsMaster.idProduto !== 0 && rsMaster.idUnidade !== 0 && rsMaster.qtdBase !== 0) {
+      setIndiceEdicao(-1)
       setOpen(true)
       BuscarDados()
       setDetalheEstrutura(ResetDados)
@@ -156,6 +146,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
       })
     }
   }
+
   const btCancelar = () => {
     setOpen(false)
     setErros({})
@@ -168,13 +159,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
       find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
     setTipo(auxTipo)
 
-    let auxNomeProduto: string | undefined = rsProduto.
-      find(produto => produto.idProduto === detalheEstrutura.idProduto)?.nome;
-    setNomeProduto(auxNomeProduto)
-
-    let auxNomeCor: string | undefined = rsCor.
-      find(cor => cor.idCor === detalheEstrutura.idCor)?.nome;
-    setNomeCor(auxNomeCor)
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -191,10 +175,10 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
 
   const podeIncluirDetalhe = (): boolean => {
     const indice = rsMaster.detalheEstruturas.findIndex(
-      (i) => i.idProduto === detalheEstrutura.idProduto
+      (v, i) => v.idProduto === detalheEstrutura.idProduto && i !== indiceEdicao
     )
 
-    if (indice >= 0 && localState.action === actionTypes.incluindo) {
+    if (indice >= 0) {
       setMensagemState({
         titulo: 'Aviso',
         exibir: true,
@@ -213,109 +197,38 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
       validarDados() &&
       podeIncluirDetalhe()
     ) {
-      rsDetalhe.push({
-        idEstrutura: detalheEstrutura.idEstrutura,
-        idProduto: detalheEstrutura.idProduto,
-        nomeProduto: nomeProduto,
-        idCor: detalheEstrutura.idCor,
-        nomeCor: nomeCor,
-        qtd: detalheEstrutura.qtd,
-      })
-
       setRsMaster({
         ...rsMaster, detalheEstruturas:
           [
             ...rsMaster.detalheEstruturas,
             {
-              idEstrutura: detalheEstrutura.idEstrutura ? detalheEstrutura.idEstrutura : null,
+              idEstrutura: rsMaster.idEstrutura as number,
               idProduto: detalheEstrutura.idProduto,
               idCor: detalheEstrutura.idCor,
               qtd: detalheEstrutura.qtd,
+              produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEstrutura.idProduto)] },
+              cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalheEstrutura.idCor)] }
             }
           ]
       })
 
-    } else if (localState.action === actionTypes.editando && validarDados()) {
+    } else if (localState.action === actionTypes.editando &&
+      validarDados() &&
+      podeIncluirDetalhe()
+    ) {
 
-      rsDetalhe.find((item) => {
-        if (item.idProduto === detalheEstrutura.idProduto) {
-          item.qtd = detalheEstrutura.qtd
-        }
-      })
+      let tmpDetalheEstruturas: Array<DetalheEstruturaInterface> = [...rsMaster.detalheEstruturas]
+      tmpDetalheEstruturas[indiceEdicao] = { ...detalheEstrutura, produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEstrutura.idProduto)] } }
+      tmpDetalheEstruturas[indiceEdicao] = { ...detalheEstrutura, cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalheEstrutura.idCor)] } }
 
       setRsMaster({
         ...rsMaster,
-        detalheEstruturas: rsMaster.detalheEstruturas.map(detalhe =>
-          detalhe.idDetalheEstrutura === detalheEstrutura.idDetalheEstrutura
-            ? { ...detalhe, qtd: detalheEstrutura.qtd }
-            : detalhe
-        )
+        detalheEstruturas: [...tmpDetalheEstruturas]
       })
-
-    } else if (localState.action === actionTypes.excluindo) {
-
-      const index = rsDetalhe.findIndex(detalhe => detalhe.idDetalheEstrutura === detalheEstrutura.idDetalheEstrutura)
-
-      if (index !== -1) {
-        rsDetalhe.splice(index, 1)
-        setRsMaster({
-          ...rsMaster,
-          detalheEstruturas: rsMaster.detalheEstruturas.filter(detalhe => detalhe.idDetalheEstrutura !== detalheEstrutura.idDetalheEstrutura)
-        });
-      }
-      clsCrud.excluir({
-        entidade: "DetalheEstrutura",
-        criterio: {
-          idDetalheEstrutura: detalheEstrutura.idDetalheEstrutura
-        },
-        cb: () => btPesquisar(),
-        setMensagemState: setMensagemState
-      })
-        .then((rs) => {
-          if (rs.ok) {
-            setLocalState({ action: actionTypes.pesquisando })
-          } else {
-            setMensagemState({
-              titulo: 'Erro...',
-              exibir: true,
-              mensagem: 'Erro no cadastro - Consulte Suporte',
-              tipo: MensagemTipo.Error,
-              exibirBotao: true,
-              cb: null
-            })
-          }
-        })
-
     }
+    setLocalState({ action: actionTypes.pesquisando })
+    setDetalheEstrutura(ResetDados)
     setOpen(false)
-  }
-
-  const btPesquisar = () => {
-    const _idEstrutura: number = rsMaster.idEstrutura === undefined ? 0 : rsMaster.idEstrutura
-    clsCrud
-      .pesquisar({
-        entidade: "DetalheEstrutura",
-        relations: ["produto", "cor"],
-        criterio: {
-          idEstrutura: _idEstrutura,
-        },
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        let det: Array<DetalheInterface> = []
-        rs.forEach((x) => {
-          det.push({
-            idEstrutura: x.idEstrutura,
-            idDetalheEstrutura: x.idDetalheEstrutura,
-            nomeProduto: x.produto.nome,
-            idProduto: x.idProduto,
-            idCor: x.idCor,
-            nomeCor: x.idCor === null ? null : x.cor.nome,
-            qtd: x.qtd,
-          })
-        })
-        setRsDetalhe(det)
-      })
   }
 
   const BuscarDados = () => {
@@ -348,21 +261,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
       })
   }
 
-  // const irpara = useNavigate()
-  // const btFechar = () => {
-  //   setOpen(false);
-  //   irpara('/Estrutura')
-  //   setLocalState({ action: actionTypes.pesquisando })
-  //   setLayoutState({
-  //     titulo: 'Estruturas de Produtos',
-  //     tituloAnterior: 'Composição de estrutura',
-  //     pathTitulo: '/Estrutura',
-  //     pathTituloAnterior: '/DetalheEstrutura'
-  //   })
-  // }
-
   useEffect(() => {
-    btPesquisar()
     BuscarDados()
   }, [])
 
@@ -506,18 +405,18 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
             temTotal={true}
             qtdColunas={2}
             cabecalho={cabecalhoForm}
-            dados={rsDetalhe}
+            dados={rsMaster.detalheEstruturas}
             acoes={[
               {
                 icone: "edit",
-                onAcionador: (rs: DetalheEstruturaInterface) =>
-                  onEditar(rs.idDetalheEstrutura as number),
+                onAcionador: (rs: DetalheEstruturaInterface, indice: number) =>
+                  onEditar(rs, indice),
                 toolTip: "Editar",
               },
               {
                 icone: "delete",
                 onAcionador: (rs: DetalheEstruturaInterface) =>
-                  onExcluir(rs.idDetalheEstrutura as number),
+                  onExcluir(rs),
                 toolTip: "Excluir",
               },
             ]}
