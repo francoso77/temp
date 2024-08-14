@@ -139,7 +139,6 @@ var ClsCrudController = /** @class */ (function () {
                 //   `;
                 return [2 /*return*/, repositorio.query(sql)
                         .then(function (rs) {
-                        console.log(rs);
                         return {
                             ok: true,
                             mensagem: 'Pesquisa Concluída',

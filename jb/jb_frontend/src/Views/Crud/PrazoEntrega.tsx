@@ -157,7 +157,7 @@ export default function PrazoEntrega() {
               clsCrud.incluir({
                 entidade: "PrazoEntrega",
                 criterio: prazoEntrega,
-                localState: localState.action,
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })

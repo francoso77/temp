@@ -184,7 +184,7 @@ export default function Maquina() {
               clsCrud.incluir({
                 entidade: "Maquina",
                 criterio: maquina,
-                localState: localState.action,
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })

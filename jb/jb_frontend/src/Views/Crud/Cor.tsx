@@ -148,7 +148,7 @@ export default function Cor() {
               clsCrud.incluir({
                 entidade: "Cor",
                 criterio: cor,
-                localState: localState.action,
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })

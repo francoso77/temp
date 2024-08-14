@@ -207,7 +207,7 @@ export default function DetalhePedido({ rsPedido, setPedidoState }: PropsInterfa
             clsCrud.incluir({
               entidade: "DetalhePedido",
               criterio: detalhePedido,
-              localState: localState.action,
+              localState: localState,
               cb: () => btPesquisar(),
               setMensagemState: setMensagemState
             })

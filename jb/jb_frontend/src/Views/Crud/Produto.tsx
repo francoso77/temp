@@ -167,7 +167,7 @@ export default function Produto() {
               clsCrud.incluir({
                 entidade: "Produto",
                 criterio: produto,
-                localState: localState.action,
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })

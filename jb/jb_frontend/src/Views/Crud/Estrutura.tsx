@@ -146,22 +146,28 @@ export default function Estrutura() {
   }
 
   const testaSoma = (): boolean => {
-    let somaQtd = 0.0
+    let somaQtd: number = 0
     estrutura.detalheEstruturas.forEach((i) => {
       somaQtd = somaQtd + i.qtd
     }
     )
-    if (somaQtd !== estrutura.qtdBase) {
-      setMensagemState({
-        titulo: 'Aviso',
-        exibir: true,
-        mensagem: 'A soma das quantidades informadas deve ser igual Qtd Base.',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
+
+    if (somaQtd === 0) {
+      return true
+    } else {
+
+      if (somaQtd > estrutura.qtdBase || somaQtd < estrutura.qtdBase) {
+        setMensagemState({
+          titulo: 'Aviso',
+          exibir: true,
+          mensagem: 'A soma das quantidades informadas deve ser igual Qtd Base.',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null
+        })
+      }
     }
-    return somaQtd === estrutura.qtdBase;
+    return somaQtd * 1.0 === estrutura.qtdBase * 1.0;
   }
 
   const btConfirmar = () => {
@@ -187,63 +193,13 @@ export default function Estrutura() {
           })
         } else {
 
-          if (validarDados() && testaSoma()) {
-
-            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-
-              console.log(estrutura)
+          if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+            if (validarDados() && testaSoma()) {
 
               clsCrud.incluir({
                 entidade: "Estrutura",
                 criterio: estrutura,
-                localState: localState.action,
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
-              })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
-              // clsCrud.incluirComDetalhe({
-              //   entidadeMaster: "Estrutura",
-              //   master: estrutura,
-              //   entidadeDetalhe: "DetalheEstrutura",
-              //   detalhes: rsDetalheEstrutura,
-              //   id: "idEstrutura",
-              //   localState: localState.action,
-              //   cb: () => btPesquisar(),
-              //   setMensagemState: setMensagemState
-              // })
-              //   .then((rs) => {
-              //     if (rs.ok) {
-              //       setLocalState({ action: actionTypes.pesquisando })
-              //     } else {
-              //       setMensagemState({
-              //         titulo: 'Erro...',
-              //         exibir: true,
-              //         mensagem: 'Erro no cadastro - Consulte Suporte',
-              //         tipo: MensagemTipo.Error,
-              //         exibirBotao: true,
-              //         cb: null
-              //       })
-              //     }
-              //   })
-            } else if (localState.action === actionTypes.excluindo) {
-              clsCrud.excluir({
-                entidade: "Estrutura",
-                criterio: {
-                  idEstrutura: estrutura.idEstrutura
-                },
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })
@@ -262,6 +218,29 @@ export default function Estrutura() {
                   }
                 })
             }
+          } else if (localState.action === actionTypes.excluindo) {
+            clsCrud.excluir({
+              entidade: "Estrutura",
+              criterio: {
+                idEstrutura: estrutura.idEstrutura
+              },
+              cb: () => btPesquisar(),
+              setMensagemState: setMensagemState
+            })
+              .then((rs) => {
+                if (rs.ok) {
+                  setLocalState({ action: actionTypes.pesquisando })
+                } else {
+                  setMensagemState({
+                    titulo: 'Erro...',
+                    exibir: true,
+                    mensagem: 'Erro no cadastro - Consulte Suporte',
+                    tipo: MensagemTipo.Error,
+                    exibirBotao: true,
+                    cb: null
+                  })
+                }
+              })
           }
         }
       })
@@ -363,6 +342,7 @@ export default function Estrutura() {
                   color="secondary"
                   sx={{ mt: 4, ml: 1 }}
                   onClick={() => btIncluir()}
+                  disabled={localState.action === 'excluindo' ? true : false}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
                 </IconButton>
@@ -409,6 +389,7 @@ export default function Estrutura() {
                 field="idProduto"
                 label="Produto"
                 erros={erros}
+                disabled={localState.action === 'excluindo' ? true : false}
                 setState={setEstrutura}
               />
             </Grid>
@@ -422,6 +403,7 @@ export default function Estrutura() {
                 field="idUnidade"
                 label="Unidade"
                 erros={erros}
+                disabled={localState.action === 'excluindo' ? true : false}
                 setState={setEstrutura}
               />
             </Grid>
@@ -440,6 +422,7 @@ export default function Estrutura() {
               <DetalheEstrutura
                 rsMaster={estrutura}
                 setRsMaster={setEstrutura}
+                masterLocalState={localState}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
@@ -491,3 +474,29 @@ export default function Estrutura() {
     </Container >
   )
 }
+
+
+// clsCrud.incluirComDetalhe({
+//   entidadeMaster: "Estrutura",
+//   master: estrutura,
+//   entidadeDetalhe: "DetalheEstrutura",
+//   detalhes: rsDetalheEstrutura,
+//   id: "idEstrutura",
+//   localState: localState.action,
+//   cb: () => btPesquisar(),
+//   setMensagemState: setMensagemState
+// })
+//   .then((rs) => {
+//     if (rs.ok) {
+//       setLocalState({ action: actionTypes.pesquisando })
+//     } else {
+//       setMensagemState({
+//         titulo: 'Erro...',
+//         exibir: true,
+//         mensagem: 'Erro no cadastro - Consulte Suporte',
+//         tipo: MensagemTipo.Error,
+//         exibirBotao: true,
+//         cb: null
+//       })
+//     }
+//   })

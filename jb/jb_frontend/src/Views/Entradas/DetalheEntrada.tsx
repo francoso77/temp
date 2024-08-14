@@ -274,7 +274,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
             clsCrud.incluir({
               entidade: "DetalheEntrada",
               criterio: detalheEntrada,
-              localState: localState.action,
+              localState: localState,
               cb: () => btPesquisar(),
               setMensagemState: setMensagemState
             })

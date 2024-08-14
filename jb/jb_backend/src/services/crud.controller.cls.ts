@@ -91,7 +91,6 @@ export default class ClsCrudController {
 
     return repositorio.query(sql)
       .then((rs) => {
-        console.log(rs)
         return {
           ok: true,
           mensagem: 'Pesquisa Concluída',

@@ -153,7 +153,7 @@ export default function Pedido() {
         clsCrud.incluir({
           entidade: "Pedido",
           criterio: pedido,
-          localState: localState.action,
+          localState: localState,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })

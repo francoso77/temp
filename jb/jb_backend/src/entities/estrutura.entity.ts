@@ -27,7 +27,7 @@ export default class Estrutura implements EstruturaInterface {
   @ManyToOne(() => Produto)
   produto: Produto
 
-  @JoinColumn({ name: "idEstrutura" })
+  @JoinColumn({ name: 'idEstrutura' })
   @OneToMany(() => DetalheEstrutura,
     detalheEstrutura => detalheEstrutura.estrutura, { cascade: true })
   detalheEstruturas: DetalheEstrutura[]

@@ -23,10 +23,11 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 interface PropsInterface {
   rsMaster: EstruturaInterface
   setRsMaster: React.Dispatch<React.SetStateAction<EstruturaInterface>>,
+  masterLocalState: ActionInterface,
 }
 
 
-export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterface) {
+export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -54,7 +55,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false);
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface;
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
   const [erros, setErros] = useState({});
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
@@ -115,13 +115,12 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     setIndiceEdicao(indice)
     setDetalheEstrutura(rs)
     setOpen(true)
-
   }
 
   const onExcluir = (rs: DetalheEstruturaInterface) => {
     let tmpDetalhe: Array<DetalheEstruturaInterface> = []
     rsMaster.detalheEstruturas.forEach(det => {
-      if (det.idProduto !== rs.idProduto) {
+      if (det.idDetalheEstrutura !== rs.idDetalheEstrutura) {
         tmpDetalhe.push(det)
       }
     })
@@ -191,16 +190,14 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
     return indice < 0;
   }
 
-  const btConfirmar = () => {
+  const btConfirmaInclusao = () => {
 
-    if (localState.action === actionTypes.incluindo &&
-      validarDados() &&
-      podeIncluirDetalhe()
-    ) {
+    if (validarDados() && podeIncluirDetalhe()) {
       setRsMaster({
         ...rsMaster, detalheEstruturas:
           [
             ...rsMaster.detalheEstruturas,
+
             {
               idEstrutura: rsMaster.idEstrutura as number,
               idProduto: detalheEstrutura.idProduto,
@@ -211,11 +208,15 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
             }
           ]
       })
+      setLocalState({ action: actionTypes.pesquisando })
+      setDetalheEstrutura(ResetDados)
+      setOpen(false)
+    }
+  }
 
-    } else if (localState.action === actionTypes.editando &&
-      validarDados() &&
-      podeIncluirDetalhe()
-    ) {
+  const btConfirmaAlteracao = () => {
+
+    if (validarDados() && podeIncluirDetalhe()) {
 
       let tmpDetalheEstruturas: Array<DetalheEstruturaInterface> = [...rsMaster.detalheEstruturas]
       tmpDetalheEstruturas[indiceEdicao] = { ...detalheEstrutura, produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEstrutura.idProduto)] } }
@@ -225,10 +226,10 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
         ...rsMaster,
         detalheEstruturas: [...tmpDetalheEstruturas]
       })
+      setLocalState({ action: actionTypes.pesquisando })
+      setDetalheEstrutura(ResetDados)
+      setOpen(false)
     }
-    setLocalState({ action: actionTypes.pesquisando })
-    setDetalheEstrutura(ResetDados)
-    setOpen(false)
   }
 
   const BuscarDados = () => {
@@ -363,21 +364,10 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
                       <IconButton
                         color="secondary"
                         sx={{ mt: 3, ml: 2 }}
-                        onClick={() => btConfirmar()}
+                        onClick={localState.action === actionTypes.incluindo ?
+                          () => btConfirmaInclusao() : () => btConfirmaAlteracao()}
                       >
                         <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Condicional>
-
-                  <Condicional condicao={localState.action === 'excluindo'}>
-                    <Tooltip title={'Excluir'}>
-                      <IconButton
-                        color="secondary"
-                        sx={{ mt: 3, ml: 2 }}
-                        onClick={() => btConfirmar()}
-                      >
-                        <DeleteIcon sx={{ fontSize: 60 }} />
                       </IconButton>
                     </Tooltip>
                   </Condicional>
@@ -389,15 +379,17 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
       </Dialog >
       <Paper sx={{ m: 0, p: 0 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
-          <Tooltip title={'Incluir'}>
-            <IconButton
-              color="secondary"
-              sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}
-              onClick={() => btIncluir()}
-            >
-              <AddCircleIcon sx={{ fontSize: 50 }} />
-            </IconButton>
-          </Tooltip>
+          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+            <Tooltip title={'Incluir'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}
+                onClick={() => btIncluir()}
+              >
+                <AddCircleIcon sx={{ fontSize: 50 }} />
+              </IconButton>
+            </Tooltip>
+          </Condicional>
         </Grid>
         <Grid item xs={12}>
           <DataTable
@@ -406,20 +398,21 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster }: PropsInterfa
             qtdColunas={2}
             cabecalho={cabecalhoForm}
             dados={rsMaster.detalheEstruturas}
-            acoes={[
-              {
-                icone: "edit",
-                onAcionador: (rs: DetalheEstruturaInterface, indice: number) =>
-                  onEditar(rs, indice),
-                toolTip: "Editar",
-              },
-              {
-                icone: "delete",
-                onAcionador: (rs: DetalheEstruturaInterface) =>
-                  onExcluir(rs),
-                toolTip: "Excluir",
-              },
-            ]}
+            acoes={masterLocalState.action === actionTypes.excluindo ? [] :
+              [
+                {
+                  icone: "edit",
+                  onAcionador: (rs: DetalheEstruturaInterface, indice: number) =>
+                    onEditar(rs, indice),
+                  toolTip: "Editar",
+                },
+                {
+                  icone: "delete",
+                  onAcionador: (rs: DetalheEstruturaInterface) =>
+                    onExcluir(rs),
+                  toolTip: "Excluir",
+                },
+              ]}
             order={order}
             orderBy={orderBy}
             onRequestSort={handleRequestSort}

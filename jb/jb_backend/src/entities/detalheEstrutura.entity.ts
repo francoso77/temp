@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import Estrutura from './estrutura.entity';
 import Produto from './produto.entity';
 import { DetalheEstruturaInterface } from '../interfaces/estruturaInterface';
@@ -10,11 +10,11 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   @PrimaryGeneratedColumn()
   idDetalheEstrutura: number;
 
-  @PrimaryColumn()
+  @Column()
   idEstrutura: number;
 
   @JoinColumn({ name: 'idEstrutura' })
-  @ManyToOne(() => Estrutura, estrutura => estrutura.detalheEstruturas)
+  @ManyToOne(() => Estrutura, estrutura => estrutura.detalheEstruturas, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   estrutura: Estrutura;
 
   @Column()

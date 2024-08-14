@@ -21,12 +21,12 @@ var DetalheEstrutura = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "idDetalheEstrutura", void 0);
     __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
+        (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "idEstrutura", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idEstrutura' }),
-        (0, typeorm_1.ManyToOne)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.detalheEstruturas; }),
+        (0, typeorm_1.ManyToOne)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.detalheEstruturas; }, { onDelete: 'CASCADE', onUpdate: 'CASCADE' }),
         __metadata("design:type", estrutura_entity_1.default)
     ], DetalheEstrutura.prototype, "estrutura", void 0);
     __decorate([

@@ -4,10 +4,10 @@ import {
 } from "../../../jb_backend/src/interfaces/respostaPadrao.interface"
 import axios, { AxiosRequestConfig } from "axios"
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState'
-import { actionTypes } from '../Interfaces/ActionInterface'
+import { ActionInterface, actionTypes } from '../Interfaces/ActionInterface'
 
 export interface PropsInterface extends PadraoPesquisaInterface {
-  localState?: actionTypes | undefined,
+  localState?: ActionInterface | undefined,
   msg?: string,
   cb?: null | ((res: boolean) => void),
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>,
@@ -182,7 +182,7 @@ export default class ClsCrud {
       setMensagemState({
         titulo: '',
         exibir: true,
-        mensagem: localState === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
+        mensagem: localState?.action === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
         tipo: MensagemTipo.Info,
         exibirBotao: false,
         cb: null
@@ -199,8 +199,8 @@ export default class ClsCrud {
           setMensagemState({
             titulo: 'Cadastro...',
             exibir: true,
-            mensagem: localState === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
-            tipo: localState === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
+            mensagem: localState?.action === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
+            tipo: localState?.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
             exibirBotao: true,
             cb: cb ? cb : null
           })
@@ -208,7 +208,7 @@ export default class ClsCrud {
           setMensagemState({
             titulo: 'Erro...',
             exibir: true,
-            mensagem: localState === actionTypes.incluindo ? 'Erro ao incluir!' : 'Erro ao alterar!',
+            mensagem: localState?.action === actionTypes.incluindo ? 'Erro ao incluir!' : 'Erro ao alterar!',
             tipo: MensagemTipo.Error,
             exibirBotao: true,
             cb: null
@@ -246,7 +246,7 @@ export default class ClsCrud {
       setMensagemState({
         titulo: '',
         exibir: true,
-        mensagem: localState === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
+        mensagem: localState?.action === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
         tipo: MensagemTipo.Info,
         exibirBotao: false,
         cb: null
@@ -263,8 +263,8 @@ export default class ClsCrud {
           setMensagemState({
             titulo: 'Cadastro...',
             exibir: true,
-            mensagem: localState === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
-            tipo: localState === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
+            mensagem: localState?.action === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
+            tipo: localState?.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
             exibirBotao: true,
             cb: cb ? cb : null
           })
@@ -272,7 +272,7 @@ export default class ClsCrud {
           setMensagemState({
             titulo: 'Erro...',
             exibir: true,
-            mensagem: localState === actionTypes.incluindo ? 'Erro ao incluir!' : 'Erro ao alterar!',
+            mensagem: localState?.action === actionTypes.incluindo ? 'Erro ao incluir!' : 'Erro ao alterar!',
             tipo: MensagemTipo.Error,
             exibirBotao: true,
             cb: null

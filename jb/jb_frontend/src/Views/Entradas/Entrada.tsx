@@ -141,7 +141,7 @@ export default function Entrada() {
         clsCrud.incluir({
           entidade: "Entrada",
           criterio: entrada,
-          localState: localState.action,
+          localState: localState,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })

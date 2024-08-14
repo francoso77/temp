@@ -207,7 +207,7 @@ export default function Pessoa() {
               clsCrud.incluir({
                 entidade: "Pessoa",
                 criterio: pessoa,
-                localState: localState.action,
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })

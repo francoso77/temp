@@ -155,7 +155,7 @@ export default function UnidadeMedida() {
               clsCrud.incluir({
                 entidade: "UnidadeMedida",
                 criterio: unidadeMedida,
-                localState: localState.action,
+                localState: localState,
                 cb: () => btPesquisar(),
                 setMensagemState: setMensagemState
               })

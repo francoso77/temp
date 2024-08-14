@@ -59,6 +59,7 @@ var Produto = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Produto.prototype, "tipoProduto", void 0);
     __decorate([
+        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) {
             return detalheProducaoDublagem.produto;
         }, { cascade: true }),
