@@ -1,4 +1,4 @@
-import { Like } from 'typeorm';
+import { Like, Not } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 
@@ -99,14 +99,23 @@ export default class ClsCrudController {
       })
   }
 
-  public async pesquisar({ entidade, criterio, camposLike, select, relations = [] }: PadraoPesquisaInterface):
+  public async pesquisar({ entidade, criterio, camposLike, select, relations = [], campoOrder, notOrLike }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
 
     let where: Record<string, any> = {}
     where = { ...criterio }
 
     camposLike.forEach((campo) => {
-      where[campo] = Like(where[campo])
+      if (notOrLike === "L") {
+        where[campo] = Like(where[campo])
+      } else {
+        where[campo] = Not(where[campo])
+      }
+    })
+
+    let order: Record<string, any> = {}
+    campoOrder.forEach((campo) => {
+      order[campo] = 'ASC'
     })
 
     return AppDataSource.getRepository(entidade)
@@ -114,6 +123,7 @@ export default class ClsCrudController {
         where: where,
         select: select,
         relations: relations,
+        order: order
       })
       .then((rs) => {
         return {

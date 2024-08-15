@@ -17,4 +17,6 @@ export interface PadraoPesquisaInterface {
   detalhes?: Record<string, any>,
   id?: string,
   relations?: Array<string>,
+  campoOrder?: Array<any>,
+  notOrLike?: "N" | "L",
 }

@@ -14,7 +14,11 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   idEstrutura: number;
 
   @JoinColumn({ name: 'idEstrutura' })
-  @ManyToOne(() => Estrutura, estrutura => estrutura.detalheEstruturas, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToOne(() => Estrutura, estrutura => estrutura.detalheEstruturas, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   estrutura: Estrutura;
 
   @Column()

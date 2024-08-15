@@ -33,13 +33,15 @@ var CrudController = /** @class */ (function () {
             sql: sql ? sql : ''
         });
     };
-    CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select, relations) {
+    CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select, relations, campoOrder, notOrLike) {
         return new crud_controller_cls_1.default().pesquisar({
             entidade: entidade,
             criterio: criterio,
             camposLike: camposLike ? camposLike : [],
             select: select ? select : [],
             relations: relations ? relations : [],
+            campoOrder: campoOrder ? campoOrder : [],
+            notOrLike: notOrLike ? notOrLike : "L",
         });
     };
     CrudController.prototype.excluir = function (entidade, criterio) {
@@ -87,10 +89,13 @@ var CrudController = /** @class */ (function () {
         __param(2, (0, common_1.Body)("camposLike")),
         __param(3, (0, common_1.Body)("select")),
         __param(4, (0, common_1.Body)("relations")),
+        __param(5, (0, common_1.Body)("campoOrder")),
+        __param(6, (0, common_1.Body)("notOrLike")),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Object, Array,
             Array,
-            Array]),
+            Array,
+            Array, String]),
         __metadata("design:returntype", Promise)
     ], CrudController.prototype, "pesquisar", null);
     __decorate([
@@ -108,22 +113,4 @@ var CrudController = /** @class */ (function () {
     return CrudController;
 }());
 exports.CrudController = CrudController;
-// @Post("query")
-// query(
-//   @Body("entidade") entidade: string,
-//   @Body("criterio") criterio: Record<string, any>,
-//   @Body("camposLike") camposLike: Array<string>,
-//   @Body("select") select: Array<string>,
-//   @Body("joins") joins: { tabelaRelacao: string, relacao: string }[],
-//   @Body("sql") sql: string,
-// ): Promise<RespostaPadraoInterface<any>> {
-//   return new ClsCrudController().query({
-//     entidade: entidade ? entidade : '',
-//     criterio: criterio ? criterio : [],
-//     camposLike: camposLike ? camposLike : [],
-//     select: select ? select : [],
-//     joins: joins,
-//     sql: sql ? sql : ''
-//   });
-// }
 //# sourceMappingURL=crud.controller.js.map

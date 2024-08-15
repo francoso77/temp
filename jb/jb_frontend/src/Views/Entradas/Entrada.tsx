@@ -220,22 +220,18 @@ export default function Entrada() {
   }
 
   const BuscarDados = () => {
-    let query: string = `
-      SELECT 
-          p.*
-      FROM 
-          pessoas p
-      WHERE 
-          p.tipoPessoa = 'F'
-      `;
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Pessoa",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ["nome"],
+        notOrLike: 'N',
+        criterio: {
+          tipoPessoa: 'F'
+        },
+        camposLike: ["tipoPessoa"],
       })
-      .then((rs: Array<PessoaInterface>) => {
-        setRsFornecedor(rs)
+      .then((rsFornecedores: Array<PessoaInterface>) => {
+        setRsFornecedor(rsFornecedores)
       })
   }
 

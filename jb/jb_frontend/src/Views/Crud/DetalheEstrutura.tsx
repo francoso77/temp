@@ -1,4 +1,4 @@
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
@@ -10,7 +10,6 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
@@ -64,8 +63,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  let query: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -233,21 +230,16 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   const BuscarDados = () => {
-    query = `
-      SELECT 
-          p.idProduto, p.nome, p.tipoProduto
-      FROM 
-          produtos p
-      WHERE 
-          p.idProduto <> ${rsMaster.idProduto}
-      ORDER BY p.nome ASC;
-      `;
+
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Produto",
-        sql: query,
-        msg: '',
-        setMensagemState: setMensagemState
+        campoOrder: ["nome"],
+        notOrLike: 'N',
+        criterio: {
+          idProduto: rsMaster.idProduto
+        },
+        camposLike: ["idProduto"],
       })
       .then((rsProdutos: Array<ProdutoInterface>) => {
         setRsProduto(rsProdutos)
@@ -256,6 +248,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     clsCrud
       .pesquisar({
         entidade: "Cor",
+        campoOrder: ["nome"],
       })
       .then((rsCores: Array<CorInterface>) => {
         setRsCor(rsCores)
@@ -266,14 +259,15 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     BuscarDados()
   }, [])
 
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   return (
     <>
-      <Dialog open={open} sx={{
-        width: '95%', // Ajuste esta porcentagem conforme necessário
-        height: '80vh', // Ajuste esta altura conforme necessário
-        maxWidth: 'none',
-        maxHeight: 'none',
-      }}>
+      <Dialog
+        open={open}
+        fullScreen={fullScreen}
+        fullWidth
+        maxWidth='md'>
         <Paper variant="outlined"
           sx={{
             display: 'flex',
@@ -419,7 +413,6 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
           />
         </Grid>
       </Paper>
-
     </>
   )
 }

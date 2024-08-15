@@ -26,7 +26,11 @@ var DetalheEstrutura = /** @class */ (function () {
     ], DetalheEstrutura.prototype, "idEstrutura", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idEstrutura' }),
-        (0, typeorm_1.ManyToOne)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.detalheEstruturas; }, { onDelete: 'CASCADE', onUpdate: 'CASCADE' }),
+        (0, typeorm_1.ManyToOne)(function () { return estrutura_entity_1.default; }, function (estrutura) { return estrutura.detalheEstruturas; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", estrutura_entity_1.default)
     ], DetalheEstrutura.prototype, "estrutura", void 0);
     __decorate([

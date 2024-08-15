@@ -149,20 +149,30 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.pesquisar = function (_a) {
-        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b;
+        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike;
         return __awaiter(this, void 0, void 0, function () {
-            var where;
+            var where, order;
             return __generator(this, function (_c) {
                 where = {};
                 where = __assign({}, criterio);
                 camposLike.forEach(function (campo) {
-                    where[campo] = (0, typeorm_1.Like)(where[campo]);
+                    if (notOrLike === "L") {
+                        where[campo] = (0, typeorm_1.Like)(where[campo]);
+                    }
+                    else {
+                        where[campo] = (0, typeorm_1.Not)(where[campo]);
+                    }
+                });
+                order = {};
+                campoOrder.forEach(function (campo) {
+                    order[campo] = 'ASC';
                 });
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(entidade)
                         .find({
                         where: where,
                         select: select,
                         relations: relations,
+                        order: order
                     })
                         .then(function (rs) {
                         return {

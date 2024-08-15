@@ -110,19 +110,7 @@ export default function Estrutura() {
       setLocalState({ action: actionTypes.excluindo })
     })
   }
-  // const onDetalhe = (id: string | number) => {
-  //   pesquisarID(id).then((rs) => {
-  //     setEstrutura(rs)
-  //     setSelectedValue(rsPesquisa[0].produto_nome);
-  //     setLocalState({ action: actionTypes.detalhes })
-  //     setLayoutState({
-  //       titulo: 'Composição de Estrutura',
-  //       tituloAnterior: 'Estruturas de Produtos',
-  //       pathTitulo: '/DetalheEstrutura',
-  //       pathTituloAnterior: '/Estrutura'
-  //     })
-  //   })
-  // }
+
   const btIncluir = () => {
     setEstrutura(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
@@ -365,12 +353,6 @@ export default function Estrutura() {
                       onExcluir(rs.idEstrutura as number),
                     toolTip: "Excluir",
                   },
-                  // {
-                  //   icone: "auto_awesome_motion_outlined",
-                  //   onAcionador: (rs: DetalheEstruturaInterface) =>
-                  //     onDetalhe(rs.idEstrutura as number),
-                  //   toolTip: "Estrutura",
-                  // },
                 ]}
                 order={order}
                 orderBy={orderBy}
@@ -460,43 +442,8 @@ export default function Estrutura() {
               </Condicional>
             </Grid>
           </Condicional>
-          {/* <Condicional condicao={localState.action === 'detalhes'}>
-            <Grid item xs={12}>
-              <ShowText
-                titulo='Estrutura do Produto'
-                descricao={selectedValue}
-              />
-              <DetalheEstrutura rsEstrutura={estrutura} setEstruturaState={setLocalState} />
-            </Grid>
-          </Condicional> */}
         </Grid>
       </Paper >
     </Container >
   )
 }
-
-
-// clsCrud.incluirComDetalhe({
-//   entidadeMaster: "Estrutura",
-//   master: estrutura,
-//   entidadeDetalhe: "DetalheEstrutura",
-//   detalhes: rsDetalheEstrutura,
-//   id: "idEstrutura",
-//   localState: localState.action,
-//   cb: () => btPesquisar(),
-//   setMensagemState: setMensagemState
-// })
-//   .then((rs) => {
-//     if (rs.ok) {
-//       setLocalState({ action: actionTypes.pesquisando })
-//     } else {
-//       setMensagemState({
-//         titulo: 'Erro...',
-//         exibir: true,
-//         mensagem: 'Erro no cadastro - Consulte Suporte',
-//         tipo: MensagemTipo.Error,
-//         exibirBotao: true,
-//         cb: null
-//       })
-//     }
-//   })

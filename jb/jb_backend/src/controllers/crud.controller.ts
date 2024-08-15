@@ -58,6 +58,8 @@ export class CrudController {
     @Body("camposLike") camposLike: Array<string>,
     @Body("select") select: Array<string>,
     @Body("relations") relations: Array<string>,
+    @Body("campoOrder") campoOrder: Array<any>,
+    @Body("notOrLike") notOrLike: "N" | "L",
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({
       entidade: entidade,
@@ -65,6 +67,8 @@ export class CrudController {
       camposLike: camposLike ? camposLike : [],
       select: select ? select : [],
       relations: relations ? relations : [],
+      campoOrder: campoOrder ? campoOrder : [],
+      notOrLike: notOrLike ? notOrLike : "L",
     });
   }
 
@@ -77,22 +81,3 @@ export class CrudController {
   }
 
 }
-
-// @Post("query")
-// query(
-//   @Body("entidade") entidade: string,
-//   @Body("criterio") criterio: Record<string, any>,
-//   @Body("camposLike") camposLike: Array<string>,
-//   @Body("select") select: Array<string>,
-//   @Body("joins") joins: { tabelaRelacao: string, relacao: string }[],
-//   @Body("sql") sql: string,
-// ): Promise<RespostaPadraoInterface<any>> {
-//   return new ClsCrudController().query({
-//     entidade: entidade ? entidade : '',
-//     criterio: criterio ? criterio : [],
-//     camposLike: camposLike ? camposLike : [],
-//     select: select ? select : [],
-//     joins: joins,
-//     sql: sql ? sql : ''
-//   });
-// }
