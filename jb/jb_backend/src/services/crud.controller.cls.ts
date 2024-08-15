@@ -1,4 +1,4 @@
-import { Like, Not } from 'typeorm';
+import { FindOperator, FindOperators, In, Like, Not, Or } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 
@@ -108,8 +108,10 @@ export default class ClsCrudController {
     camposLike.forEach((campo) => {
       if (notOrLike === "L") {
         where[campo] = Like(where[campo])
-      } else {
+      } else if (notOrLike === "N") {
         where[campo] = Not(where[campo])
+      } else {
+        where[campo] = In(where[campo])
       }
     })
 

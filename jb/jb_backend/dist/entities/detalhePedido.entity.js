@@ -25,7 +25,12 @@ var DetalhePedido = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "idPedido", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return pedido_entity_1.default; }, function (pedido) { return pedido.detalhesPedido; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPedido' }),
+        (0, typeorm_1.ManyToOne)(function () { return pedido_entity_1.default; }, function (pedido) { return pedido.detalhePedidos; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", pedido_entity_1.default)
     ], DetalhePedido.prototype, "pedido", void 0);
     __decorate([
@@ -34,7 +39,7 @@ var DetalhePedido = /** @class */ (function () {
     ], DetalhePedido.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.pedidos; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], DetalhePedido.prototype, "produto", void 0);
     __decorate([

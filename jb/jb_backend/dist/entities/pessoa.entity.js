@@ -102,7 +102,7 @@ var Pessoa = /** @class */ (function () {
         __metadata("design:type", Array)
     ], Pessoa.prototype, "revisadorProducaoMalharias", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaTecelao' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_tecelao' }),
         (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
             return producaoMalharia.tecelao;
         }, { cascade: true }),

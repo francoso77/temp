@@ -18,5 +18,5 @@ export interface PadraoPesquisaInterface {
   id?: string,
   relations?: Array<string>,
   campoOrder?: Array<any>,
-  notOrLike?: "N" | "L",
+  notOrLike?: "N" | "L" | "I",
 }

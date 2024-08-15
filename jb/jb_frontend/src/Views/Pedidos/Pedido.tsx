@@ -16,7 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
+import { PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
@@ -35,7 +35,8 @@ export default function Pedido() {
     idPessoa_cliente: 0,
     idPessoa_vendedor: 0,
     idPrazoEntrega: 0,
-    statusPedido: StatusPedidoType.aberto
+    statusPedido: StatusPedidoType.aberto,
+    detalhePedidos: []
   }
   interface PesquisaInterface {
     itemPesquisa: string
@@ -58,7 +59,8 @@ export default function Pedido() {
     {
       cabecalho: 'Cliente',
       alinhamento: 'left',
-      campo: 'nome_cliente',
+      campo: 'idPessoa',
+      format: (_v, rs: any) => rs.cliente.nome
     },
     {
       cabecalho: 'Data',
@@ -69,7 +71,8 @@ export default function Pedido() {
     {
       cabecalho: 'Vendedor',
       alinhamento: 'left',
-      campo: 'nome_vendedor',
+      campo: 'idPessoa',
+      format: (_v, rs: any) => rs.vendedor.nome
     },
   ]
 
@@ -238,6 +241,7 @@ export default function Pedido() {
     clsCrud
       .pesquisar({
         entidade: "PrazoEntrega",
+        campoOrder: ["nome"],
         criterio: {
           nome: "%".concat("%"),
         },
@@ -265,22 +269,18 @@ export default function Pedido() {
       .then((rs: Array<PessoaInterface>) => {
         setRsCliente(rs)
       })
-    query = `
-      SELECT 
-          p.*
-      FROM 
-          pessoas p
-      WHERE 
-          p.tipoPessoa = 'V'
-      `;
+
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Pessoa",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ['nome'],
+        criterio: {
+          tipoPessoa: "V",
+        },
+        camposLike: ["tipoPessoa"],
       })
-      .then((rs: Array<PessoaInterface>) => {
-        setRsVendedor(rs)
+      .then((rsVendedores: Array<PessoaInterface>) => {
+        setRsVendedor(rsVendedores)
       })
   }
 
@@ -342,12 +342,12 @@ export default function Pedido() {
                       onExcluir(rs.idPedido as number),
                     toolTip: "Excluir",
                   },
-                  {
-                    icone: "auto_awesome_motion_outlined",
-                    onAcionador: (rs: DetalhePedidoInterface) =>
-                      onDetalhe(rs.idPedido as number),
-                    toolTip: "Itens",
-                  },
+                  // {
+                  //   icone: "auto_awesome_motion_outlined",
+                  //   onAcionador: (rs: DetalhePedidoInterface) =>
+                  //     onDetalhe(rs.idPedido as number),
+                  //   toolTip: "Itens",
+                  // },
                 ]}
                 order={order}
                 orderBy={orderBy}
@@ -420,6 +420,13 @@ export default function Pedido() {
                 erros={erros}
               />
             </Grid>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <DetalhePedido
+                rsMaster={pedido}
+                setRsMaster={setPedido}
+                masterLocalState={localState}
+              />
+            </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
@@ -455,11 +462,11 @@ export default function Pedido() {
               </Condicional>
             </Grid>
           </Condicional>
-          <Condicional condicao={localState.action === 'detalhes'}>
+          {/* <Condicional condicao={localState.action === 'detalhes'}>
             <Grid item xs={12}>
               <DetalhePedido rsPedido={pedido} setPedidoState={setLocalState} />
             </Grid>
-          </Condicional>
+          </Condicional> */}
         </Grid>
       </Paper >
     </Container >

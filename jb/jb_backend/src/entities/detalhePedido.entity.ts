@@ -13,15 +13,21 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   @PrimaryColumn()
   idPedido: number;
 
-  @ManyToOne(() => Pedido, pedido => pedido.detalhesPedido)
+  @JoinColumn({ name: 'idPedido' })
+  @ManyToOne(() => Pedido, pedido => pedido.detalhePedidos, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   pedido: Pedido;
 
   @Column()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.pedidos)
+  @ManyToOne(() => Produto)
   produto: Produto
+
 
   @Column({ type: 'float', precision: 4 })
   qtdPedida: number

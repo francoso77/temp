@@ -72,7 +72,7 @@ export default class Pessoa implements PessoaInterface {
     producaoMalharia.revisador, { cascade: true })
   revisadorProducaoMalharias: ProducaoMalharia[]
 
-  @JoinColumn({ name: 'idPessoaTecelao' })
+  @JoinColumn({ name: 'idPessoa_tecelao' })
   @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
     producaoMalharia.tecelao, { cascade: true })
   tecelaoProducaoMalharias: ProducaoMalharia[]

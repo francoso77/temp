@@ -159,8 +159,11 @@ var ClsCrudController = /** @class */ (function () {
                     if (notOrLike === "L") {
                         where[campo] = (0, typeorm_1.Like)(where[campo]);
                     }
-                    else {
+                    else if (notOrLike === "N") {
                         where[campo] = (0, typeorm_1.Not)(where[campo]);
+                    }
+                    else {
+                        where[campo] = (0, typeorm_1.In)(where[campo]);
                     }
                 });
                 order = {};

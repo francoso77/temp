@@ -1,5 +1,6 @@
 import { StatusPedidoItemType } from '../types/statusPedidoItemTypes'
 import { StatusPedidoType } from '../types/statusPedidoTypes'
+import { ProdutoInterface } from './produtoInterface'
 
 export interface PedidoInterface {
   idPedido?: number
@@ -9,14 +10,16 @@ export interface PedidoInterface {
   idPessoa_vendedor: number
   idPrazoEntrega: number
   statusPedido: StatusPedidoType
+  detalhePedidos: Array<DetalhePedidoInterface>
 }
 
 export interface DetalhePedidoInterface {
   idDetalhePedido?: number
-  idPedido: number
+  idPedido: number | null
   idProduto: number
   qtdPedida: number
   vrUnitario: number
   qtdAtendida: number
   statusItem: StatusPedidoItemType
+  produto: ProdutoInterface
 }

@@ -21,25 +21,38 @@ export default class Pedido implements PedidoInterface {
   idPrazoEntrega: number
 
   @JoinColumn({ name: 'idPrazoEntrega' })
-  @ManyToOne(() => PrazoEntrega, (prazoEntrega) => prazoEntrega.pedidos)
+  @ManyToOne(() => PrazoEntrega, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   prazoEntrega: PrazoEntrega
 
   @Column()
   idPessoa_cliente: number
 
   @JoinColumn({ name: 'idPessoa_cliente' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.clientePedidos)
+  @ManyToOne(() => Pessoa, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   cliente: Pessoa
 
   @Column()
   idPessoa_vendedor: number
 
   @JoinColumn({ name: 'idPessoa_vendedor' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.vendedorPedidos)
+  @ManyToOne(() => Pessoa, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   vendedor: Pessoa
 
-  @OneToMany(() => DetalhePedido, detalhePedido => detalhePedido.pedido)
-  detalhesPedido: DetalhePedido[]
+  @JoinColumn({ name: 'idPedido' })
+  @OneToMany(() => DetalhePedido, detalhePedido => detalhePedido.pedido, { cascade: true })
+  detalhePedidos: DetalhePedido[]
 
   @Column({ length: 1 })
   statusPedido: StatusPedidoType

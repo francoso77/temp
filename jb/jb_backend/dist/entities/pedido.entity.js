@@ -35,7 +35,11 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPrazoEntrega", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPrazoEntrega' }),
-        (0, typeorm_1.ManyToOne)(function () { return prazoEntrega_entity_1.default; }, function (prazoEntrega) { return prazoEntrega.pedidos; }),
+        (0, typeorm_1.ManyToOne)(function () { return prazoEntrega_entity_1.default; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", prazoEntrega_entity_1.default)
     ], Pedido.prototype, "prazoEntrega", void 0);
     __decorate([
@@ -44,7 +48,11 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPessoa_cliente", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.clientePedidos; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Pedido.prototype, "cliente", void 0);
     __decorate([
@@ -53,13 +61,18 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPessoa_vendedor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_vendedor' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.vendedorPedidos; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Pedido.prototype, "vendedor", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalhePedido_entity_1.default; }, function (detalhePedido) { return detalhePedido.pedido; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPedido' }),
+        (0, typeorm_1.OneToMany)(function () { return detalhePedido_entity_1.default; }, function (detalhePedido) { return detalhePedido.pedido; }, { cascade: true }),
         __metadata("design:type", Array)
-    ], Pedido.prototype, "detalhesPedido", void 0);
+    ], Pedido.prototype, "detalhePedidos", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 1 }),
         __metadata("design:type", String)
