@@ -1,8 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProdutoInterface } from '../interfaces/produtoInterface';
-import Estrutura from './estrutura.entity';
-import Pedido from './pedido.entity';
-import DetalhePedido from './detalhePedido.entity';
 import DetalheEntrada from './detalheEntrada.entity';
 import UnidadeMedida from './unidadeMedida.entity';
 import ProducaoMalharia from './producaoMalharia.entity';
@@ -24,7 +21,7 @@ export default class Produto implements ProdutoInterface {
   idUnidade: number
 
   @JoinColumn({ name: 'idUnidade' })
-  @ManyToOne(() => UnidadeMedida, (unidadeMedida) => unidadeMedida.produtos)
+  @ManyToOne(() => UnidadeMedida)
   unidadeMedida: UnidadeMedida
 
   @Column({ nullable: true, length: 10 })
@@ -46,11 +43,6 @@ export default class Produto implements ProdutoInterface {
   @OneToMany(() => DetalheProducaoDublagem, (detalheProducaoDublagem) =>
     detalheProducaoDublagem.produto, { cascade: true })
   producaoDublagens: DetalheProducaoDublagem[]
-
-  @JoinColumn({ name: "idProduto" })
-  @OneToMany(() => DetalhePedido, (detalhePedido) =>
-    detalhePedido.produto, { cascade: true })
-  pedidos: Pedido[]
 
   @JoinColumn({ name: "idProduto" })
   @OneToMany(() => DetalheEntrada, (entrada) =>

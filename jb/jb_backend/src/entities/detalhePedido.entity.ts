@@ -10,7 +10,7 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   @PrimaryGeneratedColumn()
   idDetalhePedido: number;
 
-  @PrimaryColumn()
+  @Column()
   idPedido: number;
 
   @JoinColumn({ name: 'idPedido' })
@@ -27,7 +27,6 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   @JoinColumn({ name: 'idProduto' })
   @ManyToOne(() => Produto)
   produto: Produto
-
 
   @Column({ type: 'float', precision: 4 })
   qtdPedida: number

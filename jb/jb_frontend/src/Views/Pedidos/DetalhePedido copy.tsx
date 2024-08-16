@@ -1,5 +1,7 @@
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
@@ -10,15 +12,33 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
+import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
+import ShowText from '../../Componentes/ShowText';
 import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
-import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
+import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
+import styled from 'styled-components';
+import ClsFormatacao from '../../Utils/ClsFormatacao';
 import InputCalc from '../../Componentes/InputCalc';
+import { TipoProdutoType } from '../../types/tipoProdutoypes';
+import { StatusPedidoType } from '../../types/statusPedidoTypes';
 
+
+const CustomDialog = styled(Dialog)(({ theme }) => ({
+  '& .MuiDialog-paper': {
+    width: '90%', // Ajuste esta porcentagem conforme necessário
+    height: '90vh', // Ajuste esta altura conforme necessário
+    maxWidth: 'none',
+    maxHeight: 'none',
+  },
+}));
+
+// interface PropsInterface {
+//   rsPedido: PedidoInterface
+//   setPedidoState: React.Dispatch<React.SetStateAction<ActionInterface>>,
+// }
 
 interface PropsInterface {
   rsMaster: PedidoInterface
@@ -26,13 +46,20 @@ interface PropsInterface {
   masterLocalState: ActionInterface,
 }
 
-
+interface rsSomatorioInterface {
+  total: number
+  totalQtdPedida: number
+}
 export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
+  const SomatorioDados: rsSomatorioInterface = {
+    total: 0,
+    totalQtdPedida: 0
+  }
   const ResetDados: DetalhePedidoInterface = {
     idPedido: null,
     idProduto: 0,
@@ -48,26 +75,34 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
     qtdPedida: 0,
     vrUnitario: 0,
     qtdAtendida: 0,
-    statusItem: StatusPedidoItemType.aberto,
+    statusItem: StatusPedidoItemType.aberto
+  }
+
+  interface PesquisaInterface {
+    nome: string
   }
 
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false);
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
-  const [erros, setErros] = useState({});
-  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados);
-  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
+  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
+  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalhePedidoInterface>>([])
+  const [nomeCliente, setNomeCliente] = useState<PesquisaInterface>({ nome: '' })
+  const [erros, setErros] = useState({})
+  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
+  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
+  const [rsSomatorio, setRsSomatorio] = useState<rsSomatorioInterface>(SomatorioDados)
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'idProduto',
-      format: (_v, rs: any) => rs.produto.nome
+      campo: 'idProduto'
     },
     {
       cabecalho: 'Qtd',
@@ -79,15 +114,14 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
       cabecalho: 'Vr Unitário',
       alinhamento: 'right',
       campo: 'vrUnitario',
-      format: (qtd) => clsFormatacao.currency(qtd)
+      format: (vr) => clsFormatacao.currency(vr)
     },
-    {
-      cabecalho: 'Total Item',
-      alinhamento: 'right',
-      campo: 'qtdPedida',
-      format: (_v, rs: any) => rs.qtdPedida ?
-        clsFormatacao.currency(rs.qtdPedida * rs.vrUnitario) : ""
-    },
+    // {
+    //   cabecalho: 'Total Item',
+    //   alinhamento: 'right',
+    //   campo: 'vrTotal',
+    //   format: (vrTotal) => clsFormatacao.currency(vrTotal)
+    // },
   ]
 
   const handleRequestSort = (
@@ -98,18 +132,6 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
-  const validarDados = (): boolean => {
-    let retorno: boolean = true
-    let erros: { [key: string]: string } = {}
-
-    retorno = validaCampo.naoVazio('idProduto', detalhePedido, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('qtdPedida', detalhePedido, erros, retorno, 'Valor maior que 0')
-    retorno = validaCampo.naoVazio('vrUnitario', detalhePedido, erros, retorno, 'Valor maior que 0')
-
-    setErros(erros)
-    return retorno
-  }
 
   const onEditar = (rs: DetalhePedidoInterface, indice: number) => {
     setLocalState({ action: actionTypes.editando })
@@ -130,10 +152,10 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
 
   const btIncluir = () => {
     if (
-      rsMaster.dataPedido !== "" &&
-      rsMaster.idPrazoEntrega !== 0 &&
+      rsMaster.dataPedido !== '' &&
       rsMaster.idPessoa_cliente !== 0 &&
-      rsMaster.idPessoa_vendedor !== 0
+      rsMaster.idPessoa_vendedor !== 0 &&
+      rsMaster.idPrazoEntrega !== 0
     ) {
       setIndiceEdicao(-1)
       setOpen(true)
@@ -189,6 +211,18 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
     return indice < 0;
   }
 
+  const validarDados = (): boolean => {
+
+    let retorno: boolean = true
+    let erros: { [key: string]: string } = {}
+
+    retorno = validaCampo.naoVazio('idProduto', detalhePedido, erros, retorno, 'Escolha um produto')
+    retorno = validaCampo.naoVazio('vrUnitario', detalhePedido, erros, retorno, 'Valor maior que 0')
+    retorno = validaCampo.naoVazio('qtdPedida', detalhePedido, erros, retorno, 'Valor maior que 0')
+    setErros(erros)
+    return retorno
+  }
+
   const btConfirmaInclusao = () => {
 
     if (validarDados() && podeIncluirDetalhe()) {
@@ -201,10 +235,10 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
               idPedido: rsMaster.idPedido as number,
               idProduto: detalhePedido.idProduto,
               qtdPedida: detalhePedido.qtdPedida,
-              qtdAtendida: 0,
               vrUnitario: detalhePedido.vrUnitario,
+              qtdAtendida: 0,
               statusItem: StatusPedidoItemType.aberto,
-              produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
+              produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] }
             }
           ]
       })
@@ -230,7 +264,6 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
       setOpen(false)
     }
   }
-
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
@@ -241,14 +274,16 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
         setRsProduto(rsProdutos)
       })
 
+    console.log(rsMaster)
   }
+
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
     BuscarDados()
   }, [])
 
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   return (
     <>
       <Dialog
@@ -266,12 +301,32 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
           }}>
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: 'white' }}>
-              Item da estrutura do produto
+              Item do Pedido
             </Typography>
           </Grid>
         </Paper>
+        {/* <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+                  <InputText
+                    label="Qtd Total"
+                    dados={rsSomatorio}
+                    field="totalQtdPedida"
+                    setState={setDetalhePedido}
+                    disabled={true}
+                    textAlign='center'
+                  />
+                </Grid>
+                <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+                  <InputText
+                    label="Total Pedido"
+                    dados={rsSomatorio}
+                    field="total"
+                    setState={setDetalhePedido}
+                    disabled={true}
+                    textAlign='center'
+                  />
+                </Grid> */}
         <Condicional condicao={localState.action !== 'pesquisando'}>
-          <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+          <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
               <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
                 <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
@@ -285,9 +340,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                     label="Produtos"
                     erros={erros}
                     setState={setDetalhePedido}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 1)}
-
+                    onKeyDown={(event) => btPulaCampo(event, 1)}
                   />
                 </Box>
               </Grid>
@@ -295,8 +348,8 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                 <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                   <InputText
                     tipo='currency'
-                    scale={2}
-                    label="Qtd"
+                    scale={4}
+                    label="Qtd Pedida"
                     dados={detalhePedido}
                     field="qtdPedida"
                     setState={setDetalhePedido}
@@ -304,6 +357,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                     erros={erros}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                    textAlign='right'
                   />
                 </Box>
               </Grid>
@@ -311,7 +365,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                 <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                   <InputText
                     tipo='currency'
-                    scale={2}
+                    scale={4}
                     label="Vr Unitário"
                     dados={detalhePedido}
                     field="vrUnitario"
@@ -320,21 +374,22 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                     erros={erros}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                    textAlign='right'
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              {/* <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
 
-                <InputCalc
-                  label='Total Item'
-                  tipo='currency'
-                  scale={4}
-                  disabled={true}
-                  value={(detalhePedido.qtdPedida * detalhePedido.vrUnitario).toString()}
-                  textAlign='right'
+                  <InputCalc
+                    label='Total Item'
+                    tipo='currency'
+                    scale={4}
+                    disabled={true}
+                    value={(detalhePedido.qtdPedida * detalhePedido.vrUnitario).toString()}
+                    textAlign='right'
 
-                />
-              </Grid>
+                  />
+                </Grid> */}
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>
@@ -351,8 +406,9 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                       <IconButton
                         color="secondary"
                         sx={{ mt: 3, ml: 2 }}
-                        onClick={localState.action === actionTypes.incluindo ?
-                          () => btConfirmaInclusao() : () => btConfirmaAlteracao()}
+                        onClick={localState.action === actionTypes.incluindo ? () => btConfirmaInclusao() :
+                          () => btConfirmaAlteracao()
+                        }
                       >
                         <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
                       </IconButton>
@@ -363,7 +419,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
             </Grid>
           </Paper >
         </Condicional>
-      </Dialog >
+      </Dialog>
       <Paper sx={{ m: 0, p: 0 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
           <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
@@ -380,6 +436,9 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
         </Grid>
         <Grid item xs={12}>
           <DataTable
+            colunaSoma='qtd'
+            temTotal={true}
+            qtdColunas={2}
             cabecalho={cabecalhoForm}
             dados={rsMaster.detalhePedidos}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
@@ -403,6 +462,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
           />
         </Grid>
       </Paper>
+
     </>
   )
 }

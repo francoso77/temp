@@ -51,7 +51,8 @@ export default class Pedido implements PedidoInterface {
   vendedor: Pessoa
 
   @JoinColumn({ name: 'idPedido' })
-  @OneToMany(() => DetalhePedido, detalhePedido => detalhePedido.pedido, { cascade: true })
+  @OneToMany(() => DetalhePedido,
+    detalhePedido => detalhePedido.pedido, { cascade: true })
   detalhePedidos: DetalhePedido[]
 
   @Column({ length: 1 })

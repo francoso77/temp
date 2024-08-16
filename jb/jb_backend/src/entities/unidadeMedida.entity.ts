@@ -1,7 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UnidadeMedidaInterface } from '../interfaces/unidadeMedidaInteface';
 import Produto from './produto.entity';
-import Estrutura from './estrutura.entity';
 
 @Entity({ name: 'unidademedidas' })
 export default class UnidadeMedida implements UnidadeMedidaInterface {

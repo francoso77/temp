@@ -38,8 +38,19 @@ export default function Pedido() {
     statusPedido: StatusPedidoType.aberto,
     detalhePedidos: []
   }
+
   interface PesquisaInterface {
     itemPesquisa: string
+  }
+
+  interface SomatorioInterface {
+    totalPedido: string
+    totalQtdPedida: string
+  }
+
+  const SomatorioDados: SomatorioInterface = {
+    totalPedido: '',
+    totalQtdPedida: ''
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
@@ -52,16 +63,12 @@ export default function Pedido() {
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const [order, setOrder] = useState<Order>('asc')
+  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  const [rsSomatorio, setRsSomatorio] = useState<SomatorioInterface>(SomatorioDados)
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
-    {
-      cabecalho: 'Cliente',
-      alinhamento: 'left',
-      campo: 'idPessoa',
-      format: (_v, rs: any) => rs.cliente.nome
-    },
     {
       cabecalho: 'Data',
       alinhamento: 'left',
@@ -69,9 +76,15 @@ export default function Pedido() {
       format: (data) => clsFormatacao.dataISOtoUser(data)
     },
     {
+      cabecalho: 'Cliente',
+      alinhamento: 'left',
+      campo: 'idPessoa_cliente',
+      format: (_v, rs: any) => rs.cliente.nome
+    },
+    {
       cabecalho: 'Vendedor',
       alinhamento: 'left',
-      campo: 'idPessoa',
+      campo: 'idPessoa_vendedor',
       format: (_v, rs: any) => rs.vendedor.nome
     },
   ]
@@ -89,6 +102,13 @@ export default function Pedido() {
     return clsCrud
       .pesquisar({
         entidade: "Pedido",
+        relations: [
+          "cliente",
+          "vendedor",
+          "prazoEntrega",
+          "detalhePedidos",
+          "detalhePedidos.produto",
+        ],
         criterio: {
           idPedido: id,
         },
@@ -101,34 +121,26 @@ export default function Pedido() {
         }
       })
   }
+
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
+
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
-  const onDetalhe = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setPedido(rs)
-      setLocalState({ action: actionTypes.detalhes })
-      setLayoutState({
-        titulo: 'Itens Pedido',
-        tituloAnterior: 'Pedidos',
-        pathTitulo: '/DetalhePedido',
-        pathTituloAnterior: '/Pedido'
-      })
-    })
-  }
+
   const btIncluir = () => {
     setPedido(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
+
   const btCancelar = () => {
     setErros({})
     setPedido(ResetDados)
@@ -202,29 +214,38 @@ export default function Pedido() {
   }
 
   const btPesquisar = () => {
-    const query = `
-      SELECT 
-        p.*, 
-        pc.nome AS nome_cliente, 
-        pv.nome AS nome_vendedor
-      FROM 
-        pedidos p
-      INNER JOIN 
-        pessoas pc ON pc.idPessoa = p.idPessoa_cliente
-      INNER JOIN 
-        pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
-      WHERE 
-        pc.nome LIKE '%${pesquisa.itemPesquisa}%'
-      `;
+
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Pedido",
-        sql: query,
+        relations: [
+          "cliente",
+          "vendedor",
+          "prazoEntrega",
+          "detalhePedidos",
+          "detalhePedidos.produto",
+        ],
+        criterio: {
+          idPedido: "%".concat(pesquisa.itemPesquisa).concat("%"),
+        },
+        camposLike: ["idPedido"],
+        msg: 'Pesquisando pedidos ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
+        console.log(rs)
       })
+    if (pedido.detalhePedidos) {
+      let totalQtdPedida: number = 0
+      let totalPedido: number = 0
+
+      pedido.detalhePedidos.forEach((detalhe) => {
+        totalQtdPedida = totalQtdPedida + detalhe.qtdPedida
+        totalPedido = totalPedido + (detalhe.qtdPedida * detalhe.vrUnitario)
+      })
+      setRsSomatorio({ totalPedido: totalPedido.toString(), totalQtdPedida: totalQtdPedida.toString() })
+    }
   }
   const irPara = useNavigate()
   const btFechar = () => {
@@ -342,12 +363,6 @@ export default function Pedido() {
                       onExcluir(rs.idPedido as number),
                     toolTip: "Excluir",
                   },
-                  // {
-                  //   icone: "auto_awesome_motion_outlined",
-                  //   onAcionador: (rs: DetalhePedidoInterface) =>
-                  //     onDetalhe(rs.idPedido as number),
-                  //   toolTip: "Itens",
-                  // },
                 ]}
                 order={order}
                 orderBy={orderBy}
@@ -427,6 +442,30 @@ export default function Pedido() {
                 masterLocalState={localState}
               />
             </Grid>
+            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                tipo='currency'
+                scale={2}
+                label="Qtd Total"
+                dados={rsSomatorio}
+                field="totalQtdPedida"
+                setState={setPedido}
+                disabled={true}
+                textAlign='center'
+              />
+            </Grid>
+            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                tipo='currency'
+                scale={2}
+                label="Total Pedido"
+                dados={rsSomatorio}
+                field="totalPedido"
+                setState={setPedido}
+                disabled={true}
+                textAlign='center'
+              />
+            </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
@@ -448,7 +487,6 @@ export default function Pedido() {
                   </IconButton>
                 </Tooltip>
               </Condicional>
-
               <Condicional condicao={localState.action === 'excluindo'}>
                 <Tooltip title={'Excluir'}>
                   <IconButton
@@ -462,11 +500,6 @@ export default function Pedido() {
               </Condicional>
             </Grid>
           </Condicional>
-          {/* <Condicional condicao={localState.action === 'detalhes'}>
-            <Grid item xs={12}>
-              <DetalhePedido rsPedido={pedido} setPedidoState={setLocalState} />
-            </Grid>
-          </Condicional> */}
         </Grid>
       </Paper >
     </Container >

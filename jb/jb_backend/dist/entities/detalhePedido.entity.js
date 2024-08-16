@@ -21,7 +21,7 @@ var DetalhePedido = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "idDetalhePedido", void 0);
     __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
+        (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "idPedido", void 0);
     __decorate([

@@ -10,7 +10,7 @@ export interface PedidoInterface {
   idPessoa_vendedor: number
   idPrazoEntrega: number
   statusPedido: StatusPedidoType
-  detalhePedidos: Array<DetalhePedidoInterface>
+  detalhePedidos: DetalhePedidoInterface[]
 }
 
 export interface DetalhePedidoInterface {
