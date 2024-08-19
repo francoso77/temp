@@ -2,9 +2,6 @@ import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGenerat
 import { PessoaInterface } from '../interfaces/pessoaInterface';
 import { PessoaType } from '../types/pessoaTypes';
 import { Length } from 'class-validator';
-import Pedido from './pedido.entity';
-import Entrada from './entrada.entity';
-import DetalheEntrada from './detalheEntrada.entity';
 import ProducaoMalharia from './producaoMalharia.entity';
 import Tinturaria from './tinturaria.entity';
 import Estoque from './estoque.entity';
@@ -63,11 +60,6 @@ export default class Pessoa implements PessoaInterface {
   ativo: boolean
 
   @JoinColumn({ name: 'idPessoa_revisador' })
-  @OneToMany(() => DetalheEntrada, (detalheEntrada) =>
-    detalheEntrada.revisador, { cascade: true })
-  revisadorDetalheEntradas: DetalheEntrada[]
-
-  @JoinColumn({ name: 'idPessoa_revisador' })
   @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
     producaoMalharia.revisador, { cascade: true })
   revisadorProducaoMalharias: ProducaoMalharia[]
@@ -76,21 +68,6 @@ export default class Pessoa implements PessoaInterface {
   @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
     producaoMalharia.tecelao, { cascade: true })
   tecelaoProducaoMalharias: ProducaoMalharia[]
-
-  @JoinColumn({ name: 'idPessoa_cliente' })
-  @OneToMany(() => Pedido, (pedido) =>
-    pedido.cliente, { cascade: true })
-  clientePedidos: Pedido[]
-
-  @JoinColumn({ name: 'idPessoa_vendedor' })
-  @OneToMany(() => Pedido, (pedido) =>
-    pedido.vendedor, { cascade: true })
-  vendedorPedidos: Pedido[]
-
-  @JoinColumn({ name: 'idPessoa_fornecedor' })
-  @OneToMany(() => Entrada, (entrada) =>
-    entrada.fornecedor, { cascade: true })
-  fornecedorEntradas: Pedido[]
 
   @JoinColumn({ name: 'idPessoa_cliente' })
   @OneToMany(() => Tinturaria, (tinturaria) =>
@@ -106,11 +83,6 @@ export default class Pessoa implements PessoaInterface {
   @OneToMany(() => Tinturaria, (tinturaria) =>
     tinturaria.fornecedor, { cascade: true })
   fornecedorTinturarias: Tinturaria[]
-
-  @JoinColumn({ name: 'idPessoa_fornecedor' })
-  @OneToMany(() => Estoque, (estoque) =>
-    estoque.fornecedor, { cascade: true })
-  fornecedorEstoques: Estoque[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date

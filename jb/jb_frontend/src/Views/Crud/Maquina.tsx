@@ -105,9 +105,14 @@ export default function Maquina() {
         },
       })
       .then((rs: Array<MaquinaInterface>) => {
-        return rs[0]
+        let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataPreventiva)
+        return {
+          ...rs[0],
+          dataPreventiva: clsFormatacao.dataISOtoDatetime(dt)
+        }
       })
   }
+
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setMaquina(rs)
@@ -279,10 +284,8 @@ export default function Maquina() {
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -410,15 +413,15 @@ export default function Maquina() {
               />
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
+            <InputText
+                type='tel'
+                tipo="date"
                 label="Próxima Preventiva"
-                setState={setMaquina}
                 dados={maquina}
                 field="dataPreventiva"
-                erros={erros}
-                type="tel"
-                tipo='date'
+                setState={setMaquina}
                 disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
               />
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>

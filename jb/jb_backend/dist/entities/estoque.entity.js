@@ -26,7 +26,7 @@ var Estoque = /** @class */ (function () {
     ], Estoque.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.estoques; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], Estoque.prototype, "produto", void 0);
     __decorate([
@@ -35,7 +35,7 @@ var Estoque = /** @class */ (function () {
     ], Estoque.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.fornecedorEstoques; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Estoque.prototype, "fornecedor", void 0);
     __decorate([
@@ -48,7 +48,7 @@ var Estoque = /** @class */ (function () {
     ], Estoque.prototype, "idCor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idCor' }),
-        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }, function (cor) { return cor.corEstoques; }),
+        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }),
         __metadata("design:type", cor_entity_1.default)
     ], Estoque.prototype, "cor", void 0);
     __decorate([

@@ -10,26 +10,31 @@ import Tinturaria from './tinturaria.entity';
 export default class DetalheEntrada implements DetalheEntradaInterface {
 
   @PrimaryGeneratedColumn()
-  idDetalheEntrada: number;
+  idDetalheEntrada: number
 
-  @PrimaryColumn()
-  idEntrada: number;
+  @Column()
+  idEntrada: number
 
-  @ManyToOne(() => Entrada, entrada => entrada.detalheEntradas)
-  entrada: Entrada;
-
+  @JoinColumn({ name: 'idEntrada' })
+  @ManyToOne(() => Entrada, entrada => entrada.detalheEntradas, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
+  entrada: Entrada
+  
   @Column()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.entradas)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @Column({ nullable: true })
   idCor: number | null;
 
   @JoinColumn({ name: 'idCor' })
-  @ManyToOne(() => Cor, (cor) => cor.corDetalheEntradas)
+  @ManyToOne(() => Cor)
   cor: Cor
 
   @Column({ type: 'float', precision: 4, nullable: true })
@@ -51,14 +56,14 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   idPessoa_revisador: number | null
 
   @JoinColumn({ name: 'idPessoa_revisador' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.revisadorDetalheEntradas)
+  @ManyToOne(() => Pessoa)
   revisador: Pessoa
 
   @Column({ nullable: true })
   idTinturaria: number | null
 
   @JoinColumn({ name: 'idTinturaria' })
-  @ManyToOne(() => Tinturaria, (tinturaria) => tinturaria.romaneioDetalheEntradas)
+  @ManyToOne(() => Tinturaria)
   romaneio: Tinturaria
 
   @Column({ type: 'float', precision: 4, nullable: true })

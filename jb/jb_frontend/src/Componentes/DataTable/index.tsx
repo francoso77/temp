@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon, TableFooter } from '@mui/material'
-import TablePagination, { tablePaginationClasses } from '@mui/material/TablePagination'
+import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import Condicional from '../Condicional/Condicional';
@@ -218,6 +218,7 @@ export default function DataTable<T>({
                     active={orderBy === coluna.campo}
                     direction={orderBy === coluna.campo ? order : 'asc'}
                     onClick={createSortHandler(coluna.campo)}
+                    sx={{ ml: 0.15 }}
                   >
                     {coluna.cabecalho}
                   </TableSortLabel>
@@ -243,7 +244,6 @@ export default function DataTable<T>({
                       cabecalho.map((coluna, indice) => {
                         return (
                           <StyledTableCell
-                            sx={{ m: 0, p: 0 }}
                             key={indice}
                             align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
                             {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}

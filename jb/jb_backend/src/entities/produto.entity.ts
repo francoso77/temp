@@ -1,10 +1,8 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProdutoInterface } from '../interfaces/produtoInterface';
-import DetalheEntrada from './detalheEntrada.entity';
 import UnidadeMedida from './unidadeMedida.entity';
 import ProducaoMalharia from './producaoMalharia.entity';
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
-import Estoque from './estoque.entity';
 import DetalheProgramacao from './detalheProgramacao.entity';
 import { TipoProdutoType } from '../types/tipoProdutoypes';
 
@@ -45,19 +43,9 @@ export default class Produto implements ProdutoInterface {
   producaoDublagens: DetalheProducaoDublagem[]
 
   @JoinColumn({ name: "idProduto" })
-  @OneToMany(() => DetalheEntrada, (entrada) =>
-    entrada.produto, { cascade: true })
-  entradas: DetalheEntrada[]
-
-  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
     producaoMalharia.produto, { cascade: true })
   producaoMalharias: ProducaoMalharia[]
-
-  @JoinColumn({ name: "idProduto" })
-  @OneToMany(() => Estoque, (estoque) =>
-    estoque.produto, { cascade: true })
-  estoques: Estoque[]
 
   @JoinColumn({ name: "idProduto" })
   @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>

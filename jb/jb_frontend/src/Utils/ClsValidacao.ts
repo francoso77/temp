@@ -444,12 +444,7 @@ export default class ClsValidacao {
           erros[campo] = mensagemErro
           return false
         }
-
-
       }
-
     }
-
   }
-
 }

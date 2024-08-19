@@ -117,6 +117,7 @@ export default function Pessoa() {
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setPessoa(rs)
+      setSelectedValue(rs.tipoPessoa)
       setLocalState({ action: actionTypes.editando })
     })
   }
@@ -185,7 +186,7 @@ export default function Pessoa() {
           tipoPessoa: pessoa.tipoPessoa
         },
         camposLike: ["nome"],
-        select: ["nome"],
+        select: ["nome", "tipoPessoa"],
         msg: 'Pesquisando pessoas ...',
         setMensagemState: setMensagemState
       })
@@ -340,10 +341,8 @@ export default function Pessoa() {
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -416,9 +415,12 @@ export default function Pessoa() {
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
-            <Grid item xs={6} sm={6} md={6} sx={{ textAlign: 'right', color: THEME.cores.cinzaTexto }}>
-              <Typography variant="h6" component="div">
-                Tipo de Pessoa: {PessoaTypes.map((p) => p.idPessoaType === selectedValue ? p.descricao : '')}
+            <Grid item xs={7} sm={6} md={6} sx={{ textAlign: 'left', ml: -5 }}>
+              <Typography variant="subtitle1" component="div">
+                Tipo de Pessoa:
+              </Typography>
+              <Typography sx={{ color: THEME.cores.cinzaTexto }}>
+                {PessoaTypes.map((p) => p.idPessoaType === selectedValue ? p.descricao : "")}
               </Typography>
             </Grid>
             <Grid item xs={12} md={['C', 'F', 'J'].includes(pessoa.tipoPessoa) ? 6 : 4} sx={{ mt: 2, pl: { md: 1 } }}>

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import Pessoa from './pessoa.entity';
 import { EstoqueInterface } from '../interfaces/estoqueInterface';
+import Pessoa from './pessoa.entity';
 import Produto from './produto.entity';
 import Cor from './cor.entity';
 
@@ -14,14 +14,14 @@ export default class Estoque implements EstoqueInterface {
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.estoques)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @Column()
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.fornecedorEstoques)
+  @ManyToOne(() => Pessoa)
   fornecedor: Pessoa
 
   @Column({ type: 'float', precision: 4 })
@@ -31,7 +31,7 @@ export default class Estoque implements EstoqueInterface {
   idCor: number | null;
 
   @JoinColumn({ name: 'idCor' })
-  @ManyToOne(() => Cor, (cor) => cor.corEstoques)
+  @ManyToOne(() => Cor)
   cor: Cor
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })

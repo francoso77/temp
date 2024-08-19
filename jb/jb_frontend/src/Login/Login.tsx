@@ -101,7 +101,7 @@ export default function Login() {
           <Paper sx={{ padding: 3, margin: 3 }}>
             <Grid container>
               <Grid item xs={12} sx={{ textAlign: "center" }}>
-                <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} />
+                {/* <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} /> */}
               </Grid>
               <Grid item xs={12} sx={{ mt: 3 }}>
                 <Text

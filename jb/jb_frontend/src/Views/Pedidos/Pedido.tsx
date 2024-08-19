@@ -22,6 +22,10 @@ import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/pra
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import DetalhePedido from './DetalhePedido';
 
+export interface SomatorioPedidoInterface {
+  total: string
+  totalQtd: string
+}
 
 export default function Pedido() {
 
@@ -43,14 +47,9 @@ export default function Pedido() {
     itemPesquisa: string
   }
 
-  interface SomatorioInterface {
-    totalPedido: string
-    totalQtdPedida: string
-  }
-
-  const SomatorioDados: SomatorioInterface = {
-    totalPedido: '',
-    totalQtdPedida: ''
+  const SomatorioDados: SomatorioPedidoInterface = {
+    total: '',
+    totalQtd: ''
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
@@ -65,7 +64,7 @@ export default function Pedido() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
-  const [rsSomatorio, setRsSomatorio] = useState<SomatorioInterface>(SomatorioDados)
+  const [rsSomatorio, setRsSomatorio] = useState<SomatorioPedidoInterface>(SomatorioDados)
 
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -125,6 +124,7 @@ export default function Pedido() {
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
+      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
@@ -132,11 +132,13 @@ export default function Pedido() {
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
+      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
 
   const btIncluir = () => {
+    setRsSomatorio({ total: '0', totalQtd: '0' })
     setPedido(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
@@ -158,6 +160,20 @@ export default function Pedido() {
 
     setErros(erros)
     return retorno
+  }
+
+  const AtualizaSomatorio = (rs: PedidoInterface) => {
+
+    let totalQtd: number = 0
+    let total: number = 0
+
+    if (rs.detalhePedidos) {
+      rs.detalhePedidos.forEach((detalhe) => {
+        totalQtd = totalQtd + detalhe.qtdPedida
+        total = total + (detalhe.qtdPedida * detalhe.vrUnitario)
+      })
+      setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
+    }
   }
 
   const btConfirmar = () => {
@@ -226,7 +242,7 @@ export default function Pedido() {
           "detalhePedidos.produto",
         ],
         criterio: {
-          idPedido: "%".concat(pesquisa.itemPesquisa).concat("%"),
+          "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%")
         },
         camposLike: ["idPedido"],
         msg: 'Pesquisando pedidos ...',
@@ -234,18 +250,7 @@ export default function Pedido() {
       })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
-        console.log(rs)
       })
-    if (pedido.detalhePedidos) {
-      let totalQtdPedida: number = 0
-      let totalPedido: number = 0
-
-      pedido.detalhePedidos.forEach((detalhe) => {
-        totalQtdPedida = totalQtdPedida + detalhe.qtdPedida
-        totalPedido = totalPedido + (detalhe.qtdPedida * detalhe.vrUnitario)
-      })
-      setRsSomatorio({ totalPedido: totalPedido.toString(), totalQtdPedida: totalQtdPedida.toString() })
-    }
   }
   const irPara = useNavigate()
   const btFechar = () => {
@@ -313,10 +318,8 @@ export default function Pedido() {
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -440,6 +443,7 @@ export default function Pedido() {
                 rsMaster={pedido}
                 setRsMaster={setPedido}
                 masterLocalState={localState}
+                setRsSomatorio={setRsSomatorio}
               />
             </Grid>
             <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
@@ -447,11 +451,13 @@ export default function Pedido() {
                 tipo='currency'
                 scale={2}
                 label="Qtd Total"
+                labelAlign='center'
                 dados={rsSomatorio}
-                field="totalQtdPedida"
-                setState={setPedido}
+                field="totalQtd"
+                setState={setRsSomatorio}
                 disabled={true}
                 textAlign='center'
+                tamanhoFonte={30}
               />
             </Grid>
             <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
@@ -459,11 +465,13 @@ export default function Pedido() {
                 tipo='currency'
                 scale={2}
                 label="Total Pedido"
+                labelAlign='center'
                 dados={rsSomatorio}
-                field="totalPedido"
-                setState={setPedido}
+                field="total"
+                setState={setRsSomatorio}
                 disabled={true}
                 textAlign='center'
+                tamanhoFonte={30}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

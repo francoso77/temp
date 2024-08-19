@@ -18,16 +18,18 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import InputCalc from '../../Componentes/InputCalc';
+import { SomatorioPedidoInterface } from './Pedido';
 
 
 interface PropsInterface {
   rsMaster: PedidoInterface
   setRsMaster: React.Dispatch<React.SetStateAction<PedidoInterface>>,
   masterLocalState: ActionInterface,
+  setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioPedidoInterface>>,
 }
 
 
-export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
+export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -112,20 +114,45 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
   }
 
   const onEditar = (rs: DetalhePedidoInterface, indice: number) => {
-    setLocalState({ action: actionTypes.editando })
-    setIndiceEdicao(indice)
-    setDetalhePedido(rs)
-    setOpen(true)
+
+    if (rs.statusItem === 1) {
+      setLocalState({ action: actionTypes.editando })
+      setIndiceEdicao(indice)
+      setDetalhePedido(rs)
+      setOpen(true)
+    } else {
+      setMensagemState({
+        titulo: 'Atenção',
+        exibir: true,
+        mensagem: 'Item em produção, não pode ser alterado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
   }
 
   const onExcluir = (rs: DetalhePedidoInterface) => {
-    let tmpDetalhe: Array<DetalhePedidoInterface> = []
-    rsMaster.detalhePedidos.forEach(det => {
-      if (det.idDetalhePedido !== rs.idDetalhePedido) {
-        tmpDetalhe.push(det)
-      }
-    })
-    setRsMaster({ ...rsMaster, detalhePedidos: tmpDetalhe })
+    if (rs.statusItem === 1) {
+
+      let tmpDetalhe: Array<DetalhePedidoInterface> = []
+      rsMaster.detalhePedidos.forEach(det => {
+        if (det.idDetalhePedido !== rs.idDetalhePedido) {
+          tmpDetalhe.push(det)
+        }
+      })
+      setRsMaster({ ...rsMaster, detalhePedidos: tmpDetalhe })
+      AtualizaSomatorio(tmpDetalhe)
+    } else {
+      setMensagemState({
+        titulo: 'Atenção',
+        exibir: true,
+        mensagem: 'Item em produção, não pode ser alterado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
   }
 
   const btIncluir = () => {
@@ -192,6 +219,17 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
   const btConfirmaInclusao = () => {
 
     if (validarDados() && podeIncluirDetalhe()) {
+      let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
+      tmpDetalhe.push({
+        idPedido: rsMaster.idPedido as number,
+        idProduto: detalhePedido.idProduto,
+        qtdPedida: detalhePedido.qtdPedida,
+        qtdAtendida: 0,
+        vrUnitario: detalhePedido.vrUnitario,
+        statusItem: StatusPedidoItemType.aberto,
+        produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
+
+      })
       setRsMaster({
         ...rsMaster, detalhePedidos:
           [
@@ -208,6 +246,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
             }
           ]
       })
+      AtualizaSomatorio(tmpDetalhe)
       setLocalState({ action: actionTypes.pesquisando })
       setDetalhePedido(ResetDados)
       setOpen(false)
@@ -218,16 +257,31 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
 
     if (validarDados() && podeIncluirDetalhe()) {
 
-      let tmpDetalheEstruturas: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
-      tmpDetalheEstruturas[indiceEdicao] = { ...detalhePedido, produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] } }
+      let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
+      tmpDetalhe[indiceEdicao] = { ...detalhePedido, produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] } }
 
       setRsMaster({
         ...rsMaster,
-        detalhePedidos: [...tmpDetalheEstruturas]
+        detalhePedidos: [...tmpDetalhe]
       })
       setLocalState({ action: actionTypes.pesquisando })
       setDetalhePedido(ResetDados)
       setOpen(false)
+      AtualizaSomatorio(tmpDetalhe)
+    }
+  }
+
+  const AtualizaSomatorio = (rs: Array<DetalhePedidoInterface>) => {
+
+    let totalQtd: number = 0
+    let total: number = 0
+
+    if (rs) {
+      rs.forEach((detalhe) => {
+        totalQtd = totalQtd + detalhe.qtdPedida
+        total = total + (detalhe.qtdPedida * detalhe.vrUnitario)
+      })
+      setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
     }
   }
 
@@ -266,7 +320,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
           }}>
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: 'white' }}>
-              Item da estrutura do produto
+              Item do Pedido
             </Typography>
           </Grid>
         </Paper>
@@ -304,6 +358,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                     erros={erros}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                    textAlign='right'
                   />
                 </Box>
               </Grid>
@@ -320,6 +375,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
                     erros={erros}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                    textAlign='right'
                   />
                 </Box>
               </Grid>
@@ -364,7 +420,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
           </Paper >
         </Condicional>
       </Dialog >
-      <Paper sx={{ m: 0, p: 0 }}>
+      <Paper sx={{ m: 0, p: 1 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
           <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
             <Tooltip title={'Incluir'}>

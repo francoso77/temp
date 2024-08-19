@@ -1,5 +1,4 @@
-import { Container, Grid, IconButton, Paper, Typography, Tooltip } from '@mui/material';
-// import { styled } from '@mui/system';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -220,17 +219,8 @@ export default function PrazoEntrega() {
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography component="h5" variant="h5" align="left">
-              {/*  Informe aqui o nome técnico de cada raça 
-           <Typography variant="body2" gutterBottom>
-               Informe os prazos de entrega 
-            </Typography>*/}
-            </Typography>
-
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>

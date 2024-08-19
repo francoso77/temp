@@ -12,12 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var pessoaTypes_1 = require("../types/pessoaTypes");
 var class_validator_1 = require("class-validator");
-var pedido_entity_1 = require("./pedido.entity");
-var entrada_entity_1 = require("./entrada.entity");
-var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var producaoMalharia_entity_1 = require("./producaoMalharia.entity");
 var tinturaria_entity_1 = require("./tinturaria.entity");
-var estoque_entity_1 = require("./estoque.entity");
 var programacao_entity_1 = require("./programacao.entity");
 var Pessoa = /** @class */ (function () {
     function Pessoa() {
@@ -89,13 +85,6 @@ var Pessoa = /** @class */ (function () {
     ], Pessoa.prototype, "ativo", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_revisador' }),
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) {
-            return detalheEntrada.revisador;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Pessoa.prototype, "revisadorDetalheEntradas", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_revisador' }),
         (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
             return producaoMalharia.revisador;
         }, { cascade: true }),
@@ -108,27 +97,6 @@ var Pessoa = /** @class */ (function () {
         }, { cascade: true }),
         __metadata("design:type", Array)
     ], Pessoa.prototype, "tecelaoProducaoMalharias", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
-        (0, typeorm_1.OneToMany)(function () { return pedido_entity_1.default; }, function (pedido) {
-            return pedido.cliente;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Pessoa.prototype, "clientePedidos", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_vendedor' }),
-        (0, typeorm_1.OneToMany)(function () { return pedido_entity_1.default; }, function (pedido) {
-            return pedido.vendedor;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Pessoa.prototype, "vendedorPedidos", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
-        (0, typeorm_1.OneToMany)(function () { return entrada_entity_1.default; }, function (entrada) {
-            return entrada.fornecedor;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Pessoa.prototype, "fornecedorEntradas", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
         (0, typeorm_1.OneToMany)(function () { return tinturaria_entity_1.default; }, function (tinturaria) {
@@ -150,13 +118,6 @@ var Pessoa = /** @class */ (function () {
         }, { cascade: true }),
         __metadata("design:type", Array)
     ], Pessoa.prototype, "fornecedorTinturarias", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
-        (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) {
-            return estoque.fornecedor;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Pessoa.prototype, "fornecedorEstoques", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
         __metadata("design:type", Date)

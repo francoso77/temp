@@ -12,7 +12,7 @@ export default class Pedido implements PedidoInterface {
   idPedido: number
 
   @Column({ type: "datetime" })
-  dataPedido: string;
+  dataPedido: string
 
   @Column({ nullable: true, length: 60 })
   observacao: string
@@ -21,33 +21,21 @@ export default class Pedido implements PedidoInterface {
   idPrazoEntrega: number
 
   @JoinColumn({ name: 'idPrazoEntrega' })
-  @ManyToOne(() => PrazoEntrega, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    orphanedRowAction: 'delete'
-  })
+  @ManyToOne(() => PrazoEntrega)
   prazoEntrega: PrazoEntrega
 
   @Column()
   idPessoa_cliente: number
 
   @JoinColumn({ name: 'idPessoa_cliente' })
-  @ManyToOne(() => Pessoa, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    orphanedRowAction: 'delete'
-  })
+  @ManyToOne(() => Pessoa)
   cliente: Pessoa
 
   @Column()
   idPessoa_vendedor: number
 
   @JoinColumn({ name: 'idPessoa_vendedor' })
-  @ManyToOne(() => Pessoa, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    orphanedRowAction: 'delete'
-  })
+  @ManyToOne(() => Pessoa)
   vendedor: Pessoa
 
   @JoinColumn({ name: 'idPedido' })

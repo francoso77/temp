@@ -1,7 +1,5 @@
-import { Box, Dialog, Grid, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
@@ -12,102 +10,107 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
-import ShowText from '../../Componentes/ShowText';
 import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
-import styled from 'styled-components';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
+import ClsFormatacao from '../../Utils/ClsFormatacao';
 import InputCalc from '../../Componentes/InputCalc';
+import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
+import { SomatorioEntradaInterface } from './Entrada';
+import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
+import { PessoaType } from '../../types/pessoaTypes';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
-import Entrada from './Entrada';
 
-
-const CustomDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-paper': {
-    width: '95%', // Ajuste esta porcentagem conforme necessário
-    height: '80vh', // Ajuste esta altura conforme necessário
-    maxWidth: 'none',
-    maxHeight: 'none',
-  },
-}));
 
 interface PropsInterface {
-  rsEntrada: EntradaInterface
+  rsMaster: EntradaInterface
+  setRsMaster: React.Dispatch<React.SetStateAction<EntradaInterface>>,
+  masterLocalState: ActionInterface,
+  setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioEntradaInterface>>,
 }
 
-interface rsSomatorioInterface {
-  totalEntrada: number
-  totalQtd: number
-}
-export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
+
+export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const SomatorioDados: rsSomatorioInterface = {
-    totalEntrada: 0,
-    totalQtd: 0
-  }
   const ResetDados: DetalheEntradaInterface = {
-    idEntrada: rsEntrada.idEntrada as number,
+    idEntrada: null,
     idProduto: 0,
+    produto: {
+      nome: '',
+      idUnidade: 0,
+      localizacao: '',
+      largura: 0,
+      gm2: 0,
+      ativo: false,
+      tipoProduto: TipoProdutoType.tecidoTinto
+    },
     qtd: 0,
     vrUnitario: 0,
     idCor: null,
+    cor: {
+      nome: ''
+    },
     qtdPecas: 0,
     metro: 0,
     gm2: 0,
     idPessoa_revisador: null,
+    revisador: {
+      nome: '',
+      apelido: '',
+      cpf_cnpj: '',
+      endereco: '',
+      numero: 0,
+      bairro: '',
+      cidade: '',
+      uf: '',
+      cep: '',
+      telefone: '',
+      whatsapp: '',
+      email: '',
+      tipoPessoa: PessoaType.revisador,
+      comissao: 0,
+      ativo: false
+    },
     idTinturaria: null,
+    romaneio: {
+      dataTinturaria: '',
+      idPessoa_cliente: 0,
+      idPessoa_fornecedor: 0
+    },
     perdaMalharia: 0,
     perdaTinturaria: 0
   }
 
-  const MovimentaEstoque: EstoqueInterface = {
-    idProduto: 0,
-    idPessoa_fornecedor: 0,
-    idCor: null,
-    qtd: 0
-  }
-  interface PesquisaInterface {
-    nome: string
-  }
-
-  const [open, setOpen] = useState(true);
+  const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
+  const [open, setOpen] = useState(false);
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<DetalheEntradaInterface>>([])
-  const [nomeFornecedor, setNomeFornecedor] = useState<PesquisaInterface>({ nome: '' })
   const [erros, setErros] = useState({})
-  const [tipo, setTipo] = useState<TipoProdutoType>()
   const [detalheEntrada, setDetalheEntrada] = useState<DetalheEntradaInterface>(ResetDados)
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
-  const [rsTinturaria, setRsTinturaria] = useState<Array<any>>([])
-  const [rsSomatorio, setRsSomatorio] = useState<rsSomatorioInterface>(SomatorioDados)
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [rsTinturaria, setRsTinturaria] = useState<Array<TinturariaInterface>>([])
+  const [order, setOrder] = useState<Order>('asc')
+  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  const [tipo, setTipo] = useState<TipoProdutoType>()
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [delEstoque, setDelEstoque] = useState(false);
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'nomeProduto'
-    },
-    {
-      cabecalho: 'Cor',
-      alinhamento: 'left',
-      campo: 'nomeCor'
+      campo: 'idProduto',
+      format: (_v, rs: any) => rs.produto.nome
     },
     {
       cabecalho: 'Qtd',
@@ -118,14 +121,15 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     {
       cabecalho: 'Vr Unitário',
       alinhamento: 'right',
-      campo: 'vr',
-      format: (vr) => clsFormatacao.currency(vr)
+      campo: 'vrUnitario',
+      format: (qtd) => clsFormatacao.currency(qtd)
     },
     {
       cabecalho: 'Total Item',
       alinhamento: 'right',
-      campo: 'vrTotal',
-      format: (vrTotal) => clsFormatacao.currency(vrTotal)
+      campo: 'qtd',
+      format: (_v, rs: any) => rs.qtd ?
+        clsFormatacao.currency(rs.qtd * rs.vrUnitario) : ""
     },
   ]
 
@@ -138,63 +142,97 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<DetalheEntradaInterface> => {
+  const pegaTipo = () => {
+    let auxTipo: number | undefined = rsProduto.
+      find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
+    setTipo(auxTipo)
+  }
+
+  const validarDados = (): boolean => {
+
+    let retorno: boolean = true
+    let erros: { [key: string]: string } = {}
+
+    retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
+    retorno = validaCampo.naoVazio('qtd', detalheEntrada, erros, retorno, 'Quantudade maior que 0')
+    retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
+    // if (tipo === 10) {
+    //   retorno = validaCampo.naoVazio('idCor', detalheEntrada, erros, retorno, 'Defina uma cor')
+    //   retorno = validaCampo.naoVazio('qtdPecas', detalheEntrada, erros, retorno, 'Informe a quantidade peças')
+    //   retorno = validaCampo.naoVazio('metro', detalheEntrada, erros, retorno, 'Qual a metragem')
+    //   retorno = validaCampo.naoVazio('gm2', detalheEntrada, erros, retorno, 'Qual a gramatura')
+    //   retorno = validaCampo.naoVazio('idPessoa_revisador', detalheEntrada, erros, retorno, 'Defina um revisador')
+    //   retorno = validaCampo.naoVazio('idTinturaria', detalheEntrada, erros, retorno, 'Defina uma tinturaria')
+    //   retorno = validaCampo.naoVazio('perdaMalharia', detalheEntrada, erros, retorno, 'Qtd perdida em malharia')
+    //   retorno = validaCampo.naoVazio('perdaTinturaria', detalheEntrada, erros, retorno, 'Qtd perdida em tinturaria')
+
+    // }
+    setErros(erros)
+    return retorno
+  }
+
+  const pesquisarEstoque = (fornecedor: number, produto: number): Promise<EstoqueInterface> => {
     return clsCrud
       .pesquisar({
-        entidade: "DetalheEntrada",
+        entidade: "Estoque",
         criterio: {
-          idDetalheEntrada: id,
+          idProduto: produto,
+          idPessoa_fornecedor: fornecedor
         },
       })
-      .then((rs: Array<DetalheEntradaInterface>) => {
+      .then((rs: Array<EstoqueInterface>) => {
         return rs[0]
       })
   }
 
-  const onEditar = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      console.log('entrou aqui')
-      const query = `
-      UPDATE estoques  
-      SET qtd = (qtd - ${detalheEntrada.qtd})
-      WHERE 
-        idProduto = ${detalheEntrada.idProduto} AND 
-        idCor = ${detalheEntrada.idCor};
-      `;
+  const onEditar = (rs: DetalheEntradaInterface, indice: number) => {
 
-      clsCrud
-        .query({
-          entidade: "Estoque",
-          sql: query,
-        })
-        .then((rs: Array<any>) => {
-          if (rs.length > 0) {
-            setMensagemState({
-              titulo: 'Erro...',
-              exibir: true,
-              mensagem: 'Deu Certo!',
-              tipo: MensagemTipo.Error,
-              exibirBotao: true,
-              cb: null
-            })
-          }
-        })
+    AtualizaEstoque(rsMaster.idPessoa_fornecedor, rs.idProduto, rs.qtd, 'Editar')
+    setLocalState({ action: actionTypes.editando })
+    setIndiceEdicao(indice)
+    setDetalheEntrada(rs)
+    setOpen(true)
+  }
 
-      setDetalheEntrada(rs)
-      setLocalState({ action: actionTypes.editando })
+  const onExcluir = (rs: DetalheEntradaInterface) => {
+    AtualizaEstoque(rsMaster.idPessoa_fornecedor, rs.idProduto, rs.qtd, 'Excluir')
+
+
+    let tmpDetalhe: Array<DetalheEntradaInterface> = []
+    rsMaster.detalheEntradas.forEach(det => {
+      if (det.idDetalheEntrada !== rs.idDetalheEntrada) {
+        tmpDetalhe.push(det)
+      }
     })
+    setRsMaster({ ...rsMaster, detalheEntradas: tmpDetalhe })
+    AtualizaSomatorio(tmpDetalhe)
   }
-  const onExcluir = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setDetalheEntrada(rs)
-      setLocalState({ action: actionTypes.excluindo })
-    })
-  }
+
   const btIncluir = () => {
-    setDetalheEntrada(ResetDados)
-    setLocalState({ action: actionTypes.incluindo })
+    if (
+      rsMaster.dataEmissao !== "" &&
+      rsMaster.notaFiscal !== "" &&
+      rsMaster.idPessoa_fornecedor !== 0
+    ) {
+      setIndiceEdicao(-1)
+      setOpen(true)
+      BuscarDados()
+      setDetalheEntrada(ResetDados)
+      setLocalState({ action: actionTypes.incluindo })
+    } else {
+      setMensagemState({
+        titulo: 'Atenção',
+        exibir: true,
+        mensagem: 'Informe os dados da Nota Fiscal!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
   }
+
   const btCancelar = () => {
+    setOpen(false)
     setErros({})
     setDetalheEntrada(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
@@ -212,262 +250,205 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
     }
   }
 
-  const pegaTipo = () => {
-    let auxTipo: number | undefined = rsProduto.
-      find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
-    setTipo(auxTipo)
+  const podeIncluirDetalhe = (): boolean => {
+    const indice = rsMaster.detalheEntradas.findIndex(
+      (v, i) => v.idProduto === detalheEntrada.idProduto && i !== indiceEdicao
+    )
+
+    if (indice >= 0) {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Produto já cadastrado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
+    return indice < 0;
   }
-  const validarDados = (): boolean => {
 
-    let retorno: boolean = true
-    let erros: { [key: string]: string } = {}
+  const btConfirmaInclusao = () => {
 
-    retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('qtd', detalheEntrada, erros, retorno, 'Quantudade maior que 0')
-    retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
-    if (tipo === 10) {
-      retorno = validaCampo.naoVazio('idCor', detalheEntrada, erros, retorno, 'Defina uma cor')
-      retorno = validaCampo.naoVazio('qtdPecas', detalheEntrada, erros, retorno, 'Informe a quantidade peças')
-      retorno = validaCampo.naoVazio('metro', detalheEntrada, erros, retorno, 'Qual a metragem')
-      retorno = validaCampo.naoVazio('gm2', detalheEntrada, erros, retorno, 'Qual a gramatura')
-      retorno = validaCampo.naoVazio('idPessoa_revisador', detalheEntrada, erros, retorno, 'Defina um revisador')
-      retorno = validaCampo.naoVazio('idTinturaria', detalheEntrada, erros, retorno, 'Defina uma tinturaria')
-      retorno = validaCampo.naoVazio('perdaMalharia', detalheEntrada, erros, retorno, 'Qtd perdida em malharia')
-      retorno = validaCampo.naoVazio('perdaTinturaria', detalheEntrada, erros, retorno, 'Qtd perdida em tinturaria')
+    if (validarDados() && podeIncluirDetalhe()) {
+      let tmpDetalhe: Array<DetalheEntradaInterface> = [...rsMaster.detalheEntradas]
+      tmpDetalhe.push({
+        idEntrada: rsMaster.idEntrada as number,
+        idProduto: detalheEntrada.idProduto,
+        idCor: detalheEntrada.idCor,
+        qtdPecas: detalheEntrada.qtdPecas,
+        vrUnitario: detalheEntrada.vrUnitario,
+        qtd: detalheEntrada.qtd,
+        metro: detalheEntrada.metro,
+        gm2: detalheEntrada.gm2,
+        idPessoa_revisador: detalheEntrada.idPessoa_revisador,
+        idTinturaria: detalheEntrada.idTinturaria,
+        perdaMalharia: detalheEntrada.perdaMalharia,
+        perdaTinturaria: detalheEntrada.perdaTinturaria,
+        produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEntrada.idProduto)] },
+        cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalheEntrada.idCor)] },
+        revisador: { ...rsRevisador[rsRevisador.findIndex(v => v.idPessoa === detalheEntrada.idPessoa_revisador)] },
+        romaneio: { ...rsTinturaria[rsTinturaria.findIndex(v => v.idTinturaria === detalheEntrada.idTinturaria)] },
+      })
+
+      setRsMaster({
+        ...rsMaster, detalheEntradas:
+          [
+            ...rsMaster.detalheEntradas,
+
+            {
+              idEntrada: rsMaster.idEntrada as number,
+              idProduto: detalheEntrada.idProduto,
+              idCor: detalheEntrada.idCor,
+              qtdPecas: detalheEntrada.qtdPecas,
+              vrUnitario: detalheEntrada.vrUnitario,
+              qtd: detalheEntrada.qtd,
+              metro: detalheEntrada.metro,
+              gm2: detalheEntrada.gm2,
+              idPessoa_revisador: detalheEntrada.idPessoa_revisador,
+              idTinturaria: detalheEntrada.idTinturaria,
+              perdaMalharia: detalheEntrada.perdaMalharia,
+              perdaTinturaria: detalheEntrada.perdaTinturaria,
+              produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEntrada.idProduto)] },
+              cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalheEntrada.idCor)] },
+              revisador: { ...rsRevisador[rsRevisador.findIndex(v => v.idPessoa === detalheEntrada.idPessoa_revisador)] },
+              romaneio: { ...rsTinturaria[rsTinturaria.findIndex(v => v.idTinturaria === detalheEntrada.idTinturaria)] },
+            }
+          ]
+      })
+      AtualizaSomatorio(tmpDetalhe)
+      setLocalState({ action: actionTypes.pesquisando })
+      setDetalheEntrada(ResetDados)
+      setOpen(false)
+    }
+  }
+
+  const btConfirmaAlteracao = () => {
+
+    if (validarDados() && podeIncluirDetalhe()) {
+
+      let tmpDetalhe: Array<DetalheEntradaInterface> = [...rsMaster.detalheEntradas]
+      tmpDetalhe[indiceEdicao] = {
+        ...detalheEntrada,
+        produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEntrada.idProduto)] },
+        cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalheEntrada.idCor)] },
+        revisador: { ...rsRevisador[rsRevisador.findIndex(v => v.idPessoa === detalheEntrada.idPessoa_revisador)] },
+        romaneio: { ...rsTinturaria[rsTinturaria.findIndex(v => v.idTinturaria === detalheEntrada.idTinturaria)] },
+      }
+
+      setRsMaster({
+        ...rsMaster,
+        detalheEntradas: [...tmpDetalhe]
+      })
+      setLocalState({ action: actionTypes.pesquisando })
+      setDetalheEntrada(ResetDados)
+      setOpen(false)
+      AtualizaSomatorio(tmpDetalhe)
 
     }
-    setErros(erros)
-    return retorno
   }
 
-  const btConfirmar = () => {
+  const AtualizaSomatorio = (rs: Array<DetalheEntradaInterface>) => {
 
-    const query = `
-    SELECT 
-    de.*
-    FROM 
-    detalheentradas de
-    WHERE 
-    de.idProduto = ${detalheEntrada.idProduto} AND 
-    de.idCor = ${detalheEntrada.idCor};
-    `;
+    let totalQtd: number = 0
+    let total: number = 0
 
-    clsCrud
-      .query({
-        entidade: "DetalheEntrada",
-        sql: query,
-        setMensagemState: setMensagemState,
+    if (rs) {
+      rs.forEach((detalhe) => {
+        totalQtd = totalQtd + detalhe.qtd
+        total = total + (detalhe.qtd * detalhe.vrUnitario)
       })
-      .then((rs: Array<any>) => {
-        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
-          setMensagemState({
-            titulo: 'Erro...',
-            exibir: true,
-            mensagem: 'Produto já cadastrado!',
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null
-          })
-        } else if (validarDados()) {
+      setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
+    }
+  }
 
-          if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+  const AtualizaEstoque = (fornecedor: number, produto: number, qtd: number, action: string) => {
+    pesquisarEstoque(fornecedor, produto)
+      .then((rs) => {
+        let tmpEstoque: EstoqueInterface = rs
+        if (rs) {
+          let novaQtd: number = rs.qtd - qtd
+
+          if (action === 'Editar') {
+            tmpEstoque = {
+              ...tmpEstoque,
+              qtd: novaQtd,
+            }
             clsCrud.incluir({
-              entidade: "DetalheEntrada",
-              criterio: detalheEntrada,
-              localState: localState,
-              cb: () => btPesquisar(),
-              setMensagemState: setMensagemState
+              entidade: "Estoque",
+              criterio: tmpEstoque,
             })
               .then((rs) => {
-                if (rs.ok) {
-                  MovimentaEstoque.idProduto = detalheEntrada.idProduto
-                  MovimentaEstoque.idCor = detalheEntrada.idCor ? detalheEntrada.idCor : null
-                  MovimentaEstoque.idPessoa_fornecedor = rsEntrada.idPessoa_fornecedor
-                  MovimentaEstoque.qtd = detalheEntrada.qtd
-                  clsCrud.incluir({
-                    entidade: "Estoque",
-                    criterio: MovimentaEstoque,
-                  })
-                  setLocalState({ action: actionTypes.pesquisando })
-                } else {
+                if (!rs.ok) {
                   setMensagemState({
                     titulo: 'Erro...',
                     exibir: true,
-                    mensagem: 'Erro no cadastro - Consulte Suporte',
+                    mensagem: 'Produto sem estoque ou falha com o banco!',
                     tipo: MensagemTipo.Error,
                     exibirBotao: true,
                     cb: null
                   })
                 }
               })
-          } else if (localState.action === actionTypes.excluindo) {
+
+          } else {
             clsCrud.excluir({
-              entidade: "DetalheEntrada",
+              entidade: "Estoque",
               criterio: {
-                idDetalheEntrada: detalheEntrada.idDetalheEntrada
+                idEstoque: rs.idEstoque
               },
-              cb: () => btPesquisar(),
-              setMensagemState: setMensagemState
             })
               .then((rs) => {
-                if (rs.ok) {
-                  setLocalState({ action: actionTypes.pesquisando })
-                } else {
+                if (!rs.ok) {
                   setMensagemState({
                     titulo: 'Erro...',
                     exibir: true,
-                    mensagem: 'Erro no cadastro - Consulte Suporte',
+                    mensagem: 'Produto sem estoque ou falha com o banco!',
                     tipo: MensagemTipo.Error,
                     exibirBotao: true,
                     cb: null
                   })
                 }
               })
+
+
+
           }
+
         }
+
       })
   }
 
-  const btPesquisar = () => {
-    let query = `
-    SELECT 
-        de.idDetalheEntrada, 
-        de.idEntrada, 
-        de.qtd, 
-        de.vrUnitario AS vr, 
-        de.idProduto, 
-        p.nome AS nomeProduto,
-        c.nome AS nomeCor,
-        FORMAT((de.qtd * de.vrUnitario),2) AS vrTotal
-        
-    FROM 
-        detalheentradas de
-    INNER JOIN 
-	      entradas e ON e.idEntrada = de.idEntrada
-    INNER JOIN
-	      produtos p ON p.idProduto = de.idProduto
-    LEFT JOIN
-        cores c ON c.idCor = de.idCor
-    WHERE 
-        de.idEntrada = ${detalheEntrada.idEntrada}
-    ORDER BY nomeProduto ASC;
-    `;
-
-    clsCrud
-      .query({
-        entidade: "Entrada",
-        sql: query,
-        msg: 'Pesquisando Entradas ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
-      })
-
-    query = `
-      SELECT 
-      FORMAT(SUM(de.qtd * de.vrUnitario),2,'de_DE') AS totalEntrada,
-      FORMAT(SUM(de.qtd),2,'de_DE') AS totalQtd
-    FROM 
-        detalheentradas de
-    INNER JOIN 
-        entradas e ON e.idEntrada = de.idEntrada
-    WHERE 
-        de.idEntrada = ${detalheEntrada.idEntrada};
-    `;
-
-    clsCrud
-      .query({
-        entidade: "DetalheEntrada",
-        sql: query,
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<rsSomatorioInterface>) => {
-        setRsSomatorio({
-          totalEntrada: rs[0].totalEntrada ? rs[0].totalEntrada : 0,
-          totalQtd: rs[0].totalQtd ? rs[0].totalQtd : 0
-        })
-      })
-  }
-
-  // const pesquisarProdutos = (nome: string) => {
-  //   clsCrud
-  //     .pesquisar({
-  //       entidade: "Produto",
-  //       criterio: {
-  //         nome: "%".concat(nome, "%"),
-  //       },
-  //       camposLike: ["nome"],
-  //       select: ["idProduto", "nome"],
-  //       msg: "Pesquisando produtos",
-  //       setMensagemState: setMensagemState,
-  //     })
-  //     .then((rsProdutos: Array<ProdutoInterface>) => {
-  //       setRsProduto(rsProdutos)
-  //     })
-  // }
   const BuscarDados = () => {
-
-    let query: string = `
-    SELECT 
-        e.*,
-        pe.nome AS nomeFornecedor
-    FROM 
-        entradas e
-    INNER JOIN 
-        pessoas pe ON pe.idPessoa = e.idPessoa_fornecedor
-    WHERE 
-        e.idEntrada = ${rsEntrada.idEntrada};
-    `;
-
     clsCrud
-      .query({
-        entidade: "Entrada",
-        sql: query,
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        setNomeFornecedor({ nome: rs[0].nomeFornecedor })
-      })
-
-    query = `
-    SELECT p.idProduto, p.nome, p.tipoProduto 
-    FROM produtos p
-    ORDER BY p.nome ASC;
-    `;
-    clsCrud
-      .query({
+      .pesquisar({
         entidade: "Produto",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ["nome"],
       })
       .then((rsProdutos: Array<ProdutoInterface>) => {
         setRsProduto(rsProdutos)
       })
 
-    query = `SELECT c.* FROM cores c ORDER BY c.nome ASC;`;
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Cor",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ["nome"],
       })
       .then((rsCores: Array<CorInterface>) => {
         setRsCor(rsCores)
       })
 
-    query = `SELECT idTinturaria FROM tinturarias ORDER BY idTinturaria ASC;`;
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Tinturaria",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ["idTinturaria"],
       })
-      .then((rsTinturarias: Array<any>) => {
+      .then((rsTinturarias: Array<TinturariaInterface>) => {
         setRsTinturaria(rsTinturarias)
       })
 
-    query = `
+    let query: string = `
         SELECT 
             p.idPessoa, p.nome, p.tipoPessoa
         FROM 
@@ -487,120 +468,34 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
       })
   }
 
-  const irpara = useNavigate()
-  const btFechar = () => {
-    setOpen(false);
-    irpara('/Entrada')
-    setLocalState({ action: actionTypes.pesquisando })
-
-    setLayoutState({
-      titulo: 'Entradas',
-      tituloAnterior: 'Itens da Entrada',
-      pathTitulo: '/Entrada',
-      pathTituloAnterior: '/DetalheEntrada'
-    })
-  }
-
   useEffect(() => {
-    fieldRefs.current = fieldRefs.current.slice(0, 11)
-    btPesquisar()
     BuscarDados()
-    setLayoutState({
-      titulo: 'Itens da Entrada',
-      tituloAnterior: 'Entradas',
-      pathTitulo: '/DetalheEntrada',
-      pathTituloAnterior: '/Entrada'
-    })
   }, [])
 
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   return (
     <>
-      <CustomDialog open={open} >
-        <Paper variant="outlined" sx={{ display: 'flex', m: 1, padding: 1 }}>
-          <Grid container >
-            <Grid item xs={10}>
-              <ShowText
-                titulo="Fornecedor"
-                descricao={nomeFornecedor.nome} />
-            </Grid>
-            <Grid item xs={2} sx={{ textAlign: 'right' }}>
-              <IconButton onClick={() => btFechar()}>
-                <CloseIcon />
-              </IconButton>
-            </Grid>
-            <Grid item xs={6} >
-              <ShowText
-                titulo="Nota Fiscal"
-                descricao={rsEntrada.notaFiscal} />
-            </Grid>
-            <Grid item xs={6} >
-              <ShowText
-                titulo="Emissão"
-                descricao={clsFormatacao.dataFormatada(rsEntrada.dataEmissao)} />
-            </Grid>
+      <Dialog
+        open={open}
+        fullScreen={fullScreen}
+        fullWidth
+        maxWidth='md'
+      >
+        <Paper variant="outlined"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            m: 1,
+            p: 1.5,
+            backgroundColor: '#3c486b'
+          }}>
+          <Grid item xs={12} sx={{ textAlign: 'center' }}>
+            <Typography sx={{ color: 'white' }}>
+              Item da Nota Fiscal
+            </Typography>
           </Grid>
         </Paper>
-        <Condicional condicao={localState.action === 'pesquisando'}>
-          <Paper sx={{ m: 1, padding: 1.5 }}>
-            <Grid item xs={12} sx={{ mb: 2, textAlign: 'center' }}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 1, ml: { xs: 1, md: 0.5 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={12}>
-              <DataTable
-                temTotal={false}
-                cabecalho={cabecalhoForm}
-                dados={rsPesquisa}
-                acoes={[
-                  {
-                    icone: "edit",
-                    onAcionador: (rs: DetalheEntradaInterface) =>
-                      onEditar(rs.idDetalheEntrada as number),
-                    toolTip: "Editar",
-                  },
-                  {
-                    icone: "delete",
-                    onAcionador: (rs: DetalheEntradaInterface) =>
-                      onExcluir(rs.idDetalheEntrada as number),
-                    toolTip: "Excluir",
-                  },
-                ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
-              />
-            </Grid>
-          </Paper>
-          <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-            <Grid container spacing={1.2} justifyContent='flex-end' sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  label="Qtd Total"
-                  dados={rsSomatorio}
-                  field="totalQtd"
-                  setState={setDetalheEntrada}
-                  disabled={true}
-                />
-              </Grid>
-              <Grid item xs={3} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  label="Total Entrada"
-                  dados={rsSomatorio}
-                  field="totalEntrada"
-                  setState={setDetalheEntrada}
-                  disabled={true}
-                />
-              </Grid>
-            </Grid>
-          </Paper>
-        </Condicional>
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -622,6 +517,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       tipo === 10 ? (event) => btPulaCampo(event, 1)
                         : (event) => btPulaCampo(event, 2)
                     }
+                    onFocus={(e) => e.target.select()}
                     autoFocus
                   />
                 </Box>
@@ -815,8 +711,7 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                     </Grid>
                   </Grid>
                 </Paper>
-              </Condicional>
-              <Condicional condicao={localState.action !== 'pesquisando'}>
+              </Condicional>              <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>
                     <IconButton
@@ -832,21 +727,10 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
                       <IconButton
                         color="secondary"
                         sx={{ mt: 3, ml: 2 }}
-                        onClick={() => btConfirmar()}
+                        onClick={localState.action === actionTypes.incluindo ?
+                          () => btConfirmaInclusao() : () => btConfirmaAlteracao()}
                       >
                         <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Condicional>
-
-                  <Condicional condicao={localState.action === 'excluindo'}>
-                    <Tooltip title={'Excluir'}>
-                      <IconButton
-                        color="secondary"
-                        sx={{ mt: 3, ml: 2 }}
-                        onClick={() => btConfirmar()}
-                      >
-                        <DeleteIcon sx={{ fontSize: 60 }} />
                       </IconButton>
                     </Tooltip>
                   </Condicional>
@@ -855,7 +739,46 @@ export default function DetalheEntrada({ rsEntrada }: PropsInterface) {
             </Grid>
           </Paper >
         </Condicional>
-      </CustomDialog>
+      </Dialog >
+      <Paper sx={{ m: 0, p: 1 }}>
+        <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
+          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+            <Tooltip title={'Incluir'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}
+                onClick={() => btIncluir()}
+              >
+                <AddCircleIcon sx={{ fontSize: 50 }} />
+              </IconButton>
+            </Tooltip>
+          </Condicional>
+        </Grid>
+        <Grid item xs={12}>
+          <DataTable
+            cabecalho={cabecalhoForm}
+            dados={rsMaster.detalheEntradas}
+            acoes={masterLocalState.action === actionTypes.excluindo ? [] :
+              [
+                {
+                  icone: "edit",
+                  onAcionador: (rs: DetalheEntradaInterface, indice: number) =>
+                    onEditar(rs, indice),
+                  toolTip: "Editar",
+                },
+                {
+                  icone: "delete",
+                  onAcionador: (rs: DetalheEntradaInterface) =>
+                    onExcluir(rs),
+                  toolTip: "Excluir",
+                },
+              ]}
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+          />
+        </Grid>
+      </Paper>
     </>
   )
 }

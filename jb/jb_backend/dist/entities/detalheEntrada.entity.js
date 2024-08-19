@@ -23,11 +23,16 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idDetalheEntrada", void 0);
     __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
+        (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idEntrada", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return entrada_entity_1.default; }, function (entrada) { return entrada.detalheEntradas; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idEntrada' }),
+        (0, typeorm_1.ManyToOne)(function () { return entrada_entity_1.default; }, function (entrada) { return entrada.detalheEntradas; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", entrada_entity_1.default)
     ], DetalheEntrada.prototype, "entrada", void 0);
     __decorate([
@@ -36,7 +41,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.entradas; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], DetalheEntrada.prototype, "produto", void 0);
     __decorate([
@@ -45,7 +50,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "idCor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idCor' }),
-        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }, function (cor) { return cor.corDetalheEntradas; }),
+        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }),
         __metadata("design:type", cor_entity_1.default)
     ], DetalheEntrada.prototype, "cor", void 0);
     __decorate([
@@ -74,7 +79,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "idPessoa_revisador", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_revisador' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.revisadorDetalheEntradas; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], DetalheEntrada.prototype, "revisador", void 0);
     __decorate([
@@ -83,7 +88,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "idTinturaria", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
-        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }, function (tinturaria) { return tinturaria.romaneioDetalheEntradas; }),
+        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }),
         __metadata("design:type", tinturaria_entity_1.default)
     ], DetalheEntrada.prototype, "romaneio", void 0);
     __decorate([

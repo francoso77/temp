@@ -1,5 +1,5 @@
-import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -15,11 +15,16 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
+import { EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import DetalhePedido from './DetalheEntrada';
+import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
 
+export interface SomatorioEntradaInterface {
+  total: string
+  totalQtd: string
+}
 
 export default function Entrada() {
 
@@ -31,14 +36,20 @@ export default function Entrada() {
     dataEmissao: '',
     observacao: '',
     notaFiscal: '',
-    idPessoa_fornecedor: 0
+    idPessoa_fornecedor: 0,
+    detalheEntradas: []
   }
+
   interface PesquisaInterface {
     itemPesquisa: string
   }
 
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const SomatorioDados: SomatorioEntradaInterface = {
+    total: '',
+    totalQtd: ''
+  }
+  const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -46,7 +57,10 @@ export default function Entrada() {
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  const [rsSomatorio, setRsSomatorio] = useState<SomatorioEntradaInterface>(SomatorioDados)
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -64,7 +78,8 @@ export default function Entrada() {
     {
       cabecalho: 'Fornecedor',
       alinhamento: 'left',
-      campo: 'nome_fornecedor',
+      campo: 'idPessoa_fornecedor',
+      format: (_v, rs: any) => rs.fornecedor.nome
     },
   ]
 
@@ -81,6 +96,14 @@ export default function Entrada() {
     return clsCrud
       .pesquisar({
         entidade: "Entrada",
+        relations: [
+          "fornecedor",
+          "detalheEntradas",
+          "detalheEntradas.produto",
+          "detalheEntradas.cor",
+          "detalheEntradas.revisador",
+          "detalheEntradas.romaneio",
+        ],
         criterio: {
           idEntrada: id,
         },
@@ -93,28 +116,43 @@ export default function Entrada() {
         }
       })
   }
+
+  const pesquisarEstoque = (fornecedor: number, produto: number): Promise<EstoqueInterface> => {
+    return clsCrud
+      .pesquisar({
+        entidade: "Estoque",
+        criterio: {
+          idProduto: produto,
+          idPessoa_fornecedor: fornecedor
+        },
+      })
+      .then((rs: Array<EstoqueInterface>) => {
+        return rs[0]
+      })
+  }
+
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setEntrada(rs)
+      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
+
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setEntrada(rs)
+      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
-  const onDetalhe = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setEntrada(rs)
-      setLocalState({ action: actionTypes.detalhes })
-    })
-  }
+
   const btIncluir = () => {
     setEntrada(ResetDados)
+    setRsSomatorio({ total: "", totalQtd: "" })
     setLocalState({ action: actionTypes.incluindo })
   }
+
   const btCancelar = () => {
     setErros({})
     setEntrada(ResetDados)
@@ -133,6 +171,85 @@ export default function Entrada() {
     return retorno
   }
 
+  const AtualizaSomatorio = (rs: EntradaInterface) => {
+
+    let totalQtd: number = 0
+    let total: number = 0
+
+    if (rs.detalheEntradas) {
+      rs.detalheEntradas.forEach((detalhe) => {
+        totalQtd = totalQtd + detalhe.qtd
+        total = total + (detalhe.qtd * detalhe.vrUnitario)
+      })
+      setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
+    }
+  }
+
+  const MovimentaEstoque = (tp: string) => {
+
+    if (tp === "Entrada") {
+      entrada.detalheEntradas.forEach((dadosEstoque) => {
+        pesquisarEstoque(entrada.idPessoa_fornecedor, dadosEstoque.idProduto)
+          .then((rs) => {
+            let tmpEstoque: EstoqueInterface = rs
+            if (rs) {
+              let novaQtd: number = rs.qtd + dadosEstoque.qtd
+              tmpEstoque = {
+                ...tmpEstoque,
+                qtd: novaQtd,
+              }
+            } else {
+              tmpEstoque = {
+                idProduto: dadosEstoque.idProduto,
+                idPessoa_fornecedor: entrada.idPessoa_fornecedor,
+                idCor: dadosEstoque.idCor,
+                qtd: dadosEstoque.qtd
+              }
+            }
+            clsCrud.incluir({
+              entidade: "Estoque",
+              criterio: tmpEstoque,
+              localState: localState,
+              setMensagemState: setMensagemState
+            })
+              .then((rs) => {
+                if (rs.ok) {
+                  setMensagemState({
+                    titulo: 'Estoques atualizado',
+                    exibir: true,
+                    mensagem: 'Entrada realizada com sucesso!',
+                    tipo: MensagemTipo.Ok,
+                    exibirBotao: true,
+                    cb: () => btPesquisar(),
+                  })
+                } else {
+                  setMensagemState({
+                    titulo: 'Erro...',
+                    exibir: true,
+                    mensagem: 'Estoque não foi atualizado - consulte o suporte',
+                    tipo: MensagemTipo.Error,
+                    exibirBotao: true,
+                    cb: null
+                  })
+                }
+              })
+          })
+      })
+    }
+  }
+
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
+
   const btConfirmar = () => {
 
     if (validarDados()) {
@@ -147,6 +264,7 @@ export default function Entrada() {
         })
           .then((rs) => {
             if (rs.ok) {
+              MovimentaEstoque('Entrada')
               setLocalState({ action: actionTypes.pesquisando })
             } else {
               setMensagemState({
@@ -187,27 +305,29 @@ export default function Entrada() {
   }
 
   const btPesquisar = () => {
-    const query = `
-      SELECT 
-        e.*, 
-        f.nome AS nome_fornecedor
-      FROM 
-        entradas e
-      INNER JOIN 
-        pessoas f ON f.idPessoa = e.idPessoa_fornecedor
-      WHERE 
-        e.notaFiscal LIKE '%${pesquisa.itemPesquisa}%'
-      `;
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Entrada",
-        sql: query,
+        relations: [
+          "fornecedor",
+          "detalheEntradas",
+          "detalheEntradas.produto",
+          "detalheEntradas.cor",
+          "detalheEntradas.revisador",
+          "detalheEntradas.romaneio",
+        ],
+        criterio: {
+          notaFiscal: "%".concat(pesquisa.itemPesquisa).concat("%"),
+        },
+        camposLike: ["notaFiscal"],
+        msg: 'Pesquisando notas ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
   }
+
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -220,15 +340,24 @@ export default function Entrada() {
   }
 
   const BuscarDados = () => {
+
+    let query: string = `
+      SELECT 
+          p.*
+      FROM 
+          pessoas p
+      WHERE 
+          p.tipoPessoa = 'J' OR
+          p.tipoPessoa = 'C' OR
+          p.tipoPessoa = 'F' 
+      ORDER BY
+          p.nome ASC;
+      `;
     clsCrud
-      .pesquisar({
+      .query({
         entidade: "Pessoa",
-        campoOrder: ["nome"],
-        notOrLike: 'N',
-        criterio: {
-          tipoPessoa: 'F'
-        },
-        camposLike: ["tipoPessoa"],
+        sql: query,
+        setMensagemState: setMensagemState
       })
       .then((rsFornecedores: Array<PessoaInterface>) => {
         setRsFornecedor(rsFornecedores)
@@ -239,26 +368,12 @@ export default function Entrada() {
     BuscarDados()
   }, [])
 
-  useEffect(() => {
-    if (layoutState.titulo === "Entradas") {
-      setLocalState({ action: actionTypes.pesquisando })
-      setLayoutState({
-        titulo: 'Entradas de produtos',
-        tituloAnterior: 'Itens da Entrada',
-        pathTitulo: '/Entrada',
-        pathTituloAnterior: '/DetalheEntrada'
-      })
-    }
-  },)
-
   return (
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -305,12 +420,6 @@ export default function Entrada() {
                       onExcluir(rs.idEntrada as number),
                     toolTip: "Excluir",
                   },
-                  {
-                    icone: "auto_awesome_motion_outlined",
-                    onAcionador: (rs: DetalheEntradaInterface) =>
-                      onDetalhe(rs.idEntrada as number),
-                    toolTip: "Itens",
-                  },
                 ]}
                 order={order}
                 orderBy={orderBy}
@@ -320,54 +429,104 @@ export default function Entrada() {
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                type='tel'
-                tipo="date"
-                label="Data"
-                dados={entrada}
-                field="dataEmissao"
-                setState={setEntrada}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                autoFocus
-              />
+              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                <InputText
+                  type='tel'
+                  tipo="date"
+                  label="Data"
+                  dados={entrada}
+                  field="dataEmissao"
+                  setState={setEntrada}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                  autoFocus
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsFornecedor}
-                campoDescricao="nome"
-                campoID="idPessoa"
-                dados={entrada}
-                mensagemPadraoCampoEmBranco="Escolha um fornecedor"
-                field="idPessoa_fornecedor"
-                label="Fornecedor"
-                erros={erros}
-                setState={setEntrada}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+
+                <ComboBox
+                  opcoes={rsFornecedor}
+                  campoDescricao="nome"
+                  campoID="idPessoa"
+                  dados={entrada}
+                  mensagemPadraoCampoEmBranco="Escolha um fornecedor"
+                  field="idPessoa_fornecedor"
+                  label="Fornecedor"
+                  erros={erros}
+                  setState={setEntrada}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event) => btPulaCampo(event, 2)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                type='text'
-                mask='nf'
-                tipo='mac'
-                label="Nota Fiscal"
-                dados={entrada}
-                field="notaFiscal"
-                setState={setEntrada}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <InputText
+                  type='text'
+                  mask='nf'
+                  tipo='mac'
+                  label="Nota Fiscal"
+                  dados={entrada}
+                  field="notaFiscal"
+                  setState={setEntrada}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <InputText
+                  type='text'
+                  tipo='uppercase'
+                  label="Observação"
+                  dados={entrada}
+                  field="observacao"
+                  setState={setEntrada}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <DetalhePedido
+                rsMaster={entrada}
+                setRsMaster={setEntrada}
+                masterLocalState={localState}
+                setRsSomatorio={setRsSomatorio}
+              />
+            </Grid>
+            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                type='text'
-                tipo='uppercase'
-                label="Observação"
-                dados={entrada}
-                field="observacao"
-                setState={setEntrada}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
+                tipo='currency'
+                scale={2}
+                label="Qtd Total"
+                labelAlign='center'
+                dados={rsSomatorio}
+                field="totalQtd"
+                setState={setRsSomatorio}
+                disabled={true}
+                textAlign='center'
+                tamanhoFonte={30}
+              />
+            </Grid>
+            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                tipo='currency'
+                scale={2}
+                label="Total Entrada"
+                labelAlign='center'
+                dados={rsSomatorio}
+                field="total"
+                setState={setRsSomatorio}
+                disabled={true}
+                textAlign='center'
+                tamanhoFonte={30}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
@@ -403,11 +562,6 @@ export default function Entrada() {
                   </IconButton>
                 </Tooltip>
               </Condicional>
-            </Grid>
-          </Condicional>
-          <Condicional condicao={localState.action === 'detalhes'}>
-            <Grid item xs={12}>
-              <DetalhePedido rsEntrada={entrada} />
             </Grid>
           </Condicional>
         </Grid>

@@ -10,11 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var unidadeMedida_entity_1 = require("./unidadeMedida.entity");
 var producaoMalharia_entity_1 = require("./producaoMalharia.entity");
 var detalheProducaoDublagem_entity_1 = require("./detalheProducaoDublagem.entity");
-var estoque_entity_1 = require("./estoque.entity");
 var detalheProgramacao_entity_1 = require("./detalheProgramacao.entity");
 var tipoProdutoypes_1 = require("../types/tipoProdutoypes");
 var Produto = /** @class */ (function () {
@@ -66,25 +64,11 @@ var Produto = /** @class */ (function () {
     ], Produto.prototype, "producaoDublagens", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (entrada) {
-            return entrada.produto;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Produto.prototype, "entradas", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
             return producaoMalharia.produto;
         }, { cascade: true }),
         __metadata("design:type", Array)
     ], Produto.prototype, "producaoMalharias", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
-        (0, typeorm_1.OneToMany)(function () { return estoque_entity_1.default; }, function (estoque) {
-            return estoque.produto;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Produto.prototype, "estoques", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
         (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) {

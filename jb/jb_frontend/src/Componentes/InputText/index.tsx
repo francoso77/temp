@@ -21,6 +21,8 @@ interface mapKeyPressInterface {
 }
 
 interface InputTextInterface {
+  corFonte?: string
+  tamanhoFonte?: number
   inputRef?: React.Ref<any> | undefined
   label: string
   disabled?: boolean
@@ -60,6 +62,7 @@ interface InputTextInterface {
   afterChange?: (v: any) => void
   onFocus?: (v: any) => void
   textAlign?: "left" | "right" | "center"
+  labelAlign?: "left" | "right" | "center"
   width?: "100%" | string
   labelPlacement?: "top" | "start" | "end" | "bottom"
 }
@@ -238,6 +241,8 @@ const converterEmAnoMesDia = (valor: string): string => {
 }
 
 export default function InputText({
+  corFonte= '',
+  tamanhoFonte=16,
   inputRef,
   label,
   dados,
@@ -265,6 +270,7 @@ export default function InputText({
   afterChange = undefined,
   onFocus = undefined,
   textAlign = "left",
+  labelAlign = "left",
   width = "100%",
   labelPlacement = "end",
 }: InputTextInterface) {
@@ -330,7 +336,7 @@ export default function InputText({
       <FormControl sx={{ width: width }}>
         <Typography
           variant="body2"
-          textAlign="left"
+          textAlign={labelAlign}
           sx={{
             mt:
               theme && theme.inputs && theme.inputs.marginTop
@@ -341,6 +347,7 @@ export default function InputText({
           {label}
         </Typography>
         <OutlinedInput
+          sx={{color: corFonte, fontSize: tamanhoFonte}}
           inputRef={inputRef}
           name={field}
           onBlur={(e) => formatarDadosAoSair(e)}

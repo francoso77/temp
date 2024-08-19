@@ -37,11 +37,12 @@ var Entrada = /** @class */ (function () {
     ], Entrada.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.fornecedorEntradas; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Entrada.prototype, "fornecedor", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) { return detalheEntrada.entrada; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idEntrada' }),
+        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) { return detalheEntrada.entrada; }, { cascade: true }),
         __metadata("design:type", Array)
     ], Entrada.prototype, "detalheEntradas", void 0);
     __decorate([

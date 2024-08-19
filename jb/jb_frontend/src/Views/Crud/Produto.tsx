@@ -226,7 +226,7 @@ export default function Produto() {
       INNER JOIN 
           unidademedidas um ON um.idUnidade = p.idUnidade
       WHERE 
-          p.nome LIKE '%${pesquisa.nome}%' ;
+          p.nome LIKE '%${pesquisa.nome}%';
       `;
     clsCrud
       .query({
@@ -302,10 +302,8 @@ export default function Produto() {
 
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper variant="outlined" sx={{ padding: 2 }}>
-
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>

@@ -35,11 +35,7 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPrazoEntrega", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPrazoEntrega' }),
-        (0, typeorm_1.ManyToOne)(function () { return prazoEntrega_entity_1.default; }, {
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
-            orphanedRowAction: 'delete'
-        }),
+        (0, typeorm_1.ManyToOne)(function () { return prazoEntrega_entity_1.default; }),
         __metadata("design:type", prazoEntrega_entity_1.default)
     ], Pedido.prototype, "prazoEntrega", void 0);
     __decorate([
@@ -48,11 +44,7 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPessoa_cliente", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, {
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
-            orphanedRowAction: 'delete'
-        }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Pedido.prototype, "cliente", void 0);
     __decorate([
@@ -61,11 +53,7 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPessoa_vendedor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_vendedor' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, {
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
-            orphanedRowAction: 'delete'
-        }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Pedido.prototype, "vendedor", void 0);
     __decorate([

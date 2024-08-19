@@ -1,4 +1,4 @@
-import { FindOperator, FindOperators, In, Like, Not, Or } from 'typeorm';
+import { In, Like, Not } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 
@@ -119,7 +119,6 @@ export default class ClsCrudController {
     campoOrder.forEach((campo) => {
       order[campo] = 'ASC'
     })
-
     return AppDataSource.getRepository(entidade)
       .find({
         where: where,

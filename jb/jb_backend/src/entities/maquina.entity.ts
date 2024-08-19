@@ -48,7 +48,7 @@ export default class Maquina implements MaquinaInterface {
   agulha: string
 
   @Column({ type: "datetime" })
-  dataPreventiva: string;
+  dataPreventiva: string
 
   @Column({ nullable: false })
   ativo: boolean

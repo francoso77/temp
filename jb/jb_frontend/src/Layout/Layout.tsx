@@ -11,7 +11,6 @@ import Mensagem from './Mensagem';
 import { ROTAS_LIVRES } from './ClsRotas';
 import { useEffect, useState } from 'react';
 import Condicional from '../Componentes/Condicional/Condicional';
-import EventosEmAberto from '../Views/Eventos/EventosEmAberto';
 
 function Layout() {
 
@@ -65,9 +64,9 @@ function Layout() {
               <MenuNav />
             </Condicional>
 
-            <Condicional condicao={!usuarioState.logado && !rotaLivre}>
+            {/* <Condicional condicao={!usuarioState.logado && !rotaLivre}>
               <EventosEmAberto />
-            </Condicional>
+            </Condicional> */}
           </>
         </GlobalContext.Provider>
       </ThemeProvider>
