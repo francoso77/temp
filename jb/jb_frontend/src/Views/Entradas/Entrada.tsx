@@ -1,25 +1,25 @@
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate } from 'react-router-dom';
-import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import Condicional from '../../Componentes/Condicional/Condicional';
-import ClsValidacao from '../../Utils/ClsValidacao';
-import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
-import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import DeleteIcon from '@mui/icons-material/Delete';
-import InputText from '../../Componentes/InputText';
-import ComboBox from '../../Componentes/ComboBox';
-import { EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
-import DetalhePedido from './DetalheEntrada';
-import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material'
+import { useContext, useEffect, useRef, useState } from 'react'
+import CloseIcon from '@mui/icons-material/Close'
+import { useNavigate } from 'react-router-dom'
+import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
+import Condicional from '../../Componentes/Condicional/Condicional'
+import ClsValidacao from '../../Utils/ClsValidacao'
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
+import ClsCrud from '../../Utils/ClsCrudApi'
+import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable'
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
+import AddCircleIcon from "@mui/icons-material/AddCircle"
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
+import DeleteIcon from '@mui/icons-material/Delete'
+import InputText from '../../Componentes/InputText'
+import ComboBox from '../../Componentes/ComboBox'
+import { EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface'
+import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
+import ClsFormatacao from '../../Utils/ClsFormatacao'
+import DetalhePedido from './DetalheEntrada'
+import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
 
 export interface SomatorioEntradaInterface {
   total: string
@@ -185,57 +185,59 @@ export default function Entrada() {
     }
   }
 
-  const MovimentaEstoque = (tp: string) => {
+  const MovimentaEstoque = (tp: "Incluir" | "Excluir") => {
 
-    if (tp === "Entrada") {
-      entrada.detalheEntradas.forEach((dadosEstoque) => {
-        pesquisarEstoque(entrada.idPessoa_fornecedor, dadosEstoque.idProduto)
-          .then((rs) => {
-            let tmpEstoque: EstoqueInterface = rs
-            if (rs) {
-              let novaQtd: number = rs.qtd + dadosEstoque.qtd
-              tmpEstoque = {
-                ...tmpEstoque,
-                qtd: novaQtd,
-              }
+    entrada.detalheEntradas.forEach((dadosEstoque) => {
+      let novaQtd: number = 0
+      pesquisarEstoque(entrada.idPessoa_fornecedor, dadosEstoque.idProduto)
+        .then((rs) => {
+          let tmpEstoque: EstoqueInterface = rs
+          if (rs) {
+            if (tp === "Incluir") {
+              novaQtd = rs.qtd + dadosEstoque.qtd
             } else {
-              tmpEstoque = {
-                idProduto: dadosEstoque.idProduto,
-                idPessoa_fornecedor: entrada.idPessoa_fornecedor,
-                idCor: dadosEstoque.idCor,
-                qtd: dadosEstoque.qtd
-              }
+              novaQtd = rs.qtd - dadosEstoque.qtd
             }
-            clsCrud.incluir({
-              entidade: "Estoque",
-              criterio: tmpEstoque,
-              localState: localState,
-              setMensagemState: setMensagemState
-            })
-              .then((rs) => {
-                if (rs.ok) {
-                  setMensagemState({
-                    titulo: 'Estoques atualizado',
-                    exibir: true,
-                    mensagem: 'Entrada realizada com sucesso!',
-                    tipo: MensagemTipo.Ok,
-                    exibirBotao: true,
-                    cb: () => btPesquisar(),
-                  })
-                } else {
-                  setMensagemState({
-                    titulo: 'Erro...',
-                    exibir: true,
-                    mensagem: 'Estoque não foi atualizado - consulte o suporte',
-                    tipo: MensagemTipo.Error,
-                    exibirBotao: true,
-                    cb: null
-                  })
-                }
-              })
+            tmpEstoque = {
+              ...tmpEstoque,
+              qtd: novaQtd,
+            }
+          } else {
+            tmpEstoque = {
+              idProduto: dadosEstoque.idProduto,
+              idPessoa_fornecedor: entrada.idPessoa_fornecedor,
+              idCor: dadosEstoque.idCor,
+              qtd: dadosEstoque.qtd
+            }
+          }
+          clsCrud.incluir({
+            entidade: "Estoque",
+            criterio: tmpEstoque,
           })
-      })
-    }
+            .then((rs) => {
+              if (rs.ok) {
+                setMensagemState({
+                  titulo: 'Entradas...',
+                  exibir: true,
+                  mensagem: 'Estoque atualizado com sucesso!',
+                  tipo: MensagemTipo.Ok,
+                  exibirBotao: true,
+                  cb: () => btPesquisar(),
+                })
+              } else {
+                setMensagemState({
+                  titulo: 'Erro...',
+                  exibir: true,
+                  mensagem: 'Estoque não foi atualizado - consulte o suporte',
+                  tipo: MensagemTipo.Error,
+                  exibirBotao: true,
+                  cb: null
+                })
+              }
+            })
+        })
+    })
+
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -254,17 +256,15 @@ export default function Entrada() {
 
     if (validarDados()) {
 
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+      if (localState.action === actionTypes.incluindo) {
         clsCrud.incluir({
           entidade: "Entrada",
           criterio: entrada,
-          localState: localState,
           cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
         })
           .then((rs) => {
             if (rs.ok) {
-              MovimentaEstoque('Entrada')
+              MovimentaEstoque('Incluir')
               setLocalState({ action: actionTypes.pesquisando })
             } else {
               setMensagemState({
@@ -284,9 +284,9 @@ export default function Entrada() {
             idEntrada: entrada.idEntrada
           },
           cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
         })
           .then((rs) => {
+            MovimentaEstoque('Excluir')
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
             } else {
@@ -305,6 +305,19 @@ export default function Entrada() {
   }
 
   const btPesquisar = () => {
+
+    const temNumero = /\d/.test(pesquisa.itemPesquisa)
+    let campoCriterio: string = ""
+    let valorAPesquisar: string = pesquisa.itemPesquisa.trim()
+    if (temNumero) {
+
+      valorAPesquisar = valorAPesquisar.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3')
+      campoCriterio = 'notaFiscal'
+
+    } else {
+
+      campoCriterio = 'nome'
+    }
     clsCrud
       .pesquisar({
         entidade: "Entrada",
@@ -317,9 +330,9 @@ export default function Entrada() {
           "detalheEntradas.romaneio",
         ],
         criterio: {
-          notaFiscal: "%".concat(pesquisa.itemPesquisa).concat("%"),
+          campoCriterio: "%".concat(valorAPesquisar).concat("%"),
         },
-        camposLike: ["notaFiscal"],
+        camposLike: [campoCriterio],
         msg: 'Pesquisando notas ...',
         setMensagemState: setMensagemState
       })
@@ -409,10 +422,10 @@ export default function Entrada() {
                 dados={rsPesquisa}
                 acoes={[
                   {
-                    icone: "edit",
+                    icone: "find_in_page_two_tone",
                     onAcionador: (rs: EntradaInterface) =>
                       onEditar(rs.idEntrada as number),
-                    toolTip: "Editar",
+                    toolTip: "Visualizar",
                   },
                   {
                     icone: "delete",
@@ -437,7 +450,7 @@ export default function Entrada() {
                   dados={entrada}
                   field="dataEmissao"
                   setState={setEntrada}
-                  disabled={localState.action === 'excluindo' ? true : false}
+                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   onKeyDown={(event: any) => btPulaCampo(event, 1)}
                   autoFocus
@@ -455,6 +468,7 @@ export default function Entrada() {
                   mensagemPadraoCampoEmBranco="Escolha um fornecedor"
                   field="idPessoa_fornecedor"
                   label="Fornecedor"
+                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   setState={setEntrada}
                   onFocus={(e) => e.target.select()}
@@ -472,7 +486,7 @@ export default function Entrada() {
                   dados={entrada}
                   field="notaFiscal"
                   setState={setEntrada}
-                  disabled={localState.action === 'excluindo' ? true : false}
+                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   onKeyDown={(event: any) => btPulaCampo(event, 3)}
                 />
@@ -487,7 +501,7 @@ export default function Entrada() {
                   dados={entrada}
                   field="observacao"
                   setState={setEntrada}
-                  disabled={localState.action === 'excluindo' ? true : false}
+                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   onKeyDown={(event: any) => btPulaCampo(event, 0)}
                 />
@@ -539,7 +553,7 @@ export default function Entrada() {
                   <CancelRoundedIcon sx={{ fontSize: 50 }} />
                 </IconButton>
               </Tooltip>
-              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+              <Condicional condicao={['incluindo'].includes(localState.action)}>
                 <Tooltip title={'Confirmar'}>
                   <IconButton
                     color="secondary"

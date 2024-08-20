@@ -187,7 +187,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
 
   const onEditar = (rs: DetalheEntradaInterface, indice: number) => {
 
-    AtualizaEstoque(rsMaster.idPessoa_fornecedor, rs.idProduto, rs.qtd, 'Editar')
     setLocalState({ action: actionTypes.editando })
     setIndiceEdicao(indice)
     setDetalheEntrada(rs)
@@ -195,8 +194,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
   }
 
   const onExcluir = (rs: DetalheEntradaInterface) => {
-    AtualizaEstoque(rsMaster.idPessoa_fornecedor, rs.idProduto, rs.qtd, 'Excluir')
-
 
     let tmpDetalhe: Array<DetalheEntradaInterface> = []
     rsMaster.detalheEntradas.forEach(det => {
@@ -362,64 +359,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     }
   }
 
-  const AtualizaEstoque = (fornecedor: number, produto: number, qtd: number, action: string) => {
-    pesquisarEstoque(fornecedor, produto)
-      .then((rs) => {
-        let tmpEstoque: EstoqueInterface = rs
-        if (rs) {
-          let novaQtd: number = rs.qtd - qtd
-
-          if (action === 'Editar') {
-            tmpEstoque = {
-              ...tmpEstoque,
-              qtd: novaQtd,
-            }
-            clsCrud.incluir({
-              entidade: "Estoque",
-              criterio: tmpEstoque,
-            })
-              .then((rs) => {
-                if (!rs.ok) {
-                  setMensagemState({
-                    titulo: 'Erro...',
-                    exibir: true,
-                    mensagem: 'Produto sem estoque ou falha com o banco!',
-                    tipo: MensagemTipo.Error,
-                    exibirBotao: true,
-                    cb: null
-                  })
-                }
-              })
-
-          } else {
-            clsCrud.excluir({
-              entidade: "Estoque",
-              criterio: {
-                idEstoque: rs.idEstoque
-              },
-            })
-              .then((rs) => {
-                if (!rs.ok) {
-                  setMensagemState({
-                    titulo: 'Erro...',
-                    exibir: true,
-                    mensagem: 'Produto sem estoque ou falha com o banco!',
-                    tipo: MensagemTipo.Error,
-                    exibirBotao: true,
-                    cb: null
-                  })
-                }
-              })
-
-
-
-          }
-
-        }
-
-      })
-  }
-
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
@@ -511,6 +450,7 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
                     label="Produtos"
                     erros={erros}
                     setState={setDetalheEntrada}
+                    disabled={localState.action === 'excluindo' ? true : false}
                     onSelect={pegaTipo}
                     // onClickPesquisa={(rs) => pesquisarProdutos(rs)}
                     onKeyDown={
@@ -535,6 +475,7 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
                       label="Cores"
                       erros={erros}
                       setState={setDetalheEntrada}
+                      disabled={localState.action === 'excluindo' ? true : false}
                       onSelect={pegaTipo}
                       onFocus={(e) => e.target.select()}
                       onKeyDown={(event) => btPulaCampo(event, 2)}
@@ -711,7 +652,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
                     </Grid>
                   </Grid>
                 </Paper>
-              </Condicional>              <Condicional condicao={localState.action !== 'pesquisando'}>
+              </Condicional>
+              <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>
                     <IconButton
@@ -758,7 +700,7 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
           <DataTable
             cabecalho={cabecalhoForm}
             dados={rsMaster.detalheEntradas}
-            acoes={masterLocalState.action === actionTypes.excluindo ? [] :
+            acoes={['excluindo', 'editando'].includes(masterLocalState.action) ? [] :
               [
                 {
                   icone: "edit",
