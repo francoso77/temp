@@ -17,6 +17,7 @@ import { Icon } from '@mui/material';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 // import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
+import FactoryIcon from '@mui/icons-material/Factory';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import menuCrud from '../Utils/menuCrud.json';
 
@@ -164,8 +165,8 @@ export default function MenuNav() {
             ))}
           </Menu>
           <Box sx={{ flexGrow: 0.5 }} />
-          <IconButton color="primary" onClick={() => irPara('/EventosEmAberto', 'Eventos Em Aberto')}>
-            <CalendarMonthIcon sx={{ width: 32, height: 32 }} />
+          <IconButton color="primary" onClick={() => irPara('/ProducaoMalharia', 'Produção Malharia')}>
+            <FactoryIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <Box sx={{ flexGrow: 0.25 }} />
           <IconButton color="primary" onClick={() => irPara('/Atleta', 'Atleta')}>

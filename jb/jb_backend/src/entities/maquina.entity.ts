@@ -53,11 +53,6 @@ export default class Maquina implements MaquinaInterface {
   @Column({ nullable: false })
   ativo: boolean
 
-  @JoinColumn({ name: 'idMaquina' })
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
-    producaoMalharia.maquina, { cascade: true })
-  ProducaoMalharias: ProducaoMalharia[]
-
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date
 

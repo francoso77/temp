@@ -14,13 +14,12 @@ var pessoa_entity_1 = require("./pessoa.entity");
 var maquina_entity_1 = require("./maquina.entity");
 var produto_entity_1 = require("./produto.entity");
 var turnoTypes_1 = require("../types/turnoTypes");
-var detalheTinturaria_entity_1 = require("./detalheTinturaria.entity");
 var tinturaria_entity_1 = require("./tinturaria.entity");
 var ProducaoMalharia = /** @class */ (function () {
     function ProducaoMalharia() {
     }
     __decorate([
-        (0, typeorm_1.PrimaryGeneratedColumn)(),
+        (0, typeorm_1.PrimaryColumn)(),
         __metadata("design:type", Number)
     ], ProducaoMalharia.prototype, "idPeca", void 0);
     __decorate([
@@ -29,7 +28,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "idMaquina", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idMaquina' }),
-        (0, typeorm_1.ManyToOne)(function () { return maquina_entity_1.default; }, function (maquina) { return maquina.ProducaoMalharias; }),
+        (0, typeorm_1.ManyToOne)(function () { return maquina_entity_1.default; }),
         __metadata("design:type", maquina_entity_1.default)
     ], ProducaoMalharia.prototype, "maquina", void 0);
     __decorate([
@@ -38,7 +37,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.producaoMalharias; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], ProducaoMalharia.prototype, "produto", void 0);
     __decorate([
@@ -63,7 +62,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "idPessoa_revisador", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_revisador' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.revisadorProducaoMalharias; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], ProducaoMalharia.prototype, "revisador", void 0);
     __decorate([
@@ -72,7 +71,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "idPessoa_tecelao", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoaTecelao' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.tecelaoProducaoMalharias; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], ProducaoMalharia.prototype, "tecelao", void 0);
     __decorate([
@@ -89,13 +88,9 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "idTinturaria", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
-        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }, function (tinturaria) { return tinturaria.producaoMalharias; }),
+        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }),
         __metadata("design:type", tinturaria_entity_1.default)
     ], ProducaoMalharia.prototype, "tinturaria", void 0);
-    __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheTinturaria_entity_1.default; }, function (detalheTinturaria) { return detalheTinturaria.peca; }),
-        __metadata("design:type", Array)
-    ], ProducaoMalharia.prototype, "detalheTinturarias", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
         __metadata("design:type", Date)

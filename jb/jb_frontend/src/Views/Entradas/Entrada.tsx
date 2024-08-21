@@ -306,20 +306,10 @@ export default function Entrada() {
 
   const btPesquisar = () => {
 
+    let dadosPesquisa = {}
     const temNumero = /\d/.test(pesquisa.itemPesquisa)
-    let campoCriterio: string = ""
-    let valorAPesquisar: string = pesquisa.itemPesquisa.trim()
     if (temNumero) {
-
-      valorAPesquisar = valorAPesquisar.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3')
-      campoCriterio = 'notaFiscal'
-
-    } else {
-
-      campoCriterio = 'nome'
-    }
-    clsCrud
-      .pesquisar({
+      dadosPesquisa = {
         entidade: "Entrada",
         relations: [
           "fornecedor",
@@ -330,12 +320,38 @@ export default function Entrada() {
           "detalheEntradas.romaneio",
         ],
         criterio: {
-          campoCriterio: "%".concat(valorAPesquisar).concat("%"),
+          notaFiscal: "%".concat(pesquisa.itemPesquisa).concat("%"),
         },
-        camposLike: [campoCriterio],
+        camposLike: ['notaFiscal'],
         msg: 'Pesquisando notas ...',
         setMensagemState: setMensagemState
-      })
+      }
+    } else {
+
+      const idsFor = rsFornecedor.filter(fornecedor =>
+        fornecedor.nome.includes(pesquisa.itemPesquisa)
+      ).map(fornecedor => fornecedor.idPessoa)
+      dadosPesquisa = {
+        entidade: "Entrada",
+        relations: [
+          "fornecedor",
+          "detalheEntradas",
+          "detalheEntradas.produto",
+          "detalheEntradas.cor",
+          "detalheEntradas.revisador",
+          "detalheEntradas.romaneio",
+        ],
+        notOrLike: 'I',
+        criterio: {
+          idPessoa_fornecedor: idsFor,
+        },
+        camposLike: ['idPessoa_fornecedor'],
+        msg: 'Pesquisando notas ...',
+        setMensagemState: setMensagemState
+      }
+    }
+    clsCrud
+      .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })

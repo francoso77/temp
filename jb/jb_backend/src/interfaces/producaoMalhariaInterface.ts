@@ -12,5 +12,5 @@ export interface ProducaoMalhariaInterface {
   idPessoa_tecelao: number
   fechado?: boolean
   dataFechado?: string
-  idTinturaria?: number
+  idTinturaria?: number | null
 }

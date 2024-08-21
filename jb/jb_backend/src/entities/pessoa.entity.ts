@@ -59,16 +59,6 @@ export default class Pessoa implements PessoaInterface {
   @Column()
   ativo: boolean
 
-  @JoinColumn({ name: 'idPessoa_revisador' })
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
-    producaoMalharia.revisador, { cascade: true })
-  revisadorProducaoMalharias: ProducaoMalharia[]
-
-  @JoinColumn({ name: 'idPessoa_tecelao' })
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
-    producaoMalharia.tecelao, { cascade: true })
-  tecelaoProducaoMalharias: ProducaoMalharia[]
-
   @JoinColumn({ name: 'idPessoa_cliente' })
   @OneToMany(() => Tinturaria, (tinturaria) =>
     tinturaria.cliente, { cascade: true })

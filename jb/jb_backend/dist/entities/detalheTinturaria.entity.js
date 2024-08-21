@@ -33,7 +33,7 @@ var DetalheTinturaria = /** @class */ (function () {
     ], DetalheTinturaria.prototype, "idPeca", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPeca' }),
-        (0, typeorm_1.ManyToOne)(function () { return producaoMalharia_entity_1.default; }, function (produtoMalharia) { return produtoMalharia.detalheTinturarias; }),
+        (0, typeorm_1.ManyToOne)(function () { return producaoMalharia_entity_1.default; }),
         __metadata("design:type", producaoMalharia_entity_1.default)
     ], DetalheTinturaria.prototype, "peca", void 0);
     __decorate([

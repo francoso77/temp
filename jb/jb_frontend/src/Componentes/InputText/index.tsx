@@ -241,8 +241,8 @@ const converterEmAnoMesDia = (valor: string): string => {
 }
 
 export default function InputText({
-  corFonte= '',
-  tamanhoFonte=16,
+  corFonte = '',
+  tamanhoFonte = 16,
   inputRef,
   label,
   dados,
@@ -342,12 +342,13 @@ export default function InputText({
               theme && theme.inputs && theme.inputs.marginTop
                 ? theme.inputs.marginTop
                 : 0,
+            fontSize: tamanhoFonte,
           }}
         >
           {label}
         </Typography>
         <OutlinedInput
-          sx={{color: corFonte, fontSize: tamanhoFonte}}
+          sx={{ color: corFonte, fontSize: tamanhoFonte }}
           inputRef={inputRef}
           name={field}
           onBlur={(e) => formatarDadosAoSair(e)}

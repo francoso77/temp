@@ -56,7 +56,10 @@ interface ComboBoxInterface<T> {
   Ref?: React.Ref<unknown> | undefined
   /**Quando o componente recebe o foco */
   onFocus?: (v: any) => void
-
+  /**Define uma tamanho para a fonte */
+  tamanhoFonte?: number
+  /**Quando o componente perder o foco */
+  onBlur?: (v: any) => void
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -97,6 +100,8 @@ export default function ComboBox<T>(
     onSelect,
     Ref,
     onFocus = undefined,
+    tamanhoFonte = 16,
+    onBlur
   }: ComboBoxInterface<T>) {
 
 
@@ -124,6 +129,7 @@ export default function ComboBox<T>(
   return (
     <>
       <Autocomplete
+        sx={{ fontSize: tamanhoFonte }}
         autoFocus={autoFocus}
         ref={Ref}
         onSelect={(e) => {
@@ -134,6 +140,11 @@ export default function ComboBox<T>(
         onFocus={(e) => {
           if (onFocus) {
             onFocus(e)
+          }
+        }}
+        onBlur={(e) => {
+          if (onBlur) {
+            onBlur(e)
           }
         }}
         clearOnEscape
@@ -208,7 +219,13 @@ export default function ComboBox<T>(
                 <Typography
                   variant='body2'
                   textAlign='left'
-                  sx={{ mt: theme.inputs.marginTop }}
+                  sx={{
+                    mt:
+                      theme && theme.inputs && theme.inputs.marginTop
+                        ? theme.inputs.marginTop
+                        : 0,
+                    fontSize: tamanhoFonte,
+                  }}
                 >
                   {label}
                 </Typography>
@@ -216,7 +233,12 @@ export default function ComboBox<T>(
 
               <TextField
                 {...params}
-                size="small"
+                sx={{
+                  '& .MuiInputBase-input': {
+                    fontSize: tamanhoFonte, // Aumenta o tamanho da fonte do input
+                  }
+                }}
+                size='small'
                 placeholder={placeholder}
                 type="text"
                 InputProps={{

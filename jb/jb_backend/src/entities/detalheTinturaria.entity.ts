@@ -19,7 +19,7 @@ export default class DetalheTinturaria implements DetalheTinturariaInterface {
   idPeca: number;
 
   @JoinColumn({ name: 'idPeca' })
-  @ManyToOne(() => ProducaoMalharia, (produtoMalharia) => produtoMalharia.detalheTinturarias)
+  @ManyToOne(() => ProducaoMalharia)
   peca: ProducaoMalharia
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })

@@ -22,7 +22,6 @@ import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface'
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
 import { PessoaType } from '../../types/pessoaTypes';
-import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
 
 
 interface PropsInterface {
@@ -102,8 +101,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [delEstoque, setDelEstoque] = useState(false);
-
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -169,20 +166,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     // }
     setErros(erros)
     return retorno
-  }
-
-  const pesquisarEstoque = (fornecedor: number, produto: number): Promise<EstoqueInterface> => {
-    return clsCrud
-      .pesquisar({
-        entidade: "Estoque",
-        criterio: {
-          idProduto: produto,
-          idPessoa_fornecedor: fornecedor
-        },
-      })
-      .then((rs: Array<EstoqueInterface>) => {
-        return rs[0]
-      })
   }
 
   const onEditar = (rs: DetalheEntradaInterface, indice: number) => {

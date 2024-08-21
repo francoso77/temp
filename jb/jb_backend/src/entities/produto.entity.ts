@@ -43,11 +43,6 @@ export default class Produto implements ProdutoInterface {
   producaoDublagens: DetalheProducaoDublagem[]
 
   @JoinColumn({ name: "idProduto" })
-  @OneToMany(() => ProducaoMalharia, (producaoMalharia) =>
-    producaoMalharia.produto, { cascade: true })
-  producaoMalharias: ProducaoMalharia[]
-
-  @JoinColumn({ name: "idProduto" })
   @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>
     detalheProgramacao.produto, { cascade: true })
   detalheProgramacoes: DetalheProgramacao[]

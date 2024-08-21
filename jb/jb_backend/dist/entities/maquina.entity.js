@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var producaoMalharia_entity_1 = require("./producaoMalharia.entity");
 var Maquina = /** @class */ (function () {
     function Maquina() {
     }
@@ -78,13 +77,6 @@ var Maquina = /** @class */ (function () {
         (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", Boolean)
     ], Maquina.prototype, "ativo", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idMaquina' }),
-        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (producaoMalharia) {
-            return producaoMalharia.maquina;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Maquina.prototype, "ProducaoMalharias", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
         __metadata("design:type", Date)

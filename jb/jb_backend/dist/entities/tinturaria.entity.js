@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var pessoa_entity_1 = require("./pessoa.entity");
 var detalheTinturaria_entity_1 = require("./detalheTinturaria.entity");
-var producaoMalharia_entity_1 = require("./producaoMalharia.entity");
 var programacao_entity_1 = require("./programacao.entity");
 var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var Tinturaria = /** @class */ (function () {
@@ -48,13 +47,6 @@ var Tinturaria = /** @class */ (function () {
         (0, typeorm_1.OneToMany)(function () { return detalheTinturaria_entity_1.default; }, function (detalheTinturaria) { return detalheTinturaria.tinturaria; }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "detalheTinturarias", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
-        (0, typeorm_1.OneToMany)(function () { return producaoMalharia_entity_1.default; }, function (ProducaoMalharia) {
-            return ProducaoMalharia.tinturaria;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Tinturaria.prototype, "producaoMalharias", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
         (0, typeorm_1.OneToMany)(function () { return programacao_entity_1.default; }, function (programacao) {

@@ -33,11 +33,6 @@ export default class Tinturaria implements TinturariaInterface {
   detalheTinturarias: DetalheTinturaria[]
 
   @JoinColumn({ name: 'idTinturaria' })
-  @OneToMany(() => ProducaoMalharia, ProducaoMalharia =>
-    ProducaoMalharia.tinturaria, { cascade: true })
-  producaoMalharias: ProducaoMalharia[]
-
-  @JoinColumn({ name: 'idTinturaria' })
   @OneToMany(() => Programacao, programacao =>
     programacao.tinturaria, { cascade: true })
   programacoes: Programacao[]

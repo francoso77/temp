@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { ProducaoMalhariaInterface } from '../interfaces/producaoMalhariaInterface';
 import Maquina from './maquina.entity';
@@ -10,21 +10,21 @@ import Tinturaria from './tinturaria.entity';
 @Entity({ name: 'producaomalharia' })
 export default class ProducaoMalharia implements ProducaoMalhariaInterface {
 
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   idPeca: number
 
   @Column()
   idMaquina: number
 
   @JoinColumn({ name: 'idMaquina' })
-  @ManyToOne(() => Maquina, (maquina) => maquina.ProducaoMalharias)
+  @ManyToOne(() => Maquina)
   maquina: Maquina
 
   @Column()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.producaoMalharias)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @Column({ type: "datetime" })
@@ -43,14 +43,14 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   idPessoa_revisador: number
 
   @JoinColumn({ name: 'idPessoa_revisador' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.revisadorProducaoMalharias)
+  @ManyToOne(() => Pessoa)
   revisador: Pessoa
 
   @Column()
   idPessoa_tecelao: number
 
   @JoinColumn({ name: 'idPessoaTecelao' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.tecelaoProducaoMalharias)
+  @ManyToOne(() => Pessoa)
   tecelao: Pessoa
 
   @Column({ nullable: true })
@@ -63,11 +63,8 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   idTinturaria: number
 
   @JoinColumn({ name: 'idTinturaria' })
-  @ManyToOne(() => Tinturaria, (tinturaria) => tinturaria.producaoMalharias)
+  @ManyToOne(() => Tinturaria)
   tinturaria: Tinturaria
-
-  @OneToMany(() => DetalheTinturaria, (detalheTinturaria) => detalheTinturaria.peca)
-  detalheTinturarias: DetalheTinturaria[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date
