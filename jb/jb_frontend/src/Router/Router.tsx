@@ -13,6 +13,7 @@ import Pedido from '../Views/Pedidos/Pedido';
 import Entrada from '../Views/Entradas/Entrada';
 import PedidoForm from '../Views/testes/testes';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
+import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 
 export const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
       {
         path: "/ProducaoMalharia",
         element: <ProducaoMalharia />,
+      },
+      {
+        path: "/Tinturaria",
+        element: <Tinturaria />,
       },
       {
         path: "/Testes",

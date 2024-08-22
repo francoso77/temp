@@ -1,17 +1,19 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { ProducaoMalhariaInterface } from '../interfaces/producaoMalhariaInterface';
 import Maquina from './maquina.entity';
 import Produto from './produto.entity';
 import { TurnoType } from '../types/turnoTypes';
-import DetalheTinturaria from './detalheTinturaria.entity';
 import Tinturaria from './tinturaria.entity';
 
 @Entity({ name: 'producaomalharia' })
 export default class ProducaoMalharia implements ProducaoMalhariaInterface {
 
-  @PrimaryColumn()
-  idPeca: number
+  @PrimaryGeneratedColumn()
+  idMalharia: number
+
+  @Column()
+  peca: number
 
   @Column()
   idMaquina: number
@@ -49,7 +51,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   @Column()
   idPessoa_tecelao: number
 
-  @JoinColumn({ name: 'idPessoaTecelao' })
+  @JoinColumn({ name: 'idPessoa_tecelao' })
   @ManyToOne(() => Pessoa)
   tecelao: Pessoa
 

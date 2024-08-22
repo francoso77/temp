@@ -25,7 +25,7 @@ var DetalheProgramacao = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "idProgramacao", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return programacao_entity_1.default; }, function (programacao) { return programacao.detalheProgramacoes; }),
+        (0, typeorm_1.ManyToOne)(function () { return programacao_entity_1.default; }),
         __metadata("design:type", programacao_entity_1.default)
     ], DetalheProgramacao.prototype, "programacao", void 0);
     __decorate([
@@ -34,7 +34,7 @@ var DetalheProgramacao = /** @class */ (function () {
     ], DetalheProgramacao.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.detalheProgramacoes; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], DetalheProgramacao.prototype, "produto", void 0);
     __decorate([
@@ -43,7 +43,7 @@ var DetalheProgramacao = /** @class */ (function () {
     ], DetalheProgramacao.prototype, "idCor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idCor' }),
-        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }, function (cor) { return cor.corDetalheProgramacoes; }),
+        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }),
         __metadata("design:type", cor_entity_1.default)
     ], DetalheProgramacao.prototype, "cor", void 0);
     __decorate([

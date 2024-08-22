@@ -5,6 +5,7 @@ import ProducaoMalharia from './producaoMalharia.entity';
 
 @Entity({ name: 'detalhetinturarias' })
 export default class DetalheTinturaria implements DetalheTinturariaInterface {
+  idPeca: number;
 
   @PrimaryGeneratedColumn()
   idDetalheTinturaria: number;
@@ -12,13 +13,18 @@ export default class DetalheTinturaria implements DetalheTinturariaInterface {
   @PrimaryColumn()
   idTinturaria: number;
 
-  @ManyToOne(() => Tinturaria, tinturaria => tinturaria.detalheTinturarias)
+  @JoinColumn({ name: 'idTinturaria' })
+  @ManyToOne(() => Tinturaria, tinturaria => tinturaria.detalheTinturarias, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
   tinturaria: Tinturaria;
 
   @Column()
-  idPeca: number;
+  idMalharia: number;
 
-  @JoinColumn({ name: 'idPeca' })
+  @JoinColumn({ name: 'idMalharia' })
   @ManyToOne(() => ProducaoMalharia)
   peca: ProducaoMalharia
 

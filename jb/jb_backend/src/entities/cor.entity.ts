@@ -11,11 +11,6 @@ export default class Cor implements CorInterface {
   @Column({ length: 35 })
   nome: string
 
-  @JoinColumn({ name: "idCor" })
-  @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>
-    detalheProgramacao.cor, { cascade: true })
-  corDetalheProgramacoes: DetalheProgramacao[]
-
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date;
 

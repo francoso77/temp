@@ -81,7 +81,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     romaneio: {
       dataTinturaria: '',
       idPessoa_cliente: 0,
-      idPessoa_fornecedor: 0
+      idPessoa_fornecedor: 0,
+      detalheTinturarias: []
     },
     perdaMalharia: 0,
     perdaTinturaria: 0

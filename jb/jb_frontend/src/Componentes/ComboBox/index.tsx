@@ -60,6 +60,8 @@ interface ComboBoxInterface<T> {
   tamanhoFonte?: number
   /**Quando o componente perder o foco */
   onBlur?: (v: any) => void
+  //usando referência
+  inputRef?: React.Ref<unknown> | undefined
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -99,6 +101,7 @@ export default function ComboBox<T>(
     onClickPesquisa = undefined,
     onSelect,
     Ref,
+    inputRef,
     onFocus = undefined,
     tamanhoFonte = 16,
     onBlur
@@ -247,6 +250,7 @@ export default function ComboBox<T>(
                     <>{exibirIconePesquisa()}</> : <></>
                 }}
                 onKeyDown={(ev) => onKey(ev.key, mapKeyPress, pesquisa)}
+                inputRef={inputRef}
               />
 
               <Condicional condicao={typeof erros[field] !== 'undefined'}>

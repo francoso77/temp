@@ -24,7 +24,7 @@ var DetalheProducaoDublagem = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheProducaoDublagem.prototype, "idProducaoDublagem", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return producaoDublagem_entity_1.default; }, function (producaoDublagem) { return producaoDublagem.detalheProducaoDublagens; }),
+        (0, typeorm_1.ManyToOne)(function () { return producaoDublagem_entity_1.default; }),
         __metadata("design:type", producaoDublagem_entity_1.default)
     ], DetalheProducaoDublagem.prototype, "ProducaoDublagem", void 0);
     __decorate([
@@ -33,7 +33,7 @@ var DetalheProducaoDublagem = /** @class */ (function () {
     ], DetalheProducaoDublagem.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }, function (produto) { return produto.producaoDublagens; }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], DetalheProducaoDublagem.prototype, "produto", void 0);
     __decorate([

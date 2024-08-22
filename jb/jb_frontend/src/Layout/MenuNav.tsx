@@ -18,6 +18,7 @@ import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutl
 // import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import FactoryIcon from '@mui/icons-material/Factory';
+import ColorLensTwoToneIcon from '@mui/icons-material/ColorLensTwoTone';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import menuCrud from '../Utils/menuCrud.json';
 
@@ -169,13 +170,16 @@ export default function MenuNav() {
             <FactoryIcon sx={{ width: 32, height: 32 }} />
           </IconButton>
           <Box sx={{ flexGrow: 0.25 }} />
-          <IconButton color="primary" onClick={() => irPara('/Atleta', 'Atleta')}>
+          <IconButton color="primary" onClick={() => irPara('/Tinturaria', 'Tinturaria')}>
+            <ColorLensTwoToneIcon sx={{ width: 32, height: 32 }} />
+          </IconButton>
+          {/* <IconButton color="primary" onClick={() => irPara('/Atleta', 'Atleta')}>
             <Avatar
               alt="Foto do Usuário"
               src="imagens/avatar.jpg"
               sx={{ width: 32, height: 32 }}
             />
-          </IconButton>
+          </IconButton> */}
         </Toolbar>
       </AppBar>
     </React.Fragment>

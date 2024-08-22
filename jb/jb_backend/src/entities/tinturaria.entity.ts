@@ -2,9 +2,6 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, Pri
 import Pessoa from './pessoa.entity';
 import { TinturariaInterface } from '../interfaces/tinturariaInterface';
 import DetalheTinturaria from './detalheTinturaria.entity';
-import ProducaoMalharia from './producaoMalharia.entity';
-import Programacao from './programacao.entity';
-import DetalheEntrada from './detalheEntrada.entity';
 
 @Entity({ name: 'tinturarias' })
 export default class Tinturaria implements TinturariaInterface {
@@ -29,18 +26,10 @@ export default class Tinturaria implements TinturariaInterface {
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.fornecedorTinturarias)
   fornecedor: Pessoa
 
-  @OneToMany(() => DetalheTinturaria, detalheTinturaria => detalheTinturaria.tinturaria)
+  @JoinColumn({ name: 'idTinturaria' })
+  @OneToMany(() => DetalheTinturaria,
+    DetalheTinturaria => DetalheTinturaria.tinturaria, { cascade: true })
   detalheTinturarias: DetalheTinturaria[]
-
-  @JoinColumn({ name: 'idTinturaria' })
-  @OneToMany(() => Programacao, programacao =>
-    programacao.tinturaria, { cascade: true })
-  programacoes: Programacao[]
-
-  @JoinColumn({ name: 'idTinturaria' })
-  @OneToMany(() => DetalheEntrada, detalheEntrada =>
-    detalheEntrada.romaneio, { cascade: true })
-  romaneioDetalheEntradas: DetalheEntrada[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date

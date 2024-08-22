@@ -11,8 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var unidadeMedida_entity_1 = require("./unidadeMedida.entity");
-var detalheProducaoDublagem_entity_1 = require("./detalheProducaoDublagem.entity");
-var detalheProgramacao_entity_1 = require("./detalheProgramacao.entity");
 var tipoProdutoypes_1 = require("../types/tipoProdutoypes");
 var Produto = /** @class */ (function () {
     function Produto() {
@@ -54,20 +52,6 @@ var Produto = /** @class */ (function () {
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], Produto.prototype, "tipoProduto", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
-        (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) {
-            return detalheProducaoDublagem.produto;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Produto.prototype, "producaoDublagens", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: "idProduto" }),
-        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) {
-            return detalheProgramacao.produto;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Produto.prototype, "detalheProgramacoes", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
         __metadata("design:type", Date)

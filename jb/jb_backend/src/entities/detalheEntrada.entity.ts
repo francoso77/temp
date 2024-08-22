@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import Produto from './produto.entity';
 import { DetalheEntradaInterface } from '../interfaces/entradaInterface';
 import Entrada from './entrada.entity';
@@ -22,7 +22,7 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
     orphanedRowAction: 'delete'
   })
   entrada: Entrada
-  
+
   @Column()
   idProduto: number;
 

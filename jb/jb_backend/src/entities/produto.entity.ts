@@ -1,9 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProdutoInterface } from '../interfaces/produtoInterface';
 import UnidadeMedida from './unidadeMedida.entity';
-import ProducaoMalharia from './producaoMalharia.entity';
-import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
-import DetalheProgramacao from './detalheProgramacao.entity';
 import { TipoProdutoType } from '../types/tipoProdutoypes';
 
 @Entity({ name: 'produtos' })
@@ -36,16 +33,6 @@ export default class Produto implements ProdutoInterface {
 
   @Column()
   tipoProduto: TipoProdutoType
-
-  @JoinColumn({ name: "idProduto" })
-  @OneToMany(() => DetalheProducaoDublagem, (detalheProducaoDublagem) =>
-    detalheProducaoDublagem.produto, { cascade: true })
-  producaoDublagens: DetalheProducaoDublagem[]
-
-  @JoinColumn({ name: "idProduto" })
-  @OneToMany(() => DetalheProgramacao, (detalheProgramacao) =>
-    detalheProgramacao.produto, { cascade: true })
-  detalheProgramacoes: DetalheProgramacao[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date

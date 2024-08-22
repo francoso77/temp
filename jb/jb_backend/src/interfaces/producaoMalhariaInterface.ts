@@ -1,7 +1,8 @@
 import { TurnoType } from '../types/turnoTypes'
 
 export interface ProducaoMalhariaInterface {
-  idPeca?: number
+  idMalharia?: number
+  peca: number
   idMaquina: number
   idProduto: number
   dataProducao: string
@@ -11,6 +12,6 @@ export interface ProducaoMalhariaInterface {
   idPessoa_revisador: number
   idPessoa_tecelao: number
   fechado?: boolean
-  dataFechado?: string
+  dataFechado?: string | undefined
   idTinturaria?: number | null
 }

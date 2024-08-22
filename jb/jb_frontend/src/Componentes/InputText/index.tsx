@@ -21,6 +21,7 @@ interface mapKeyPressInterface {
 }
 
 interface InputTextInterface {
+  corFundo?: string,
   corFonte?: string
   tamanhoFonte?: number
   inputRef?: React.Ref<any> | undefined
@@ -241,6 +242,7 @@ const converterEmAnoMesDia = (valor: string): string => {
 }
 
 export default function InputText({
+  corFundo = '',
   corFonte = '',
   tamanhoFonte = 16,
   inputRef,
@@ -348,7 +350,11 @@ export default function InputText({
           {label}
         </Typography>
         <OutlinedInput
-          sx={{ color: corFonte, fontSize: tamanhoFonte }}
+          sx={{
+            color: corFonte,
+            fontSize: tamanhoFonte,
+            backgroundColor: corFundo,
+          }}
           inputRef={inputRef}
           name={field}
           onBlur={(e) => formatarDadosAoSair(e)}

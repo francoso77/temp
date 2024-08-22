@@ -12,8 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var pessoa_entity_1 = require("./pessoa.entity");
 var detalheTinturaria_entity_1 = require("./detalheTinturaria.entity");
-var programacao_entity_1 = require("./programacao.entity");
-var detalheEntrada_entity_1 = require("./detalheEntrada.entity");
 var Tinturaria = /** @class */ (function () {
     function Tinturaria() {
     }
@@ -44,23 +42,10 @@ var Tinturaria = /** @class */ (function () {
         __metadata("design:type", pessoa_entity_1.default)
     ], Tinturaria.prototype, "fornecedor", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheTinturaria_entity_1.default; }, function (detalheTinturaria) { return detalheTinturaria.tinturaria; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
+        (0, typeorm_1.OneToMany)(function () { return detalheTinturaria_entity_1.default; }, function (DetalheTinturaria) { return DetalheTinturaria.tinturaria; }, { cascade: true }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "detalheTinturarias", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
-        (0, typeorm_1.OneToMany)(function () { return programacao_entity_1.default; }, function (programacao) {
-            return programacao.tinturaria;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Tinturaria.prototype, "programacoes", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
-        (0, typeorm_1.OneToMany)(function () { return detalheEntrada_entity_1.default; }, function (detalheEntrada) {
-            return detalheEntrada.romaneio;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Tinturaria.prototype, "romaneioDetalheEntradas", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
         __metadata("design:type", Date)

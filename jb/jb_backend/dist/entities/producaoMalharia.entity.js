@@ -19,9 +19,13 @@ var ProducaoMalharia = /** @class */ (function () {
     function ProducaoMalharia() {
     }
     __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
+        (0, typeorm_1.PrimaryGeneratedColumn)(),
         __metadata("design:type", Number)
-    ], ProducaoMalharia.prototype, "idPeca", void 0);
+    ], ProducaoMalharia.prototype, "idMalharia", void 0);
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], ProducaoMalharia.prototype, "peca", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
@@ -70,7 +74,7 @@ var ProducaoMalharia = /** @class */ (function () {
         __metadata("design:type", Number)
     ], ProducaoMalharia.prototype, "idPessoa_tecelao", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoaTecelao' }),
+        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_tecelao' }),
         (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], ProducaoMalharia.prototype, "tecelao", void 0);

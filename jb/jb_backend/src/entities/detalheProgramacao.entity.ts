@@ -13,21 +13,21 @@ export default class DetalheProgramacao implements DetalheProgramacaoInterface {
   @PrimaryColumn()
   idProgramacao: number;
 
-  @ManyToOne(() => Programacao, programacao => programacao.detalheProgramacoes)
+  @ManyToOne(() => Programacao)
   programacao: Programacao;
 
   @Column()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.detalheProgramacoes)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @Column()
   idCor: number;
 
   @JoinColumn({ name: 'idCor' })
-  @ManyToOne(() => Cor, (cor) => cor.corDetalheProgramacoes)
+  @ManyToOne(() => Cor)
   cor: Cor
 
   @Column({ type: 'float', precision: 4 })

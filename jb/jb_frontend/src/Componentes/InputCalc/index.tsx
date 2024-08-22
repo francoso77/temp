@@ -7,6 +7,9 @@ import ClsFormatacao from '../../Utils/ClsFormatacao'
 
 
 interface InputTextInterface {
+  corFundo?: string,
+  corFonte?: string
+  tamanhoFonte?: number
   value: any
   label: string
   disabled?: boolean
@@ -30,6 +33,7 @@ interface InputTextInterface {
   unmask?: boolean
   onFocus?: (v: any) => void
   textAlign?: "left" | "right" | "center"
+  labelAlign?: "left" | "right" | "center"
   width?: "100%" | string
 }
 
@@ -137,6 +141,9 @@ const CurrencyMaskCustom = forwardRef((props: any, ref: any) => {
 
 
 export default function InputCalc({
+  corFundo = '',
+  corFonte = '',
+  tamanhoFonte = 16,
   value,
   label,
   disabled = false,
@@ -152,6 +159,7 @@ export default function InputCalc({
   unmask = false,
   onFocus = undefined,
   textAlign = "left",
+  labelAlign = "left",
   width = "100%",
 }: InputTextInterface) {
   const theme = useTheme()
@@ -162,17 +170,23 @@ export default function InputCalc({
     <FormControl sx={{ width: width }}>
       <Typography
         variant="body2"
-        textAlign="left"
+        textAlign={labelAlign}
         sx={{
           mt:
             theme && theme.inputs && theme.inputs.marginTop
               ? theme.inputs.marginTop
               : 0,
+          fontSize: tamanhoFonte,
         }}
       >
         {label}
       </Typography>
       <OutlinedInput
+        sx={{
+          color: corFonte,
+          fontSize: tamanhoFonte,
+          backgroundColor: corFundo,
+        }}
         onBlur={(e) => {
           let dado: any = e
           clsFormatos.currency(dado)

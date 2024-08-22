@@ -12,14 +12,14 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   @PrimaryColumn()
   idProducaoDublagem: number;
 
-  @ManyToOne(() => ProducaoDublagem, producaoDublagem => producaoDublagem.detalheProducaoDublagens)
+  @ManyToOne(() => ProducaoDublagem)
   ProducaoDublagem: ProducaoDublagem;
 
   @Column()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto, (produto) => produto.producaoDublagens)
+  @ManyToOne(() => Produto)
   produto: Produto
 
   @Column({ type: 'float', precision: 4 })
