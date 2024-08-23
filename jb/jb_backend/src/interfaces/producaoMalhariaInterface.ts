@@ -2,7 +2,7 @@ import { TurnoType } from '../types/turnoTypes'
 
 export interface ProducaoMalhariaInterface {
   idMalharia?: number
-  peca: number
+  peca: string
   idMaquina: number
   idProduto: number
   dataProducao: string

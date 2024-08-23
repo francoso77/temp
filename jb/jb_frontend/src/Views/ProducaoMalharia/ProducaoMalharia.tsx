@@ -7,8 +7,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { MaquinaInterface } from '../../../../jb_backend/src/interfaces/maquinaInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import Condicional from '../../Componentes/Condicional/Condicional';
+import { Box, Dialog, Grid, IconButton, Input, OutlinedInput, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import ComboBox from '../../Componentes/ComboBox';
 import InputText from '../../Componentes/InputText';
 import InputCalc from '../../Componentes/InputCalc';
@@ -20,6 +19,11 @@ import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 
+interface DadosPecaInterface {
+  nomeProduto: string | undefined
+  peca: string
+  peso: string
+}
 
 export function ProducaoMalharia() {
 
@@ -32,8 +36,13 @@ export function ProducaoMalharia() {
     return clsFormatacao.dataISOtoDatetime(dataAtual.toFormat('dd/MM/yyyy'))
   }
 
+  const ResetDadosPeca: DadosPecaInterface = {
+    nomeProduto: '',
+    peca: '',
+    peso: ''
+  }
   const ResetDados: ProducaoMalhariaInterface = {
-    peca: 0,
+    peca: '0',
     idMaquina: 0,
     idProduto: 0,
     dataProducao: obterDataAtualSistema(),
@@ -52,6 +61,7 @@ export function ProducaoMalharia() {
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [producaoMalharia, setProducaoMalharia] = useState<ProducaoMalhariaInterface>(ResetDados)
+  const [rsDadosPeca, setRsDadosPeca] = useState<DadosPecaInterface>(ResetDadosPeca)
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
   const [rsTecelao, setRsTecelao] = useState<Array<PessoaInterface>>([])
   const [rsMaquina, setRsMaquina] = useState<Array<MaquinaInterface>>([])
@@ -133,15 +143,24 @@ export function ProducaoMalharia() {
       campoOrder: ['peca'],
     })
       .then((rs: Array<ProducaoMalhariaInterface>) => {
+        let nomeMaquina: string = ''
         let ultimaPeca: string = ''
+        rsMaquina.find(v => v.idMaquina === maquina ? nomeMaquina = v.nome : '')
         if (rs.length === 0) {
-          ultimaPeca = maquina.toString().concat('1')
-          setProducaoMalharia({ ...producaoMalharia, peca: parseInt(ultimaPeca) })
-
+          ultimaPeca = nomeMaquina.concat('-').concat('1')
+          setProducaoMalharia({ ...producaoMalharia, peca: ultimaPeca })
         } else {
-          const ultima = rs[rs.length - 1].peca
-          setProducaoMalharia({ ...producaoMalharia, peca: ultima ? ultima + 1 : 0 })
+          const sorteDados = rs.sort((a, b) => {
+            const numA = parseInt(a.peca.split('-')[1], 10)
+            const numB = parseInt(b.peca.split('-')[1], 10)
+            return numA - numB
+          })
+          let ultimaPecaSorteada = sorteDados[sorteDados.length - 1]
+          const [prefix, number] = ultimaPecaSorteada.peca.split('-')
+          const novaPeca = `${prefix}-${parseInt(number, 10) + 1}`
 
+          ultimaPeca = novaPeca
+          setProducaoMalharia({ ...producaoMalharia, peca: ultimaPeca })
         }
       })
 
@@ -201,6 +220,10 @@ export function ProducaoMalharia() {
                   cb: null,
                   tipo: MensagemTipo.Ok,
                 })
+                setProducaoMalharia(ResetDados)
+                setRsDadosPeca(ResetDadosPeca)
+                setOpen(false)
+
               } else {
                 setMensagemState({
                   titulo: 'Erro...',
@@ -221,9 +244,6 @@ export function ProducaoMalharia() {
                 tipo: MensagemTipo.Error
               })
             })
-
-          setProducaoMalharia(ResetDados)
-          setOpen(false)
         }
       })
   }
@@ -231,6 +251,11 @@ export function ProducaoMalharia() {
   const btConfirmar = () => {
 
     if (validarDados()) {
+      setRsDadosPeca({
+        nomeProduto: NomeProduto(producaoMalharia.idProduto, rsProduto),
+        peca: producaoMalharia.peca,
+        peso: producaoMalharia.peso.toString()
+      })
       setOpen(true)
     }
   }
@@ -302,7 +327,6 @@ export function ProducaoMalharia() {
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 2)}
                 tamanhoFonte={30}
-
               />
             </Box>
           </Grid>
@@ -321,11 +345,9 @@ export function ProducaoMalharia() {
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 3)}
                 tamanhoFonte={30}
-
               />
             </Box>
           </Grid>
-
           <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
@@ -341,7 +363,6 @@ export function ProducaoMalharia() {
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 4)}
                 tamanhoFonte={30}
-
               />
             </Box>
           </Grid>
@@ -360,7 +381,6 @@ export function ProducaoMalharia() {
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 7)}
                 tamanhoFonte={30}
-
               />
             </Box>
           </Grid>
@@ -376,49 +396,46 @@ export function ProducaoMalharia() {
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 7)}
                 tamanhoFonte={30}
-
               />
             </Box>
           </Grid>
-
           <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
             <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
               <InputText
                 type='tel'
                 tipo="date"
                 label="Data"
+                posicaoLabel={'bottom'}
                 dados={producaoMalharia}
                 field="dataProducao"
                 setState={setProducaoMalharia}
                 erros={erros}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={60}
+                tamanhoFonte={50}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
-
               />
             </Box>
           </Grid>
-
           <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
             <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
               <InputText
                 tipo='currency'
                 scale={3}
                 label="Peso"
+                posicaoLabel={'bottom'}
                 dados={producaoMalharia}
                 field="peso"
                 setState={setProducaoMalharia}
                 erros={erros}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 8)}
-                tamanhoFonte={60}
+                tamanhoFonte={50}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
-
               />
             </Box>
           </Grid>
@@ -427,13 +444,14 @@ export function ProducaoMalharia() {
               <InputText
                 tipo='number'
                 label="Peça"
+                posicaoLabel={'bottom'}
                 dados={producaoMalharia}
                 field="peca"
                 setState={setProducaoMalharia}
                 disabled={true}
                 erros={erros}
                 onFocus={(e) => e.target.select()}
-                tamanhoFonte={60}
+                tamanhoFonte={50}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
@@ -475,14 +493,13 @@ export function ProducaoMalharia() {
             </Typography>
           </Grid>
         </Paper>
-
         <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} md={12} sx={{ mt: 1, pl: { md: 1 } }}>
               <InputCalc
-                value={NomeProduto(producaoMalharia.idProduto, rsProduto)}
-                tipo='text'
+                value={rsDadosPeca.nomeProduto}
                 label="Produto"
+                posicaoLabel={'bottom'}
                 disabled={true}
                 tamanhoFonte={40}
                 textAlign={'center'}
@@ -492,10 +509,9 @@ export function ProducaoMalharia() {
             </Grid>
             <Grid item xs={12} md={6} sx={{ mt: 1, pl: { md: 1 } }}>
               <InputCalc
-
-                value={producaoMalharia.peca}
-                tipo='number'
+                value={rsDadosPeca.peca}
                 label="Peça"
+                posicaoLabel={'bottom'}
                 disabled={true}
                 tamanhoFonte={40}
                 textAlign={'center'}
@@ -503,13 +519,12 @@ export function ProducaoMalharia() {
                 corFundo={'#cbdce9'}
               />
             </Grid>
-
             <Grid item xs={12} md={6} sx={{ mt: 1, pl: { md: 1 } }}>
               <InputCalc
-
-                value={producaoMalharia.peso.toString()}
-                tipo="currency"
+                value={rsDadosPeca.peso}
+                tipo={'currency'}
                 label="Peso"
+                posicaoLabel={'bottom'}
                 disabled={true}
                 tamanhoFonte={40}
                 textAlign={'center'}

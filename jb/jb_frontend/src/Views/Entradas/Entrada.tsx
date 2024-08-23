@@ -48,7 +48,7 @@ export default function Entrada() {
     total: '',
     totalQtd: ''
   }
-  const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
@@ -87,10 +87,10 @@ export default function Entrada() {
     event: React.MouseEvent<unknown>,
     property: keyof any,
   ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property);
-  };
+  }
 
   const pesquisarID = (id: string | number): Promise<EntradaInterface> => {
     return clsCrud

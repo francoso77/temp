@@ -4,9 +4,11 @@ import { OutlinedInput, Typography } from "@mui/material"
 import { IMaskInput } from "react-imask"
 import { useTheme } from "@mui/material"
 import ClsFormatacao from '../../Utils/ClsFormatacao'
+import Condicional from '../Condicional/Condicional'
 
 
 interface InputTextInterface {
+  posicaoLabel?: 'top' | 'bottom',
   corFundo?: string,
   corFonte?: string
   tamanhoFonte?: number
@@ -141,6 +143,7 @@ const CurrencyMaskCustom = forwardRef((props: any, ref: any) => {
 
 
 export default function InputCalc({
+  posicaoLabel = 'top',
   corFundo = '',
   corFonte = '',
   tamanhoFonte = 16,
@@ -168,19 +171,21 @@ export default function InputCalc({
 
   return (
     <FormControl sx={{ width: width }}>
-      <Typography
-        variant="body2"
-        textAlign={labelAlign}
-        sx={{
-          mt:
-            theme && theme.inputs && theme.inputs.marginTop
-              ? theme.inputs.marginTop
-              : 0,
-          fontSize: tamanhoFonte,
-        }}
-      >
-        {label}
-      </Typography>
+      <Condicional condicao={posicaoLabel === 'top'}>
+        <Typography
+          variant="body2"
+          textAlign={labelAlign}
+          sx={{
+            mt:
+              theme && theme.inputs && theme.inputs.marginTop
+                ? theme.inputs.marginTop
+                : 0,
+            fontSize: tamanhoFonte,
+          }}
+        >
+          {label}
+        </Typography>
+      </Condicional>
       <OutlinedInput
         sx={{
           color: corFonte,
@@ -243,6 +248,21 @@ export default function InputCalc({
                   : undefined
         }
       />
+      <Condicional condicao={posicaoLabel === 'bottom'}>
+        <Typography
+          variant="body2"
+          textAlign={labelAlign}
+          sx={{
+            mt:
+              theme && theme.inputs && theme.inputs.marginTop
+                ? theme.inputs.marginTop
+                : 0,
+            fontSize: tamanhoFonte,
+          }}
+        >
+          {label}
+        </Typography>
+      </Condicional>
     </FormControl>
   )
 

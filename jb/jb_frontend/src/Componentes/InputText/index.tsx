@@ -21,6 +21,7 @@ interface mapKeyPressInterface {
 }
 
 interface InputTextInterface {
+  posicaoLabel?: 'top' | 'bottom',
   corFundo?: string,
   corFonte?: string
   tamanhoFonte?: number
@@ -242,6 +243,7 @@ const converterEmAnoMesDia = (valor: string): string => {
 }
 
 export default function InputText({
+  posicaoLabel = 'top',
   corFundo = '',
   corFonte = '',
   tamanhoFonte = 16,
@@ -336,19 +338,22 @@ export default function InputText({
 
     return (
       <FormControl sx={{ width: width }}>
-        <Typography
-          variant="body2"
-          textAlign={labelAlign}
-          sx={{
-            mt:
-              theme && theme.inputs && theme.inputs.marginTop
-                ? theme.inputs.marginTop
-                : 0,
-            fontSize: tamanhoFonte,
-          }}
-        >
-          {label}
-        </Typography>
+        <Condicional condicao={posicaoLabel === 'top'}>
+
+          <Typography
+            variant="body2"
+            textAlign={labelAlign}
+            sx={{
+              mt:
+                theme && theme.inputs && theme.inputs.marginTop
+                  ? theme.inputs.marginTop
+                  : 0,
+              fontSize: tamanhoFonte,
+            }}
+          >
+            {label}
+          </Typography>
+        </Condicional>
         <OutlinedInput
           sx={{
             color: corFonte,
@@ -458,6 +463,21 @@ export default function InputText({
                     : undefined
           }
         />
+        <Condicional condicao={posicaoLabel === 'bottom'}>
+          <Typography
+            variant="body2"
+            textAlign={labelAlign}
+            sx={{
+              mt:
+                theme && theme.inputs && theme.inputs.marginTop
+                  ? theme.inputs.marginTop
+                  : 0,
+              fontSize: tamanhoFonte,
+            }}
+          >
+            {label}
+          </Typography>
+        </Condicional>
         <Condicional condicao={typeof erros[field] !== "undefined"}>
           <Typography variant="caption" textAlign="left" color="warning.main">
             {erros[field]}

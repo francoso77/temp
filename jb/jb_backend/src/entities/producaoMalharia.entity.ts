@@ -13,7 +13,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   idMalharia: number
 
   @Column()
-  peca: number
+  peca: string
 
   @Column()
   idMaquina: number
