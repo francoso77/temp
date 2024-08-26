@@ -16,14 +16,14 @@ export default class Tinturaria implements TinturariaInterface {
   idPessoa_cliente: number
 
   @JoinColumn({ name: 'idPessoa_cliente' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.clienteTinturarias)
+  @ManyToOne(() => Pessoa)
   cliente: Pessoa
 
   @Column()
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })
-  @ManyToOne(() => Pessoa, (pessoa) => pessoa.fornecedorTinturarias)
+  @ManyToOne(() => Pessoa)
   fornecedor: Pessoa
 
   @JoinColumn({ name: 'idTinturaria' })

@@ -10,7 +10,7 @@ export interface TinturariaInterface {
 
 export interface DetalheTinturariaInterface {
   idDetalheTinturaria?: number
-  idTinturaria: number
+  idTinturaria: number | null
   idMalharia: number
   peca: ProducaoMalhariaInterface
 }

@@ -1,16 +1,14 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { DetalheTinturariaInterface } from '../interfaces/tinturariaInterface';
 import Tinturaria from './tinturaria.entity';
 import ProducaoMalharia from './producaoMalharia.entity';
 
 @Entity({ name: 'detalhetinturarias' })
 export default class DetalheTinturaria implements DetalheTinturariaInterface {
-  idPeca: number;
-
   @PrimaryGeneratedColumn()
   idDetalheTinturaria: number;
 
-  @PrimaryColumn()
+  @Column()
   idTinturaria: number;
 
   @JoinColumn({ name: 'idTinturaria' })

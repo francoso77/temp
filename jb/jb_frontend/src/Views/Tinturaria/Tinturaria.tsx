@@ -193,7 +193,7 @@ export function Tinturaria() {
       dadosPesquisa = {
         entidade: "Tinturaria",
         relations: [
-          "clientes",
+          "cliente",
           "fornecedor",
           "detalheTinturarias",
           "detalheTinturarias.peca",
@@ -213,7 +213,7 @@ export function Tinturaria() {
       dadosPesquisa = {
         entidade: "Tinturaria",
         relations: [
-          "clientes",
+          "cliente",
           "fornecedor",
           "detalheTinturarias",
           "detalheTinturarias.peca",
@@ -348,17 +348,20 @@ export function Tinturaria() {
                     erros={erros}
                     setState={setTinturaria}
                     onFocus={(e) => e.target.select()}
-                    onKeyDown={(event) => btPulaCampo(event, 0)}
+                    onKeyDown={(event) => btPulaCampo(event, 3)}
                   />
                 </Box>
               </Grid>
               <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-                <DetalheTinturaria
-                  rsMaster={tinturaria}
-                  setRsMaster={setTinturaria}
-                  masterLocalState={localState}
-                // setRsSomatorio={setRsSomatorio}
-                />
+                <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+
+                  <DetalheTinturaria
+                    rsMaster={tinturaria}
+                    setRsMaster={setTinturaria}
+                    masterLocalState={localState}
+                  // setRsSomatorio={setRsSomatorio}
+                  />
+                </Box>
               </Grid>
               {/* 
               <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>

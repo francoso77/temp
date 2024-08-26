@@ -29,7 +29,7 @@ var Tinturaria = /** @class */ (function () {
     ], Tinturaria.prototype, "idPessoa_cliente", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.clienteTinturarias; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Tinturaria.prototype, "cliente", void 0);
     __decorate([
@@ -38,7 +38,7 @@ var Tinturaria = /** @class */ (function () {
     ], Tinturaria.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idPessoa_fornecedor' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }, function (pessoa) { return pessoa.fornecedorTinturarias; }),
+        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
         __metadata("design:type", pessoa_entity_1.default)
     ], Tinturaria.prototype, "fornecedor", void 0);
     __decorate([

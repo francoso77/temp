@@ -1,6 +1,5 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { CorInterface } from '../interfaces/corInteface';
-import DetalheProgramacao from './detalheProgramacao.entity';
 
 @Entity({ name: 'cores' })
 export default class Cor implements CorInterface {
