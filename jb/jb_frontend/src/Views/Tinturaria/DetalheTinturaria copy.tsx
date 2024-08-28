@@ -33,6 +33,8 @@ interface DadosPecaInterface {
 
 export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
 
+
+  {/** 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
@@ -98,6 +100,7 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   // }
 
   const validarDados = (): boolean => {
+
 
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
@@ -371,17 +374,6 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
                   // onKeyDown={(event: any) => btPulaCampo(event, 1)}
 
                   />
-                  {/* <InputText
-                    label="Peça"
-                    tipo="uppercase"
-                    dados={PesquisaPeca}
-                    field="peca"
-                    setState={setPesquisaPeca}
-                    iconeEnd='searchicon'
-                    onClickIconeEnd={() => btTemPeca()}
-                    mapKeyPress={[{ key: 'Enter', onKey: btTemPeca }]}
-                  /> */}
-
                 </Box>
               </Grid>
               <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
@@ -425,21 +417,7 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       </Dialog >
 
       <Paper sx={{ m: 0, p: 1, display: 'flex' }}>
-        <Grid item xs={3} md={3} sx={{ mt: -3, textAlign: 'left' }}>
-          <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
 
-            {/* <InputText
-              label="Peça"
-              tipo="uppercase"
-              dados={PesquisaPeca}
-              field="peca"
-              setState={setPesquisaPeca}
-              iconeEnd='searchicon'
-              onClickIconeEnd={() => btTemPeca()}
-              mapKeyPress={[{ key: 'Enter', onKey: btTemPeca }]}
-            /> */}
-          </Box>
-        </Grid>
         <Grid item xs={2}>
           <Tooltip title={'Incluir'}>
             <IconButton
@@ -479,4 +457,5 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       </Paper>
     </>
   )
+    */}
 }

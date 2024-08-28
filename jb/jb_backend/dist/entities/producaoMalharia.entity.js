@@ -104,7 +104,7 @@ var ProducaoMalharia = /** @class */ (function () {
         __metadata("design:type", Date)
     ], ProducaoMalharia.prototype, "updateAD", void 0);
     ProducaoMalharia = __decorate([
-        (0, typeorm_1.Entity)({ name: 'producaomalharia' })
+        (0, typeorm_1.Entity)({ name: 'producaomalharias' })
     ], ProducaoMalharia);
     return ProducaoMalharia;
 }());

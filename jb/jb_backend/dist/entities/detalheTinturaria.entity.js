@@ -25,11 +25,7 @@ var DetalheTinturaria = /** @class */ (function () {
     ], DetalheTinturaria.prototype, "idTinturaria", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
-        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }, function (tinturaria) { return tinturaria.detalheTinturarias; }, {
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
-            orphanedRowAction: 'delete'
-        }),
+        (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }, function (tinturaria) { return tinturaria.detalheTinturarias; }),
         __metadata("design:type", tinturaria_entity_1.default)
     ], DetalheTinturaria.prototype, "tinturaria", void 0);
     __decorate([
@@ -40,7 +36,7 @@ var DetalheTinturaria = /** @class */ (function () {
         (0, typeorm_1.JoinColumn)({ name: 'idMalharia' }),
         (0, typeorm_1.ManyToOne)(function () { return producaoMalharia_entity_1.default; }),
         __metadata("design:type", producaoMalharia_entity_1.default)
-    ], DetalheTinturaria.prototype, "peca", void 0);
+    ], DetalheTinturaria.prototype, "malharia", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
         __metadata("design:type", Date)

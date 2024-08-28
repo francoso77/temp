@@ -11,7 +11,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle"
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
 import DeleteIcon from '@mui/icons-material/Delete'
-
+import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone';
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import Condicional from '../../Componentes/Condicional/Condicional'
@@ -19,6 +19,7 @@ import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes
 import ComboBox from '../../Componentes/ComboBox'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
 
 
 
@@ -26,13 +27,12 @@ export function Tinturaria() {
 
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
-  const validarCampos = new ClsValidacao()
+  const validaCampo = new ClsValidacao()
 
   const ResetDados: TinturariaInterface = {
     dataTinturaria: '',
     idPessoa_cliente: 0,
     idPessoa_fornecedor: 0,
-    detalheTinturarias: []
   }
 
   interface PesquisaInterface {
@@ -65,7 +65,7 @@ export function Tinturaria() {
       format: (_v, rs: any) => rs.cliente.nome
     },
     {
-      cabecalho: 'Fornecedor',
+      cabecalho: 'Tinturaria',
       alinhamento: 'left',
       campo: 'idPessoa_fornecedor',
       format: (_v, rs: any) => rs.fornecedor.nome
@@ -86,10 +86,10 @@ export function Tinturaria() {
       .pesquisar({
         entidade: "Tinturaria",
         relations: [
-          "clientes",
+          "cliente",
           "fornecedor",
           "detalheTinturarias",
-          "detalheTinturarias.peca",
+          "detalheTinturarias.malharia",
         ],
         criterio: {
           idTinturaria: id,
@@ -102,6 +102,13 @@ export function Tinturaria() {
           dataTinturaria: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
         }
       })
+  }
+
+  const onDetalhes = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setTinturaria(rs)
+      setLocalState({ action: actionTypes.detalhes })
+    })
   }
 
   const onEditar = (id: string | number) => {
@@ -191,17 +198,19 @@ export function Tinturaria() {
     const temNumero = /\d/.test(pesquisa.itemPesquisa)
     if (temNumero) {
       dadosPesquisa = {
+        campoOrder: ['dataTinturaria'],
         entidade: "Tinturaria",
         relations: [
           "cliente",
           "fornecedor",
           "detalheTinturarias",
-          "detalheTinturarias.peca",
+          "detalheTinturarias.malharia",
         ],
         criterio: {
           dataTinturaria: "%".concat(pesquisa.itemPesquisa).concat("%"),
         },
         camposLike: ['dataTinturaria'],
+
         msg: 'Pesquisando notas ...',
         setMensagemState: setMensagemState
       }
@@ -211,12 +220,13 @@ export function Tinturaria() {
         cliente.nome.includes(pesquisa.itemPesquisa)
       ).map(cliente => cliente.idPessoa)
       dadosPesquisa = {
+        campoOrder: ['dataTinturaria'],
         entidade: "Tinturaria",
         relations: [
           "cliente",
           "fornecedor",
           "detalheTinturarias",
-          "detalheTinturarias.peca",
+          "detalheTinturarias.malharia",
         ],
         notOrLike: 'I',
         criterio: {
@@ -234,7 +244,43 @@ export function Tinturaria() {
       })
   }
 
-  const btConfirmar = () => { }
+  const validarDados = (): boolean => {
+    let retorno: boolean = true
+    let erros: { [key: string]: string } = {}
+
+    retorno = validaCampo.eData('dataTinturaria', tinturaria, erros, retorno)
+    retorno = validaCampo.naoVazio('idPessoa_cliente', tinturaria, erros, retorno, 'Informe um cliente')
+    retorno = validaCampo.naoVazio('idPessoa_fornecedor', tinturaria, erros, retorno, 'Informe um fornecedor')
+
+    setErros(erros)
+    return retorno
+  }
+
+  const btConfirmar = () => {
+    if (validarDados()) {
+      clsCrud.incluir({
+        entidade: 'Tinturaria',
+        criterio: tinturaria,
+        localState: localState,
+        cb: () => btPesquisar(),
+        setMensagemState: setMensagemState
+      })
+        .then((rs) => {
+          if (rs.ok) {
+            setLocalState({ action: actionTypes.pesquisando })
+          } else {
+            setMensagemState({
+              titulo: 'Erro...',
+              exibir: true,
+              mensagem: 'Erro no cadastro - Consulte Suporte',
+              tipo: MensagemTipo.Error,
+              exibirBotao: true,
+              cb: null
+            })
+          }
+        })
+    }
+  }
 
   useEffect(() => {
     BuscarDados()
@@ -281,16 +327,23 @@ export function Tinturaria() {
                   dados={rsPesquisa}
                   acoes={[
                     {
-                      icone: "find_in_page_two_tone",
+                      //icone: "find_in_page_two_tone",
+                      icone: 'edit',
                       onAcionador: (rs: TinturariaInterface) =>
                         onEditar(rs.idTinturaria as number),
-                      toolTip: "Visualizar",
+                      toolTip: "Editar",
                     },
                     {
                       icone: "delete",
                       onAcionador: (rs: TinturariaInterface) =>
                         onExcluir(rs.idTinturaria as number),
                       toolTip: "Excluir",
+                    },
+                    {
+                      icone: "edit_note_two_tone",
+                      onAcionador: (rs: TinturariaInterface) =>
+                        onDetalhes(rs.idTinturaria as number),
+                      toolTip: "Romaneio",
                     },
                   ]}
                   order={order}
@@ -352,6 +405,7 @@ export function Tinturaria() {
                   />
                 </Box>
               </Grid>
+              {/* 
               <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
                 <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
 
@@ -363,7 +417,7 @@ export function Tinturaria() {
                   />
                 </Box>
               </Grid>
-              {/* 
+            
               <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   tipo='currency'
@@ -427,10 +481,18 @@ export function Tinturaria() {
                 </Condicional>
               </Grid>
             </Condicional>
+            <Condicional condicao={localState.action === 'detalhes'}>
+              <Grid item xs={12}>
+                <DetalheTinturaria
+                  rsMaster={tinturaria}
+                  setRsMaster={setTinturaria}
+                  masterLocalState={localState}
+                />
+              </Grid>
+            </Condicional>
           </Grid>
         </Paper >
       </Container >
-      )
     </>
   )
 }

@@ -6,7 +6,7 @@ import Produto from './produto.entity';
 import { TurnoType } from '../types/turnoTypes';
 import Tinturaria from './tinturaria.entity';
 
-@Entity({ name: 'producaomalharia' })
+@Entity({ name: 'producaomalharias' })
 export default class ProducaoMalharia implements ProducaoMalhariaInterface {
 
   @PrimaryGeneratedColumn()

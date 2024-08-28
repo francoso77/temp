@@ -77,15 +77,27 @@ export default function Mensagem() {
         <Grid item xs={12} sx={{ padding: 1, border: 'none', borderWidth: '2px', borderColor: 'green', textAlign: 'right' }}>
           <Box>
             <Condicional condicao={mensagemState.exibirBotao !== 'SN'}>
-              <Button variant='contained' color='primary' onClick={() => fecharJanela()} sx={{ margin: 2, color: 'white' }}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => fecharJanela()}
+                sx={{ margin: 2, color: 'white' }}>
                 {textoBotao()}
               </Button>
             </Condicional>
             <Condicional condicao={mensagemState.exibirBotao === 'SN'}>
-              <Button variant='contained' color='primary' onClick={() => btResposta(true)} sx={{ margin: 2, color: 'white' }}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => btResposta(true)}
+                sx={{ margin: 2, color: 'white' }}>
                 Sim
               </Button>
-              <Button variant='contained' color='primary' onClick={() => btResposta(false)} sx={{ margin: 2, color: 'white' }}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => btResposta(false)}
+                sx={{ margin: 2, color: 'white' }}>
                 Não
               </Button>
             </Condicional>

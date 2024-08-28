@@ -26,10 +26,13 @@ export default class Tinturaria implements TinturariaInterface {
   @ManyToOne(() => Pessoa)
   fornecedor: Pessoa
 
-  @JoinColumn({ name: 'idTinturaria' })
-  @OneToMany(() => DetalheTinturaria,
-    DetalheTinturaria => DetalheTinturaria.tinturaria, { cascade: true })
+  @OneToMany(() => DetalheTinturaria, (detalheTinturaria) => detalheTinturaria.tinturaria)
   detalheTinturarias: DetalheTinturaria[]
+
+  // @JoinColumn({ name: 'idTinturaria' })
+  // @OneToMany(() => DetalheTinturaria,
+  //   DetalheTinturaria => DetalheTinturaria.tinturaria, { cascade: true })
+  // detalheTinturarias: DetalheTinturaria[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date

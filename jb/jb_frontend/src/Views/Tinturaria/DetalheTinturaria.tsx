@@ -18,6 +18,10 @@ import InputCalc from '../../Componentes/InputCalc';
 import { DetalheTinturariaInterface, TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
 import { TurnoType } from '../../types/turnoTypes';
 import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface';
+import ShowText from '../../Componentes/ShowText';
+import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 interface PropsInterface {
@@ -40,7 +44,7 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   const ResetDados: DetalheTinturariaInterface = {
     idTinturaria: 0,
     idMalharia: 0,
-    peca: {
+    malharia: {
       peca: '',
       idMaquina: 0,
       idProduto: 0,
@@ -65,12 +69,14 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [detalheTinturaria, setDetalheTinturaria] = useState<DetalheTinturariaInterface>(ResetDados)
+  const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPeca, setRsPeca] = useState<Array<ProducaoMalhariaInterface>>([])
-  const [rsProducao, setRsProducao] = useState<Array<ProducaoMalhariaInterface>>([])
+  const [rsSomaPeca, setRsSomaPeca] = useState<Array<ProducaoMalhariaInterface>>([])
+  const [rsProducao, setRsProducao] = useState<ProducaoMalhariaInterface>()
+  const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
-  const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -78,10 +84,30 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       cabecalho: 'Peça',
       alinhamento: 'left',
       campo: 'idMalharia',
-      format: (_v, rs: any) => rs.peca.peca
+      format: (_v, rs: any) => rs.malharia.peca
     },
   ]
 
+  const cabecalhoPecas: Array<DataTableCabecalhoInterface> = [
+    {
+      cabecalho: 'Tecido',
+      alinhamento: 'left',
+      campo: 'idMalharia',
+      format: (_v, rs: any) => rs.malharia.peca
+    },
+    {
+      cabecalho: 'Peso',
+      alinhamento: 'left',
+      campo: 'idMalharia',
+      format: (_v, rs: any) => rs.malharia.peca
+    },
+    {
+      cabecalho: 'Qtd',
+      alinhamento: 'left',
+      campo: 'idMalharia',
+      format: (_v, rs: any) => rs.malharia.peca
+    },
+  ]
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof any,
@@ -119,17 +145,20 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     return retorno
   }
 
-  const onExcluir = (rs: DetalheTinturariaInterface) => {
+  const onEditar = (id: number) => { }
+  const onExcluir = (id: number) => { }
 
-    let tmpDetalhe: Array<DetalheTinturariaInterface> = []
-    rsMaster.detalheTinturarias.forEach(det => {
-      if (det.idDetalheTinturaria !== rs.idDetalheTinturaria) {
-        tmpDetalhe.push(det)
-      }
-    })
-    setRsMaster({ ...rsMaster, detalheTinturarias: tmpDetalhe })
-    // AtualizaSomatorio(tmpDetalhe)
-  }
+  // const onExcluir = (rs: DetalheTinturariaInterface) => {
+
+  //   let tmpDetalhe: Array<DetalheTinturariaInterface> = []
+  //   rsMaster.detalheTinturarias.forEach(det => {
+  //     if (det.idDetalheTinturaria !== rs.idDetalheTinturaria) {
+  //       tmpDetalhe.push(det)
+  //     }
+  //   })
+  //   setRsMaster({ ...rsMaster, detalheTinturarias: tmpDetalhe })
+  //   // AtualizaSomatorio(tmpDetalhe)
+  // }
 
   const btIncluir = () => {
     if (
@@ -174,8 +203,8 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   }
 
   const podeIncluirDetalhe = (): boolean => {
-    const indice = rsMaster.detalheTinturarias.findIndex(
-      (v, i) => v.idMalharia === detalheTinturaria.idMalharia && i !== indiceEdicao
+    const indice = dados.findIndex(
+      (v, i) => v.malharia.peca === PesquisaPeca.peca && i !== indiceEdicao
     )
 
     if (indice >= 0) {
@@ -191,35 +220,60 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     return indice < 0;
   }
 
-  const btConfirmaInclusao = () => {
+  // const btConfirmaInclusao = () => {
 
-    if (podeIncluirDetalhe()) {
-      console.log('pode incluir')
-      console.log(detalheTinturaria.idMalharia)
-      let tmpDetalhe: Array<DetalheTinturariaInterface> = [...rsMaster.detalheTinturarias]
-      tmpDetalhe.push({
-        idTinturaria: rsMaster.idTinturaria as number,
-        idMalharia: detalheTinturaria.idMalharia,
-        peca: { ...rsProducao[rsProducao.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia)] },
-      })
-      console.log(tmpDetalhe)
-      setRsMaster({
-        ...rsMaster, detalheTinturarias:
-          [
-            ...rsMaster.detalheTinturarias,
+  //   if (podeIncluirDetalhe()) {
+  //     console.log('pode incluir')
+  //     console.log(detalheTinturaria.idMalharia)
+  //     let tmpDetalhe: Array<DetalheTinturariaInterface> = [...rsMaster.detalheTinturarias]
+  //     tmpDetalhe.push({
+  //       idTinturaria: rsMaster.idTinturaria as number,
+  //       idMalharia: detalheTinturaria.idMalharia,
+  //       peca: { ...rsProducao[rsProducao.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia)] },
+  //     })
+  //     console.log(tmpDetalhe)
+  //     setRsMaster({
+  //       ...rsMaster, detalheTinturarias:
+  //         [
+  //           ...rsMaster.detalheTinturarias,
 
-            {
-              idTinturaria: rsMaster.idTinturaria as number,
-              idMalharia: detalheTinturaria.idMalharia,
-              peca: { ...rsProducao[rsProducao.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia)] },
-            }
-          ]
-      })
-    }
-  }
+  //           {
+  //             idTinturaria: rsMaster.idTinturaria as number,
+  //             idMalharia: detalheTinturaria.idMalharia,
+  //             peca: { ...rsProducao[rsProducao.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia)] },
+  //           }
+  //         ]
+  //     })
+  //   }
+  // }
 
   const btFechar = () => {
     setOpen(false)
+
+  }
+
+  const btConfirmar = () => {
+
+  }
+  const SomaPeca = (rs: ProducaoMalhariaInterface) => {
+
+    if (podeIncluirDetalhe()) {
+
+      let tmpDetalhe: Array<DetalheTinturariaInterface> = []
+      tmpDetalhe.push({
+        idTinturaria: rsMaster.idTinturaria as number,
+        idMalharia: rs.idMalharia as number,
+        malharia: rs,
+
+      })
+      setDados([...dados,
+      {
+        idTinturaria: rsMaster.idTinturaria as number,
+        idMalharia: rs.idMalharia as number,
+        malharia: rs,
+      }
+      ])
+    }
 
   }
 
@@ -232,20 +286,52 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       },
       camposLike: ['peca', 'fechado'],
     }).then((rs: Array<ProducaoMalhariaInterface>) => {
-      console.log(rs)
+      if (rs.length > 0) {
+        setRsProducao(rs[0])
+        SomaPeca(rs[0])
+        setPesquisaPeca({ peca: '' })
+        // setRsProducao({
+        //   ...rsProducao,
+        //   idMalharia: rs[0].idMalharia,
+        //   peca: rs[0].peca,
+        //   idProduto: rs[0].idProduto,
+        //   idMaquina: rs[0].idMaquina,
+        //   dataProducao: rs[0].dataProducao,
+        //   turno: rs[0].turno,
+        //   peso: rs[0].peso,
+        //   localizacao: rs[0].localizacao,
+        //   idPessoa_revisador: rs[0].idPessoa_revisador,
+        //   idPessoa_tecelao: rs[0].idPessoa_tecelao,
+        //   fechado: true,
+        //   dataFechado: rsMaster.dataTinturaria,
+        //   idTinturaria: rsMaster.idTinturaria,
+        // })
 
-      if (rs.length > 0 && rs[0].idMalharia !== 0) {
-        // console.log(rs)
-        // setRsPeca(rs)
-        // setDetalheTinturaria({ ...detalheTinturaria, idMalharia: rs[0].idMalharia as number })
-        // setPesquisaPeca(DadosPeca)
-        // btConfirmaInclusao()
+      } else {
+        setMensagemState({
+          titulo: 'Aviso',
+          exibir: true,
+          mensagem: 'peça já cadastrada!',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null
+        })
       }
     })
   }
 
 
   const BuscarDados = () => {
+
+    clsCrud
+      .pesquisar({
+        entidade: 'Pessoa',
+        campoOrder: ['nome'],
+      }).then((pessoas: Array<PessoaInterface>) => {
+        setRsPessoas(pessoas)
+      })
+
+
     clsCrud
       .pesquisar({
         entidade: "ProducaoMalharia",
@@ -256,7 +342,20 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
         camposLike: ['fechado']
       })
       .then((rsPecas: Array<ProducaoMalhariaInterface>) => {
-        setRsProducao(rsPecas)
+        setRsPeca(rsPecas)
+      })
+
+    clsCrud
+      .pesquisar({
+        entidade: "ProducaoMalharia",
+        relations: ['produto'],
+        criterio: {
+          idTinturaria: rsMaster.idTinturaria
+        },
+        camposLike: ['idTinturaria'],
+      })
+      .then((rs: Array<ProducaoMalhariaInterface>) => {
+        setRsSomaPeca(rs)
       })
   }
 
@@ -264,147 +363,165 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     BuscarDados()
   }, [])
 
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  // const theme = useTheme()
+  // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   return (
     <>
-      <Dialog
-        open={open}
-        fullScreen={fullScreen}
-        fullWidth
-        maxWidth='md'>
-        <Paper variant="outlined"
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            m: 1,
-            p: 1.5,
-            backgroundColor: '#3c486b'
-          }}>
+      <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
+        <Grid item xs={12}>
+          <ShowText
+            titulo="Cliente"
+            descricao={
+              rsPessoas.
+                find((pessoa) => pessoa.idPessoa === rsMaster.idPessoa_cliente)?.nome || 'Cliente não encontrado!'
+            }
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <ShowText
+            titulo="Tinturaria"
+            descricao={
+              rsPessoas.
+                find(pessoa => pessoa.idPessoa === rsMaster.idPessoa_fornecedor)?.nome || 'Tinturaria não encontrada!'
+            }
+          />
+        </Grid>
+      </Paper>
+      <Paper variant="outlined" sx={{ padding: 2 }}>
+        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* <Grid item xs={12} sx={{ textAlign: 'right' }}>
+            <IconButton onClick={() => btFechar()}>
+              <CloseIcon />
+            </IconButton>
+          </Grid> */}
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
-            <Typography sx={{ color: 'white' }}>
-              informe a peça
+            <Typography >
+              Informe a peça do Romaneio
             </Typography>
           </Grid>
-        </Paper>
-        <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
-              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
-                {/* <ComboBox
-                  opcoes={rsProducao}
-                  campoDescricao="peca"
-                  campoID="idMalharia"
-                  dados={detalheTinturaria}
-                  mensagemPadraoCampoEmBranco="Escolha uma peça"
-                  field="idMalharia"
-                  label="Peça"
-                  erros={erros}
-                  setState={setDetalheTinturaria}
-
-                // onFocus={(e) => e.target.select()}
-                // onKeyDown={(event: any) => btPulaCampo(event, 1)}
-
-                /> */}
-                <InputText
-                  label="Peça"
-                  tipo="uppercase"
-                  dados={PesquisaPeca}
-                  field="peca"
-                  setState={setPesquisaPeca}
-                  iconeEnd='searchicon'
-                  onClickIconeEnd={() => btPesquisaPeca()}
-                  mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
-                />
-
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-
-              <InputCalc
-                label='Achou'
-                disabled={true}
-                value={rsPeca.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia ? v.peso : '')}
-                textAlign='right'
-
+          <Grid item xs={11} >
+            <InputText
+              label="Peça"
+              tipo="text"
+              dados={PesquisaPeca}
+              field="peca"
+              setState={setPesquisaPeca}
+              iconeEnd='searchicon'
+              onClickIconeEnd={() => btPesquisaPeca()}
+              mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
+              autoFocus
+            />
+          </Grid>
+          <Condicional condicao={localState.action === 'pesquisando'}>
+            {/* <Grid item xs={11} >
+              <InputText
+                label="Digite o nome"
+                tipo="text"
+                dados={pesquisa}
+                field="nome"
+                setState={setPesquisa}
+                iconeEnd='searchicon'
+                onClickIconeEnd={() => btPesquisar()}
+                mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
+                autoFocus
               />
+            </Grid> */}
+            <Grid item xs={1}>
+              <Tooltip title={'Incluir'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
+                  onClick={() => btIncluir()}
+                >
+                  <AddCircleIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
             </Grid>
-            <Grid item xs={3} md={6} sx={{ mt: 2, ml: 2, textAlign: 'left' }}>
+            <Grid item xs={6}>
               <DataTable
                 cabecalho={cabecalhoForm}
-                dados={rsMaster.detalheTinturarias}
-                acoes={['excluindo', 'editando'].includes(masterLocalState.action) ? [] :
-                  [
-                    {
-                      icone: "delete",
-                      onAcionador: (rs: DetalheTinturariaInterface) =>
-                        onExcluir(rs),
-                      toolTip: "Excluir",
-                    },
-                  ]}
+                dados={dados}
+                acoes={[
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: DetalheTinturariaInterface) =>
+                      onEditar(rs.idDetalheTinturaria as number),
+                    toolTip: "Editar",
+                  },
+                  {
+                    icone: "delete",
+                    onAcionador: (rs: DetalheTinturariaInterface) =>
+                      onExcluir(rs.idDetalheTinturaria as number),
+                    toolTip: "Excluir",
+                  },
+                ]}
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
               />
             </Grid>
-            <Condicional condicao={localState.action !== 'pesquisando'}>
-              <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-                <Tooltip title={'Cancelar'}>
+            <Grid item xs={6}>
+              <DataTable
+                cabecalho={cabecalhoPecas}
+                dados={dados}
+                acoes={[
+
+                ]}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+            </Grid>
+          </Condicional>
+          <Condicional condicao={localState.action !== 'pesquisando'}>
+            {/* <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
+              <InputText
+                label="Ativo"
+                tipo="checkbox"
+                dados={cao}
+                field="ativo"
+                setState={setCao}
+                disabled={localState.action === 'excluindo' ? true : false}
+              />
+            </Grid> */}
+            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+              <Tooltip title={'Cancelar'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: 2 }}
+                  onClick={() => btCancelar()}
+                >
+                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+                <Tooltip title={'Confirmar'}>
                   <IconButton
                     color="secondary"
                     sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btCancelar()}
+                    onClick={() => btConfirmar()}
                   >
-                    <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                    <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
                   </IconButton>
                 </Tooltip>
-                <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                  <Tooltip title={'Confirmar'}>
-                    <IconButton
-                      color="secondary"
-                      sx={{ mt: 3, ml: 2 }}
-                      onClick={() => btFechar()}
-                    >
-                      <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                    </IconButton>
-                  </Tooltip>
-                </Condicional>
-              </Grid>
-            </Condicional>
-          </Grid>
-        </Paper >
-      </Dialog>
-      <Grid item xs={2}>
-        <Tooltip title={'Incluir'}>
-          <IconButton
-            color="secondary"
-            sx={{ mt: 4, ml: 1 }}
-            onClick={() => btIncluir()}
-            disabled={localState.action === 'excluindo' ? true : false}
-          >
-            <AddCircleIcon sx={{ fontSize: 50 }} />
-          </IconButton>
-        </Tooltip>
-      </Grid>
-      <Grid item xs={3} md={6} sx={{ mt: 2, ml: 2, textAlign: 'left' }}>
-        <DataTable
-          cabecalho={cabecalhoForm}
-          dados={rsMaster.detalheTinturarias}
-          acoes={['excluindo', 'editando'].includes(masterLocalState.action) ? [] :
-            [
-              {
-                icone: "delete",
-                onAcionador: (rs: DetalheTinturariaInterface) =>
-                  onExcluir(rs),
-                toolTip: "Excluir",
-              },
-            ]}
-          order={order}
-          orderBy={orderBy}
-          onRequestSort={handleRequestSort}
-        />
-      </Grid>
+              </Condicional>
 
+              <Condicional condicao={localState.action === 'excluindo'}>
+                <Tooltip title={'Excluir'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 3, ml: 2 }}
+                    onClick={() => btConfirmar()}
+                  >
+                    <DeleteIcon sx={{ fontSize: 60 }} />
+                  </IconButton>
+                </Tooltip>
+              </Condicional>
+            </Grid>
+          </Condicional>
+        </Grid>
+      </Paper >
     </>
   )
 }
