@@ -173,7 +173,7 @@ export default function DataTable<T>({
   onRequestSort,
   order,
   orderBy,
-  temTotal,
+  temTotal = false,
   colunaSoma = "",
   qtdColunas
 }: DataTableInterface) {
@@ -296,11 +296,11 @@ export default function DataTable<T>({
               </StyledTableRow>
             </Condicional>
           </TableBody>
-          <Condicional condicao={temTotal === true}>
+          <Condicional condicao={temTotal}>
             <TableFooter>
               <StyledTableRow>
                 <StyledTableCell colSpan={qtdColunas}>
-                  TOTAL {"(".concat(colunaSoma.toUpperCase()).concat(")")}
+                  Total {"(".concat(colunaSoma.toUpperCase()).concat(")")}
                 </StyledTableCell>
                 <StyledTableCell>{formattedTotal}</StyledTableCell>
               </StyledTableRow>
@@ -308,6 +308,7 @@ export default function DataTable<T>({
           </Condicional>
         </Table>
       </TableContainer>
+      <Condicional condicao={exibirPaginacao}>
       <TablePagination
         labelRowsPerPage="Qtd: "
         rowsPerPageOptions={[10, 25,
@@ -333,32 +334,33 @@ export default function DataTable<T>({
             },
           },
           '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-            fontSize: '0.75rem',
+            fontSize: '0.65rem',
             [theme.breakpoints.down('sm')]: {
               fontSize: '0.55rem',
             },
             [theme.breakpoints.up('md')]: {
-              fontSize: '1rem',
+              fontSize: '0.75rem',
             },
             [theme.breakpoints.up('lg')]: {
-              fontSize: '1.125rem',
+              fontSize: '1rem',
             },
           },
           '& .MuiTablePagination-select': {
-            fontSize: '0.75rem',
+            fontSize: '0.65rem',
             [theme.breakpoints.down('sm')]: {
               fontSize: '0.55rem',
             },
             [theme.breakpoints.up('md')]: {
-              fontSize: '1rem',
+              fontSize: '0.75rem',
             },
             [theme.breakpoints.up('lg')]: {
-              fontSize: '1.125rem',
+              fontSize: '1rem',
             },
           },
 
         }}
       />
+      </Condicional>
     </>
   )
 

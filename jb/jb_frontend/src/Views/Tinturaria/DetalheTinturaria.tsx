@@ -35,6 +35,12 @@ interface DadosPecaInterface {
   peca: string
 }
 
+interface PecasSomadasInterface {
+  produto_nome: string,
+  total_peca: number,
+  qtd_peca: number
+}
+
 export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -63,21 +69,26 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   const DadosPeca: DadosPecaInterface = {
     peca: ''
   }
+
+  const PecasSomadas: PecasSomadasInterface = {
+    produto_nome: '',
+    total_peca: 0,
+    qtd_peca: 0
+  }
+
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
-  const [open, setOpen] = useState(false);
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [erros, setErros] = useState({})
   const [detalheTinturaria, setDetalheTinturaria] = useState<DetalheTinturariaInterface>(ResetDados)
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPeca, setRsPeca] = useState<Array<ProducaoMalhariaInterface>>([])
-  const [rsSomaPeca, setRsSomaPeca] = useState<Array<ProducaoMalhariaInterface>>([])
+  const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
   const [rsProducao, setRsProducao] = useState<ProducaoMalhariaInterface>()
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
-  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+  let sql: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -92,20 +103,20 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     {
       cabecalho: 'Tecido',
       alinhamento: 'left',
-      campo: 'idMalharia',
-      format: (_v, rs: any) => rs.malharia.peca
+      campo: 'produto_nome',
+      // format: (_v, rs: any) => rs.malharia.peca
     },
     {
       cabecalho: 'Peso',
-      alinhamento: 'left',
-      campo: 'idMalharia',
-      format: (_v, rs: any) => rs.malharia.peca
+      alinhamento: 'center',
+      campo: 'total_peca',
+      format: (qtd) => clsFormatacao.currency(qtd)
     },
     {
       cabecalho: 'Qtd',
-      alinhamento: 'left',
-      campo: 'idMalharia',
-      format: (_v, rs: any) => rs.malharia.peca
+      alinhamento: 'center',
+      campo: 'qtd_peca',
+      // format: (_v, rs: any) => rs.malharia.peca
     },
   ]
   const handleRequestSort = (
@@ -117,35 +128,6 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     setOrderBy(property);
   };
 
-  // const pegaTipo = () => {
-  //   let auxTipo: number | undefined = rsProduto.
-  //     find(produto => produto.idProduto === detalheTinturaria.idProduto)?.tipoProduto;
-  //   setTipo(auxTipo)
-  // }
-
-  const validarDados = (): boolean => {
-
-    let retorno: boolean = true
-    let erros: { [key: string]: string } = {}
-
-    // retorno = validaCampo.naoVazio('idMalharia', detalheTinturaria, erros, retorno, 'cliente')
-    // retorno = validaCampo.naoVazio('idPessoa_fornecedor', detalheTinturaria, erros, retorno, 'Informe uma tinturaria')
-    // if (tipo === 10) {
-    //   retorno = validaCampo.naoVazio('idCor', detalheEntrada, erros, retorno, 'Defina uma cor')
-    //   retorno = validaCampo.naoVazio('qtdPecas', detalheEntrada, erros, retorno, 'Informe a quantidade peças')
-    //   retorno = validaCampo.naoVazio('metro', detalheEntrada, erros, retorno, 'Qual a metragem')
-    //   retorno = validaCampo.naoVazio('gm2', detalheEntrada, erros, retorno, 'Qual a gramatura')
-    //   retorno = validaCampo.naoVazio('idPessoa_revisador', detalheEntrada, erros, retorno, 'Defina um revisador')
-    //   retorno = validaCampo.naoVazio('idTinturaria', detalheEntrada, erros, retorno, 'Defina uma tinturaria')
-    //   retorno = validaCampo.naoVazio('perdaMalharia', detalheEntrada, erros, retorno, 'Qtd perdida em malharia')
-    //   retorno = validaCampo.naoVazio('perdaTinturaria', detalheEntrada, erros, retorno, 'Qtd perdida em tinturaria')
-
-    // }
-    setErros(erros)
-    return retorno
-  }
-
-  const onEditar = (id: number) => { }
   const onExcluir = (id: number) => { }
 
   // const onExcluir = (rs: DetalheTinturariaInterface) => {
@@ -160,46 +142,10 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   //   // AtualizaSomatorio(tmpDetalhe)
   // }
 
-  const btIncluir = () => {
-    if (
-      rsMaster.dataTinturaria !== "" &&
-      rsMaster.idPessoa_cliente !== 0 &&
-      rsMaster.idPessoa_fornecedor !== 0
-    ) {
-      setIndiceEdicao(-1)
-      setOpen(true)
-      // BuscarDados()
-      setDetalheTinturaria(ResetDados)
-      setLocalState({ action: actionTypes.incluindo })
-    } else {
-      setMensagemState({
-        titulo: 'Atenção',
-        exibir: true,
-        mensagem: 'Informe os dados do Romaneio!',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
-    }
-  }
 
   const btCancelar = () => {
-    setOpen(false)
-    setErros({})
     setDetalheTinturaria(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
-  }
-
-  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
-    if (event.key === 'Enter') {
-      const nextField = fieldRefs.current[index];
-      if (nextField) {
-        const input = nextField.querySelector('input');
-        if (input) {
-          input.focus();
-        }
-      }
-    }
   }
 
   const podeIncluirDetalhe = (): boolean => {
@@ -247,14 +193,11 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
   //   }
   // }
 
-  const btFechar = () => {
-    setOpen(false)
-
-  }
 
   const btConfirmar = () => {
 
   }
+
   const SomaPeca = (rs: ProducaoMalhariaInterface) => {
 
     if (podeIncluirDetalhe()) {
@@ -273,6 +216,26 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
         malharia: rs,
       }
       ])
+
+      sql = `
+      UPDATE producaomalharias 
+      SET 
+        idTinturaria = ${rsMaster.idTinturaria},
+        dataFechado = STR_TO_DATE(${rsMaster.dataTinturaria}, '%d%m%Y'),
+        fechado = TRUE
+      WHERE 
+        idMalharia = ${rs.idMalharia};
+      `
+      clsCrud.query({
+        entidade: "ProducaoMalharia",
+        sql: sql,
+      }).then((rs) => {
+        AtualizaSoma()
+        console.log('resultado do rs: ', rs)
+        if (rs.length > 0) {
+          console.log(rs)
+        }
+      })
     }
 
   }
@@ -289,34 +252,17 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       if (rs.length > 0) {
         setRsProducao(rs[0])
         SomaPeca(rs[0])
-        setPesquisaPeca({ peca: '' })
-        // setRsProducao({
-        //   ...rsProducao,
-        //   idMalharia: rs[0].idMalharia,
-        //   peca: rs[0].peca,
-        //   idProduto: rs[0].idProduto,
-        //   idMaquina: rs[0].idMaquina,
-        //   dataProducao: rs[0].dataProducao,
-        //   turno: rs[0].turno,
-        //   peso: rs[0].peso,
-        //   localizacao: rs[0].localizacao,
-        //   idPessoa_revisador: rs[0].idPessoa_revisador,
-        //   idPessoa_tecelao: rs[0].idPessoa_tecelao,
-        //   fechado: true,
-        //   dataFechado: rsMaster.dataTinturaria,
-        //   idTinturaria: rsMaster.idTinturaria,
-        // })
-
       } else {
         setMensagemState({
           titulo: 'Aviso',
           exibir: true,
-          mensagem: 'peça já cadastrada!',
+          mensagem: 'Peça já cadastrada ou inexistente!',
           tipo: MensagemTipo.Error,
           exibirBotao: true,
           cb: null
         })
       }
+      setPesquisaPeca({ peca: '' })
     })
   }
 
@@ -345,26 +291,49 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
         setRsPeca(rsPecas)
       })
 
-    clsCrud
-      .pesquisar({
-        entidade: "ProducaoMalharia",
-        relations: ['produto'],
-        criterio: {
-          idTinturaria: rsMaster.idTinturaria
-        },
-        camposLike: ['idTinturaria'],
-      })
-      .then((rs: Array<ProducaoMalhariaInterface>) => {
-        setRsSomaPeca(rs)
-      })
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "ProducaoMalharia",
+    //     relations: ['produto'],
+    //     criterio: {
+    //       idTinturaria: rsMaster.idTinturaria
+    //     },
+    //     camposLike: ['idTinturaria'],
+    //   })
+    //   .then((rs: Array<ProducaoMalhariaInterface>) => {
+    //     console.log('pecas somadas: ', rs)
+    //     setRsSomaPeca(rs)
+    //   })
+
+  }
+
+  const AtualizaSoma = () => {
+    sql = `
+      SELECT 
+          ROUND(SUM(pm.peso),2) AS total_peca,
+          COUNT(pm.peso) AS qtd_peca,
+          p.nome AS produto_nome
+      FROM 
+          producaomalharias pm
+      INNER JOIN 
+          produtos p ON p.idProduto = pm.idProduto
+      WHERE 
+          pm.idTinturaria = ${rsMaster.idTinturaria}
+      GROUP BY p.nome;
+    `
+    clsCrud.query({
+      entidade: "ProducaoMalharia",
+      sql: sql,
+    }).then((rs) => {
+      setRsPecasSomadas(rs)
+    })
   }
 
   useEffect(() => {
     BuscarDados()
+    AtualizaSoma()
   }, [])
 
-  // const theme = useTheme()
-  // const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   return (
     <>
       <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
@@ -377,7 +346,6 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
             }
           />
         </Grid>
-
         <Grid item xs={12}>
           <ShowText
             titulo="Tinturaria"
@@ -390,17 +358,12 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       </Paper>
       <Paper variant="outlined" sx={{ padding: 2 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* <Grid item xs={12} sx={{ textAlign: 'right' }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
-          </Grid> */}
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography >
               Informe a peça do Romaneio
             </Typography>
           </Grid>
-          <Grid item xs={11} >
+          <Grid item xs={12} >
             <InputText
               label="Peça"
               tipo="text"
@@ -414,41 +377,11 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
             />
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            {/* <Grid item xs={11} >
-              <InputText
-                label="Digite o nome"
-                tipo="text"
-                dados={pesquisa}
-                field="nome"
-                setState={setPesquisa}
-                iconeEnd='searchicon'
-                onClickIconeEnd={() => btPesquisar()}
-                mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autoFocus
-              />
-            </Grid> */}
-            <Grid item xs={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 3, ml: { xs: 0, md: 2 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={dados}
                 acoes={[
-                  {
-                    icone: "edit",
-                    onAcionador: (rs: DetalheTinturariaInterface) =>
-                      onEditar(rs.idDetalheTinturaria as number),
-                    toolTip: "Editar",
-                  },
                   {
                     icone: "delete",
                     onAcionador: (rs: DetalheTinturariaInterface) =>
@@ -461,30 +394,21 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
                 onRequestSort={handleRequestSort}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={7} sx={{ mt: { xs: -7, md: -7 } }}>
               <DataTable
                 cabecalho={cabecalhoPecas}
-                dados={dados}
-                acoes={[
-
-                ]}
+                dados={rsPecasSomadas}
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
+                exibirPaginacao={false}
+                temTotal={true}
+                qtdColunas={0}
+                colunaSoma='total_peca'
               />
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
-            {/* <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
-              <InputText
-                label="Ativo"
-                tipo="checkbox"
-                dados={cao}
-                field="ativo"
-                setState={setCao}
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid> */}
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton

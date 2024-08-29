@@ -1,5 +1,5 @@
-import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useState } from 'react';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { useContext, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -53,7 +53,8 @@ export default function Maquina() {
   const [maquina, setMaquina] = useState<MaquinaInterface>(ResetDados)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -136,6 +137,18 @@ export default function Maquina() {
     setLocalState({ action: actionTypes.pesquisando })
   }
 
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
+
   const validarDados = (): boolean => {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
@@ -164,7 +177,7 @@ export default function Maquina() {
       .pesquisar({
         entidade: "Maquina",
         criterio: {
-          nome: "%".concat(maquina.nome).concat("%"),
+          nome: maquina.nome,
         },
         camposLike: ["nome"],
         select: ["nome"],
@@ -342,179 +355,224 @@ export default function Maquina() {
 
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} sm={12} md={12} sx={{ textAlign: 'left' }}>
-              <InputText
-                label="Ativo"
-                tipo="checkbox"
-                dados={maquina}
-                field="ativo"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                <InputText
+                  label="Ativo"
+                  tipo="checkbox"
+                  dados={maquina}
+                  field="ativo"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Nome"
-                tipo="uppercase"
-                dados={maquina}
-                field="nome"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={35}
-                autoFocus
-              />
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <InputText
+                  label="Nome"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="nome"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={35}
+                  autoFocus
+                  onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Marca"
-                tipo="uppercase"
-                dados={maquina}
-                field="marca"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <InputText
+                  label="Marca"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="marca"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Tipo Tear"
-                tipo="uppercase"
-                dados={maquina}
-                field="tipoTear"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <InputText
+                  label="Tipo Tear"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="tipoTear"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Modelo"
-                tipo="uppercase"
-                dados={maquina}
-                field="modelo"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                <InputText
+                  label="Modelo"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="modelo"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Série"
-                tipo="uppercase"
-                dados={maquina}
-                field="serie"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                <InputText
+                  label="Série"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="serie"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 6)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-            <InputText
-                type='tel'
-                tipo="date"
-                label="Próxima Preventiva"
-                dados={maquina}
-                field="dataPreventiva"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                <InputText
+                  type='tel'
+                  tipo="date"
+                  label="Próxima Preventiva"
+                  dados={maquina}
+                  field="dataPreventiva"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Platina"
-                tipo="uppercase"
-                dados={maquina}
-                field="platina"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
+                <InputText
+                  label="Platina"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="platina"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 8)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Correia"
-                tipo="uppercase"
-                dados={maquina}
-                field="correia"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
+                <InputText
+                  label="Correia"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="correia"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 9)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Agulha"
-                tipo="uppercase"
-                dados={maquina}
-                field="agulha"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={15}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[9] = el)}>
+                <InputText
+                  label="Agulha"
+                  tipo="uppercase"
+                  dados={maquina}
+                  field="agulha"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={15}
+                  onKeyDown={(event: any) => btPulaCampo(event, 10)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Qtd Agulhas"
-                tipo="number"
-                dados={maquina}
-                field="qtdAgulhas"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[10] = el)}>
+                <InputText
+                  label="Qtd Agulhas"
+                  tipo="number"
+                  dados={maquina}
+                  field="qtdAgulhas"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onKeyDown={(event: any) => btPulaCampo(event, 11)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Qtd Alimentadores"
-                tipo="number"
-                dados={maquina}
-                field="qtdAlimentadores"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[11] = el)}>
+                <InputText
+                  label="Qtd Alimentadores"
+                  tipo="number"
+                  dados={maquina}
+                  field="qtdAlimentadores"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onKeyDown={(event: any) => btPulaCampo(event, 12)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Diâmetro"
-                tipo="currency"
-                dados={maquina}
-                field="diametro"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                scale={2}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[12] = el)}>
+                <InputText
+                  label="Diâmetro"
+                  tipo="currency"
+                  dados={maquina}
+                  field="diametro"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  scale={2}
+                  onKeyDown={(event: any) => btPulaCampo(event, 13)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Espessura"
-                tipo="currency"
-                dados={maquina}
-                field="espessura"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                scale={2}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[13] = el)}>
+                <InputText
+                  label="Espessura"
+                  tipo="currency"
+                  dados={maquina}
+                  field="espessura"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  scale={2}
+                  onKeyDown={(event: any) => btPulaCampo(event, 14)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sm={3} md={3} sx={{ textAlign: 'left' }}>
-              <InputText
-                label="Kit Elastano?"
-                tipo="checkbox"
-                dados={maquina}
-                field="kitElastano"
-                setState={setMaquina}
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[14] = el)}>
+                <InputText
+                  label="Kit Elastano?"
+                  tipo="checkbox"
+                  dados={maquina}
+                  field="kitElastano"
+                  setState={setMaquina}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>

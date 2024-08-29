@@ -291,7 +291,7 @@ export function Tinturaria() {
       <Container maxWidth="md" sx={{ mt: 5 }}>
         <Paper variant="outlined" sx={{ padding: 2 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
+            <Grid item xs={12} sx={{ textAlign: 'right', mt: -2, mr: -5, mb: 0}}>
               <IconButton onClick={() => btFechar()}>
                 <CloseIcon />
               </IconButton>
