@@ -36,8 +36,8 @@ export interface DataTableInterface {
   order: Order;
   orderBy: string | number | symbol;
   temTotal?: boolean;
-  colunaSoma?: string | undefined;
-  qtdColunas?: number;
+  colunaSoma?: Array<string>;
+  // qtdColunas?: number;
 }
 
 export const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -65,18 +65,18 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     padding: '1px',
-    fontSize: '0.55rem',
+    fontSize: '0.75rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '0.70rem',
+      fontSize: '0.90rem',
     },
   },
   [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
     padding: '1px',
-    fontSize: '0.55rem',
+    fontSize: '0.75rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '0.70rem',
+      fontSize: '0.90rem',
     },
     position: "sticky",
     left: 0,
@@ -84,20 +84,20 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.footer}`]: {
     padding: '1px',
-    fontSize: '0.55rem',
+    fontSize: '0.85rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '0.80rem',
+      fontSize: '1rem',
     },
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
     padding: '1px',
-    fontSize: '0.55rem',
+    fontSize: '0.85rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '0.80rem',
+      fontSize: '1rem',
     },
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
@@ -164,6 +164,13 @@ const sumColumn = (data: Array<any>, column: string): number => {
   return data.reduce((sum, row) => sum + row[column], 0);
 };
 
+const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, number> => {
+  return columns.reduce((sums, column) => {
+    sums[column] = data.reduce((sum, row) => formatNumber(sum + (row[column] || 0), 'pt-BR'), 0);
+    return sums;
+  }, {} as Record<string, number>);
+};
+
 export default function DataTable<T>({
   dados = [],
   cabecalho = [],
@@ -174,8 +181,8 @@ export default function DataTable<T>({
   order,
   orderBy,
   temTotal = false,
-  colunaSoma = "",
-  qtdColunas
+  colunaSoma = [],
+  // qtdColunas
 }: DataTableInterface) {
 
   const theme = useTheme()
@@ -198,8 +205,16 @@ export default function DataTable<T>({
       }
     }
 
-  const total = sumColumn(dados, colunaSoma)
-  const formattedTotal = formatNumber(total, 'pt-BR')
+  // const total = sumColumn(dados, colunaSoma)
+  // const formattedTotal = formatNumber(total, 'pt-BR')
+
+  const totalColunas = sumColumns(dados, colunaSoma)
+  console.log('Dados Recebidos: ', dados)
+  console.log('resultado das somas:', totalColunas)
+
+  colunaSoma.map((col) => {
+    console.log(col)
+  })
 
   return (
     <>
@@ -299,67 +314,80 @@ export default function DataTable<T>({
           <Condicional condicao={temTotal}>
             <TableFooter>
               <StyledTableRow>
-                <StyledTableCell colSpan={qtdColunas}>
-                  Total {"(".concat(colunaSoma.toUpperCase()).concat(")")}
+                <StyledTableCell>
+                  TOTAL
                 </StyledTableCell>
-                <StyledTableCell>{formattedTotal}</StyledTableCell>
+                {colunaSoma.map((column) => (
+                  <StyledTableCell
+                    colSpan={1}
+                    align={'center'}
+                    key={column}
+                  >
+                    {totalColunas[column]}
+                  </StyledTableCell>
+                ))}
+                {/* <StyledTableCell colSpan={2} align="right">
+                  Total {"(".concat(colunaSoma.toUpperCase()).concat(")")}
+                  Total
+                </StyledTableCell>
+                <StyledTableCell align="right">{formattedTotal}</StyledTableCell> */}
               </StyledTableRow>
             </TableFooter>
           </Condicional>
         </Table>
       </TableContainer>
       <Condicional condicao={exibirPaginacao}>
-      <TablePagination
-        labelRowsPerPage="Qtd: "
-        rowsPerPageOptions={[10, 25,
-          { value: dados && dados.length ? dados.length : 0, label: "Todos" },
-        ]}
-        component="div"
-        count={dados.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        sx={{
-          '& .MuiTablePagination-toolbar': {
-            padding: theme.spacing(1),
-            [theme.breakpoints.down('sm')]: {
-              padding: theme.spacing(0.5),
+        <TablePagination
+          labelRowsPerPage="Qtd: "
+          rowsPerPageOptions={[10, 25,
+            { value: dados && dados.length ? dados.length : 0, label: "Todos" },
+          ]}
+          component="div"
+          count={dados.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{
+            '& .MuiTablePagination-toolbar': {
+              padding: theme.spacing(1),
+              [theme.breakpoints.down('sm')]: {
+                padding: theme.spacing(0.5),
+              },
+              [theme.breakpoints.up('md')]: {
+                padding: theme.spacing(1.5),
+              },
+              [theme.breakpoints.up('lg')]: {
+                padding: theme.spacing(2),
+              },
             },
-            [theme.breakpoints.up('md')]: {
-              padding: theme.spacing(1.5),
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              fontSize: '0.65rem',
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '0.55rem',
+              },
+              [theme.breakpoints.up('md')]: {
+                fontSize: '0.75rem',
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: '1rem',
+              },
             },
-            [theme.breakpoints.up('lg')]: {
-              padding: theme.spacing(2),
+            '& .MuiTablePagination-select': {
+              fontSize: '0.65rem',
+              [theme.breakpoints.down('sm')]: {
+                fontSize: '0.55rem',
+              },
+              [theme.breakpoints.up('md')]: {
+                fontSize: '0.75rem',
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: '1rem',
+              },
             },
-          },
-          '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-            fontSize: '0.65rem',
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.55rem',
-            },
-            [theme.breakpoints.up('md')]: {
-              fontSize: '0.75rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '1rem',
-            },
-          },
-          '& .MuiTablePagination-select': {
-            fontSize: '0.65rem',
-            [theme.breakpoints.down('sm')]: {
-              fontSize: '0.55rem',
-            },
-            [theme.breakpoints.up('md')]: {
-              fontSize: '0.75rem',
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: '1rem',
-            },
-          },
 
-        }}
-      />
+          }}
+        />
       </Condicional>
     </>
   )

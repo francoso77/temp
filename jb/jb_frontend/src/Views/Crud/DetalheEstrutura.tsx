@@ -387,9 +387,8 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
         </Grid>
         <Grid item xs={12}>
           <DataTable
-            colunaSoma='qtd'
+            colunaSoma={['qtd']}
             temTotal={true}
-            qtdColunas={2}
             cabecalho={cabecalhoForm}
             dados={rsMaster.detalheEstruturas}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :

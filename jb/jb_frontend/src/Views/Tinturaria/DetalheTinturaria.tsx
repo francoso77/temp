@@ -1,34 +1,22 @@
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { Grid, IconButton, Paper, TableContainer, Tooltip, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import Condicional from '../../Componentes/Condicional/Condicional';
-import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
-import ComboBox from '../../Componentes/ComboBox';
-import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import InputCalc from '../../Componentes/InputCalc';
 import { DetalheTinturariaInterface, TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
-import { TurnoType } from '../../types/turnoTypes';
 import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface';
 import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close';
-
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
-  setRsMaster: React.Dispatch<React.SetStateAction<TinturariaInterface>>,
-  masterLocalState: ActionInterface,
-  // setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioEntradaInterface>>,
+  setMasterLocalState: React.Dispatch<React.SetStateAction<ActionInterface>>
 }
 
 interface DadosPecaInterface {
@@ -41,49 +29,38 @@ interface PecasSomadasInterface {
   qtd_peca: number
 }
 
-export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
+export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: PropsInterface) {
 
-  const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const ResetDados: DetalheTinturariaInterface = {
-    idTinturaria: 0,
-    idMalharia: 0,
-    malharia: {
-      peca: '',
-      idMaquina: 0,
-      idProduto: 0,
-      dataProducao: '',
-      turno: TurnoType.segundo,
-      peso: 0,
-      localizacao: '',
-      idPessoa_revisador: 0,
-      idPessoa_tecelao: 0,
-      fechado: false,
-      dataFechado: undefined,
-      idTinturaria: 0
-    },
-  }
+  // const ResetDados: DetalheTinturariaInterface = {
+  //   idTinturaria: 0,
+  //   idMalharia: 0,
+  //   malharia: {
+  //     peca: '',
+  //     idMaquina: 0,
+  //     idProduto: 0,
+  //     dataProducao: '',
+  //     turno: TurnoType.segundo,
+  //     peso: 0,
+  //     localizacao: '',
+  //     idPessoa_revisador: 0,
+  //     idPessoa_tecelao: 0,
+  //     fechado: false,
+  //     dataFechado: undefined,
+  //     idTinturaria: 0
+  //   },
+  // }
 
   const DadosPeca: DadosPecaInterface = {
     peca: ''
   }
 
-  const PecasSomadas: PecasSomadasInterface = {
-    produto_nome: '',
-    total_peca: 0,
-    qtd_peca: 0
-  }
-
-  const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.incluindo })
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [detalheTinturaria, setDetalheTinturaria] = useState<DetalheTinturariaInterface>(ResetDados)
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
-  const [rsPeca, setRsPeca] = useState<Array<ProducaoMalhariaInterface>>([])
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
-  const [rsProducao, setRsProducao] = useState<ProducaoMalhariaInterface>()
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
@@ -104,7 +81,6 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       cabecalho: 'Tecido',
       alinhamento: 'left',
       campo: 'produto_nome',
-      // format: (_v, rs: any) => rs.malharia.peca
     },
     {
       cabecalho: 'Peso',
@@ -116,7 +92,7 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       cabecalho: 'Qtd',
       alinhamento: 'center',
       campo: 'qtd_peca',
-      // format: (_v, rs: any) => rs.malharia.peca
+      format: (qtd) => clsFormatacao.currency(qtd)
     },
   ]
   const handleRequestSort = (
@@ -128,29 +104,62 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     setOrderBy(property);
   };
 
-  const onExcluir = (id: number) => { }
+  const onExcluir = (rs: DetalheTinturariaInterface) => {
 
-  // const onExcluir = (rs: DetalheTinturariaInterface) => {
+    let tmpDetalhe: Array<DetalheTinturariaInterface> = []
+    dados.forEach(det => {
+      if (det.idMalharia !== rs.idMalharia) {
+        tmpDetalhe.push(det)
+      }
+    })
+    setDados(tmpDetalhe)
 
-  //   let tmpDetalhe: Array<DetalheTinturariaInterface> = []
-  //   rsMaster.detalheTinturarias.forEach(det => {
-  //     if (det.idDetalheTinturaria !== rs.idDetalheTinturaria) {
-  //       tmpDetalhe.push(det)
-  //     }
-  //   })
-  //   setRsMaster({ ...rsMaster, detalheTinturarias: tmpDetalhe })
-  //   // AtualizaSomatorio(tmpDetalhe)
-  // }
+    clsCrud.excluir({
+      entidade: "DetalheTinturaria",
+      criterio: {
+        idMalharia: rs.idMalharia
+      },
+      setMensagemState: setMensagemState
+    })
+      .then((rs) => {
+        if (!rs.ok) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Erro no cadastro - Consulte Suporte',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+        }
+      })
 
+    sql = `
+    UPDATE producaomalharias 
+    SET 
+      idTinturaria = NULL,
+      dataFechado = NULL,
+      fechado = FALSE
+    WHERE 
+      idMalharia = ${rs.idMalharia};
+    `
+    clsCrud.query({
+      entidade: "ProducaoMalharia",
+      sql: sql,
+    }).then((rs) => {
+      AtualizaSoma()
+    })
+
+  }
 
   const btCancelar = () => {
-    setDetalheTinturaria(ResetDados)
-    setLocalState({ action: actionTypes.pesquisando })
+    setMasterLocalState({ action: actionTypes.pesquisando })
+    setLocalState({ action: actionTypes.incluindo })
   }
 
   const podeIncluirDetalhe = (): boolean => {
     const indice = dados.findIndex(
-      (v, i) => v.malharia.peca === PesquisaPeca.peca && i !== indiceEdicao
+      (v) => v.malharia.peca === PesquisaPeca.peca
     )
 
     if (indice >= 0) {
@@ -166,36 +175,28 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     return indice < 0;
   }
 
-  // const btConfirmaInclusao = () => {
-
-  //   if (podeIncluirDetalhe()) {
-  //     console.log('pode incluir')
-  //     console.log(detalheTinturaria.idMalharia)
-  //     let tmpDetalhe: Array<DetalheTinturariaInterface> = [...rsMaster.detalheTinturarias]
-  //     tmpDetalhe.push({
-  //       idTinturaria: rsMaster.idTinturaria as number,
-  //       idMalharia: detalheTinturaria.idMalharia,
-  //       peca: { ...rsProducao[rsProducao.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia)] },
-  //     })
-  //     console.log(tmpDetalhe)
-  //     setRsMaster({
-  //       ...rsMaster, detalheTinturarias:
-  //         [
-  //           ...rsMaster.detalheTinturarias,
-
-  //           {
-  //             idTinturaria: rsMaster.idTinturaria as number,
-  //             idMalharia: detalheTinturaria.idMalharia,
-  //             peca: { ...rsProducao[rsProducao.findIndex(v => v.idMalharia === detalheTinturaria.idMalharia)] },
-  //           }
-  //         ]
-  //     })
-  //   }
-  // }
-
-
   const btConfirmar = () => {
 
+    clsCrud.incluir({
+      entidade: 'DetalheTinturaria',
+      criterio: dados,
+      localState: localState,
+      setMensagemState: setMensagemState,
+    }).then((rs) => {
+      if (!rs.ok) {
+        setMensagemState({
+          titulo: 'Erro...',
+          exibir: true,
+          mensagem: 'Erro no cadastro - Consulte Suporte',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null
+        })
+      } else {
+        setMasterLocalState({ action: actionTypes.pesquisando })
+        setLocalState({ action: actionTypes.incluindo })
+      }
+    })
   }
 
   const SomaPeca = (rs: ProducaoMalhariaInterface) => {
@@ -231,10 +232,6 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
         sql: sql,
       }).then((rs) => {
         AtualizaSoma()
-        console.log('resultado do rs: ', rs)
-        if (rs.length > 0) {
-          console.log(rs)
-        }
       })
     }
 
@@ -250,7 +247,6 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
       camposLike: ['peca', 'fechado'],
     }).then((rs: Array<ProducaoMalhariaInterface>) => {
       if (rs.length > 0) {
-        setRsProducao(rs[0])
         SomaPeca(rs[0])
       } else {
         setMensagemState({
@@ -277,33 +273,20 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
         setRsPessoas(pessoas)
       })
 
-
     clsCrud
       .pesquisar({
-        entidade: "ProducaoMalharia",
-        campoOrder: ['peca'],
+        entidade: 'DetalheTinturaria',
+        relations: ['malharia'],
         criterio: {
-          fechado: false
+          idTinturaria: `${rsMaster.idTinturaria}`
         },
-        camposLike: ['fechado']
+        camposLike: ['idTinturaria']
+      }).then((rs: Array<DetalheTinturariaInterface>) => {
+        if (rs.length > 0) {
+          setLocalState({ action: actionTypes.editando })
+          setDados(rs)
+        }
       })
-      .then((rsPecas: Array<ProducaoMalhariaInterface>) => {
-        setRsPeca(rsPecas)
-      })
-
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "ProducaoMalharia",
-    //     relations: ['produto'],
-    //     criterio: {
-    //       idTinturaria: rsMaster.idTinturaria
-    //     },
-    //     camposLike: ['idTinturaria'],
-    //   })
-    //   .then((rs: Array<ProducaoMalhariaInterface>) => {
-    //     console.log('pecas somadas: ', rs)
-    //     setRsSomaPeca(rs)
-    //   })
 
   }
 
@@ -324,7 +307,8 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
     clsCrud.query({
       entidade: "ProducaoMalharia",
       sql: sql,
-    }).then((rs) => {
+    }).then((rs: Array<PecasSomadasInterface>) => {
+      rs.forEach(v => v.qtd_peca = v.qtd_peca * 1.0)
       setRsPecasSomadas(rs)
     })
   }
@@ -336,7 +320,7 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
 
   return (
     <>
-      <Paper variant="outlined" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
+      <Paper variant="outlined" sx={{ display: { xs: '', md: 'flex' }, justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
         <Grid item xs={12}>
           <ShowText
             titulo="Cliente"
@@ -356,28 +340,30 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
           />
         </Grid>
       </Paper>
-      <Paper variant="outlined" sx={{ padding: 2 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'center' }}>
-            <Typography >
-              Informe a peça do Romaneio
-            </Typography>
+      <Paper variant="outlined" sx={{ padding: 1 }}>
+        <Grid container spacing={1.2} sx={{ alignItems: 'flex-start' }}>
+          <Grid item xs={12} container justifyContent={'center'}>
+            <Grid item xs={12} sx={{ textAlign: 'center' }}>
+              <Typography>
+                Informe a peça
+              </Typography>
+            </Grid>
+            <Grid item xs={8} md={4} sx={{ mb: 1.5 }}>
+              <InputText
+                label=""
+                tipo="text"
+                dados={PesquisaPeca}
+                field="peca"
+                setState={setPesquisaPeca}
+                iconeEnd='searchicon'
+                onClickIconeEnd={() => btPesquisaPeca()}
+                mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
+                autoFocus
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} >
-            <InputText
-              label="Peça"
-              tipo="text"
-              dados={PesquisaPeca}
-              field="peca"
-              setState={setPesquisaPeca}
-              iconeEnd='searchicon'
-              onClickIconeEnd={() => btPesquisaPeca()}
-              mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
-              autoFocus
-            />
-          </Grid>
-          <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={5}>
+          <Grid item xs={5}>
+            <TableContainer component={Paper}>
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={dados}
@@ -385,7 +371,7 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
                   {
                     icone: "delete",
                     onAcionador: (rs: DetalheTinturariaInterface) =>
-                      onExcluir(rs.idDetalheTinturaria as number),
+                      onExcluir(rs),
                     toolTip: "Excluir",
                   },
                 ]}
@@ -393,8 +379,10 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
               />
-            </Grid>
-            <Grid item xs={7} sx={{ mt: { xs: -7, md: -7 } }}>
+            </TableContainer>
+          </Grid>
+          <Grid item xs={7} >
+            <TableContainer component={Paper}>
               <DataTable
                 cabecalho={cabecalhoPecas}
                 dados={rsPecasSomadas}
@@ -403,47 +391,30 @@ export default function DetalheTinturaria({ rsMaster, setRsMaster, masterLocalSt
                 onRequestSort={handleRequestSort}
                 exibirPaginacao={false}
                 temTotal={true}
-                qtdColunas={0}
-                colunaSoma='total_peca'
+                colunaSoma={['total_peca', 'qtd_peca']}
               />
-            </Grid>
-          </Condicional>
-          <Condicional condicao={localState.action !== 'pesquisando'}>
-            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-              <Tooltip title={'Cancelar'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 3, ml: 2 }}
-                  onClick={() => btCancelar()}
-                >
-                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                <Tooltip title={'Confirmar'}>
-                  <IconButton
-                    color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
-                  >
-                    <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                  </IconButton>
-                </Tooltip>
-              </Condicional>
-
-              <Condicional condicao={localState.action === 'excluindo'}>
-                <Tooltip title={'Excluir'}>
-                  <IconButton
-                    color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
-                  >
-                    <DeleteIcon sx={{ fontSize: 60 }} />
-                  </IconButton>
-                </Tooltip>
-              </Condicional>
-            </Grid>
-          </Condicional>
+            </TableContainer>
+          </Grid>
+          <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+            <Tooltip title={'Cancelar'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: 3, ml: 2 }}
+                onClick={() => btCancelar()}
+              >
+                <CancelRoundedIcon sx={{ fontSize: 50 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={'Confirmar'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: 3, ml: 2 }}
+                onClick={() => btConfirmar()}
+              >
+                <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+              </IconButton>
+            </Tooltip>
+          </Grid>
         </Grid>
       </Paper >
     </>

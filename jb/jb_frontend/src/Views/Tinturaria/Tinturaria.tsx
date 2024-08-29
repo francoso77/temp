@@ -170,14 +170,13 @@ export function Tinturaria() {
 
   const IrPara = useNavigate()
   const btFechar = () => {
-
+    IrPara(layoutState.pathTitulo)
     setLayoutState({
       titulo: '',
       tituloAnterior: 'Tinturaia',
       pathTitulo: '/',
       pathTituloAnterior: '/Tinturaria'
     })
-    IrPara(layoutState.pathTitulo)
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -291,7 +290,7 @@ export function Tinturaria() {
       <Container maxWidth="md" sx={{ mt: 5 }}>
         <Paper variant="outlined" sx={{ padding: 2 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Grid item xs={12} sx={{ textAlign: 'right', mt: -2, mr: -5, mb: 0}}>
+            <Grid item xs={12} sx={{ textAlign: 'right', mt: -2, mr: -5, mb: 0 }}>
               <IconButton onClick={() => btFechar()}>
                 <CloseIcon />
               </IconButton>
@@ -340,7 +339,7 @@ export function Tinturaria() {
                       toolTip: "Excluir",
                     },
                     {
-                      icone: "edit_note_two_tone",
+                      icone: "assignment_turned_in_two_tone",
                       onAcionador: (rs: TinturariaInterface) =>
                         onDetalhes(rs.idTinturaria as number),
                       toolTip: "Romaneio",
@@ -405,47 +404,6 @@ export function Tinturaria() {
                   />
                 </Box>
               </Grid>
-              {/* 
-              <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-                <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
-
-                  <DetalheTinturaria
-                    rsMaster={tinturaria}
-                    setRsMaster={setTinturaria}
-                    masterLocalState={localState}
-                  // setRsSomatorio={setRsSomatorio}
-                  />
-                </Box>
-              </Grid>
-            
-              <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={2}
-                  label="Qtd Total"
-                  labelAlign='center'
-                  dados={rsSomatorio}
-                  field="totalQtd"
-                  setState={setRsSomatorio}
-                  disabled={true}
-                  textAlign='center'
-                  tamanhoFonte={30}
-                />
-              </Grid>
-              <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={2}
-                  label="Total tinturaria"
-                  labelAlign='center'
-                  dados={rsSomatorio}
-                  field="total"
-                  setState={setRsSomatorio}
-                  disabled={true}
-                  textAlign='center'
-                  tamanhoFonte={30}
-                />
-              </Grid> */}
               <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
                 <Tooltip title={'Cancelar'}>
                   <IconButton
@@ -485,8 +443,7 @@ export function Tinturaria() {
               <Grid item xs={12}>
                 <DetalheTinturaria
                   rsMaster={tinturaria}
-                  setRsMaster={setTinturaria}
-                  masterLocalState={localState}
+                  setMasterLocalState={setLocalState}
                 />
               </Grid>
             </Condicional>
