@@ -13,9 +13,11 @@ import { DetalheTinturariaInterface, TinturariaInterface } from '../../../../jb_
 import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface';
 import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import Condicional from '../../Componentes/Condicional/Condicional';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
+  masterLocalState: ActionInterface,
   setMasterLocalState: React.Dispatch<React.SetStateAction<ActionInterface>>
 }
 
@@ -29,7 +31,7 @@ interface PecasSomadasInterface {
   qtd_peca: number
 }
 
-export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: PropsInterface) {
+export default function DetalheTinturaria({ rsMaster, masterLocalState, setMasterLocalState }: PropsInterface) {
 
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
@@ -61,6 +63,7 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
+  const [rsProducao, setRsProducao] = useState<ProducaoMalhariaInterface>()
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
@@ -69,8 +72,8 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Peça',
-      alinhamento: 'left',
+      cabecalho: 'Relação de peças',
+      alinhamento: 'center',
       campo: 'idMalharia',
       format: (_v, rs: any) => rs.malharia.peca
     },
@@ -133,22 +136,24 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
           })
         }
       })
+    AtualizaPeca(null, '', rs.idMalharia as number, false)
+    AtualizaSoma()
 
-    sql = `
-    UPDATE producaomalharias 
-    SET 
-      idTinturaria = NULL,
-      dataFechado = NULL,
-      fechado = FALSE
-    WHERE 
-      idMalharia = ${rs.idMalharia};
-    `
-    clsCrud.query({
-      entidade: "ProducaoMalharia",
-      sql: sql,
-    }).then((rs) => {
-      AtualizaSoma()
-    })
+    // sql = `
+    // UPDATE producaomalharias 
+    // SET 
+    //   idTinturaria = NULL,
+    //   dataFechado = NULL,
+    //   fechado = FALSE
+    // WHERE 
+    //   idMalharia = ${rs.idMalharia};
+    // `
+    // clsCrud.query({
+    //   entidade: "ProducaoMalharia",
+    //   sql: sql,
+    // }).then((rs) => {
+    //   AtualizaSoma()
+    // })
 
   }
 
@@ -201,6 +206,7 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
 
   const SomaPeca = (rs: ProducaoMalhariaInterface) => {
 
+    console.log('chegou aqui no soma peça:', rs)
     if (podeIncluirDetalhe()) {
 
       let tmpDetalhe: Array<DetalheTinturariaInterface> = []
@@ -218,23 +224,47 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
       }
       ])
 
-      sql = `
-      UPDATE producaomalharias 
-      SET 
-        idTinturaria = ${rsMaster.idTinturaria},
-        dataFechado = STR_TO_DATE(${rsMaster.dataTinturaria}, '%d%m%Y'),
-        fechado = TRUE
-      WHERE 
-        idMalharia = ${rs.idMalharia};
-      `
-      clsCrud.query({
-        entidade: "ProducaoMalharia",
-        sql: sql,
-      }).then((rs) => {
-        AtualizaSoma()
-      })
+      AtualizaPeca(rsMaster.idTinturaria as number, rsMaster.dataTinturaria, rs.idMalharia as number, true)
+      AtualizaSoma()
+      // sql = `
+      // UPDATE producaomalharias 
+      // SET 
+      //   idTinturaria = ${rsMaster.idTinturaria},
+      //   dataFechado = STR_TO_DATE(${rsMaster.dataTinturaria}, '%d%m%Y'),
+      //   fechado = TRUE
+      // WHERE 
+      //   idMalharia = ${rs.idMalharia};
+      // `
+      // clsCrud.query({
+      //   entidade: "ProducaoMalharia",
+      //   sql: sql,
+      // }).then((rs) => {
+      //   AtualizaSoma()
+      // })
     }
 
+  }
+
+  const AtualizaPeca = (idTinturaria: number | null, data: string, idMalharia: number, fechado: boolean) => {
+    console.log('em atuzliar peca: ', rsProducao)
+    // console.log('rsproducao: ', rsProducao)
+    // let tmpProducao = rsProducao
+    // tmpProducao.map(item =>
+    //   item.idMalharia === idMalharia ? { ...item, idTinturaria: idTinturaria, dataFechado: data, fechado: fechado } : item
+    // )
+    // console.log('producao: ', tmpProducao)
+    // setRsProducao(tmpProducao)
+
+    clsCrud
+      .incluir({
+        entidade: "ProducaoMalharia",
+        criterio: rsProducao
+      }).then((rs) => {
+        if (rs.ok) {
+          console.log(rs.mensagem)
+          AtualizaSoma()
+        }
+      })
   }
 
   const btPesquisaPeca = () => {
@@ -245,8 +275,19 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
         fechado: false
       },
       camposLike: ['peca', 'fechado'],
+      select: [
+        'idTinturaria',
+        'idMalharia',
+        'peca',
+        'idProduto',
+        'peso',
+        'dataFechado',
+        'fechado',
+      ]
     }).then((rs: Array<ProducaoMalhariaInterface>) => {
       if (rs.length > 0) {
+        console.log('peças da produção', rs)
+        setRsProducao(rs[0])
         SomaPeca(rs[0])
       } else {
         setMensagemState({
@@ -288,29 +329,62 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
         }
       })
 
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: 'ProducaoMalharia',
+    //     criterio: {
+    //       idTinturaria: `${rsMaster.idTinturaria}`
+    //     },
+    //   }).then((rs: Array<ProducaoMalhariaInterface>) => {
+    //     if (rs.length > 0) {
+    //       console.log('producao no busca dodos', rs)
+    //       setRsProducao(rs[0])
+    //     }
+    //   })
+
   }
 
   const AtualizaSoma = () => {
-    sql = `
-      SELECT 
-          ROUND(SUM(pm.peso),2) AS total_peca,
-          COUNT(pm.peso) AS qtd_peca,
-          p.nome AS produto_nome
-      FROM 
-          producaomalharias pm
-      INNER JOIN 
-          produtos p ON p.idProduto = pm.idProduto
-      WHERE 
-          pm.idTinturaria = ${rsMaster.idTinturaria}
-      GROUP BY p.nome;
-    `
-    clsCrud.query({
-      entidade: "ProducaoMalharia",
-      sql: sql,
-    }).then((rs: Array<PecasSomadasInterface>) => {
-      rs.forEach(v => v.qtd_peca = v.qtd_peca * 1.0)
-      setRsPecasSomadas(rs)
-    })
+    // sql = `
+    //   SELECT 
+    //       ROUND(SUM(pm.peso),2) AS total_peca,
+    //       COUNT(pm.peso) AS qtd_peca,
+    //       p.nome AS produto_nome
+    //   FROM 
+    //       producaomalharias pm
+    //   INNER JOIN 
+    //       produtos p ON p.idProduto = pm.idProduto
+    //   WHERE 
+    //       pm.idTinturaria = ${rsMaster.idTinturaria}
+    //   GROUP BY p.nome;
+    // `
+    // clsCrud.query({
+    //   entidade: "ProducaoMalharia",
+    //   sql: sql,
+    // }).then((rs: Array<PecasSomadasInterface>) => {
+    //   rs.forEach(v => v.qtd_peca = v.qtd_peca * 1.0)
+    //   setRsPecasSomadas(rs)
+    // })
+
+    clsCrud
+      .consultar(
+        {
+          entidade: "ProducaoMalharia",
+          joins: [
+            { "tabelaRelacao": "producaomalharia.produto", "relacao": "produto" }
+          ],
+          criterio: {
+            "idTinturaria": rsMaster.idTinturaria
+          },
+          groupBy: "nome",
+          campoOrder: ["nome"],
+          having: "total_peca > 0",
+          select: ["ROUND(SUM(peso),2) AS total_peca", "COUNT(peso) AS qtd_peca", "nome AS produto_nome"]
+        }
+      ).then((rs: Array<any>) => {
+        rs.forEach(v => v.qtd_peca = v.qtd_peca * 1.0)
+        setRsPecasSomadas(rs)
+      })
   }
 
   useEffect(() => {
@@ -320,61 +394,66 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
 
   return (
     <>
-      <Paper variant="outlined" sx={{ display: { xs: '', md: 'flex' }, justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
-        <Grid item xs={12}>
-          <ShowText
-            titulo="Cliente"
-            descricao={
-              rsPessoas.
-                find((pessoa) => pessoa.idPessoa === rsMaster.idPessoa_cliente)?.nome || 'Cliente não encontrado!'
-            }
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <ShowText
-            titulo="Tinturaria"
-            descricao={
-              rsPessoas.
-                find(pessoa => pessoa.idPessoa === rsMaster.idPessoa_fornecedor)?.nome || 'Tinturaria não encontrada!'
-            }
-          />
-        </Grid>
-      </Paper>
+      <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+        <Paper variant="outlined" sx={{ display: { xs: '', md: 'flex' }, justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
+          <Grid item xs={12}>
+            <ShowText
+              titulo="Cliente"
+              descricao={
+                rsPessoas.
+                  find((pessoa) => pessoa.idPessoa === rsMaster.idPessoa_cliente)?.nome || 'Cliente não encontrado!'
+              }
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <ShowText
+              titulo="Tinturaria"
+              descricao={
+                rsPessoas.
+                  find(pessoa => pessoa.idPessoa === rsMaster.idPessoa_fornecedor)?.nome || 'Tinturaria não encontrada!'
+              }
+            />
+          </Grid>
+        </Paper>
+      </Condicional>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1.2} sx={{ alignItems: 'flex-start' }}>
-          <Grid item xs={12} container justifyContent={'center'}>
-            <Grid item xs={12} sx={{ textAlign: 'center' }}>
-              <Typography>
-                Informe a peça
-              </Typography>
+          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+            <Grid item xs={12} container justifyContent={'center'}>
+              <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                <Typography>
+                  Informe a peça
+                </Typography>
+              </Grid>
+              <Grid item xs={8} md={4} sx={{ mb: 1.5 }}>
+                <InputText
+                  label=""
+                  tipo="text"
+                  dados={PesquisaPeca}
+                  field="peca"
+                  setState={setPesquisaPeca}
+                  iconeEnd='searchicon'
+                  onClickIconeEnd={() => btPesquisaPeca()}
+                  mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
+                  autoFocus
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={8} md={4} sx={{ mb: 1.5 }}>
-              <InputText
-                label=""
-                tipo="text"
-                dados={PesquisaPeca}
-                field="peca"
-                setState={setPesquisaPeca}
-                iconeEnd='searchicon'
-                onClickIconeEnd={() => btPesquisaPeca()}
-                mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
-                autoFocus
-              />
-            </Grid>
-          </Grid>
+          </Condicional>
           <Grid item xs={5}>
             <TableContainer component={Paper}>
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={dados}
-                acoes={[
-                  {
-                    icone: "delete",
-                    onAcionador: (rs: DetalheTinturariaInterface) =>
-                      onExcluir(rs),
-                    toolTip: "Excluir",
-                  },
-                ]}
+                acoes={masterLocalState.action === actionTypes.excluindo ? [] :
+                  [
+                    {
+                      icone: "delete",
+                      onAcionador: (rs: DetalheTinturariaInterface) =>
+                        onExcluir(rs),
+                      toolTip: "Excluir",
+                    },
+                  ]}
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
@@ -395,26 +474,29 @@ export default function DetalheTinturaria({ rsMaster, setMasterLocalState }: Pro
               />
             </TableContainer>
           </Grid>
-          <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-            <Tooltip title={'Cancelar'}>
-              <IconButton
-                color="secondary"
-                sx={{ mt: 3, ml: 2 }}
-                onClick={() => btCancelar()}
-              >
-                <CancelRoundedIcon sx={{ fontSize: 50 }} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={'Confirmar'}>
-              <IconButton
-                color="secondary"
-                sx={{ mt: 3, ml: 2 }}
-                onClick={() => btConfirmar()}
-              >
-                <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-              </IconButton>
-            </Tooltip>
-          </Grid>
+          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+
+            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+              <Tooltip title={'Cancelar'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: 2 }}
+                  onClick={() => btCancelar()}
+                >
+                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={'Confirmar'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: 2 }}
+                  onClick={() => btConfirmar()}
+                >
+                  <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Condicional>
         </Grid>
       </Paper >
     </>

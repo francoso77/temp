@@ -19,4 +19,6 @@ export interface PadraoPesquisaInterface {
   relations?: Array<string>,
   campoOrder?: Array<any>,
   notOrLike?: "N" | "L" | "I",
+  groupBy?: string,
+  having?: string,
 }

@@ -2,9 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGenerat
 import { PessoaInterface } from '../interfaces/pessoaInterface';
 import { PessoaType } from '../types/pessoaTypes';
 import { Length } from 'class-validator';
-import ProducaoMalharia from './producaoMalharia.entity';
 import Tinturaria from './tinturaria.entity';
-import Estoque from './estoque.entity';
 import Programacao from './programacao.entity';
 
 @Entity({ name: 'pessoas' })
@@ -60,19 +58,9 @@ export default class Pessoa implements PessoaInterface {
   ativo: boolean
 
   @JoinColumn({ name: 'idPessoa_cliente' })
-  @OneToMany(() => Tinturaria, (tinturaria) =>
-    tinturaria.cliente, { cascade: true })
-  clienteTinturarias: Tinturaria[]
-
-  @JoinColumn({ name: 'idPessoa_cliente' })
   @OneToMany(() => Programacao, (programacao) =>
     programacao.cliente, { cascade: true })
   clienteProgramacoes: Programacao[]
-
-  @JoinColumn({ name: 'idPessoa_fornecedor' })
-  @OneToMany(() => Tinturaria, (tinturaria) =>
-    tinturaria.fornecedor, { cascade: true })
-  fornecedorTinturarias: Tinturaria[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createAD: Date

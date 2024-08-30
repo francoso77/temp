@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Post, Put } from '@nestjs/common';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import ClsCrudController from '../services/crud.controller.cls';
+import { join } from 'path';
 
 
 @Controller()
@@ -80,4 +81,29 @@ export class CrudController {
     return new ClsCrudController().excluir(criterio, entidade);
   }
 
+  @Post("consultar")
+  consultar(
+    @Body("entidade") entidade: string,
+    @Body("joins") joins: { tabelaRelacao: string, relacao: string }[],
+    @Body("criterio") criterio: Record<string, any>,
+    @Body("camposLike") camposLike: Array<string>,
+    @Body("select") select: Array<string>,
+    @Body("campoOrder") campoOrder: Array<any>,
+    @Body("notOrLike") notOrLike: "N" | "L" | "I",
+    @Body("groupBy") groupBy: string,
+    @Body("having") having: string,
+  ): Promise<RespostaPadraoInterface<any>> {
+
+    return new ClsCrudController().consultar({
+      entidade: entidade,
+      joins: joins ? joins : [],
+      criterio: criterio,
+      camposLike: camposLike ? camposLike : [],
+      select: select ? select : [],
+      campoOrder: campoOrder ? campoOrder : [],
+      notOrLike: notOrLike ? notOrLike : "L",
+      groupBy: groupBy ? groupBy : '',
+      having: having ? having : '',
+    });
+  }
 }

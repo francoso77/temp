@@ -12,15 +12,15 @@ export default class DetalheTinturaria implements DetalheTinturariaInterface {
   idTinturaria: number;
 
   @JoinColumn({ name: 'idTinturaria' })
-  // @ManyToOne(() => Tinturaria, (tinturaria) => tinturaria.detalheTinturarias)
-  // tinturaria: Tinturaria;
-
-  @ManyToOne(() => Tinturaria, tinturaria => tinturaria.detalheTinturarias, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    orphanedRowAction: 'delete'
-  })
+  @ManyToOne(() => Tinturaria, (tinturaria) => tinturaria.detalheTinturarias)
   tinturaria: Tinturaria;
+
+  // @ManyToOne(() => Tinturaria, tinturaria => tinturaria.detalheTinturarias, {
+  //   onDelete: 'CASCADE',
+  //   onUpdate: 'CASCADE',
+  //   orphanedRowAction: 'delete'
+  // })
+  // tinturaria: Tinturaria;
 
   @Column()
   idMalharia: number;

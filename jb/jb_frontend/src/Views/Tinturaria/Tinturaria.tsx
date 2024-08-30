@@ -11,7 +11,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle"
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
 import DeleteIcon from '@mui/icons-material/Delete'
-import EditNoteTwoToneIcon from '@mui/icons-material/EditNoteTwoTone';
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import Condicional from '../../Componentes/Condicional/Condicional'
@@ -53,6 +52,11 @@ export function Tinturaria() {
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
+      cabecalho: 'Romaneio',
+      alinhamento: 'left',
+      campo: 'idTinturaria',
+    },
+    {
       cabecalho: 'Data',
       alinhamento: 'left',
       campo: 'dataTinturaria',
@@ -82,18 +86,14 @@ export function Tinturaria() {
   }
 
   const pesquisarID = (id: string | number): Promise<TinturariaInterface> => {
+
     return clsCrud
       .pesquisar({
         entidade: "Tinturaria",
-        relations: [
-          "cliente",
-          "fornecedor",
-          "detalheTinturarias",
-          "detalheTinturarias.malharia",
-        ],
         criterio: {
           idTinturaria: id,
         },
+        select: ['idTinturaria', 'idPessoa_cliente', 'idPessoa_fornecedor', 'dataTinturaria']
       })
       .then((rs: Array<TinturariaInterface>) => {
         let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataTinturaria)
@@ -114,7 +114,6 @@ export function Tinturaria() {
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setTinturaria(rs)
-      // AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
@@ -122,14 +121,12 @@ export function Tinturaria() {
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setTinturaria(rs)
-      // AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
 
   const btIncluir = () => {
     setTinturaria(ResetDados)
-    // setRsSomatorio({ total: "", totalQtd: "" })
     setLocalState({ action: actionTypes.incluindo })
   }
 
@@ -218,6 +215,7 @@ export function Tinturaria() {
       const idsCli = rsCliente.filter(cliente =>
         cliente.nome.includes(pesquisa.itemPesquisa)
       ).map(cliente => cliente.idPessoa)
+
       dadosPesquisa = {
         campoOrder: ['dataTinturaria'],
         entidade: "Tinturaria",
@@ -256,28 +254,58 @@ export function Tinturaria() {
   }
 
   const btConfirmar = () => {
+
     if (validarDados()) {
-      clsCrud.incluir({
-        entidade: 'Tinturaria',
-        criterio: tinturaria,
-        localState: localState,
-        cb: () => btPesquisar(),
-        setMensagemState: setMensagemState
-      })
-        .then((rs) => {
-          if (rs.ok) {
-            setLocalState({ action: actionTypes.pesquisando })
-          } else {
-            setMensagemState({
-              titulo: 'Erro...',
-              exibir: true,
-              mensagem: 'Erro no cadastro - Consulte Suporte',
-              tipo: MensagemTipo.Error,
-              exibirBotao: true,
-              cb: null
-            })
-          }
-        })
+
+      if (['incluindo', 'editando'].includes(localState.action)) {
+
+        clsCrud
+          .incluir({
+            entidade: 'Tinturaria',
+            criterio: tinturaria,
+            localState: localState,
+            cb: () => btPesquisar(),
+            setMensagemState: setMensagemState
+          })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      } else {
+        clsCrud
+          .excluir({
+            entidade: 'Tinturaria',
+            criterio: tinturaria,
+            localState: localState,
+            cb: () => btPesquisar(),
+            setMensagemState: setMensagemState
+          })
+          .then((rs) => {
+            console.log(rs.mensagem)
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      }
     }
   }
 
@@ -287,7 +315,7 @@ export function Tinturaria() {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ mt: 5 }}>
+      <Container maxWidth="md" sx={{ mt: 1.5 }}>
         <Paper variant="outlined" sx={{ padding: 2 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: -2, mr: -5, mb: 0 }}>
@@ -326,7 +354,6 @@ export function Tinturaria() {
                   dados={rsPesquisa}
                   acoes={[
                     {
-                      //icone: "find_in_page_two_tone",
                       icone: 'edit',
                       onAcionador: (rs: TinturariaInterface) =>
                         onEditar(rs.idTinturaria as number),
@@ -361,8 +388,9 @@ export function Tinturaria() {
                     dados={tinturaria}
                     field="dataTinturaria"
                     setState={setTinturaria}
-                    disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
+                    disabled={['excluindo'].includes(localState.action) ? true : false}
                     erros={erros}
+                    onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
                     autoFocus
                   />
@@ -378,7 +406,7 @@ export function Tinturaria() {
                     mensagemPadraoCampoEmBranco="Escolha um cliente"
                     field="idPessoa_cliente"
                     label="Cliente"
-                    disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
+                    disabled={['excluindo'].includes(localState.action) ? true : false}
                     erros={erros}
                     setState={setTinturaria}
                     onFocus={(e) => e.target.select()}
@@ -396,7 +424,7 @@ export function Tinturaria() {
                     mensagemPadraoCampoEmBranco="Escolha uma tinturaria"
                     field="idPessoa_fornecedor"
                     label="Tinturaria"
-                    disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
+                    disabled={['excluindo'].includes(localState.action) ? true : false}
                     erros={erros}
                     setState={setTinturaria}
                     onFocus={(e) => e.target.select()}
@@ -404,7 +432,18 @@ export function Tinturaria() {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+            </Condicional>
+            <Condicional condicao={['detalhes', 'excluindo'].includes(localState.action)}>
+              <Grid item xs={12}>
+                <DetalheTinturaria
+                  rsMaster={tinturaria}
+                  setMasterLocalState={setLocalState}
+                  masterLocalState={localState}
+                />
+              </Grid>
+            </Condicional>
+            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+              <Condicional condicao={!['pesquisando', 'detalhes'].includes(localState.action)}>
                 <Tooltip title={'Cancelar'}>
                   <IconButton
                     color="secondary"
@@ -414,39 +453,30 @@ export function Tinturaria() {
                     <CancelRoundedIcon sx={{ fontSize: 50 }} />
                   </IconButton>
                 </Tooltip>
-                <Condicional condicao={['incluindo'].includes(localState.action)}>
-                  <Tooltip title={'Confirmar'}>
-                    <IconButton
-                      color="secondary"
-                      sx={{ mt: 3, ml: 2 }}
-                      onClick={() => btConfirmar()}
-                    >
-                      <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                    </IconButton>
-                  </Tooltip>
-                </Condicional>
-
-                <Condicional condicao={localState.action === 'excluindo'}>
-                  <Tooltip title={'Excluir'}>
-                    <IconButton
-                      color="secondary"
-                      sx={{ mt: 3, ml: 2 }}
-                      onClick={() => btConfirmar()}
-                    >
-                      <DeleteIcon sx={{ fontSize: 60 }} />
-                    </IconButton>
-                  </Tooltip>
-                </Condicional>
-              </Grid>
-            </Condicional>
-            <Condicional condicao={localState.action === 'detalhes'}>
-              <Grid item xs={12}>
-                <DetalheTinturaria
-                  rsMaster={tinturaria}
-                  setMasterLocalState={setLocalState}
-                />
-              </Grid>
-            </Condicional>
+              </Condicional>
+              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+                <Tooltip title={'Confirmar'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 3, ml: 2 }}
+                    onClick={() => btConfirmar()}
+                  >
+                    <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                  </IconButton>
+                </Tooltip>
+              </Condicional>
+              <Condicional condicao={localState.action === 'excluindo'}>
+                <Tooltip title={'Excluir'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 3, ml: 2 }}
+                    onClick={() => btConfirmar()}
+                  >
+                    <DeleteIcon sx={{ fontSize: 60 }} />
+                  </IconButton>
+                </Tooltip>
+              </Condicional>
+            </Grid>
           </Grid>
         </Paper >
       </Container >

@@ -214,7 +214,79 @@ var ClsCrudController = /** @class */ (function () {
             });
         });
     };
+    ClsCrudController.prototype.consultar = function (_a) {
+        var entidade = _a.entidade, joins = _a.joins, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike, groupBy = _a.groupBy, having = _a.having;
+        return __awaiter(this, void 0, void 0, function () {
+            var where_1, order_1, repository, queryBuilder_1, resultado, error_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        where_1 = {};
+                        where_1 = __assign({}, criterio);
+                        camposLike.forEach(function (campo) {
+                            if (notOrLike === "L") {
+                                where_1[campo] = (0, typeorm_1.Like)(where_1[campo]);
+                            }
+                            else if (notOrLike === "N") {
+                                where_1[campo] = (0, typeorm_1.Not)(where_1[campo]);
+                            }
+                            else {
+                                where_1[campo] = (0, typeorm_1.In)(where_1[campo]);
+                            }
+                        });
+                        order_1 = {};
+                        campoOrder.forEach(function (campo) {
+                            order_1[campo] = 'ASC';
+                        });
+                        console.log('entidade:', entidade);
+                        console.log('joins:', joins);
+                        console.log('groupBy:', groupBy);
+                        console.log('having:', having);
+                        console.log("where: ", where_1);
+                        repository = data_source_1.AppDataSource.getRepository(entidade);
+                        queryBuilder_1 = repository.createQueryBuilder(entidade.toLowerCase());
+                        joins.forEach(function (join) {
+                            queryBuilder_1 = queryBuilder_1.leftJoinAndSelect(join.tabelaRelacao, join.relacao);
+                        });
+                        queryBuilder_1 = queryBuilder_1
+                            .select(select)
+                            .where(where_1)
+                            .groupBy(groupBy)
+                            .having(having)
+                            .orderBy(order_1);
+                        return [4 /*yield*/, queryBuilder_1.getRawMany()];
+                    case 1:
+                        resultado = _b.sent();
+                        console.log(resultado);
+                        return [2 /*return*/, {
+                                ok: true,
+                                mensagem: 'Pesquisa Concluída',
+                                dados: resultado
+                            }];
+                    case 2:
+                        error_1 = _b.sent();
+                        console.error("Erro na consulta: ", error_1);
+                        return [2 /*return*/, {
+                                ok: false,
+                                mensagem: 'Erro na pesquisa',
+                                dados: null
+                            }];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     return ClsCrudController;
 }());
 exports.default = ClsCrudController;
+// const repositorio = AppDataSource.getRepository(entidade)
+// return repositorio.query(sql)
+//   .then((rs) => {
+//     return {
+//       ok: true,
+//       mensagem: 'Pesquisa Concluída',
+//       dados: rs
+//     }
+//   })
 //# sourceMappingURL=crud.controller.cls.js.map

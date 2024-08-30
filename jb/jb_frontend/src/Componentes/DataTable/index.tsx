@@ -4,6 +4,7 @@ import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import Condicional from '../Condicional/Condicional';
+import ClsFormatacao from '../../Utils/ClsFormatacao'
 
 export type Order = 'asc' | 'desc';
 
@@ -154,22 +155,24 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
   return stabilizedThis.map((el) => el[0]);
 }
 
-//formatando o valor somado
-const formatNumber = (number: number, locale: string): string => {
-  return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, }).format(number);
-};
+// //formatando o valor somado
+// const formatNumber = (number: number, locale: string): string => {
+//   return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, }).format(number);
+// };
 
-//Somando a coluna informada para totalizar na tabela
-const sumColumn = (data: Array<any>, column: string): number => {
-  return data.reduce((sum, row) => sum + row[column], 0);
-};
+// //Somando a coluna informada para totalizar na tabela
+// const sumColumn = (data: Array<any>, column: string): number => {
+//   return data.reduce((sum, row) => sum + row[column], 0);
+// };
 
 const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, number> => {
-  return columns.reduce((sums, column) => {
-    sums[column] = data.reduce((sum, row) => formatNumber(sum + (row[column] || 0), 'pt-BR'), 0);
-    return sums;
+  return columns.reduce((result, column) => {
+    result[column] = data.reduce((sum, row) => sum + row[column], 0);
+    return result;
   }, {} as Record<string, number>);
 };
+
+
 
 export default function DataTable<T>({
   dados = [],
@@ -185,6 +188,7 @@ export default function DataTable<T>({
   // qtdColunas
 }: DataTableInterface) {
 
+  const clsFormatacao = new ClsFormatacao()
   const theme = useTheme()
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -205,16 +209,14 @@ export default function DataTable<T>({
       }
     }
 
-  // const total = sumColumn(dados, colunaSoma)
-  // const formattedTotal = formatNumber(total, 'pt-BR')
 
   const totalColunas = sumColumns(dados, colunaSoma)
-  console.log('Dados Recebidos: ', dados)
-  console.log('resultado das somas:', totalColunas)
+  // console.log('Dados Recebidos: ', dados)
+  // console.log('resultado das somas:', totalColunas)
 
-  colunaSoma.map((col) => {
-    console.log(col)
-  })
+  // colunaSoma.map((col) => {
+  //   console.log(col)
+  // })
 
   return (
     <>
@@ -323,7 +325,7 @@ export default function DataTable<T>({
                     align={'center'}
                     key={column}
                   >
-                    {totalColunas[column]}
+                    {clsFormatacao.currency(totalColunas[column])}
                   </StyledTableCell>
                 ))}
                 {/* <StyledTableCell colSpan={2} align="right">

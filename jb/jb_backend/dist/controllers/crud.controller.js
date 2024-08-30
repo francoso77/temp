@@ -47,6 +47,19 @@ var CrudController = /** @class */ (function () {
     CrudController.prototype.excluir = function (entidade, criterio) {
         return new crud_controller_cls_1.default().excluir(criterio, entidade);
     };
+    CrudController.prototype.consultar = function (entidade, joins, criterio, camposLike, select, campoOrder, notOrLike, groupBy, having) {
+        return new crud_controller_cls_1.default().consultar({
+            entidade: entidade,
+            joins: joins ? joins : [],
+            criterio: criterio,
+            camposLike: camposLike ? camposLike : [],
+            select: select ? select : [],
+            campoOrder: campoOrder ? campoOrder : [],
+            notOrLike: notOrLike ? notOrLike : "L",
+            groupBy: groupBy ? groupBy : '',
+            having: having ? having : '',
+        });
+    };
     __decorate([
         (0, common_1.Post)("incluirComDetalhe"),
         __param(0, (0, common_1.Body)("master")),
@@ -106,6 +119,23 @@ var CrudController = /** @class */ (function () {
         __metadata("design:paramtypes", [String, Object]),
         __metadata("design:returntype", Promise)
     ], CrudController.prototype, "excluir", null);
+    __decorate([
+        (0, common_1.Post)("consultar"),
+        __param(0, (0, common_1.Body)("entidade")),
+        __param(1, (0, common_1.Body)("joins")),
+        __param(2, (0, common_1.Body)("criterio")),
+        __param(3, (0, common_1.Body)("camposLike")),
+        __param(4, (0, common_1.Body)("select")),
+        __param(5, (0, common_1.Body)("campoOrder")),
+        __param(6, (0, common_1.Body)("notOrLike")),
+        __param(7, (0, common_1.Body)("groupBy")),
+        __param(8, (0, common_1.Body)("having")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String, Array, Object, Array,
+            Array,
+            Array, String, String, String]),
+        __metadata("design:returntype", Promise)
+    ], CrudController.prototype, "consultar", null);
     CrudController = __decorate([
         (0, common_1.Controller)(),
         __metadata("design:paramtypes", [])

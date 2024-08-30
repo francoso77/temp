@@ -119,6 +119,7 @@ export default class ClsCrudController {
     campoOrder.forEach((campo) => {
       order[campo] = 'ASC'
     })
+    
     return AppDataSource.getRepository(entidade)
       .find({
         where: where,
@@ -158,4 +159,86 @@ export default class ClsCrudController {
         };
       });
   }
-}
+
+  public async consultar({ 
+    entidade, 
+    joins, 
+    criterio, 
+    camposLike, 
+    select, 
+    campoOrder, 
+    notOrLike, 
+    groupBy, 
+    having 
+  }: PadraoPesquisaInterface): Promise<RespostaPadraoInterface<any>> {
+
+    try{
+      
+      let where: Record<string, any> = {}
+      where = { ...criterio }
+      
+      camposLike.forEach((campo) => {
+        if (notOrLike === "L") {
+          where[campo] = Like(where[campo])
+        } else if (notOrLike === "N") {
+          where[campo] = Not(where[campo])
+        } else {
+          where[campo] = In(where[campo])
+        }
+      })
+  
+      let order: Record<string, any> = {}
+      campoOrder.forEach((campo) => {
+        order[campo] = 'ASC'
+      })
+      
+      console.log('entidade:', entidade)
+      console.log('joins:', joins)
+      console.log('groupBy:', groupBy)
+      console.log('having:', having)
+      console.log("where: ", where)
+      
+      const repository = AppDataSource.getRepository(entidade)
+      let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
+      
+      joins.forEach(join => {
+        queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
+      })
+      
+      queryBuilder = queryBuilder
+        .select(select)
+        .where(where)
+        .groupBy(groupBy)
+        .having(having)
+        .orderBy(order)
+  
+  
+      const resultado = await queryBuilder.getRawMany()
+      console.log(resultado)
+      return {
+            ok: true,
+            mensagem: 'Pesquisa Concluída',
+            dados: resultado
+          }
+
+      }catch (error) {
+        console.error("Erro na consulta: ", error);
+        return {
+          ok: false,
+          mensagem: 'Erro na pesquisa',
+          dados: null
+        }
+      
+    }
+  }
+}  
+  // const repositorio = AppDataSource.getRepository(entidade)
+  
+  // return repositorio.query(sql)
+  //   .then((rs) => {
+//     return {
+//       ok: true,
+//       mensagem: 'Pesquisa Concluída',
+//       dados: rs
+//     }
+//   })
