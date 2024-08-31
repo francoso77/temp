@@ -19,6 +19,7 @@ import ComboBox from '../../Componentes/ComboBox'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
+import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface'
 
 
 
@@ -165,16 +166,20 @@ export function Tinturaria() {
       })
   }
 
-  const IrPara = useNavigate()
+  const IrPara = useNavigate();
   const btFechar = () => {
-    IrPara(layoutState.pathTitulo)
-    setLayoutState({
-      titulo: '',
-      tituloAnterior: 'Tinturaia',
-      pathTitulo: '/',
-      pathTituloAnterior: '/Tinturaria'
+    setLayoutState(prevState => {
+      const newState = {
+        titulo: '',
+        tituloAnterior: 'Tinturaria',
+        pathTitulo: '/',
+        pathTituloAnterior: '/Tinturaria'
+      };
+      IrPara(newState.pathTitulo)
+      return newState
     })
   }
+  
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
     if (event.key === 'Enter') {
@@ -253,6 +258,45 @@ export function Tinturaria() {
     return retorno
   }
 
+  const AtualizaProducao = async (id: number): Promise<boolean> => {
+    try {
+      let tmpProducao: Array<ProducaoMalhariaInterface> = await clsCrud.pesquisar({
+        entidade: 'ProducaoMalharia',
+        criterio: { idTinturaria: id },
+      });
+
+      if (tmpProducao.length > 0) {
+        tmpProducao.forEach((producao) => {
+          producao.dataFechado = "";
+          producao.fechado = false;
+          producao.idTinturaria = null;
+        });
+      }
+
+      const rs = await clsCrud.incluir({
+        entidade: 'ProducaoMalharia',
+        criterio: tmpProducao,
+      });
+
+      if (!rs.ok) {
+        setMensagemState({
+          titulo: 'Erro...',
+          exibir: true,
+          mensagem: 'Não foi possível alterar os items da produção - Consulte Suporte',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null,
+        });
+        return false;
+      } else {
+        return true;
+      }
+    } catch (e) {
+      console.log('sem produtos para alteração!');
+      return false;
+    }
+  }
+
   const btConfirmar = () => {
 
     if (validarDados()) {
@@ -282,29 +326,44 @@ export function Tinturaria() {
             }
           })
       } else {
-        clsCrud
-          .excluir({
-            entidade: 'Tinturaria',
-            criterio: tinturaria,
-            localState: localState,
-            cb: () => btPesquisar(),
-            setMensagemState: setMensagemState
-          })
-          .then((rs) => {
-            console.log(rs.mensagem)
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
+
+        AtualizaProducao(tinturaria.idTinturaria as number).then((v) => {
+          if (v) {
+            clsCrud
+              .excluir({
+                entidade: "DetalheTinturaria",
+                criterio: { idTinturaria: tinturaria.idTinturaria }
+              }).then((rs) => {
+                if (!rs.ok) {
+                  console.log('Não foi possível excluir os detalhes da tinturaria')
+                  console.log(rs.mensagem)
+                } else {
+                  clsCrud
+                    .excluir({
+                      entidade: 'Tinturaria',
+                      criterio: tinturaria,
+                      localState: localState,
+                      cb: () => btPesquisar(),
+                      setMensagemState: setMensagemState
+                    })
+                    .then((rs) => {
+                      if (rs.ok) {
+                        setLocalState({ action: actionTypes.pesquisando })
+                      } else {
+                        setMensagemState({
+                          titulo: 'Erro...',
+                          exibir: true,
+                          mensagem: 'Erro no cadastro - Consulte Suporte',
+                          tipo: MensagemTipo.Error,
+                          exibirBotao: true,
+                          cb: null
+                        })
+                      }
+                    })
+                }
               })
-            }
-          })
+          }
+        })
       }
     }
   }
@@ -317,7 +376,7 @@ export function Tinturaria() {
     <>
       <Container maxWidth="md" sx={{ mt: 1.5 }}>
         <Paper variant="outlined" sx={{ padding: 2 }}>
-          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: -2, mr: -5, mb: 0 }}>
               <IconButton onClick={() => btFechar()}>
                 <CloseIcon />

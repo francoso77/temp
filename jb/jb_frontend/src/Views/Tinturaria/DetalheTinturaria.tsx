@@ -59,16 +59,14 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     peca: ''
   }
 
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.incluindo })
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.editando })
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
-  const [rsProducao, setRsProducao] = useState<ProducaoMalhariaInterface>()
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
-  let sql: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -121,8 +119,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       entidade: "DetalheTinturaria",
       criterio: {
         idMalharia: rs.idMalharia
-      },
-      setMensagemState: setMensagemState
+      }
     })
       .then((rs) => {
         if (!rs.ok) {
@@ -136,25 +133,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           })
         }
       })
-    AtualizaPeca(null, '', rs.idMalharia as number, false)
-    AtualizaSoma()
-
-    // sql = `
-    // UPDATE producaomalharias 
-    // SET 
-    //   idTinturaria = NULL,
-    //   dataFechado = NULL,
-    //   fechado = FALSE
-    // WHERE 
-    //   idMalharia = ${rs.idMalharia};
-    // `
-    // clsCrud.query({
-    //   entidade: "ProducaoMalharia",
-    //   sql: sql,
-    // }).then((rs) => {
-    //   AtualizaSoma()
-    // })
-
+    AtualizaPeca(rs.idMalharia as number, null, '', false)
   }
 
   const btCancelar = () => {
@@ -206,7 +185,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
 
   const SomaPeca = (rs: ProducaoMalhariaInterface) => {
 
-    console.log('chegou aqui no soma peça:', rs)
     if (podeIncluirDetalhe()) {
 
       let tmpDetalhe: Array<DetalheTinturariaInterface> = []
@@ -224,47 +202,39 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       }
       ])
 
-      AtualizaPeca(rsMaster.idTinturaria as number, rsMaster.dataTinturaria, rs.idMalharia as number, true)
-      AtualizaSoma()
-      // sql = `
-      // UPDATE producaomalharias 
-      // SET 
-      //   idTinturaria = ${rsMaster.idTinturaria},
-      //   dataFechado = STR_TO_DATE(${rsMaster.dataTinturaria}, '%d%m%Y'),
-      //   fechado = TRUE
-      // WHERE 
-      //   idMalharia = ${rs.idMalharia};
-      // `
-      // clsCrud.query({
-      //   entidade: "ProducaoMalharia",
-      //   sql: sql,
-      // }).then((rs) => {
-      //   AtualizaSoma()
-      // })
+      AtualizaPeca(rs.idMalharia as number, rsMaster.idTinturaria as number, rsMaster.dataTinturaria, true)
     }
-
   }
 
-  const AtualizaPeca = (idTinturaria: number | null, data: string, idMalharia: number, fechado: boolean) => {
-    console.log('em atuzliar peca: ', rsProducao)
-    // console.log('rsproducao: ', rsProducao)
-    // let tmpProducao = rsProducao
-    // tmpProducao.map(item =>
-    //   item.idMalharia === idMalharia ? { ...item, idTinturaria: idTinturaria, dataFechado: data, fechado: fechado } : item
-    // )
-    // console.log('producao: ', tmpProducao)
-    // setRsProducao(tmpProducao)
+  const AtualizaPeca = (
+    idMalharia: number | null,
+    idTinturaria: number | null,
+    data: string,
+    fechado: boolean) => {
 
-    clsCrud
-      .incluir({
-        entidade: "ProducaoMalharia",
-        criterio: rsProducao
-      }).then((rs) => {
-        if (rs.ok) {
-          console.log(rs.mensagem)
-          AtualizaSoma()
-        }
-      })
+    clsCrud.pesquisar({
+      entidade: 'ProducaoMalharia',
+      criterio: {
+        idMalharia: idMalharia
+      }
+    }).then((rs: Array<ProducaoMalhariaInterface>) => {
+      let tmpProducao: ProducaoMalhariaInterface = rs[0]
+      let dataFormatada = data !== '' ? clsFormatacao.dataFormatada(data) : ''
+      if (tmpProducao.idMalharia) {
+        tmpProducao.dataFechado = clsFormatacao.dataISOtoDatetime(dataFormatada)
+        tmpProducao.fechado = fechado
+        tmpProducao.idTinturaria = idTinturaria
+      }
+      clsCrud
+        .incluir({
+          entidade: "ProducaoMalharia",
+          criterio: tmpProducao
+        }).then((rs) => {
+          if (rs.ok) {
+            AtualizaSoma()
+          }
+        })
+    })
   }
 
   const btPesquisaPeca = () => {
@@ -283,11 +253,15 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         'peso',
         'dataFechado',
         'fechado',
+        'idMaquina',
+        'dataProducao',
+        'turno',
+        'localizacao',
+        'idPessoa_revisador',
+        'idPessoa_tecelao',
       ]
     }).then((rs: Array<ProducaoMalhariaInterface>) => {
       if (rs.length > 0) {
-        console.log('peças da produção', rs)
-        setRsProducao(rs[0])
         SomaPeca(rs[0])
       } else {
         setMensagemState({
@@ -302,7 +276,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       setPesquisaPeca({ peca: '' })
     })
   }
-
 
   const BuscarDados = () => {
 
@@ -328,44 +301,9 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           setDados(rs)
         }
       })
-
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: 'ProducaoMalharia',
-    //     criterio: {
-    //       idTinturaria: `${rsMaster.idTinturaria}`
-    //     },
-    //   }).then((rs: Array<ProducaoMalhariaInterface>) => {
-    //     if (rs.length > 0) {
-    //       console.log('producao no busca dodos', rs)
-    //       setRsProducao(rs[0])
-    //     }
-    //   })
-
   }
 
   const AtualizaSoma = () => {
-    // sql = `
-    //   SELECT 
-    //       ROUND(SUM(pm.peso),2) AS total_peca,
-    //       COUNT(pm.peso) AS qtd_peca,
-    //       p.nome AS produto_nome
-    //   FROM 
-    //       producaomalharias pm
-    //   INNER JOIN 
-    //       produtos p ON p.idProduto = pm.idProduto
-    //   WHERE 
-    //       pm.idTinturaria = ${rsMaster.idTinturaria}
-    //   GROUP BY p.nome;
-    // `
-    // clsCrud.query({
-    //   entidade: "ProducaoMalharia",
-    //   sql: sql,
-    // }).then((rs: Array<PecasSomadasInterface>) => {
-    //   rs.forEach(v => v.qtd_peca = v.qtd_peca * 1.0)
-    //   setRsPecasSomadas(rs)
-    // })
-
     clsCrud
       .consultar(
         {

@@ -7,7 +7,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { MaquinaInterface } from '../../../../jb_backend/src/interfaces/maquinaInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { Box, Dialog, Grid, IconButton, Input, OutlinedInput, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import ComboBox from '../../Componentes/ComboBox';
 import InputText from '../../Componentes/InputText';
 import InputCalc from '../../Componentes/InputCalc';
@@ -52,7 +52,7 @@ export function ProducaoMalharia() {
     idPessoa_revisador: 0,
     idPessoa_tecelao: 0,
     fechado: false,
-    dataFechado: undefined,
+    dataFechado: null,
     idTinturaria: null
   }
 
