@@ -177,6 +177,10 @@ export default class ClsCrudController {
       let where: Record<string, any> = {}
       where = { ...criterio }
       
+      console.log("como está o criterio: ", Object.keys(where)[0]
+    )
+
+
       camposLike.forEach((campo) => {
         if (notOrLike === "L") {
           where[campo] = Like(where[campo])
@@ -186,7 +190,7 @@ export default class ClsCrudController {
           where[campo] = In(where[campo])
         }
       })
-  
+        
       let order: Record<string, any> = {}
       campoOrder.forEach((campo) => {
         order[campo] = 'ASC'
@@ -207,12 +211,23 @@ export default class ClsCrudController {
       
       queryBuilder = queryBuilder
         .select(select)
-        .where(where)
+        .where('pedido.dataPedido LIKE :dataPedido', { dataPedido: `%8%` })
         .groupBy(groupBy)
         .having(having)
         .orderBy(order)
   
-  
+      //Adiciona a cláusula WHERE para os campos LIKE
+      // camposLike.forEach((campo) => {
+      //   const nomeCampo = `${criterio}`;
+      //   if (notOrLike === "L") {
+      //     queryBuilder = queryBuilder.andWhere(`${nomeCampo} LIKE :${campo}`, { [campo]: `%${criterio[campo]}%` });
+      //   } else if (notOrLike === "N") {
+      //     queryBuilder = queryBuilder.andWhere(`${nomeCampo} NOT LIKE :${campo}`, { [campo]: `%${criterio[campo]}%` });
+      //   } else {
+      //     queryBuilder = queryBuilder.andWhere(`${nomeCampo} IN (:...${campo})`, { [campo]: criterio[campo] });
+      //   }
+      // });
+
       const resultado = await queryBuilder.getRawMany()
       console.log(resultado)
       return {
@@ -231,6 +246,8 @@ export default class ClsCrudController {
       
     }
   }
+
+ 
 }  
   // const repositorio = AppDataSource.getRepository(entidade)
   

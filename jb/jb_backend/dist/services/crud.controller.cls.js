@@ -224,6 +224,7 @@ var ClsCrudController = /** @class */ (function () {
                         _b.trys.push([0, 2, , 3]);
                         where_1 = {};
                         where_1 = __assign({}, criterio);
+                        console.log("como está o criterio: ", Object.keys(where_1)[0]);
                         camposLike.forEach(function (campo) {
                             if (notOrLike === "L") {
                                 where_1[campo] = (0, typeorm_1.Like)(where_1[campo]);
@@ -251,7 +252,7 @@ var ClsCrudController = /** @class */ (function () {
                         });
                         queryBuilder_1 = queryBuilder_1
                             .select(select)
-                            .where(where_1)
+                            .where('pedido.dataPedido LIKE :dataPedido', { dataPedido: "%8%" })
                             .groupBy(groupBy)
                             .having(having)
                             .orderBy(order_1);

@@ -40,7 +40,7 @@ export function Tinturaria() {
   }
 
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [tinturaria, setTinturaria] = useState<TinturariaInterface>(ResetDados)
   const [erros, setErros] = useState({})
@@ -179,7 +179,7 @@ export function Tinturaria() {
       return newState
     })
   }
-  
+
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
     if (event.key === 'Enter') {
@@ -376,7 +376,7 @@ export function Tinturaria() {
     <>
       <Container maxWidth="md" sx={{ mt: 1.5 }}>
         <Paper variant="outlined" sx={{ padding: 2 }}>
-          <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center'}}>
+          <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: -2, mr: -5, mb: 0 }}>
               <IconButton onClick={() => btFechar()}>
                 <CloseIcon />
