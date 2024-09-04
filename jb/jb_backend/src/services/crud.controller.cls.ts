@@ -119,7 +119,7 @@ export default class ClsCrudController {
     campoOrder.forEach((campo) => {
       order[campo] = 'ASC'
     })
-    
+
     return AppDataSource.getRepository(entidade)
       .find({
         where: where,
@@ -160,25 +160,25 @@ export default class ClsCrudController {
       });
   }
 
-  public async consultar({ 
-    entidade, 
-    joins, 
-    criterio, 
-    camposLike, 
-    select, 
-    campoOrder, 
-    notOrLike, 
-    groupBy, 
-    having 
+  public async consultar({
+    entidade,
+    joins,
+    criterio,
+    camposLike,
+    select,
+    campoOrder,
+    notOrLike,
+    groupBy,
+    having
   }: PadraoPesquisaInterface): Promise<RespostaPadraoInterface<any>> {
 
-    try{
-      
+    try {
+
       let where: Record<string, any> = {}
       where = { ...criterio }
-      
+
       console.log("como está o criterio: ", Object.keys(where)[0]
-    )
+      )
 
 
       camposLike.forEach((campo) => {
@@ -190,32 +190,32 @@ export default class ClsCrudController {
           where[campo] = In(where[campo])
         }
       })
-        
+
       let order: Record<string, any> = {}
       campoOrder.forEach((campo) => {
         order[campo] = 'ASC'
       })
-      
+
       console.log('entidade:', entidade)
       console.log('joins:', joins)
       console.log('groupBy:', groupBy)
       console.log('having:', having)
       console.log("where: ", where)
-      
+
       const repository = AppDataSource.getRepository(entidade)
       let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
-      
+
       joins.forEach(join => {
         queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
       })
-      
+
       queryBuilder = queryBuilder
         .select(select)
         .where('pedido.dataPedido LIKE :dataPedido', { dataPedido: `%8%` })
         .groupBy(groupBy)
         .having(having)
         .orderBy(order)
-  
+
       //Adiciona a cláusula WHERE para os campos LIKE
       // camposLike.forEach((campo) => {
       //   const nomeCampo = `${criterio}`;
@@ -231,31 +231,21 @@ export default class ClsCrudController {
       const resultado = await queryBuilder.getRawMany()
       console.log(resultado)
       return {
-            ok: true,
-            mensagem: 'Pesquisa Concluída',
-            dados: resultado
-          }
+        ok: true,
+        mensagem: 'Pesquisa Concluída',
+        dados: resultado
+      }
 
-      }catch (error) {
-        console.error("Erro na consulta: ", error);
-        return {
-          ok: false,
-          mensagem: 'Erro na pesquisa',
-          dados: null
-        }
-      
+    } catch (error) {
+      console.error("Erro na consulta: ", error);
+      return {
+        ok: false,
+        mensagem: 'Erro na pesquisa',
+        dados: null
+      }
+
     }
   }
 
- 
-}  
-  // const repositorio = AppDataSource.getRepository(entidade)
-  
-  // return repositorio.query(sql)
-  //   .then((rs) => {
-//     return {
-//       ok: true,
-//       mensagem: 'Pesquisa Concluída',
-//       dados: rs
-//     }
-//   })
+
+}

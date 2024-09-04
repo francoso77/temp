@@ -281,13 +281,4 @@ var ClsCrudController = /** @class */ (function () {
     return ClsCrudController;
 }());
 exports.default = ClsCrudController;
-// const repositorio = AppDataSource.getRepository(entidade)
-// return repositorio.query(sql)
-//   .then((rs) => {
-//     return {
-//       ok: true,
-//       mensagem: 'Pesquisa Concluída',
-//       dados: rs
-//     }
-//   })
 //# sourceMappingURL=crud.controller.cls.js.map

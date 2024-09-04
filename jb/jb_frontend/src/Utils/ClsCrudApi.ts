@@ -5,6 +5,7 @@ import {
 import axios, { AxiosRequestConfig } from "axios"
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState'
 import { ActionInterface, actionTypes } from '../Interfaces/ActionInterface'
+import { URL_BACKEND } from './Servidor'
 
 export interface PropsInterface extends PadraoPesquisaInterface {
   localState?: ActionInterface | undefined,
@@ -25,14 +26,6 @@ interface dadosCepInterface {
   uf: string,
   tem: boolean
 }
-
-const URL_BACKEND: string = (
-  process.env.REACT_APP_BACKEND_PROTOCOLO as string
-).concat(
-  process.env.REACT_APP_BACKEND_HOST as string,
-  ":",
-  process.env.REACT_APP_BACKEND_PORTA as string
-)
 
 export default class ClsCrud {
 

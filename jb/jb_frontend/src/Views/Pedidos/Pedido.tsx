@@ -21,6 +21,7 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import DetalhePedido from './DetalhePedido';
+import ClsApi from '../../Utils/ClsApi';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -32,6 +33,7 @@ export default function Pedido() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
+  const clsApi = new ClsApi()
 
   const ResetDados: PedidoInterface = {
     dataPedido: '',
@@ -123,6 +125,7 @@ export default function Pedido() {
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      console.log('no editar: ', rs)
       setPedido(rs)
       AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
@@ -179,7 +182,7 @@ export default function Pedido() {
   const btConfirmar = () => {
 
     if (validarDados()) {
-
+      console.log('Confirmar os dados antes de gravar: ', pedido)
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
           entidade: "Pedido",
@@ -252,6 +255,7 @@ export default function Pedido() {
         setRsPesquisa(rs)
       })
   }
+
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -310,8 +314,17 @@ export default function Pedido() {
       })
   }
 
+  const pesquisaEventos = () => {
+    clsApi.execute<Array<PedidoInterface>>({ url: 'pedidosEmAberto', method: 'get' }).then((rs) => {
+      console.log('Resultado da pesquisa: ', rs)
+    })
+  }
   useEffect(() => {
     BuscarDados()
+  }, [])
+
+  useEffect(() => {
+    pesquisaEventos()
   }, [])
 
   return (
