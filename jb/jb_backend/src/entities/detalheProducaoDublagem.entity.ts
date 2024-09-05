@@ -25,9 +25,9 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   @Column({ type: 'float', precision: 4 })
   metro: number
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 }

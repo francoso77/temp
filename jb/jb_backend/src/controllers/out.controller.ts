@@ -1,15 +1,20 @@
-import { Body, Controller, Delete, Get, Post, Put } from "@nestjs/common"
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common"
 import Pedido from '../entities/pedido.entity'
 import { AppDataSource } from '../data-source'
-import { StatusPedidoType } from '../types/statusPedidoTypes'
 
 @Controller()
 export class OutController {
 
-  @Get("pedidosEmAberto")
-  async pedidosEmAberto(): Promise<Array<Pedido>> {
-    return AppDataSource.getRepository(Pedido).find({
-      where: { statusPedido: StatusPedidoType.aberto }
-    })
+  @Post("pedidosEmAberto")
+  async pedidosEmAberto(
+    @Body("statusPedido") statusPedido: string,
+  ): Promise<Array<Pedido>> {
+
+    console.log(statusPedido
+
+    )
+    const sql: string = `SELECT * FROM pedidos WHERE statusPedido = '${statusPedido}'`
+    return AppDataSource.getRepository(Pedido).query(sql)
   }
 }
+

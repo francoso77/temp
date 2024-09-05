@@ -26,13 +26,13 @@ export default class Entrada implements EntradaInterface {
   fornecedor: Pessoa
 
   @JoinColumn({ name: 'idEntrada' })
-  @OneToMany(() => DetalheEntrada, 
-  detalheEntrada => detalheEntrada.entrada, { cascade: true })
+  @OneToMany(() => DetalheEntrada,
+    detalheEntrada => detalheEntrada.entrada, { cascade: true })
   detalheEntradas: DetalheEntrada[]
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 }

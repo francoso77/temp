@@ -34,9 +34,9 @@ export default class Estoque implements EstoqueInterface {
   @ManyToOne(() => Cor)
   cor: Cor
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 }

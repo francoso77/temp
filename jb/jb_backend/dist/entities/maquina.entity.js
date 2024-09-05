@@ -78,11 +78,11 @@ var Maquina = /** @class */ (function () {
         __metadata("design:type", Boolean)
     ], Maquina.prototype, "ativo", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Maquina.prototype, "createAD", void 0);
     __decorate([
-        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Maquina.prototype, "updateAD", void 0);
     Maquina = __decorate([

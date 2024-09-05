@@ -52,11 +52,11 @@ var Estoque = /** @class */ (function () {
         __metadata("design:type", cor_entity_1.default)
     ], Estoque.prototype, "cor", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Estoque.prototype, "createAD", void 0);
     __decorate([
-        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Estoque.prototype, "updateAD", void 0);
     Estoque = __decorate([

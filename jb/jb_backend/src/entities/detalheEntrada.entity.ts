@@ -72,9 +72,9 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   @Column({ type: 'float', precision: 4, nullable: true })
   perdaTinturaria: number
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 }

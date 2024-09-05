@@ -89,11 +89,11 @@ var Pessoa = /** @class */ (function () {
         __metadata("design:type", Array)
     ], Pessoa.prototype, "clienteProgramacoes", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Pessoa.prototype, "createAD", void 0);
     __decorate([
-        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Pessoa.prototype, "updateAD", void 0);
     Pessoa = __decorate([

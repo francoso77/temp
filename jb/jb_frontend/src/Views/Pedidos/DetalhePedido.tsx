@@ -69,7 +69,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       cabecalho: 'Produto',
       alinhamento: 'left',
       campo: 'idProduto',
-      format: (_v, rs: any) => rs.produto.nome
+      format: (_v, rs: any) => rsProduto.find(x => x.idProduto === rs.idProduto)?.nome
     },
     {
       cabecalho: 'Qtd',

@@ -59,11 +59,11 @@ var DetalhePedido = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalhePedido.prototype, "statusItem", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], DetalhePedido.prototype, "createAD", void 0);
     __decorate([
-        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], DetalhePedido.prototype, "updateAD", void 0);
     DetalhePedido = __decorate([

@@ -96,11 +96,11 @@ var ProducaoMalharia = /** @class */ (function () {
         __metadata("design:type", tinturaria_entity_1.default)
     ], ProducaoMalharia.prototype, "tinturaria", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], ProducaoMalharia.prototype, "createAD", void 0);
     __decorate([
-        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], ProducaoMalharia.prototype, "updateAD", void 0);
     ProducaoMalharia = __decorate([

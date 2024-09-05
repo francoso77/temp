@@ -104,9 +104,6 @@ export default function Pedido() {
       .pesquisar({
         entidade: "Pedido",
         relations: [
-          "cliente",
-          "vendedor",
-          "prazoEntrega",
           "detalhePedidos",
           "detalhePedidos.produto",
         ],
@@ -125,7 +122,6 @@ export default function Pedido() {
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      console.log('no editar: ', rs)
       setPedido(rs)
       AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
@@ -180,7 +176,6 @@ export default function Pedido() {
   }
 
   const btConfirmar = () => {
-
     if (validarDados()) {
       console.log('Confirmar os dados antes de gravar: ', pedido)
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
@@ -233,6 +228,19 @@ export default function Pedido() {
   }
 
   const btPesquisar = () => {
+    const regex = /^\d{2}\/\d{2}\/\d{4}$/
+    let criterioPesquisa = {}
+    let likes = []
+
+    if (regex.test(pesquisa.itemPesquisa)) {
+      criterioPesquisa = {
+        "dataPedido": pesquisa.itemPesquisa,
+        "statusPedido": StatusPedidoType.aberto
+      }
+      likes = ["dataPedido", "statusPedido"]
+    } else {
+
+    }
 
     clsCrud
       .pesquisar({
@@ -245,9 +253,10 @@ export default function Pedido() {
           "detalhePedidos.produto",
         ],
         criterio: {
-          "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%")
+          "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%"),
+          "statusPedido": StatusPedidoType.aberto
         },
-        camposLike: ["idPedido"],
+        camposLike: ["idPedido", "statusPedido"],
         msg: 'Pesquisando pedidos ...',
         setMensagemState: setMensagemState
       })
@@ -315,7 +324,7 @@ export default function Pedido() {
   }
 
   const pesquisaEventos = () => {
-    clsApi.execute<Array<PedidoInterface>>({ url: 'pedidosEmAberto', method: 'get' }).then((rs) => {
+    clsApi.execute<Array<PedidoInterface>>({ url: 'pedidosEmAberto', method: 'post', statusPedido: 'A' }).then((rs) => {
       console.log('Resultado da pesquisa: ', rs)
     })
   }
@@ -340,7 +349,7 @@ export default function Pedido() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10}>
               <InputText
-                label="Pesquisa"
+                label="Pesquise por data ou cliente"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"

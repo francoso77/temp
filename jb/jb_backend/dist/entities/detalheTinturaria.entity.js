@@ -38,11 +38,11 @@ var DetalheTinturaria = /** @class */ (function () {
         __metadata("design:type", producaoMalharia_entity_1.default)
     ], DetalheTinturaria.prototype, "malharia", void 0);
     __decorate([
-        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp' }),
+        (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], DetalheTinturaria.prototype, "createAD", void 0);
     __decorate([
-        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp' }),
+        (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], DetalheTinturaria.prototype, "updateAD", void 0);
     DetalheTinturaria = __decorate([

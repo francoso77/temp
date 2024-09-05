@@ -21,9 +21,9 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   @OneToMany(() => DetalheProducaoDublagem, detalheProducaoDublagem => detalheProducaoDublagem.ProducaoDublagem)
   detalheProducaoDublagens: DetalheProducaoDublagem[]
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 }

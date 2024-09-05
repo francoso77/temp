@@ -19,9 +19,9 @@ export default class UnidadeMedida implements UnidadeMedidaInterface {
     produto.unidadeMedida, { cascade: true })
   produtos: Produto[]
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 }

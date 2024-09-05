@@ -36,10 +36,10 @@ export default class Programacao implements ProgramacaoInterface {
   @OneToMany(() => DetalheProgramacao, detalheProgramacao => detalheProgramacao.programacao)
   detalheProgramacoes: DetalheProgramacao[]
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date
 
-  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAD: Date
 
 }
