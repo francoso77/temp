@@ -305,57 +305,57 @@ export default function Entrada() {
   }
 
   const btPesquisar = () => {
+    const relations = [
+      "fornecedor",
+      "detalheEntradas",
+      "detalheEntradas.produto",
+      "detalheEntradas.cor",
+      "detalheEntradas.revisador",
+      "detalheEntradas.romaneio",
+    ];
 
-    let dadosPesquisa = {}
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
+    const msg = 'Pesquisando notas ...';
+    const setMensagem = setMensagemState;
+
+    let dadosPesquisa = {};
+    const temNumero = /\d/.test(pesquisa.itemPesquisa);
+
     if (temNumero) {
       dadosPesquisa = {
         entidade: "Entrada",
-        relations: [
-          "fornecedor",
-          "detalheEntradas",
-          "detalheEntradas.produto",
-          "detalheEntradas.cor",
-          "detalheEntradas.revisador",
-          "detalheEntradas.romaneio",
-        ],
+        relations,
         criterio: {
-          notaFiscal: "%".concat(pesquisa.itemPesquisa).concat("%"),
+          notaFiscal: `%${pesquisa.itemPesquisa}%`,
         },
         camposLike: ['notaFiscal'],
-        msg: 'Pesquisando notas ...',
-        setMensagemState: setMensagemState
-      }
+        msg,
+        setMensagemState: setMensagem
+      };
     } else {
+      const idsFor = rsFornecedor
+        .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
+        .map(fornecedor => fornecedor.idPessoa);
 
-      const idsFor = rsFornecedor.filter(fornecedor =>
-        fornecedor.nome.includes(pesquisa.itemPesquisa)
-      ).map(fornecedor => fornecedor.idPessoa)
       dadosPesquisa = {
         entidade: "Entrada",
-        relations: [
-          "fornecedor",
-          "detalheEntradas",
-          "detalheEntradas.produto",
-          "detalheEntradas.cor",
-          "detalheEntradas.revisador",
-          "detalheEntradas.romaneio",
-        ],
+        relations,
         notOrLike: 'I',
         criterio: {
           idPessoa_fornecedor: idsFor,
         },
         camposLike: ['idPessoa_fornecedor'],
-        msg: 'Pesquisando notas ...',
-        setMensagemState: setMensagemState
-      }
+        msg,
+        setMensagemState: setMensagem
+      };
     }
+
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
-      })
+        setRsPesquisa(rs);
+      });
   }
+
 
   const irPara = useNavigate()
   const btFechar = () => {
@@ -370,23 +370,37 @@ export default function Entrada() {
 
   const BuscarDados = () => {
 
-    let query: string = `
-      SELECT 
-          p.*
-      FROM 
-          pessoas p
-      WHERE 
-          p.tipoPessoa = 'J' OR
-          p.tipoPessoa = 'C' OR
-          p.tipoPessoa = 'F' 
-      ORDER BY
-          p.nome ASC;
-      `;
+    // let query: string = `
+    //   SELECT 
+    //       p.*
+    //   FROM 
+    //       pessoas p
+    //   WHERE 
+    //       p.tipoPessoa = 'J' OR
+    //       p.tipoPessoa = 'C' OR
+    //       p.tipoPessoa = 'F' 
+    //   ORDER BY
+    //       p.nome ASC;
+    //   `;
+    // clsCrud
+    //   .query({
+    //     entidade: "Pessoa",
+    //     sql: query,
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rsFornecedores: Array<PessoaInterface>) => {
+    //     setRsFornecedor(rsFornecedores)
+    //   })
+
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Pessoa",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ['nome'],
+        notOrLike: 'I',
+        criterio: {
+          tipoPessoa: ['J', 'C', 'F'],
+        },
+        camposLike: ['tipoPessoa'],
       })
       .then((rsFornecedores: Array<PessoaInterface>) => {
         setRsFornecedor(rsFornecedores)
@@ -399,16 +413,16 @@ export default function Entrada() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper variant="outlined" sx={{ padding: 2 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+    <Container maxWidth="md" sx={{ mt: 2 }}>
+      <Paper variant="outlined" sx={{ padding: 1 }}>
+        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10}>
+            <Grid item xs={10} md={11}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -421,11 +435,11 @@ export default function Entrada() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={2} md={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, ml: 2 }}
+                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

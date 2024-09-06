@@ -60,7 +60,7 @@ var OutController = /** @class */ (function () {
             var sql, params;
             return __generator(this, function (_a) {
                 console.log("itemPesquisa: ", itemPesquisa, " campo: ", campo);
-                sql = "\n    SELECT\n      p.*,\n      pe.nome AS nome\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pe ON pe.idPessoa = p.idPessoa_cliente\n    WHERE \n      statusPedido = 'A' AND\n      ".concat(campo === 'data' ? 'dataPedido = ?' : 'nome LIKE ?', "\n  ");
+                sql = "\n    SELECT\n      p.*,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    WHERE \n      statusPedido = 'A' AND\n      ".concat(campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?', "\n  ");
                 params = [campo === 'data' ? itemPesquisa : "%".concat(itemPesquisa, "%")];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });

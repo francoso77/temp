@@ -33,10 +33,10 @@ export default class ClsApi {
 
     if (setMensagemState) {
       setMensagemState({
-        titulo: "Executando...",
+        titulo: mensagem,
         exibir: true,
-        mensagem: mensagem,
-        tipo: MensagemTipo.Warning,
+        mensagem: '',
+        tipo: MensagemTipo.Loading,
         exibirBotao: false,
         cb: null
       })
@@ -53,7 +53,26 @@ export default class ClsApi {
       requestData,
       config
     ).then((rs) => {
-      return rs.data
+      if (rs.data && setMensagemState) {
+        setMensagemState({
+          titulo: '',
+          exibir: false,
+          mensagem: '',
+          tipo: MensagemTipo.Info,
+          exibirBotao: false,
+          cb: null
+        })
+      } else if (!rs.data && setMensagemState) {
+        setMensagemState({
+          titulo: 'Erro...',
+          exibir: true,
+          mensagem: 'Erro ao pesquisar!',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null
+        })
+      }
+      return rs.data as any
     })
-  }
+}
 }

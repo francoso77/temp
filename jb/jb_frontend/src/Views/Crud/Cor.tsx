@@ -218,7 +218,7 @@ export default function Cor() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10}>
+            <Grid item xs={10} md={11}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -231,11 +231,11 @@ export default function Cor() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={2} md={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, ml: 1 }}
+                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

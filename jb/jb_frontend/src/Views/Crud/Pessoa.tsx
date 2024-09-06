@@ -339,16 +339,16 @@ export default function Pessoa() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper variant="outlined" sx={{ padding: 2 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
+    <Container maxWidth="md" sx={{ mt: 2 }}>
+      <Paper variant="outlined" sx={{ padding: 1 }}>
+        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt:-1.5, mr:-5, mb:-5}}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            <Grid item xs={10} md={11}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -361,11 +361,11 @@ export default function Pessoa() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={2} md={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, mr: 1 }}
+                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

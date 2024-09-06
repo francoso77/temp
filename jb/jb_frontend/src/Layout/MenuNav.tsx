@@ -129,14 +129,18 @@ export default function MenuNav() {
       <Offset />
       <AppBar onLoad={fecharLoading} position="fixed" color='default' sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar>
-          <IconButton color="primary" aria-label="Dashboard" id="Dashboard" onClick={() => irPara('/Pedido', 'Pedidos')}>
-            {/* <MilitaryTechOutlinedIcon sx={{ width: 32, height: 32 }} /> */}
-            <NoteAltOutlinedIcon sx={{ width: 32, height: 32 }} />
-          </IconButton>
+          <Tooltip title={'Pedidos'}>
+            <IconButton color="primary" aria-label="Dashboard" id="Dashboard" onClick={() => irPara('/Pedido', 'Pedidos')}>
+              {/* <MilitaryTechOutlinedIcon sx={{ width: 32, height: 32 }} /> */}
+              <NoteAltOutlinedIcon sx={{ width: 32, height: 32 }} />
+            </IconButton>
+          </Tooltip>
           <Box sx={{ flexGrow: 0.25 }} />
-          <IconButton color="primary" onClick={() => irPara('/Entrada', 'Entradas de Produtos')}>
-            <AddShoppingCartOutlinedIcon sx={{ width: 32, height: 32 }} />
-          </IconButton>
+          <Tooltip title={'Entradas'}>
+            <IconButton color="primary" onClick={() => irPara('/Entrada', 'Entradas de Produtos')}>
+              <AddShoppingCartOutlinedIcon sx={{ width: 32, height: 32 }} />
+            </IconButton>
+          </Tooltip>
           <StyledFab color="primary" aria-label="add">
             <Tooltip title="Open Menu" onClick={handleOpenUserMenu} sx={{ p: 0 }} >
               <AddIcon />
@@ -166,20 +170,24 @@ export default function MenuNav() {
             ))}
           </Menu>
           <Box sx={{ flexGrow: 0.5 }} />
-          <IconButton color="primary" onClick={() => irPara('/ProducaoMalharia', 'Produção Malharia')}>
-            <FactoryIcon sx={{ width: 32, height: 32 }} />
-          </IconButton>
+          <Tooltip title={'Produção Malharia'}>
+            <IconButton color="primary" onClick={() => irPara('/ProducaoMalharia', 'Produção Malharia')}>
+              <FactoryIcon sx={{ width: 32, height: 32 }} />
+            </IconButton>
+          </Tooltip>
           <Box sx={{ flexGrow: 0.25 }} />
-          <IconButton color="primary" onClick={() => irPara('/Tinturaria', 'Tinturaria')}>
-            <ColorLensTwoToneIcon sx={{ width: 32, height: 32 }} />
-          </IconButton>
-          {/* <IconButton color="primary" onClick={() => irPara('/Atleta', 'Atleta')}>
+          <Tooltip title={'Tinturaria'}>
+            <IconButton color="primary" onClick={() => irPara('/Tinturaria', 'Tinturaria')}>
+              <ColorLensTwoToneIcon sx={{ width: 32, height: 32 }} />
+            </IconButton>
+            {/* <IconButton color="primary" onClick={() => irPara('/Atleta', 'Atleta')}>
             <Avatar
               alt="Foto do Usuário"
               src="imagens/avatar.jpg"
               sx={{ width: 32, height: 32 }}
             />
           </IconButton> */}
+          </Tooltip>
         </Toolbar>
       </AppBar>
     </React.Fragment>

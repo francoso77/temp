@@ -370,24 +370,19 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
         setRsTinturaria(rsTinturarias)
       })
 
-    let query: string = `
-        SELECT 
-            p.idPessoa, p.nome, p.tipoPessoa
-        FROM 
-            pessoas p
-        WHERE 
-            p.tipoPessoa = 'R'
-        ORDER BY p.nome ASC;
-        `;
-    clsCrud
-      .query({
+      clsCrud
+      .pesquisar({
         entidade: "Pessoa",
-        sql: query,
-        setMensagemState: setMensagemState
+        campoOrder: ['nome'],
+        criterio: {
+          tipoPessoa: "R",
+        },
+        camposLike: ["tipoPessoa"],
       })
       .then((rsRevisadores: Array<PessoaInterface>) => {
         setRsRevisador(rsRevisadores)
       })
+
   }
 
   useEffect(() => {

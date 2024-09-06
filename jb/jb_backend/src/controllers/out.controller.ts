@@ -16,14 +16,17 @@ export class OutController {
     const sql = `
     SELECT
       p.*,
-      pe.nome AS nome
+      pc.nome AS nomeCliente,
+      pv.nome AS nomeVendedor
     FROM 
       pedidos p
     INNER JOIN
-      pessoas pe ON pe.idPessoa = p.idPessoa_cliente
+      pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+    INNER JOIN
+      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
     WHERE 
       statusPedido = 'A' AND
-      ${campo === 'data' ? 'dataPedido = ?' : 'nome LIKE ?'}
+      ${campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?'}
   `
 
     const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]

@@ -54,12 +54,13 @@ export default function Produto() {
     {
       cabecalho: 'Produto',
       alinhamento: 'left',
-      campo: 'produto_nome'
+      campo: 'nome'
     },
     {
       cabecalho: 'Unidade',
       alinhamento: 'left',
-      campo: 'unidadeMedida_sigla',
+      campo: 'idUnidade',
+      format: (_v, rs: any) => rs.unidadeMedida.sigla
     },
     {
       cabecalho: 'Tipo Produto',
@@ -215,29 +216,57 @@ export default function Produto() {
   }
 
   const btPesquisar = () => {
-    const query = `
-      SELECT 
-          p.*,
-          p.nome AS produto_nome,
-          um.sigla AS unidadeMedida_sigla,
-          p.tipoProduto AS tipoProduto
-      FROM 
-          produtos p
-      INNER JOIN 
-          unidademedidas um ON um.idUnidade = p.idUnidade
-      WHERE 
-          p.nome LIKE '%${pesquisa.nome}%';
-      `;
+    // const query = `
+    //   SELECT 
+    //       p.*,
+    //       p.nome AS produto_nome,
+    //       um.sigla AS unidadeMedida_sigla,
+    //       p.tipoProduto AS tipoProduto
+    //   FROM 
+    //       produtos p
+    //   INNER JOIN 
+    //       unidademedidas um ON um.idUnidade = p.idUnidade
+    //   WHERE 
+    //       p.nome LIKE '%${pesquisa.nome}%';
+    //   `;
+    // clsCrud
+    //   .query({
+    //     entidade: "Produto",
+    //     sql: query,
+    //     msg: 'Pesquisando Produtos ...',
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs: Array<any>) => {
+    //     setRsPesquisa(rs)
+    //   })
+
     clsCrud
-      .query({
+      .pesquisar({
         entidade: "Produto",
-        sql: query,
-        msg: 'Pesquisando Produtos ...',
+        relations: [
+          "unidadeMedida",
+        ],
+        criterio: {
+          "nome": "%".concat(pesquisa.nome).concat("%")
+        },
+        camposLike: ["nome"],
+        select: [
+          "idProduto",
+          "nome",
+          "idUnidade",
+          "tipoProduto",
+          "localizacao",
+          "largura",
+          "gm2",
+          "ativo",
+        ],
+        msg: 'Pesquisando produtos ...',
         setMensagemState: setMensagemState
       })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
+
   }
   // const btPesquisar = () => {
   //   clsCrud
@@ -300,16 +329,16 @@ export default function Produto() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper variant="outlined" sx={{ padding: 2 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+    <Container maxWidth="md" sx={{ mt: 2 }}>
+      <Paper variant="outlined" sx={{ padding: 1 }}>
+        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={11}>
+            <Grid item xs={10} md={11}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -322,11 +351,11 @@ export default function Produto() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={1}>
+            <Grid item xs={2} md={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, ml: { xs: 0, md: 2 } }}
+                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

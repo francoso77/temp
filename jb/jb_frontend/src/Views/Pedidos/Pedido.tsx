@@ -79,14 +79,16 @@ export default function Pedido() {
     {
       cabecalho: 'Cliente',
       alinhamento: 'left',
-      campo: 'idPessoa_cliente',
-      format: (_v, rs: any) => rs.cliente.nome
+      campo: 'nomeCliente'
+      // campo: 'idPessoa_cliente',
+      // format: (_v, rs: any) => rs.cliente.nome
     },
     {
       cabecalho: 'Vendedor',
       alinhamento: 'left',
-      campo: 'idPessoa_vendedor',
-      format: (_v, rs: any) => rs.vendedor.nome
+      campo: 'nomeVendedor'
+      // campo: 'idPessoa_vendedor',
+      // format: (_v, rs: any) => rs.vendedor.nome
     },
   ]
 
@@ -227,27 +229,44 @@ export default function Pedido() {
   }
 
   const btPesquisar = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "Pedido",
-        relations: [
-          "cliente",
-          "vendedor",
-          "prazoEntrega",
-          "detalhePedidos",
-          "detalhePedidos.produto",
-        ],
-        criterio: {
-          "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%"),
-          "statusPedido": StatusPedidoType.aberto
-        },
-        camposLike: ["idPedido", "statusPedido"],
-        msg: 'Pesquisando pedidos ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
+
+    const campo = isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
+    const itemPesquisa = campo === 'data'
+      ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)
+      : pesquisa.itemPesquisa
+
+    clsApi.execute<Array<PedidoInterface>>({
+      url: 'pedidosEmAberto',
+      method: 'post',
+      itemPesquisa,
+      campo,
+      mensagem: 'Pesquisando pedidos ...',
+      setMensagemState: setMensagemState
+    })
+      .then((rs) => {
         setRsPesquisa(rs)
       })
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "Pedido",
+    //     relations: [
+    //       "cliente",
+    //       "vendedor",
+    //       "prazoEntrega",
+    //       "detalhePedidos",
+    //       "detalhePedidos.produto",
+    //     ],
+    //     criterio: {
+    //       "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%"),
+    //       "statusPedido": StatusPedidoType.aberto
+    //     },
+    //     camposLike: ["idPedido", "statusPedido"],
+    //     msg: 'Pesquisando pedidos ...',
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs: Array<any>) => {
+    //     setRsPesquisa(rs)
+    //   })
   }
 
   const irPara = useNavigate()
@@ -275,24 +294,38 @@ export default function Pedido() {
         setRsPrazo(rs)
       })
 
-    let query: string = `
-      SELECT 
-          p.*
-      FROM 
-          pessoas p
-      WHERE 
-          p.tipoPessoa = 'J' OR
-          p.tipoPessoa = 'C';
-      `;
+    // let query: string = `
+    //   SELECT 
+    //       p.*
+    //   FROM 
+    //       pessoas p
+    //   WHERE 
+    //       p.tipoPessoa = 'J' OR
+    //       p.tipoPessoa = 'C';
+    //   `;
+    // clsCrud
+    //   .query({
+    //     entidade: "Pessoa",
+    //     sql: query,
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs: Array<PessoaInterface>) => {
+    //     setRsCliente(rs)
+    //   })
+
     clsCrud
-      .query({
-        entidade: "Pessoa",
-        sql: query,
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<PessoaInterface>) => {
-        setRsCliente(rs)
-      })
+    .pesquisar({
+      entidade: "Pessoa",
+      campoOrder: ['nome'],
+      notOrLike: 'I',
+      criterio: {
+        tipoPessoa: ['J','C'],
+      },
+      camposLike: ['tipoPessoa'],
+    })
+    .then((rsClientes: Array<PessoaInterface>) => {
+      setRsCliente(rsClientes)
+    })
 
     clsCrud
       .pesquisar({
@@ -312,51 +345,44 @@ export default function Pedido() {
     const date = new Date(value)
     return !isNaN(date.getTime())
   }
-  const pesquisaEventos = () => {
 
-    if (isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa))) {
+  // const pesquisaEventos = () => {
+  //   const campo = isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
+  //   const itemPesquisa = campo === 'data' 
+  //     ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa) 
+  //     : pesquisa.itemPesquisa
 
-      clsApi.execute<Array<PedidoInterface>>({
-        url: 'pedidosEmAberto',
-        method: 'post',
-        itemPesquisa: clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa),
-        campo: 'data',
-      })
-        .then((rs) => {
-          console.log('Resultado da pesquisa com data: ', rs)
-        })
-    } else {
-      clsApi.execute<Array<PedidoInterface>>({
-        url: 'pedidosEmAberto',
-        method: 'post',
-        itemPesquisa: pesquisa.itemPesquisa,
-        campo: 'nome',
-      })
-        .then((rs) => {
-          console.log('Resultado da pesquisa com data: ', rs)
-        })
-    }
-  }
+  //   clsApi.execute<Array<PedidoInterface>>({
+  //     url: 'pedidosEmAberto',
+  //     method: 'post',
+  //     itemPesquisa,
+  //     campo,
+  //   })
+  //   .then((rs) => {
+  //     console.log(`Resultado da pesquisa com ${campo}: `, rs)
+  //   })
+  // }
+
   useEffect(() => {
     BuscarDados()
   }, [])
 
-  useEffect(() => {
-    pesquisaEventos()
-  }, [])
+  // useEffect(() => {
+  //   pesquisaEventos()
+  // }, [])
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper variant="outlined" sx={{ padding: 2 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+    <Container maxWidth="md" sx={{ mt: 2 }}>
+      <Paper variant="outlined" sx={{ padding: 1 }}>
+        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10}>
+            <Grid item xs={10} md={11}>
               <InputText
                 label="Pesquise por data ou cliente"
                 tipo="uppercase"
@@ -364,16 +390,16 @@ export default function Pedido() {
                 field="itemPesquisa"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
-                onClickIconeEnd={() => pesquisaEventos()}
+                onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
               />
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={2} md={1}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 4, mr: 0.5 }}
+                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
                   onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />

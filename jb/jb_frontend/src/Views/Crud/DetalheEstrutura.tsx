@@ -230,7 +230,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   const BuscarDados = () => {
-    console.log(rsMaster)
+
     clsCrud
       .pesquisar({
         entidade: "Produto",
