@@ -177,7 +177,6 @@ export default function Pedido() {
 
   const btConfirmar = () => {
     if (validarDados()) {
-      console.log('Confirmar os dados antes de gravar: ', pedido)
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
           entidade: "Pedido",
@@ -228,20 +227,6 @@ export default function Pedido() {
   }
 
   const btPesquisar = () => {
-    const regex = /^\d{2}\/\d{2}\/\d{4}$/
-    let criterioPesquisa = {}
-    let likes = []
-
-    if (regex.test(pesquisa.itemPesquisa)) {
-      criterioPesquisa = {
-        "dataPedido": pesquisa.itemPesquisa,
-        "statusPedido": StatusPedidoType.aberto
-      }
-      likes = ["dataPedido", "statusPedido"]
-    } else {
-
-    }
-
     clsCrud
       .pesquisar({
         entidade: "Pedido",
@@ -323,10 +308,34 @@ export default function Pedido() {
       })
   }
 
+  const isValidDate = (value: any): boolean => {
+    const date = new Date(value)
+    return !isNaN(date.getTime())
+  }
   const pesquisaEventos = () => {
-    clsApi.execute<Array<PedidoInterface>>({ url: 'pedidosEmAberto', method: 'post', statusPedido: 'A' }).then((rs) => {
-      console.log('Resultado da pesquisa: ', rs)
-    })
+
+    if (isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa))) {
+
+      clsApi.execute<Array<PedidoInterface>>({
+        url: 'pedidosEmAberto',
+        method: 'post',
+        itemPesquisa: clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa),
+        campo: 'data',
+      })
+        .then((rs) => {
+          console.log('Resultado da pesquisa com data: ', rs)
+        })
+    } else {
+      clsApi.execute<Array<PedidoInterface>>({
+        url: 'pedidosEmAberto',
+        method: 'post',
+        itemPesquisa: pesquisa.itemPesquisa,
+        campo: 'nome',
+      })
+        .then((rs) => {
+          console.log('Resultado da pesquisa com data: ', rs)
+        })
+    }
   }
   useEffect(() => {
     BuscarDados()
@@ -355,7 +364,7 @@ export default function Pedido() {
                 field="itemPesquisa"
                 setState={setPesquisa}
                 iconeEnd='searchicon'
-                onClickIconeEnd={() => btPesquisar()}
+                onClickIconeEnd={() => pesquisaEventos()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
               />

@@ -55,21 +55,23 @@ var data_source_1 = require("../data-source");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
-    OutController.prototype.pedidosEmAberto = function (statusPedido) {
+    OutController.prototype.pedidosEmAberto = function (itemPesquisa, campo) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql;
+            var sql, params;
             return __generator(this, function (_a) {
-                console.log(statusPedido);
-                sql = "SELECT * FROM pedidos WHERE statusPedido = '".concat(statusPedido, "'");
-                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql)];
+                console.log("itemPesquisa: ", itemPesquisa, " campo: ", campo);
+                sql = "\n    SELECT\n      p.*,\n      pe.nome AS nome\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pe ON pe.idPessoa = p.idPessoa_cliente\n    WHERE \n      statusPedido = 'A' AND\n      ".concat(campo === 'data' ? 'dataPedido = ?' : 'nome LIKE ?', "\n  ");
+                params = [campo === 'data' ? itemPesquisa : "%".concat(itemPesquisa, "%")];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
         });
     };
     __decorate([
         (0, common_1.Post)("pedidosEmAberto"),
-        __param(0, (0, common_1.Body)("statusPedido")),
+        __param(0, (0, common_1.Body)("itemPesquisa")),
+        __param(1, (0, common_1.Body)("campo")),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String]),
+        __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "pedidosEmAberto", null);
     OutController = __decorate([

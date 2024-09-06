@@ -7,7 +7,8 @@ interface PropsInterface {
   url: string
   dados?: Record<any, any>
   mensagem?: string
-  statusPedido: string,
+  itemPesquisa: string,
+  campo: 'data' | 'nome',
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
 }
 
@@ -18,7 +19,8 @@ export default class ClsApi {
     url,
     dados = {},
     setMensagemState = undefined,
-    statusPedido,
+    itemPesquisa,
+    campo = 'nome',
     mensagem = ""
   }: PropsInterface): Promise<T> {
 
@@ -42,7 +44,8 @@ export default class ClsApi {
 
     const requestData = {
       ...dados,
-      statusPedido: statusPedido
+      itemPesquisa: itemPesquisa,
+      campo: campo
     }
 
     return axios[method]<T>(

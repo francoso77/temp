@@ -7,14 +7,28 @@ export class OutController {
 
   @Post("pedidosEmAberto")
   async pedidosEmAberto(
-    @Body("statusPedido") statusPedido: string,
+    @Body("itemPesquisa") itemPesquisa: string,
+    @Body("campo") campo: 'data' | 'nome',
   ): Promise<Array<Pedido>> {
 
-    console.log(statusPedido
+    console.log("itemPesquisa: ", itemPesquisa, " campo: ", campo)
 
-    )
-    const sql: string = `SELECT * FROM pedidos WHERE statusPedido = '${statusPedido}'`
-    return AppDataSource.getRepository(Pedido).query(sql)
+    const sql = `
+    SELECT
+      p.*,
+      pe.nome AS nome
+    FROM 
+      pedidos p
+    INNER JOIN
+      pessoas pe ON pe.idPessoa = p.idPessoa_cliente
+    WHERE 
+      statusPedido = 'A' AND
+      ${campo === 'data' ? 'dataPedido = ?' : 'nome LIKE ?'}
+  `
+
+    const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
+
+    return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 }
 
