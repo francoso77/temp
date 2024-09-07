@@ -61,6 +61,7 @@ export class CrudController {
     @Body("relations") relations: Array<string>,
     @Body("campoOrder") campoOrder: Array<any>,
     @Body("notOrLike") notOrLike: "N" | "L" | "I",
+    @Body("tipoOrder") tipoOrder: "ASC" | "DESC",
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({
       entidade: entidade,
@@ -70,6 +71,7 @@ export class CrudController {
       relations: relations ? relations : [],
       campoOrder: campoOrder ? campoOrder : [],
       notOrLike: notOrLike ? notOrLike : "L",
+      tipoOrder: tipoOrder ? tipoOrder : "ASC"
     });
   }
 
@@ -90,6 +92,7 @@ export class CrudController {
     @Body("select") select: Array<string>,
     @Body("campoOrder") campoOrder: Array<any>,
     @Body("notOrLike") notOrLike: "N" | "L" | "I",
+    @Body("tipoOrder") tipoOrder: "ASC" | "DESC",
     @Body("groupBy") groupBy: string,
     @Body("having") having: string,
   ): Promise<RespostaPadraoInterface<any>> {
@@ -102,6 +105,7 @@ export class CrudController {
       select: select ? select : [],
       campoOrder: campoOrder ? campoOrder : [],
       notOrLike: notOrLike ? notOrLike : "L",
+      tipoOrder: tipoOrder ? tipoOrder : "ASC",
       groupBy: groupBy ? groupBy : '',
       having: having ? having : '',
     });

@@ -18,12 +18,24 @@ import { DateTime } from 'luxon';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import ColumnChart3D from '../testes/testes';
+import Condicional from '../../Componentes/Condicional/Condicional';
+import LeaderboardTwoToneIcon from '@mui/icons-material/LeaderboardTwoTone';
+import GraficoColuna from './GraficoColunas';
 
 interface DadosPecaInterface {
   nomeProduto: string | undefined
   peca: string
   peso: string
+}
+
+interface DadosTotaisInterface {
+  mes: string
+  pesoTotal: number
+  qtdTotal: number
+}
+
+interface MesPesquisado {
+  mes: string
 }
 
 export function ProducaoMalharia() {
@@ -42,6 +54,13 @@ export function ProducaoMalharia() {
     peca: '',
     peso: ''
   }
+
+  const ResetDadosTotais: DadosTotaisInterface = {
+    mes: '',
+    pesoTotal: 0,
+    qtdTotal: 0
+  }
+
   const ResetDados: ProducaoMalhariaInterface = {
     peca: '0',
     idMaquina: 0,
@@ -58,6 +77,7 @@ export function ProducaoMalharia() {
   }
 
   const [open, setOpen] = useState(false)
+  const [openGrafico, setOpenGrafico] = useState(false)
   const [erros, setErros] = useState({})
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
@@ -67,6 +87,12 @@ export function ProducaoMalharia() {
   const [rsTecelao, setRsTecelao] = useState<Array<PessoaInterface>>([])
   const [rsMaquina, setRsMaquina] = useState<Array<MaquinaInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
+  const [rsMeses, setRsMeses] = useState<Array<any>>([])
+  const [rsTotais, setRsTotais] = useState<DadosTotaisInterface>(ResetDadosTotais)
+  const [selectedValue, setSelectedValue] = useState<MesPesquisado>({ mes: "" })
+
+
+
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
   const firstFieldRef = useRef<HTMLInputElement>(null)
 
@@ -132,38 +158,94 @@ export function ProducaoMalharia() {
         setRsProduto(rs)
       })
 
+    clsCrud.consultar({
+      entidade: 'ProducaoMalharia',
+      joins: [{ tabelaRelacao: 'producaomalharia.produto', relacao: 'produto' }],
+      tipoOrder: 'DESC',
+      groupBy: 'mes',
+      campoOrder: ['mes'],
+      select: ['CONCAT( LPAD(MONTH(dataProducao), 2, "0"), "/",YEAR(dataProducao)) AS mes']
+    })
+      .then((rs: Array<any>) => {
+        setRsMeses(rs)
+        setSelectedValue({ mes: rs[0].mes })
+      })
+
+  }
+
+
+  const Totalizador = async () => {
+    try {
+      const rs: DadosTotaisInterface[] = await clsCrud.consultar({
+        entidade: 'ProducaoMalharia',
+        joins: [{ tabelaRelacao: 'producaomalharia.produto', relacao: 'produto' }],
+        tipoOrder: 'DESC',
+        groupBy: 'mes',
+        campoOrder: ['mes'],
+        having: 'pesoTotal > 0',
+        select: ['ROUND(SUM(peso),2) AS pesoTotal', 'COUNT(peso) AS qtdTotal', 'CONCAT( LPAD(MONTH(dataProducao), 2, "0"), "/",YEAR(dataProducao)) AS mes']
+      });
+
+      if (selectedValue.mes === "") {
+        setRsTotais({
+          ...rsTotais,
+          mes: rs[0].mes,
+          pesoTotal: rs[0].pesoTotal,
+          qtdTotal: rs[0].qtdTotal
+        })
+      } else {
+
+        rs.forEach((periodo) => {
+          if (periodo.mes === selectedValue.mes) {
+            setRsTotais({
+              ...rsTotais,
+              mes: periodo.mes,
+              pesoTotal: periodo.pesoTotal,
+              qtdTotal: periodo.qtdTotal
+            })
+          }
+        })
+      }
+
+    } catch (error) {
+      console.error('Erro ao consultar dados:', error);
+    }
+
   }
 
   const novaPeca = (maquina: number) => {
 
-    clsCrud.pesquisar({
-      entidade: 'ProducaoMalharia',
-      criterio: {
-        idMaquina: maquina,
-      },
-      campoOrder: ['peca'],
-    })
-      .then((rs: Array<ProducaoMalhariaInterface>) => {
-        let nomeMaquina: string = ''
-        let ultimaPeca: string = ''
-        rsMaquina.find(v => v.idMaquina === maquina ? nomeMaquina = v.nome : '')
-        if (rs.length === 0) {
-          ultimaPeca = nomeMaquina.concat('-').concat('1')
-          setProducaoMalharia({ ...producaoMalharia, peca: ultimaPeca })
-        } else {
-          const sorteDados = rs.sort((a, b) => {
-            const numA = parseInt(a.peca.split('-')[1], 10)
-            const numB = parseInt(b.peca.split('-')[1], 10)
-            return numA - numB
-          })
-          let ultimaPecaSorteada = sorteDados[sorteDados.length - 1]
-          const [prefix, number] = ultimaPecaSorteada.peca.split('-')
-          const novaPeca = `${prefix}-${parseInt(number, 10) + 1}`
+    if (maquina) {
 
-          ultimaPeca = novaPeca
-          setProducaoMalharia({ ...producaoMalharia, peca: ultimaPeca })
-        }
+      clsCrud.pesquisar({
+        entidade: 'ProducaoMalharia',
+        criterio: {
+          idMaquina: maquina,
+        },
+        campoOrder: ['peca'],
       })
+        .then((rs: Array<ProducaoMalhariaInterface>) => {
+          let nomeMaquina: string = ''
+          let ultimaPeca: string = ''
+          rsMaquina.find(v => v.idMaquina === maquina ? nomeMaquina = v.nome : '')
+          if (rs.length === 0) {
+            ultimaPeca = nomeMaquina.concat('-').concat('1')
+            setProducaoMalharia({ ...producaoMalharia, peca: ultimaPeca })
+          } else {
+            const sorteDados = rs.sort((a, b) => {
+              const numA = parseInt(a.peca.split('-')[1], 10)
+              const numB = parseInt(b.peca.split('-')[1], 10)
+              return numA - numB
+            })
+            let ultimaPecaSorteada = sorteDados[sorteDados.length - 1]
+            const [prefix, number] = ultimaPecaSorteada.peca.split('-')
+            const novaPeca = `${prefix}-${parseInt(number, 10) + 1}`
+
+            ultimaPeca = novaPeca
+            setProducaoMalharia({ ...producaoMalharia, peca: ultimaPeca })
+          }
+        })
+    }
 
   }
 
@@ -221,6 +303,7 @@ export function ProducaoMalharia() {
                   cb: null,
                   tipo: MensagemTipo.Ok,
                 })
+                Totalizador()
                 setProducaoMalharia(ResetDados)
                 setRsDadosPeca(ResetDadosPeca)
                 setOpen(false)
@@ -249,6 +332,9 @@ export function ProducaoMalharia() {
       })
   }
 
+  const btGraficos = () => {
+    setOpenGrafico(!openGrafico)
+  }
   const btConfirmar = () => {
 
     if (validarDados()) {
@@ -272,9 +358,9 @@ export function ProducaoMalharia() {
     irPara('/')
   }
 
-
   useEffect(() => {
     BuscarDados()
+    Totalizador()
     if (firstFieldRef.current) {
       firstFieldRef.current.focus()
       firstFieldRef.current.select()
@@ -283,6 +369,8 @@ export function ProducaoMalharia() {
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const isDesktop = useMediaQuery('(min-width:960px)')
+
   return (
     <>
       <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
@@ -300,7 +388,7 @@ export function ProducaoMalharia() {
                 campoDescricao="nome"
                 campoID="idMaquina"
                 dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco="Tear"
+                mensagemPadraoCampoEmBranco=""
                 field="idMaquina"
                 label="Tear"
                 erros={erros}
@@ -309,7 +397,6 @@ export function ProducaoMalharia() {
                 onBlur={(e) => novaPeca(producaoMalharia.idMaquina)}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
                 tamanhoFonte={30}
-                autoFocus
               />
             </Box>
           </Grid>
@@ -459,12 +546,75 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          {/* <Grid item xs={12}>
-            <ColumnChart3D />
-          </Grid> */}
+          <Grid item xs={12}>
+            <GraficoColuna open={openGrafico} clickFechar={btGraficos} />
+          </Grid>
         </Grid>
       </Paper>
+      <Condicional condicao={isDesktop}>
+        <Paper variant="outlined" sx={{ p: 1.5, m: 1, bgcolor: 'greenyellow', mt: 3 }}>
+          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsMeses}
+                campoDescricao="mes"
+                campoID="mes"
+                dados={selectedValue}
+                field="mes"
+                setState={setSelectedValue}
+                mensagemPadraoCampoEmBranco=""
+                label="Período"
+                erros={erros}
+                onBlur={Totalizador}
+                tamanhoFonte={50}
+                corFundo={'#cbdce9'}
+                autoFocus
+              />
+            </Grid>
+            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputCalc
+                tipo='currency'
+                scale={2}
+                label="Peso Total"
+                posicaoLabel={'top'}
+                value={rsTotais?.pesoTotal.toString()}
+                disabled={true}
+                onFocus={(e) => e.target.select()}
+                tamanhoFonte={50}
+                textAlign={'center'}
+                labelAlign={'center'}
+                corFundo={'#cbdce9'}
+              />
+            </Grid>
+            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputCalc
+                tipo='number'
+                label="Qtd Total"
+                posicaoLabel={'top'}
+                value={rsTotais?.qtdTotal}
+                disabled={true}
+                onFocus={(e) => e.target.select()}
+                tamanhoFonte={50}
+                textAlign={'center'}
+                labelAlign={'center'}
+                corFundo={'#cbdce9'}
+              />
+            </Grid>
+          </Grid>
+        </Paper>
+      </Condicional>
+
       <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+
+        <Tooltip title={'Gráficos'}>
+          <IconButton
+            color="secondary"
+            sx={{ mt: 0, mr: 5 }}
+            onClick={() => btGraficos()}
+          >
+            <LeaderboardTwoToneIcon sx={{ fontSize: 70 }} />
+          </IconButton>
+        </Tooltip>
 
         <Tooltip title={'Confirmar'}>
           <IconButton

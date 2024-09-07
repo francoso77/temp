@@ -62,6 +62,8 @@ interface ComboBoxInterface<T> {
   onBlur?: (v: any) => void
   //usando referência
   inputRef?: React.Ref<unknown> | undefined
+  //Definição de uma cor para o fundo do componente
+  corFundo?: string
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -104,7 +106,8 @@ export default function ComboBox<T>(
     inputRef,
     onFocus = undefined,
     tamanhoFonte = 16,
-    onBlur
+    onBlur,
+    corFundo = ''
   }: ComboBoxInterface<T>) {
 
 
@@ -132,7 +135,7 @@ export default function ComboBox<T>(
   return (
     <>
       <Autocomplete
-        sx={{ fontSize: tamanhoFonte }}
+        sx={{ fontSize: tamanhoFonte}}
         autoFocus={autoFocus}
         ref={Ref}
         onSelect={(e) => {
@@ -239,6 +242,7 @@ export default function ComboBox<T>(
                 sx={{
                   '& .MuiInputBase-input': {
                     fontSize: tamanhoFonte, // Aumenta o tamanho da fonte do input
+                    bgcolor: corFundo,
                   }
                 }}
                 size='small'

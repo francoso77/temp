@@ -149,7 +149,7 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.pesquisar = function (_a) {
-        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike;
+        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike, tipoOrder = _a.tipoOrder;
         return __awaiter(this, void 0, void 0, function () {
             var where, order;
             return __generator(this, function (_c) {
@@ -168,7 +168,7 @@ var ClsCrudController = /** @class */ (function () {
                 });
                 order = {};
                 campoOrder.forEach(function (campo) {
-                    order[campo] = 'ASC';
+                    order[campo] = tipoOrder;
                 });
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(entidade)
                         .find({
@@ -215,7 +215,7 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.consultar = function (_a) {
-        var entidade = _a.entidade, joins = _a.joins, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike, groupBy = _a.groupBy, having = _a.having;
+        var entidade = _a.entidade, joins = _a.joins, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike, groupBy = _a.groupBy, having = _a.having, tipoOrder = _a.tipoOrder;
         return __awaiter(this, void 0, void 0, function () {
             var where_1, order_1, repository, queryBuilder_1, resultado, error_1;
             return __generator(this, function (_b) {
@@ -224,7 +224,6 @@ var ClsCrudController = /** @class */ (function () {
                         _b.trys.push([0, 2, , 3]);
                         where_1 = {};
                         where_1 = __assign({}, criterio);
-                        console.log("como está o criterio: ", Object.keys(where_1)[0]);
                         camposLike.forEach(function (campo) {
                             if (notOrLike === "L") {
                                 where_1[campo] = (0, typeorm_1.Like)(where_1[campo]);
@@ -238,13 +237,8 @@ var ClsCrudController = /** @class */ (function () {
                         });
                         order_1 = {};
                         campoOrder.forEach(function (campo) {
-                            order_1[campo] = 'ASC';
+                            order_1[campo] = tipoOrder;
                         });
-                        console.log('entidade:', entidade);
-                        console.log('joins:', joins);
-                        console.log('groupBy:', groupBy);
-                        console.log('having:', having);
-                        console.log("where: ", where_1);
                         repository = data_source_1.AppDataSource.getRepository(entidade);
                         queryBuilder_1 = repository.createQueryBuilder(entidade.toLowerCase());
                         joins.forEach(function (join) {
@@ -259,7 +253,6 @@ var ClsCrudController = /** @class */ (function () {
                         return [4 /*yield*/, queryBuilder_1.getRawMany()];
                     case 1:
                         resultado = _b.sent();
-                        console.log(resultado);
                         return [2 /*return*/, {
                                 ok: true,
                                 mensagem: 'Pesquisa Concluída',

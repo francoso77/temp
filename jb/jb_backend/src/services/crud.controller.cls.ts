@@ -99,7 +99,7 @@ export default class ClsCrudController {
       })
   }
 
-  public async pesquisar({ entidade, criterio, camposLike, select, relations = [], campoOrder, notOrLike }: PadraoPesquisaInterface):
+  public async pesquisar({ entidade, criterio, camposLike, select, relations = [], campoOrder, notOrLike, tipoOrder }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
 
     let where: Record<string, any> = {}
@@ -117,7 +117,7 @@ export default class ClsCrudController {
 
     let order: Record<string, any> = {}
     campoOrder.forEach((campo) => {
-      order[campo] = 'ASC'
+      order[campo] = tipoOrder
     })
 
     return AppDataSource.getRepository(entidade)
@@ -169,17 +169,14 @@ export default class ClsCrudController {
     campoOrder,
     notOrLike,
     groupBy,
-    having
+    having,
+    tipoOrder
   }: PadraoPesquisaInterface): Promise<RespostaPadraoInterface<any>> {
 
     try {
 
       let where: Record<string, any> = {}
       where = { ...criterio }
-
-      console.log("como está o criterio: ", Object.keys(where)[0]
-      )
-
 
       camposLike.forEach((campo) => {
         if (notOrLike === "L") {
@@ -193,14 +190,14 @@ export default class ClsCrudController {
 
       let order: Record<string, any> = {}
       campoOrder.forEach((campo) => {
-        order[campo] = 'ASC'
+        order[campo] = tipoOrder
       })
 
-      console.log('entidade:', entidade)
-      console.log('joins:', joins)
-      console.log('groupBy:', groupBy)
-      console.log('having:', having)
-      console.log("where: ", where)
+      // console.log('entidade:', entidade)
+      // console.log('joins:', joins)
+      // console.log('groupBy:', groupBy)
+      // console.log('having:', having)
+      // console.log("where: ", where)
 
       const repository = AppDataSource.getRepository(entidade)
       let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
@@ -229,7 +226,6 @@ export default class ClsCrudController {
       // });
 
       const resultado = await queryBuilder.getRawMany()
-      console.log(resultado)
       return {
         ok: true,
         mensagem: 'Pesquisa Concluída',

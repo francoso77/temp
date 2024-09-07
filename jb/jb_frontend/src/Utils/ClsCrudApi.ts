@@ -96,6 +96,7 @@ export default class ClsCrud {
     relations,
     campoOrder,
     notOrLike,
+    tipoOrder,
     msg = 'Pesquisando...',
     cb,
     setMensagemState
@@ -108,6 +109,7 @@ export default class ClsCrud {
       relations: relations,
       campoOrder: campoOrder,
       notOrLike: notOrLike,
+      tipoOrder: tipoOrder
     }
 
     const config: AxiosRequestConfig = {
@@ -415,6 +417,7 @@ export default class ClsCrud {
     notOrLike,
     groupBy,
     having,
+    tipoOrder,
     msg = 'Pesquisando...',
     cb,
     setMensagemState
@@ -429,6 +432,7 @@ export default class ClsCrud {
       notOrLike: notOrLike,
       groupBy: groupBy,
       having: having,
+      tipoOrder: tipoOrder
     }
 
     const config: AxiosRequestConfig = {

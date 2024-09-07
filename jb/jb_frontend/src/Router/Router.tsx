@@ -15,6 +15,7 @@ import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import PieChart3D from "../Views/testes/testes";
 import ColumnChart3D from "../Views/testes/testes";
+import PieChart from "../Views/testes/testes";
 
 export const router = createBrowserRouter([
   {
@@ -75,7 +76,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: <ColumnChart3D />,
+        element: <PieChart />,
       },
     ]
   },
