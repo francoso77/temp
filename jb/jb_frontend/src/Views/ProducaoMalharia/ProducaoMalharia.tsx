@@ -18,6 +18,7 @@ import { DateTime } from 'luxon';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
+import ColumnChart3D from '../testes/testes';
 
 interface DadosPecaInterface {
   nomeProduto: string | undefined
@@ -458,6 +459,9 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
+          {/* <Grid item xs={12}>
+            <ColumnChart3D />
+          </Grid> */}
         </Grid>
       </Paper>
       <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

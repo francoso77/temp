@@ -11,8 +11,6 @@ export class OutController {
     @Body("campo") campo: 'data' | 'nome',
   ): Promise<Array<Pedido>> {
 
-    console.log("itemPesquisa: ", itemPesquisa, " campo: ", campo)
-
     const sql = `
     SELECT
       p.*,
@@ -30,7 +28,6 @@ export class OutController {
   `
 
     const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
-
     return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 }

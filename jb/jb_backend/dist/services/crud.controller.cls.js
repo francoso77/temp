@@ -252,7 +252,7 @@ var ClsCrudController = /** @class */ (function () {
                         });
                         queryBuilder_1 = queryBuilder_1
                             .select(select)
-                            .where('pedido.dataPedido LIKE :dataPedido', { dataPedido: "%8%" })
+                            .where(where_1)
                             .groupBy(groupBy)
                             .having(having)
                             .orderBy(order_1);

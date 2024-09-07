@@ -35,6 +35,7 @@ export default function Produto() {
     tipoProduto: TipoProdutoType.tecidoTinto
 
   }
+  
   interface PesquisaInterface {
     nome: string
   }

@@ -60,7 +60,7 @@ export class CrudController {
     @Body("select") select: Array<string>,
     @Body("relations") relations: Array<string>,
     @Body("campoOrder") campoOrder: Array<any>,
-    @Body("notOrLike") notOrLike: "N" | "L",
+    @Body("notOrLike") notOrLike: "N" | "L" | "I",
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({
       entidade: entidade,

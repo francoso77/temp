@@ -211,7 +211,7 @@ export default class ClsCrudController {
 
       queryBuilder = queryBuilder
         .select(select)
-        .where('pedido.dataPedido LIKE :dataPedido', { dataPedido: `%8%` })
+        .where(where)
         .groupBy(groupBy)
         .having(having)
         .orderBy(order)

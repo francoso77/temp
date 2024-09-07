@@ -304,6 +304,16 @@ export default function Entrada() {
     }
   }
 
+  const formatDateTimeForMySQL = (dateString: string): string => {
+    const [day, month, year] = dateString.split('/')
+    return `${year}-${month}-${day} 00:00:00`
+  }
+
+  const formatNumber = (numString: string): string => {
+    const paddedNum = numString.padStart(9, '0')
+    return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+  }
+  
   const btPesquisar = () => {
     const relations = [
       "fornecedor",
@@ -314,41 +324,49 @@ export default function Entrada() {
       "detalheEntradas.romaneio",
     ];
 
-    const msg = 'Pesquisando notas ...';
-    const setMensagem = setMensagemState;
+    const msg = 'Pesquisando notas ...'
+    const setMensagem = setMensagemState
+    const idsFor = rsFornecedor
+    .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
+    .map(fornecedor => fornecedor.idPessoa)
 
-    let dadosPesquisa = {};
-    const temNumero = /\d/.test(pesquisa.itemPesquisa);
+    let dadosPesquisa = {}
+    let criterio = {}
+    let camposLike = []
+    let notOrLike = "L"
+    const temNumero = /\d/.test(pesquisa.itemPesquisa)
 
-    if (temNumero) {
-      dadosPesquisa = {
-        entidade: "Entrada",
-        relations,
-        criterio: {
-          notaFiscal: `%${pesquisa.itemPesquisa}%`,
-        },
-        camposLike: ['notaFiscal'],
-        msg,
-        setMensagemState: setMensagem
-      };
+    if (temNumero && pesquisa.itemPesquisa.includes('/')){
+      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
+      criterio = {
+        dataEmissao: formattedDateTime
+      }
+      camposLike = ['dataEmissao']
+    } else if (temNumero) {
+
+      const formattedNumber = formatNumber(pesquisa.itemPesquisa);
+      criterio= {
+        notaFiscal: formattedNumber
+      }
+      camposLike =  ['notaFiscal']
     } else {
-      const idsFor = rsFornecedor
-        .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
-        .map(fornecedor => fornecedor.idPessoa);
-
-      dadosPesquisa = {
-        entidade: "Entrada",
-        relations,
-        notOrLike: 'I',
-        criterio: {
-          idPessoa_fornecedor: idsFor,
-        },
-        camposLike: ['idPessoa_fornecedor'],
-        msg,
-        setMensagemState: setMensagem
-      };
+      criterio =  {
+        idPessoa_fornecedor: idsFor,
+      }
+      camposLike = ['idPessoa_fornecedor']
+      notOrLike =  'I'
     }
-
+    
+    dadosPesquisa = {
+      entidade: "Entrada",
+      relations,
+      notOrLike,
+      criterio,
+      camposLike,
+      msg,
+      setMensagemState: setMensagem
+    }
+    
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {

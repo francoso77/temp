@@ -11,9 +11,10 @@ import Estrutura from '../Views/Crud/Estrutura';
 import PrazoEntrega from '../Views/Crud/PrazoEntrega';
 import Pedido from '../Views/Pedidos/Pedido';
 import Entrada from '../Views/Entradas/Entrada';
-import PedidoForm from '../Views/testes/testes';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
+import PieChart3D from "../Views/testes/testes";
+import ColumnChart3D from "../Views/testes/testes";
 
 export const router = createBrowserRouter([
   {
@@ -74,7 +75,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: <PedidoForm />,
+        element: <ColumnChart3D />,
       },
     ]
   },
