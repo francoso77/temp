@@ -235,7 +235,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
       .pesquisar({
         entidade: "Produto",
         campoOrder: ["nome"],
-        notOrLike: 'N',
+        comparador: 'N',
         criterio: {
           idProduto: rsMaster.idProduto
         },

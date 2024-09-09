@@ -144,7 +144,7 @@ export function Tinturaria() {
         criterio: {
           tipoPessoa: ['J', 'C']
         },
-        notOrLike: 'I',
+        comparador: 'I',
         camposLike: ['tipoPessoa']
       }).then((rsClientes: Array<PessoaInterface>) => {
         if (rsClientes.length > 0) {
@@ -230,7 +230,7 @@ export function Tinturaria() {
           "detalheTinturarias",
           "detalheTinturarias.malharia",
         ],
-        notOrLike: 'I',
+        comparador: 'I',
         criterio: {
           idPessoa_cliente: idsCli,
         },
@@ -374,10 +374,10 @@ export function Tinturaria() {
 
   return (
     <>
-    <Container maxWidth="md" sx={{ mt: 2 }}>
-      <Paper variant="outlined" sx={{ padding: 1 }}>
-        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt:-1.5, mr:-5, mb:-5}}>
+      <Container maxWidth="md" sx={{ mt: 2 }}>
+        <Paper variant="outlined" sx={{ padding: 1 }}>
+          <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'right', mt: 0.5 }}>
               <IconButton onClick={() => btFechar()}>
                 <CloseIcon />
               </IconButton>

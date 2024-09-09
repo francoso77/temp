@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Post, Put } from '@nestjs/common';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import ClsCrudController from '../services/crud.controller.cls';
-import { join } from 'path';
 
 
 @Controller()
@@ -60,7 +59,7 @@ export class CrudController {
     @Body("select") select: Array<string>,
     @Body("relations") relations: Array<string>,
     @Body("campoOrder") campoOrder: Array<any>,
-    @Body("notOrLike") notOrLike: "N" | "L" | "I",
+    @Body("comparador") comparador: "N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=",
     @Body("tipoOrder") tipoOrder: "ASC" | "DESC",
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({
@@ -70,7 +69,7 @@ export class CrudController {
       select: select ? select : [],
       relations: relations ? relations : [],
       campoOrder: campoOrder ? campoOrder : [],
-      notOrLike: notOrLike ? notOrLike : "L",
+      comparador: comparador ? comparador : "L",
       tipoOrder: tipoOrder ? tipoOrder : "ASC"
     });
   }
@@ -91,7 +90,7 @@ export class CrudController {
     @Body("camposLike") camposLike: Array<string>,
     @Body("select") select: Array<string>,
     @Body("campoOrder") campoOrder: Array<any>,
-    @Body("notOrLike") notOrLike: "N" | "L" | "I",
+    @Body("comparador") comparador: "N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=",
     @Body("tipoOrder") tipoOrder: "ASC" | "DESC",
     @Body("groupBy") groupBy: string,
     @Body("having") having: string,
@@ -104,7 +103,7 @@ export class CrudController {
       camposLike: camposLike ? camposLike : [],
       select: select ? select : [],
       campoOrder: campoOrder ? campoOrder : [],
-      notOrLike: notOrLike ? notOrLike : "L",
+      comparador: comparador ? comparador : "L",
       tipoOrder: tipoOrder ? tipoOrder : "ASC",
       groupBy: groupBy ? groupBy : '',
       having: having ? having : '',

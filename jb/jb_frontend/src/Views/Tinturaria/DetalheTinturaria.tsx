@@ -14,6 +14,8 @@ import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces
 import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
+import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -105,6 +107,16 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     setOrderBy(property);
   };
 
+  const MensagemErro = (erro: string) => {
+    setMensagemState({
+      titulo: 'Erro...',
+      exibir: true,
+      mensagem: erro.concat(' - Consulte Suporte'),
+      tipo: MensagemTipo.Error,
+      exibirBotao: true,
+      cb: null
+    })
+  }
   const onExcluir = (rs: DetalheTinturariaInterface) => {
 
     let tmpDetalhe: Array<DetalheTinturariaInterface> = []
@@ -123,14 +135,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     })
       .then((rs) => {
         if (!rs.ok) {
-          setMensagemState({
-            titulo: 'Erro...',
-            exibir: true,
-            mensagem: 'Erro no cadastro - Consulte Suporte',
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null
-          })
+          MensagemErro('Erro no cadastro')
         }
       })
     AtualizaPeca(rs.idMalharia as number, null, '', false)
@@ -168,14 +173,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       setMensagemState: setMensagemState,
     }).then((rs) => {
       if (!rs.ok) {
-        setMensagemState({
-          titulo: 'Erro...',
-          exibir: true,
-          mensagem: 'Erro no cadastro - Consulte Suporte',
-          tipo: MensagemTipo.Error,
-          exibirBotao: true,
-          cb: null
-        })
+        MensagemErro('Erro no cadastro')
       } else {
         setMasterLocalState({ action: actionTypes.pesquisando })
         setLocalState({ action: actionTypes.incluindo })
@@ -206,6 +204,70 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     }
   }
 
+  const TemEstrutura = async (id: number): Promise<Array<EstruturaInterface>> => {
+
+    const rs = await clsCrud
+      .pesquisar({
+        entidade: 'Estrutura',
+        relations: [
+          "detalheEstruturas"
+        ],
+        criterio: {
+          idProduto: id
+        },
+      });
+    return rs[0].detalheEstruturas;
+  }
+
+  const TemEstoque = async (id: number, cliente: number): Promise<EstoqueInterface | null> => {
+    const rs = await clsCrud
+      .pesquisar({
+        entidade: 'Estoque',
+        criterio: {
+          idProduto: id,
+          idPessoa_fornecedor: cliente,
+        },
+        having: "SUM(qtd) > 0",
+        camposLike: ["idPessoa_fornecedor", "idProduto"],
+      })
+
+    if (rs[0]?.qtd > 0) {
+      return rs[0];
+    } else {
+      MensagemErro('Produto sem estoque')
+      return null;
+    }
+  }
+  const MovimentaEstoque = (rs: ProducaoMalhariaInterface, fechado: boolean) => {
+
+    TemEstrutura(rs.idProduto as number).then((estrutura: Array<any>) => {
+      if (estrutura) {
+        estrutura.forEach(det => {
+          TemEstoque(det.idProduto, rsMaster.idPessoa_cliente).then((estoque: EstoqueInterface | null) => {
+            let tmpEstoque: EstoqueInterface | null = estoque
+            if (tmpEstoque) {
+              if (fechado) {
+                tmpEstoque.qtd = tmpEstoque.qtd - (rs.peso * det.qtd)
+              } else {
+                tmpEstoque.qtd = tmpEstoque.qtd + (rs.peso * det.qtd)
+              }
+              clsCrud.incluir({
+                entidade: "Estoque",
+                criterio: tmpEstoque,
+              })
+                .then((rs) => {
+                  if (!rs.ok) {
+                    MensagemErro('Estoque não foi atualizado')
+                  }
+                })
+            }
+          })
+        })
+      } else {
+        MensagemErro('Produto sem estrutura')
+      }
+    })
+  }
   const AtualizaPeca = (
     idMalharia: number | null,
     idTinturaria: number | null,
@@ -232,6 +294,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         }).then((rs) => {
           if (rs.ok) {
             AtualizaSoma()
+            MovimentaEstoque(tmpProducao, fechado)
           }
         })
     })

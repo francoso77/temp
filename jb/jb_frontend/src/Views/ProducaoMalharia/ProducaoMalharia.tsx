@@ -373,14 +373,14 @@ export function ProducaoMalharia() {
 
   return (
     <>
-      <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+      <Paper variant="outlined" sx={{ padding: 0.5, m: 0.5 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+          <Grid item xs={12} sm={2} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
               <ComboBox
                 inputRef={firstFieldRef}
@@ -396,11 +396,11 @@ export function ProducaoMalharia() {
                 onFocus={(e) => e.target.select(1)}
                 onBlur={(e) => novaPeca(producaoMalharia.idMaquina)}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
-                tamanhoFonte={30}
+                tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 2 }} >
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
             <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
               <ComboBox
                 opcoes={rsProduto}
@@ -414,11 +414,11 @@ export function ProducaoMalharia() {
                 setState={setProducaoMalharia}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 2)}
-                tamanhoFonte={30}
+                tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ mt: 2 }} >
+          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }} >
             <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
               <ComboBox
                 opcoes={TurnoTypes}
@@ -432,11 +432,11 @@ export function ProducaoMalharia() {
                 setState={setProducaoMalharia}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 3)}
-                tamanhoFonte={30}
+                tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
                 opcoes={rsRevisador}
@@ -450,11 +450,11 @@ export function ProducaoMalharia() {
                 setState={setProducaoMalharia}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                tamanhoFonte={30}
+                tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
               <ComboBox
                 opcoes={rsTecelao}
@@ -468,11 +468,11 @@ export function ProducaoMalharia() {
                 setState={setProducaoMalharia}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 7)}
-                tamanhoFonte={30}
+                tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+          <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
               <InputText
                 tipo='uppercase'
@@ -483,11 +483,11 @@ export function ProducaoMalharia() {
                 erros={erros}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={30}
+                tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
+          <Grid item xs={12} md={5} sx={{ mt: 0 }}>
             <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
               <InputText
                 type='tel'
@@ -500,14 +500,14 @@ export function ProducaoMalharia() {
                 erros={erros}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={50}
+                tamanhoFonte={40}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+          <Grid item xs={12} md={3} sx={{ mt: 0 }}>
             <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
               <InputText
                 tipo='currency'
@@ -520,14 +520,14 @@ export function ProducaoMalharia() {
                 erros={erros}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 8)}
-                tamanhoFonte={50}
+                tamanhoFonte={40}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+          <Grid item xs={12} md={4} sx={{ mt: 0 }}>
             <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
               <InputText
                 tipo='number'
@@ -539,7 +539,7 @@ export function ProducaoMalharia() {
                 disabled={true}
                 erros={erros}
                 onFocus={(e) => e.target.select()}
-                tamanhoFonte={50}
+                tamanhoFonte={40}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
@@ -552,9 +552,9 @@ export function ProducaoMalharia() {
         </Grid>
       </Paper>
       <Condicional condicao={isDesktop}>
-        <Paper variant="outlined" sx={{ p: 1.5, m: 1, bgcolor: 'greenyellow', mt: 3 }}>
+        <Paper variant="outlined" sx={{ p: 0.5, m: 1, bgcolor: 'greenyellow', mt: 0.5 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
               <ComboBox
                 opcoes={rsMeses}
                 campoDescricao="mes"
@@ -566,12 +566,12 @@ export function ProducaoMalharia() {
                 label="Período"
                 erros={erros}
                 onBlur={Totalizador}
-                tamanhoFonte={50}
+                tamanhoFonte={40}
                 corFundo={'#cbdce9'}
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
               <InputCalc
                 tipo='currency'
                 scale={2}
@@ -580,13 +580,13 @@ export function ProducaoMalharia() {
                 value={rsTotais?.pesoTotal.toString()}
                 disabled={true}
                 onFocus={(e) => e.target.select()}
-                tamanhoFonte={50}
+                tamanhoFonte={40}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
               <InputCalc
                 tipo='number'
                 label="Qtd Total"
@@ -594,7 +594,7 @@ export function ProducaoMalharia() {
                 value={rsTotais?.qtdTotal}
                 disabled={true}
                 onFocus={(e) => e.target.select()}
-                tamanhoFonte={50}
+                tamanhoFonte={40}
                 textAlign={'center'}
                 labelAlign={'center'}
                 corFundo={'#cbdce9'}

@@ -95,7 +95,7 @@ export default class ClsCrud {
     select,
     relations,
     campoOrder,
-    notOrLike,
+    comparador,
     tipoOrder,
     msg = 'Pesquisando...',
     cb,
@@ -108,7 +108,7 @@ export default class ClsCrud {
       select: select,
       relations: relations,
       campoOrder: campoOrder,
-      notOrLike: notOrLike,
+      comparador: comparador,
       tipoOrder: tipoOrder
     }
 
@@ -414,7 +414,7 @@ export default class ClsCrud {
     camposLike,
     select,
     campoOrder,
-    notOrLike,
+    comparador,
     groupBy,
     having,
     tipoOrder,
@@ -429,7 +429,7 @@ export default class ClsCrud {
       camposLike: camposLike,
       select: select,
       campoOrder: campoOrder,
-      notOrLike: notOrLike,
+      comparador: comparador,
       groupBy: groupBy,
       having: having,
       tipoOrder: tipoOrder

@@ -33,7 +33,7 @@ var CrudController = /** @class */ (function () {
             sql: sql ? sql : ''
         });
     };
-    CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select, relations, campoOrder, notOrLike, tipoOrder) {
+    CrudController.prototype.pesquisar = function (entidade, criterio, camposLike, select, relations, campoOrder, comparador, tipoOrder) {
         return new crud_controller_cls_1.default().pesquisar({
             entidade: entidade,
             criterio: criterio,
@@ -41,14 +41,14 @@ var CrudController = /** @class */ (function () {
             select: select ? select : [],
             relations: relations ? relations : [],
             campoOrder: campoOrder ? campoOrder : [],
-            notOrLike: notOrLike ? notOrLike : "L",
+            comparador: comparador ? comparador : "L",
             tipoOrder: tipoOrder ? tipoOrder : "ASC"
         });
     };
     CrudController.prototype.excluir = function (entidade, criterio) {
         return new crud_controller_cls_1.default().excluir(criterio, entidade);
     };
-    CrudController.prototype.consultar = function (entidade, joins, criterio, camposLike, select, campoOrder, notOrLike, tipoOrder, groupBy, having) {
+    CrudController.prototype.consultar = function (entidade, joins, criterio, camposLike, select, campoOrder, comparador, tipoOrder, groupBy, having) {
         return new crud_controller_cls_1.default().consultar({
             entidade: entidade,
             joins: joins ? joins : [],
@@ -56,7 +56,7 @@ var CrudController = /** @class */ (function () {
             camposLike: camposLike ? camposLike : [],
             select: select ? select : [],
             campoOrder: campoOrder ? campoOrder : [],
-            notOrLike: notOrLike ? notOrLike : "L",
+            comparador: comparador ? comparador : "L",
             tipoOrder: tipoOrder ? tipoOrder : "ASC",
             groupBy: groupBy ? groupBy : '',
             having: having ? having : '',
@@ -105,7 +105,7 @@ var CrudController = /** @class */ (function () {
         __param(3, (0, common_1.Body)("select")),
         __param(4, (0, common_1.Body)("relations")),
         __param(5, (0, common_1.Body)("campoOrder")),
-        __param(6, (0, common_1.Body)("notOrLike")),
+        __param(6, (0, common_1.Body)("comparador")),
         __param(7, (0, common_1.Body)("tipoOrder")),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Object, Array,
@@ -130,7 +130,7 @@ var CrudController = /** @class */ (function () {
         __param(3, (0, common_1.Body)("camposLike")),
         __param(4, (0, common_1.Body)("select")),
         __param(5, (0, common_1.Body)("campoOrder")),
-        __param(6, (0, common_1.Body)("notOrLike")),
+        __param(6, (0, common_1.Body)("comparador")),
         __param(7, (0, common_1.Body)("tipoOrder")),
         __param(8, (0, common_1.Body)("groupBy")),
         __param(9, (0, common_1.Body)("having")),

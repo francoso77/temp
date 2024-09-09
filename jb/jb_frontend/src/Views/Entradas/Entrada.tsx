@@ -313,7 +313,7 @@ export default function Entrada() {
     const paddedNum = numString.padStart(9, '0')
     return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
   }
-  
+
   const btPesquisar = () => {
     const relations = [
       "fornecedor",
@@ -327,16 +327,16 @@ export default function Entrada() {
     const msg = 'Pesquisando notas ...'
     const setMensagem = setMensagemState
     const idsFor = rsFornecedor
-    .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
-    .map(fornecedor => fornecedor.idPessoa)
+      .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
+      .map(fornecedor => fornecedor.idPessoa)
 
     let dadosPesquisa = {}
     let criterio = {}
     let camposLike = []
-    let notOrLike = "L"
+    let comparador = "L"
     const temNumero = /\d/.test(pesquisa.itemPesquisa)
 
-    if (temNumero && pesquisa.itemPesquisa.includes('/')){
+    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
       const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
       criterio = {
         dataEmissao: formattedDateTime
@@ -345,28 +345,28 @@ export default function Entrada() {
     } else if (temNumero) {
 
       const formattedNumber = formatNumber(pesquisa.itemPesquisa);
-      criterio= {
+      criterio = {
         notaFiscal: formattedNumber
       }
-      camposLike =  ['notaFiscal']
+      camposLike = ['notaFiscal']
     } else {
-      criterio =  {
+      criterio = {
         idPessoa_fornecedor: idsFor,
       }
       camposLike = ['idPessoa_fornecedor']
-      notOrLike =  'I'
+      comparador = 'I'
     }
-    
+
     dadosPesquisa = {
       entidade: "Entrada",
       relations,
-      notOrLike,
+      comparador,
       criterio,
       camposLike,
       msg,
       setMensagemState: setMensagem
     }
-    
+
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
@@ -414,7 +414,7 @@ export default function Entrada() {
       .pesquisar({
         entidade: "Pessoa",
         campoOrder: ['nome'],
-        notOrLike: 'I',
+        comparador: 'I',
         criterio: {
           tipoPessoa: ['J', 'C', 'F'],
         },

@@ -24,6 +24,7 @@ var programacao_entity_1 = require("./entities/programacao.entity");
 var tinturaria_entity_1 = require("./entities/tinturaria.entity");
 var unidadeMedida_entity_1 = require("./entities/unidadeMedida.entity");
 var user_entity_1 = require("./entities/user.entity");
+var perdaMalharia_entity_1 = require("./entities/perdaMalharia.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -48,6 +49,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         maquina_entity_1.default,
         pedido_entity_1.default,
         pessoa_entity_1.default,
+        perdaMalharia_entity_1.default,
         prazoEntrega_entity_1.default,
         producaoDublagem_entity_1.default,
         producaoMalharia_entity_1.default,

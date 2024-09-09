@@ -149,21 +149,37 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.pesquisar = function (_a) {
-        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike, tipoOrder = _a.tipoOrder;
+        var entidade = _a.entidade, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, _b = _a.relations, relations = _b === void 0 ? [] : _b, campoOrder = _a.campoOrder, comparador = _a.comparador, tipoOrder = _a.tipoOrder;
         return __awaiter(this, void 0, void 0, function () {
             var where, order;
             return __generator(this, function (_c) {
                 where = {};
                 where = __assign({}, criterio);
+                //"N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=" | "!=" 
                 camposLike.forEach(function (campo) {
-                    if (notOrLike === "L") {
+                    if (comparador === "L") {
                         where[campo] = (0, typeorm_1.Like)(where[campo]);
                     }
-                    else if (notOrLike === "N") {
+                    else if (comparador === "N") {
                         where[campo] = (0, typeorm_1.Not)(where[campo]);
                     }
-                    else {
+                    else if (comparador === "I") {
                         where[campo] = (0, typeorm_1.In)(where[campo]);
+                    }
+                    else if (comparador === "=") {
+                        where[campo] = (where[campo]);
+                    }
+                    else if (comparador === ">") {
+                        where[campo] = (0, typeorm_1.MoreThan)(where[campo]);
+                    }
+                    else if (comparador === ">=") {
+                        where[campo] = (0, typeorm_1.MoreThanOrEqual)(where[campo]);
+                    }
+                    else if (comparador === "<") {
+                        where[campo] = (0, typeorm_1.LessThan)(where[campo]);
+                    }
+                    else if (comparador === "<=") {
+                        where[campo] = (0, typeorm_1.LessThanOrEqual)(where[campo]);
                     }
                 });
                 order = {};
@@ -215,7 +231,7 @@ var ClsCrudController = /** @class */ (function () {
         });
     };
     ClsCrudController.prototype.consultar = function (_a) {
-        var entidade = _a.entidade, joins = _a.joins, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, campoOrder = _a.campoOrder, notOrLike = _a.notOrLike, groupBy = _a.groupBy, having = _a.having, tipoOrder = _a.tipoOrder;
+        var entidade = _a.entidade, joins = _a.joins, criterio = _a.criterio, camposLike = _a.camposLike, select = _a.select, campoOrder = _a.campoOrder, comparador = _a.comparador, groupBy = _a.groupBy, having = _a.having, tipoOrder = _a.tipoOrder;
         return __awaiter(this, void 0, void 0, function () {
             var where_1, order_1, repository, queryBuilder_1, resultado, error_1;
             return __generator(this, function (_b) {
@@ -225,10 +241,10 @@ var ClsCrudController = /** @class */ (function () {
                         where_1 = {};
                         where_1 = __assign({}, criterio);
                         camposLike.forEach(function (campo) {
-                            if (notOrLike === "L") {
+                            if (comparador === "L") {
                                 where_1[campo] = (0, typeorm_1.Like)(where_1[campo]);
                             }
-                            else if (notOrLike === "N") {
+                            else if (comparador === "N") {
                                 where_1[campo] = (0, typeorm_1.Not)(where_1[campo]);
                             }
                             else {

@@ -1,4 +1,4 @@
-import { In, Like, Not } from 'typeorm';
+import { Between, In, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Not } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 
@@ -99,19 +99,31 @@ export default class ClsCrudController {
       })
   }
 
-  public async pesquisar({ entidade, criterio, camposLike, select, relations = [], campoOrder, notOrLike, tipoOrder }: PadraoPesquisaInterface):
+  public async pesquisar({ entidade, criterio, camposLike, select, relations = [], campoOrder, comparador, tipoOrder }: PadraoPesquisaInterface):
     Promise<RespostaPadraoInterface<any>> {
 
     let where: Record<string, any> = {}
     where = { ...criterio }
 
+    //"N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=" | "!=" 
+
     camposLike.forEach((campo) => {
-      if (notOrLike === "L") {
+      if (comparador === "L") {
         where[campo] = Like(where[campo])
-      } else if (notOrLike === "N") {
+      } else if (comparador === "N") {
         where[campo] = Not(where[campo])
-      } else {
+      } else if (comparador === "I") {
         where[campo] = In(where[campo])
+      } else if (comparador === "=") {
+        where[campo] = (where[campo])
+      } else if (comparador === ">") {
+        where[campo] = MoreThan(where[campo])
+      } else if (comparador === ">=") {
+        where[campo] = MoreThanOrEqual(where[campo])
+      } else if (comparador === "<") {
+        where[campo] = LessThan(where[campo])
+      } else if (comparador === "<=") {
+        where[campo] = LessThanOrEqual(where[campo])
       }
     })
 
@@ -167,7 +179,7 @@ export default class ClsCrudController {
     camposLike,
     select,
     campoOrder,
-    notOrLike,
+    comparador,
     groupBy,
     having,
     tipoOrder
@@ -179,9 +191,9 @@ export default class ClsCrudController {
       where = { ...criterio }
 
       camposLike.forEach((campo) => {
-        if (notOrLike === "L") {
+        if (comparador === "L") {
           where[campo] = Like(where[campo])
-        } else if (notOrLike === "N") {
+        } else if (comparador === "N") {
           where[campo] = Not(where[campo])
         } else {
           where[campo] = In(where[campo])
@@ -216,9 +228,9 @@ export default class ClsCrudController {
       //Adiciona a cláusula WHERE para os campos LIKE
       // camposLike.forEach((campo) => {
       //   const nomeCampo = `${criterio}`;
-      //   if (notOrLike === "L") {
+      //   if (comparador === "L") {
       //     queryBuilder = queryBuilder.andWhere(`${nomeCampo} LIKE :${campo}`, { [campo]: `%${criterio[campo]}%` });
-      //   } else if (notOrLike === "N") {
+      //   } else if (comparador === "N") {
       //     queryBuilder = queryBuilder.andWhere(`${nomeCampo} NOT LIKE :${campo}`, { [campo]: `%${criterio[campo]}%` });
       //   } else {
       //     queryBuilder = queryBuilder.andWhere(`${nomeCampo} IN (:...${campo})`, { [campo]: criterio[campo] });

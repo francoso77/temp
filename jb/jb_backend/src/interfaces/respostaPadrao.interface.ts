@@ -19,7 +19,7 @@ export interface PadraoPesquisaInterface {
   relations?: Array<string>,
   campoOrder?: Array<any>,
   tipoOrder?: "ASC" | "DESC",
-  notOrLike?: "N" | "L" | "I",
+  comparador?: "N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<="
   groupBy?: string,
   having?: string,
 }

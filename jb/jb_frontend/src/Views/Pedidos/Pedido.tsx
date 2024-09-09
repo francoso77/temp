@@ -314,18 +314,18 @@ export default function Pedido() {
     //   })
 
     clsCrud
-    .pesquisar({
-      entidade: "Pessoa",
-      campoOrder: ['nome'],
-      notOrLike: 'I',
-      criterio: {
-        tipoPessoa: ['J','C'],
-      },
-      camposLike: ['tipoPessoa'],
-    })
-    .then((rsClientes: Array<PessoaInterface>) => {
-      setRsCliente(rsClientes)
-    })
+      .pesquisar({
+        entidade: "Pessoa",
+        campoOrder: ['nome'],
+        comparador: 'I',
+        criterio: {
+          tipoPessoa: ['J', 'C'],
+        },
+        camposLike: ['tipoPessoa'],
+      })
+      .then((rsClientes: Array<PessoaInterface>) => {
+        setRsCliente(rsClientes)
+      })
 
     clsCrud
       .pesquisar({
