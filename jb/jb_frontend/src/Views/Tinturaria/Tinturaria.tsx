@@ -61,7 +61,7 @@ export function Tinturaria() {
       cabecalho: 'Data',
       alinhamento: 'left',
       campo: 'dataTinturaria',
-      format: (data) => clsFormatacao.dataISOtoUser(data)
+      format: (data) => clsFormatacao.dataISOtoUser(data),
     },
     {
       cabecalho: 'Cliente',

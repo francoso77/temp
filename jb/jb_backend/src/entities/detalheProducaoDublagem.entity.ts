@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import ProducaoDublagem from './producaoDublagem.entity';
 import Produto from './produto.entity';
 import { DetalheProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
@@ -9,7 +9,7 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   @PrimaryGeneratedColumn()
   idDetalheProducaoDublagem: number;
 
-  @PrimaryColumn()
+  @Column()
   idProducaoDublagem: number;
 
   @ManyToOne(() => ProducaoDublagem)

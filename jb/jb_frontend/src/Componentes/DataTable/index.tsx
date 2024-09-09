@@ -44,7 +44,7 @@ export interface DataTableInterface {
 export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     padding: '1px',
-    fontSize: '0.60rem',
+    fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
       fontSize: '0.80rem',
@@ -54,7 +54,7 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
     padding: '1px',
-    fontSize: '0.60rem',
+    fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
       fontSize: '0.80rem',
@@ -66,18 +66,18 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     padding: '1px',
-    fontSize: '0.75rem',
+    fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '0.90rem',
+      fontSize: '0.75rem',
     },
   },
   [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
     padding: '1px',
-    fontSize: '0.75rem',
+    fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '0.90rem',
+      fontSize: '0.75rem',
     },
     position: "sticky",
     left: 0,
@@ -85,20 +85,20 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.footer}`]: {
     padding: '1px',
-    fontSize: '0.85rem',
+    fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '1rem',
+      fontSize: '0.75rem',
     },
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
     padding: '1px',
-    fontSize: '0.85rem',
+    fontSize: '0.55rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
-      fontSize: '1rem',
+      fontSize: '0.75rem',
     },
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
@@ -282,11 +282,11 @@ export default function DataTable<T>({
                                 <Icon
                                   sx={{
                                     color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main,
-                                    fontSize: '0.95rem',
+                                    fontSize: '1.25rem',
                                     mx: 0,
                                     px: 0,
                                     [theme.breakpoints.up('md')]: {
-                                      fontSize: '1.25rem',
+                                      fontSize: '1.55rem',
                                     },
                                   }}
                                 >

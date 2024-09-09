@@ -20,7 +20,7 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import LeaderboardTwoToneIcon from '@mui/icons-material/LeaderboardTwoTone';
-import GraficoColuna from './GraficoColunas';
+import Graficos from './Graficos';
 
 interface DadosPecaInterface {
   nomeProduto: string | undefined
@@ -547,7 +547,7 @@ export function ProducaoMalharia() {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <GraficoColuna open={openGrafico} clickFechar={btGraficos} />
+            <Graficos open={openGrafico} clickFechar={btGraficos} />
           </Grid>
         </Grid>
       </Paper>

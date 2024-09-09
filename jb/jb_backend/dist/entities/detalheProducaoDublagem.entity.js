@@ -20,7 +20,7 @@ var DetalheProducaoDublagem = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheProducaoDublagem.prototype, "idDetalheProducaoDublagem", void 0);
     __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
+        (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DetalheProducaoDublagem.prototype, "idProducaoDublagem", void 0);
     __decorate([

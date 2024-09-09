@@ -567,7 +567,7 @@ export default function Entrada() {
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Qtd Total"
+                label="Qtd"
                 labelAlign='center'
                 dados={rsSomatorio}
                 field="totalQtd"
@@ -581,7 +581,7 @@ export default function Entrada() {
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Total Entrada"
+                label="Total"
                 labelAlign='center'
                 dados={rsSomatorio}
                 field="total"

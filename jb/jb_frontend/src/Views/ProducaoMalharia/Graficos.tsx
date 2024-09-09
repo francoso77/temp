@@ -53,7 +53,7 @@ interface PropsInterface {
     clickFechar: () => void
 }
 
-export default function GraficoColuna({ open = false, clickFechar }: PropsInterface) {
+export default function Graficos({ open = false, clickFechar }: PropsInterface) {
 
 
     const [mesesData, setMesesData] = useState<string[]>([])
