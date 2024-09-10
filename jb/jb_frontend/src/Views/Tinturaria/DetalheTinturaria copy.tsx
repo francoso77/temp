@@ -16,7 +16,6 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import Condicional from '../../Componentes/Condicional/Condicional';
 import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -67,7 +66,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
-  const [rsProdutos, setRsProdutos] = useState<Array<ProdutoInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
@@ -202,40 +200,10 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       }
       ])
 
-      // AtualizaPeca(rs.idMalharia as number, rsMaster.idTinturaria as number, rsMaster.dataTinturaria, true)
-      AtualizaGradeProdutos(rs)
+      AtualizaPeca(rs.idMalharia as number, rsMaster.idTinturaria as number, rsMaster.dataTinturaria, true)
     }
   }
 
-  const AtualizaGradeProdutos = (rsMalharia: ProducaoMalhariaInterface) => {
-    // const nomeProduto: string = rsProdutos.find((p) => p.idProduto === rsMalharia.idProduto)?.nome || ''
-
-    let tmpProdutos: Array<PecasSomadasInterface> = rsPecasSomadas
-    clsCrud
-      .consultar(
-        {
-          entidade: "ProducaoMalharia",
-          joins: [
-            { "tabelaRelacao": "producaomalharia.produto", "relacao": "produto" }
-          ],
-          criterio: {
-            "idMalharia": rsMalharia.idMalharia
-          },
-          select: ["peso", "nome AS produto_nome"],
-        })
-      .then((rs) => {
-        if (rs.length > 0) {
-          tmpProdutos.map((p) => {
-            if (p.produto_nome === rs[0].produto_nome) {
-              p.total_peca += rs[0].peso
-              p.qtd_peca += 1
-            }
-          })
-        }
-        setRsPecasSomadas(tmpProdutos)
-      })
-
-  }
   const TemEstrutura = async (id: number): Promise<Array<EstruturaInterface>> => {
 
     const rs = await clsCrud
@@ -373,13 +341,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   }
 
   const BuscarDados = () => {
-
-    clsCrud
-      .pesquisar({
-        entidade: 'Produto',
-      }).then((produtos: Array<ProdutoInterface>) => {
-        setRsProdutos(produtos)
-      })
 
     clsCrud
       .pesquisar({
