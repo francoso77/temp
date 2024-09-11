@@ -66,8 +66,23 @@ export default class ClsFormatacao {
   }
 
   //Retorna a data e a hora no formato "yyyy-MM-dd'T'HH:mm"
-  public dataTimeZoneZtoLocalInput(data: string): string {
-    return DateTime.fromISO(data).toFormat("yyyy-MM-dd'T'HH:mm")
+  public dataNormalParaDateTime(dataStr: string): string {
+    let dia: string
+    let mes: string
+    let ano: string
+
+    if (dataStr.includes('/')) {
+      [dia, mes, ano] = dataStr.split('/')
+    } else if (dataStr.length === 8) {
+      dia = dataStr.substring(0, 2)
+      mes = dataStr.substring(2, 4)
+      ano = dataStr.substring(4, 8)
+    } else {
+      throw new Error('Formato de data inválido')
+    }
+
+    const data: Date = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia))
+    return data.toISOString()
   }
 
   //Retorna formatação para número de nota fiscal no modelo 000.000.000

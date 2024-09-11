@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common"
 import Pedido from '../entities/pedido.entity'
 import { AppDataSource } from '../data-source'
+import ProducaoMalharia from '../entities/producaoMalharia.entity'
 
 @Controller()
 export class OutController {
@@ -29,6 +30,27 @@ export class OutController {
 
     const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
     return AppDataSource.getRepository(Pedido).query(sql, params)
+  }
+
+
+  @Post("limpaPecas")
+  async limpaPecas(
+    @Body("tinturaria") tinturaria: number,
+  ): Promise<Array<ProducaoMalharia>> {
+
+    const sql = `
+    UPDATE
+      producaomalharias pm
+    SET
+      pm.idTinturaria = null,
+      pm.fechado = 0,
+      pm.dataFechado = null
+    WHERE
+      pm.idTinturaria = ?;
+  `
+
+    const params = [tinturaria]
+    return AppDataSource.getRepository(ProducaoMalharia).query(sql, params)
   }
 }
 

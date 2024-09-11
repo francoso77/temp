@@ -21,7 +21,6 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import LeaderboardTwoToneIcon from '@mui/icons-material/LeaderboardTwoTone';
 import Graficos from './Graficos';
-
 interface DadosPecaInterface {
   nomeProduto: string | undefined
   peca: string

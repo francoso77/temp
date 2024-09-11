@@ -52,6 +52,7 @@ exports.OutController = void 0;
 var common_1 = require("@nestjs/common");
 var pedido_entity_1 = require("../entities/pedido.entity");
 var data_source_1 = require("../data-source");
+var producaoMalharia_entity_1 = require("../entities/producaoMalharia.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -65,6 +66,16 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    OutController.prototype.limpaPecas = function (tinturaria) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n    UPDATE\n      producaomalharias pm\n    SET\n      pm.idTinturaria = null,\n      pm.fechado = 0,\n      pm.dataFechado = null\n    WHERE\n      pm.idTinturaria = ?;\n  ";
+                params = [tinturaria];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(producaoMalharia_entity_1.default).query(sql, params)];
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)("pedidosEmAberto"),
         __param(0, (0, common_1.Body)("itemPesquisa")),
@@ -73,6 +84,13 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "pedidosEmAberto", null);
+    __decorate([
+        (0, common_1.Post)("limpaPecas"),
+        __param(0, (0, common_1.Body)("tinturaria")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Number]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "limpaPecas", null);
     OutController = __decorate([
         (0, common_1.Controller)()
     ], OutController);

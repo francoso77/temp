@@ -14,9 +14,9 @@ import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces
 import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
+import ClsApi from '../../Utils/ClsApi';
 import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -38,6 +38,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
 
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
+  const clsApi = new ClsApi()
 
   // const ResetDados: DetalheTinturariaInterface = {
   //   idTinturaria: 0,
@@ -67,7 +68,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
-  const [rsProdutos, setRsProdutos] = useState<Array<ProdutoInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
@@ -140,7 +140,14 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           MensagemErro('Erro no cadastro')
         }
       })
-    AtualizaPeca(rs.idMalharia as number, null, '', false)
+    // AtualizaPeca(rs.idMalharia as number, null, '', false)
+    pesquisarPecaID(rs.idMalharia).then((rs) => {
+      if (rs) {
+        AtualizaGradeProdutos(rs, 'Excluir')
+        MovimentaEstoque(rs, false)
+      }
+    })
+
   }
 
   const btCancelar = () => {
@@ -165,91 +172,23 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     }
     return indice < 0;
   }
-
-  const btConfirmar = () => {
-
-    clsCrud.incluir({
-      entidade: 'DetalheTinturaria',
-      criterio: dados,
-      localState: localState,
-      setMensagemState: setMensagemState,
-    }).then((rs) => {
-      if (!rs.ok) {
-        MensagemErro('Erro no cadastro')
-      } else {
-        setMasterLocalState({ action: actionTypes.pesquisando })
-        setLocalState({ action: actionTypes.incluindo })
-      }
-    })
-  }
-
-  const SomaPeca = (rs: ProducaoMalhariaInterface) => {
-
-    if (podeIncluirDetalhe()) {
-
-      let tmpDetalhe: Array<DetalheTinturariaInterface> = []
-      tmpDetalhe.push({
-        idTinturaria: rsMaster.idTinturaria as number,
-        idMalharia: rs.idMalharia as number,
-        malharia: rs,
-
-      })
-      setDados([...dados,
-      {
-        idTinturaria: rsMaster.idTinturaria as number,
-        idMalharia: rs.idMalharia as number,
-        malharia: rs,
-      }
-      ])
-
-      // AtualizaPeca(rs.idMalharia as number, rsMaster.idTinturaria as number, rsMaster.dataTinturaria, true)
-      AtualizaGradeProdutos(rs)
-    }
-  }
-
-  const AtualizaGradeProdutos = (rsMalharia: ProducaoMalhariaInterface) => {
-    // const nomeProduto: string = rsProdutos.find((p) => p.idProduto === rsMalharia.idProduto)?.nome || ''
-
-    let tmpProdutos: Array<PecasSomadasInterface> = rsPecasSomadas
-    clsCrud
-      .consultar(
-        {
-          entidade: "ProducaoMalharia",
-          joins: [
-            { "tabelaRelacao": "producaomalharia.produto", "relacao": "produto" }
-          ],
-          criterio: {
-            "idMalharia": rsMalharia.idMalharia
-          },
-          select: ["peso", "nome AS produto_nome"],
-        })
-      .then((rs) => {
-        if (rs.length > 0) {
-          tmpProdutos.map((p) => {
-            if (p.produto_nome === rs[0].produto_nome) {
-              p.total_peca += rs[0].peso
-              p.qtd_peca += 1
-            }
-          })
-        }
-        setRsPecasSomadas(tmpProdutos)
-      })
-
-  }
-  const TemEstrutura = async (id: number): Promise<Array<EstruturaInterface>> => {
-
-    const rs = await clsCrud
-      .pesquisar({
+  const TemEstrutura = async (id: number): Promise<Array<EstruturaInterface> | null> => {
+    try {
+      const [estrutura] = await clsCrud.pesquisar({
         entidade: 'Estrutura',
-        relations: [
-          "detalheEstruturas"
-        ],
-        criterio: {
-          idProduto: id
-        },
+        relations: ['detalheEstruturas'],
+        criterio: { idProduto: id },
       });
-    return rs[0].detalheEstruturas;
-  }
+
+      // Verifica se existe a estrutura e retorna detalheEstruturas ou um array vazio
+      return estrutura?.detalheEstruturas ?? null;
+    } catch (error) {
+      MensagemErro('Produto sem estrutua definida')
+      console.error('Erro ao buscar estrutura:', error)
+      return []; // Retorna um array vazio em caso de erro
+    }
+  };
+
 
   const TemEstoque = async (id: number, cliente: number): Promise<EstoqueInterface | null> => {
     const rs = await clsCrud
@@ -270,67 +209,193 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       return null;
     }
   }
-  const MovimentaEstoque = (rs: ProducaoMalhariaInterface, fechado: boolean) => {
 
-    TemEstrutura(rs.idProduto as number).then((estrutura: Array<any>) => {
-      if (estrutura) {
-        estrutura.forEach(det => {
-          TemEstoque(det.idProduto, rsMaster.idPessoa_cliente).then((estoque: EstoqueInterface | null) => {
-            let tmpEstoque: EstoqueInterface | null = estoque
-            if (tmpEstoque) {
-              if (fechado) {
-                tmpEstoque.qtd = tmpEstoque.qtd - (rs.peso * det.qtd)
-              } else {
-                tmpEstoque.qtd = tmpEstoque.qtd + (rs.peso * det.qtd)
-              }
-              clsCrud.incluir({
-                entidade: "Estoque",
-                criterio: tmpEstoque,
-              })
-                .then((rs) => {
-                  if (!rs.ok) {
-                    MensagemErro('Estoque não foi atualizado')
-                  }
-                })
-            }
-          })
-        })
+  const MovimentaEstoque = async (rs: ProducaoMalhariaInterface, fechado: boolean): Promise<boolean> => {
+    try {
+      const estrutura = await TemEstrutura(rs.idProduto as number);
+
+      if (!estrutura) {
+        MensagemErro('Produto sem estrutura');
+        return false;
+      }
+
+      for (const det of estrutura) {
+        const estoque = await TemEstoque(det.idProduto, rsMaster.idPessoa_cliente);
+
+        if (!estoque) {
+          MensagemErro('Cliente sem estoque');
+          return false;
+        }
+
+        if (fechado) {
+          estoque.qtd -= (rs.peso * det.detalheEstruturas[0].qtd);
+        } else {
+          estoque.qtd += (rs.peso * det.detalheEstruturas[0].qtd);
+        }
+
+        const rsEstoque = await clsCrud.incluir({
+          entidade: 'Estoque',
+          criterio: estoque
+        });
+
+        if (!rsEstoque.ok) {
+          MensagemErro('Estoque não foi atualizado');
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao movimentar estoque:', error);
+      return false;
+    }
+  };
+
+  const btConfirmar = () => {
+
+    clsCrud.incluir({
+      entidade: 'DetalheTinturaria',
+      criterio: dados,
+      localState: localState,
+      setMensagemState: setMensagemState,
+    }).then((rs) => {
+      if (!rs.ok) {
+        MensagemErro('Erro no cadastro')
       } else {
-        MensagemErro('Produto sem estrutura')
-      }
-    })
-  }
-  const AtualizaPeca = (
-    idMalharia: number | null,
-    idTinturaria: number | null,
-    data: string,
-    fechado: boolean) => {
-
-    clsCrud.pesquisar({
-      entidade: 'ProducaoMalharia',
-      criterio: {
-        idMalharia: idMalharia
-      }
-    }).then((rs: Array<ProducaoMalhariaInterface>) => {
-      let tmpProducao: ProducaoMalhariaInterface = rs[0]
-      let dataFormatada = data !== '' ? clsFormatacao.dataFormatada(data) : ''
-      if (tmpProducao.idMalharia) {
-        tmpProducao.dataFechado = clsFormatacao.dataISOtoDatetime(dataFormatada)
-        tmpProducao.fechado = fechado
-        tmpProducao.idTinturaria = idTinturaria
-      }
-      clsCrud
-        .incluir({
-          entidade: "ProducaoMalharia",
-          criterio: tmpProducao
-        }).then((rs) => {
-          if (rs.ok) {
-            AtualizaSoma()
-            MovimentaEstoque(tmpProducao, fechado)
+        setMasterLocalState({ action: actionTypes.pesquisando })
+        setLocalState({ action: actionTypes.incluindo })
+        LimpaPecas()
+        AtualizaPeca(dados).then((rs) => {
+          if (rs) {
+            clsCrud.incluir({
+              entidade: 'ProducaoMalharia',
+              criterio: rs,
+            })
           }
         })
+      }
     })
   }
+
+  const SomaPeca = async (rs: ProducaoMalhariaInterface) => {
+
+    const podeMovimentarEstoque = await MovimentaEstoque(rs, true)
+
+    if (podeIncluirDetalhe() && podeMovimentarEstoque) {
+
+      let tmpDetalhe: Array<DetalheTinturariaInterface> = []
+      tmpDetalhe.push({
+        idTinturaria: rsMaster.idTinturaria as number,
+        idMalharia: rs.idMalharia as number,
+        malharia: rs,
+
+      })
+      setDados([...dados,
+      {
+        idTinturaria: rsMaster.idTinturaria as number,
+        idMalharia: rs.idMalharia as number,
+        malharia: rs,
+      }
+      ])
+
+      AtualizaGradeProdutos(rs, 'Incluir')
+      MovimentaEstoque(rs, true)
+    }
+  }
+
+  const AtualizaGradeProdutos = async (rsMalharia: ProducaoMalhariaInterface, tipo: 'Incluir' | 'Excluir') => {
+    try {
+      const rs = await clsCrud.consultar({
+        entidade: "ProducaoMalharia",
+        joins: [{ tabelaRelacao: "producaomalharia.produto", relacao: "produto" }],
+        criterio: { idMalharia: rsMalharia.idMalharia },
+        select: ["peso AS total_peca", "nome AS produto_nome"],
+      });
+
+      setRsPecasSomadas((prevRsPecasSomadas) => {
+        const tmpProducao = [...prevRsPecasSomadas]; // Cria uma cópia do estado anterior
+        const produtoAtual = rs[0];
+        const produtoExistente = tmpProducao.find((p) => p.produto_nome === produtoAtual.produto_nome);
+
+        if (produtoExistente) {
+          if (tipo === 'Incluir') {
+            produtoExistente.total_peca += produtoAtual.total_peca;
+            produtoExistente.qtd_peca += 1;
+          } else {
+            produtoExistente.total_peca -= produtoAtual.total_peca;
+            produtoExistente.qtd_peca -= 1;
+          }
+
+          // Remove o produto se o total for zero
+          if (produtoExistente.total_peca === 0) {
+            return tmpProducao.filter((item) => item.produto_nome !== produtoAtual.produto_nome);
+          }
+        } else if (tipo === 'Incluir') {
+          // Adiciona novo produto apenas no caso de inclusão
+          tmpProducao.push({
+            produto_nome: produtoAtual.produto_nome,
+            total_peca: produtoAtual.total_peca,
+            qtd_peca: 1,
+          });
+        }
+
+        return tmpProducao;
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar a grade de produtos:", error);
+    }
+  };
+
+  const LimpaPecas = async () => {
+    const tinturaria = rsMaster.idTinturaria as number
+    await clsApi.limpaPecas<Array<ProducaoMalhariaInterface>>({
+      url: 'limpaPecas',
+      method: 'post',
+      tinturaria,
+      mensagem: 'Limpeza de pecas ...',
+      setMensagemState: setMensagemState
+    })
+  }
+
+  const AtualizaPeca = async (rsDetalhes: Array<DetalheTinturariaInterface>): Promise<Array<ProducaoMalhariaInterface>> => {
+    let tmpProducao: Array<ProducaoMalhariaInterface> = []
+
+    const promises = rsDetalhes.map(async (det: DetalheTinturariaInterface) => {
+      const rs = await pesquisarPecaID(det.idMalharia);
+      if (rs) {
+        rs.dataFechado = clsFormatacao.dataNormalParaDateTime(rsMaster.dataTinturaria);
+        rs.fechado = true;
+        rs.idTinturaria = rsMaster.idTinturaria;
+        return rs;
+      }
+      // Se rs for null, retorna null para não adicionar nada ao tmpProducao
+      return null;
+    });
+
+    // Aguarde a resolução de todas as promessas e filtre os valores nulos
+    tmpProducao = (await Promise.all(promises)).filter((item): item is ProducaoMalhariaInterface => item !== null);
+
+    return tmpProducao;
+  }
+
+  const pesquisarPecaID = async (id: number): Promise<ProducaoMalhariaInterface | null> => {
+    try {
+      const rs = await clsCrud.pesquisar({
+        entidade: "ProducaoMalharia",
+        criterio: {
+          idMalharia: id,
+        },
+      });
+
+      // Verifica se o resultado não está vazio e retorna o primeiro item ou null se estiver vazio
+      return rs.length > 0 ? rs[0] : null;
+    } catch (error) {
+      console.error("Erro ao pesquisar PecaID:", error);
+      // Retorna null ou lida com o erro conforme necessário
+      return null;
+    }
+  }
+
 
   const btPesquisaPeca = () => {
     clsCrud.pesquisar({
@@ -373,13 +438,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   }
 
   const BuscarDados = () => {
-
-    clsCrud
-      .pesquisar({
-        entidade: 'Produto',
-      }).then((produtos: Array<ProdutoInterface>) => {
-        setRsProdutos(produtos)
-      })
 
     clsCrud
       .pesquisar({
