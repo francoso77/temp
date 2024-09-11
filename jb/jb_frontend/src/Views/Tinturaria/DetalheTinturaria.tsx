@@ -15,7 +15,7 @@ import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsApi from '../../Utils/ClsApi';
-import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
 
 interface PropsInterface {
@@ -140,7 +140,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           MensagemErro('Erro no cadastro')
         }
       })
-    // AtualizaPeca(rs.idMalharia as number, null, '', false)
     pesquisarPecaID(rs.idMalharia).then((rs) => {
       if (rs) {
         AtualizaGradeProdutos(rs, 'Excluir')
@@ -172,7 +171,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     }
     return indice < 0;
   }
-  const TemEstrutura = async (id: number): Promise<Array<EstruturaInterface> | null> => {
+  const TemEstrutura = async (id: number): Promise<Array<DetalheEstruturaInterface> | null> => {
     try {
       const [estrutura] = await clsCrud.pesquisar({
         entidade: 'Estrutura',
@@ -190,7 +189,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   };
 
 
-  const TemEstoque = async (id: number, cliente: number): Promise<EstoqueInterface | null> => {
+  const TemEstoque = async (id: number, cliente: number): Promise<EstoqueInterface>  => {
     const rs = await clsCrud
       .pesquisar({
         entidade: 'Estoque',
@@ -198,68 +197,74 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           idProduto: id,
           idPessoa_fornecedor: cliente,
         },
-        having: "SUM(qtd) > 0",
+        having: "SUM(qtd)",
         camposLike: ["idPessoa_fornecedor", "idProduto"],
       })
 
-    if (rs[0]?.qtd > 0) {
+    if (rs.length > 0) {
       return rs[0];
     } else {
       // MensagemErro('Produto sem estoque')
-      return null;
+      const estoqueZerado: EstoqueInterface = {
+        idProduto: id,
+        idPessoa_fornecedor: cliente,
+        idCor: null,
+        qtd: 0
+      }
+      return estoqueZerado;
     }
   }
 
   const MovimentaEstoque = async (rs: ProducaoMalhariaInterface, fechado: boolean): Promise<boolean> => {
+
     try {
       const estrutura = await TemEstrutura(rs.idProduto as number)
-
+      
       if (!estrutura) {
         MensagemErro('Produto sem estrutura')
         return false
       }
+  
+      const promises = estrutura.map(async (det) => {
+        const estoque = await TemEstoque(det.idProduto, rsMaster.idPessoa_cliente)
+        console.log('qual estoque voltou', estoque)
 
-      for (const det of estrutura) {
-        let estoque = await TemEstoque(det.idProduto, rsMaster.idPessoa_cliente)
-        const estoqueZerado: EstoqueInterface = {
-          idProduto: det.idProduto as number,
-          idPessoa_fornecedor: rsMaster.idPessoa_cliente as number,
-          idCor: null,
-          qtd: 0
-        }
-        console.log(estoque, 'estoque')
-
+  
         if (!estoque) {
-          console.log('entrou aqui')
-          // MensagemErro('Cliente sem estoque')
-          // return false
-          estoque = estoqueZerado
+          MensagemErro('Produto sem estoque')
+          return false
         }
-        console.log(estoque, 'estoque zerado')
+  
         if (fechado) {
-          estoque.qtd -= (rs.peso * det.detalheEstruturas[0].qtd)
+         
+          estoque.qtd =- (rs.peso * det.qtd)
         } else {
-          estoque.qtd += (rs.peso * det.detalheEstruturas[0].qtd)
+          estoque.qtd =+ (rs.peso * det.qtd)
         }
 
         const rsEstoque = await clsCrud.incluir({
           entidade: 'Estoque',
           criterio: estoque,
         })
-
+  
         if (!rsEstoque.ok) {
           MensagemErro('Estoque não foi atualizado')
           return false
         }
-      }
-
-      return true
+        return true
+      })
+  
+      // Espera todas as promessas serem resolvidas
+      const results = await Promise.all(promises)
+  
+      // Verifica se alguma das promessas retornou false
+      return results.every(result => result === true)
     } catch (error) {
       console.error('Erro ao movimentar estoque:', error)
       return false
     }
   }
-
+  
   const btConfirmar = () => {
 
     clsCrud.incluir({

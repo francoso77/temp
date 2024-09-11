@@ -145,7 +145,8 @@ export function Tinturaria() {
           tipoPessoa: ['J', 'C']
         },
         comparador: 'I',
-        camposLike: ['tipoPessoa']
+        camposLike: ['tipoPessoa'],
+        campoOrder: ['nome'],
       }).then((rsClientes: Array<PessoaInterface>) => {
         if (rsClientes.length > 0) {
           setRsCliente(rsClientes)
@@ -158,7 +159,8 @@ export function Tinturaria() {
         criterio: {
           tipoPessoa: ['F']
         },
-        camposLike: ['tipoPessoa']
+        camposLike: ['tipoPessoa'],
+        campoOrder: ['nome'],
       }).then((rsFornecedores: Array<PessoaInterface>) => {
         if (rsFornecedores.length > 0) {
           setRsFornecedor(rsFornecedores)

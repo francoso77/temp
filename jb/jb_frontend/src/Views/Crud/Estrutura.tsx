@@ -277,6 +277,7 @@ export default function Estrutura() {
           nome: "%".concat("%"),
         },
         camposLike: ["nome"],
+        campoOrder: ['nome'],
       })
       .then((rs: Array<UnidadeMedidaInterface>) => {
         setRsUnidade(rs)
@@ -289,6 +290,7 @@ export default function Estrutura() {
           nome: "%".concat("%"),
         },
         camposLike: ["nome"],
+        campoOrder: ['nome'],
       })
       .then((rs: Array<ProdutoInterface>) => {
         setRsProduto(rs)

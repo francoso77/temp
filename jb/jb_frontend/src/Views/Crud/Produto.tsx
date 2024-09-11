@@ -330,6 +330,7 @@ export default function Produto() {
           nome: "%".concat("%"),
         },
         camposLike: ["nome"],
+        campoOrder: ['nome'],
       })
       .then((rs: Array<UnidadeMedidaInterface>) => {
         setRsUnidade(rs)
