@@ -205,51 +205,60 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     if (rs[0]?.qtd > 0) {
       return rs[0];
     } else {
-      MensagemErro('Produto sem estoque')
+      // MensagemErro('Produto sem estoque')
       return null;
     }
   }
 
   const MovimentaEstoque = async (rs: ProducaoMalhariaInterface, fechado: boolean): Promise<boolean> => {
     try {
-      const estrutura = await TemEstrutura(rs.idProduto as number);
+      const estrutura = await TemEstrutura(rs.idProduto as number)
 
       if (!estrutura) {
-        MensagemErro('Produto sem estrutura');
-        return false;
+        MensagemErro('Produto sem estrutura')
+        return false
       }
 
       for (const det of estrutura) {
-        const estoque = await TemEstoque(det.idProduto, rsMaster.idPessoa_cliente);
+        let estoque = await TemEstoque(det.idProduto, rsMaster.idPessoa_cliente)
+        const estoqueZerado: EstoqueInterface = {
+          idProduto: det.idProduto as number,
+          idPessoa_fornecedor: rsMaster.idPessoa_cliente as number,
+          idCor: null,
+          qtd: 0
+        }
+        console.log(estoque, 'estoque')
 
         if (!estoque) {
-          MensagemErro('Cliente sem estoque');
-          return false;
+          console.log('entrou aqui')
+          // MensagemErro('Cliente sem estoque')
+          // return false
+          estoque = estoqueZerado
         }
-
+        console.log(estoque, 'estoque zerado')
         if (fechado) {
-          estoque.qtd -= (rs.peso * det.detalheEstruturas[0].qtd);
+          estoque.qtd -= (rs.peso * det.detalheEstruturas[0].qtd)
         } else {
-          estoque.qtd += (rs.peso * det.detalheEstruturas[0].qtd);
+          estoque.qtd += (rs.peso * det.detalheEstruturas[0].qtd)
         }
 
         const rsEstoque = await clsCrud.incluir({
           entidade: 'Estoque',
-          criterio: estoque
-        });
+          criterio: estoque,
+        })
 
         if (!rsEstoque.ok) {
-          MensagemErro('Estoque não foi atualizado');
-          return false;
+          MensagemErro('Estoque não foi atualizado')
+          return false
         }
       }
 
-      return true;
+      return true
     } catch (error) {
-      console.error('Erro ao movimentar estoque:', error);
-      return false;
+      console.error('Erro ao movimentar estoque:', error)
+      return false
     }
-  };
+  }
 
   const btConfirmar = () => {
 

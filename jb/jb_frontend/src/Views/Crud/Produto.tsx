@@ -1,5 +1,5 @@
-import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -35,7 +35,7 @@ export default function Produto() {
     tipoProduto: TipoProdutoType.tecidoTinto
 
   }
-  
+
   interface PesquisaInterface {
     nome: string
   }
@@ -48,8 +48,10 @@ export default function Produto() {
   const [produto, setProduto] = useState<ProdutoInterface>(ResetDados)
   const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  const [order, setOrder] = useState<Order>('asc')
+  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -309,6 +311,17 @@ export default function Produto() {
     irPara('/')
   }
 
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
@@ -390,90 +403,112 @@ export default function Produto() {
 
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Produto"
-                tipo="uppercase"
-                dados={produto}
-                field="nome"
-                setState={setProduto}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={80}
-                autoFocus
-              />
+              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                <InputText
+                  label="Produto"
+                  tipo="uppercase"
+                  dados={produto}
+                  field="nome"
+                  setState={setProduto}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={80}
+                  autoFocus
+                  onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsUnidade}
-                campoDescricao="sigla"
-                campoID="idUnidade"
-                dados={produto}
-                mensagemPadraoCampoEmBranco="Escolha uma unidade de medida"
-                field="idUnidade"
-                label="Unidade"
-                erros={erros}
-                setState={setProduto}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <ComboBox
+                  opcoes={rsUnidade}
+                  campoDescricao="sigla"
+                  campoID="idUnidade"
+                  dados={produto}
+                  mensagemPadraoCampoEmBranco="Escolha uma unidade de medida"
+                  field="idUnidade"
+                  label="Unidade"
+                  erros={erros}
+                  setState={setProduto}
+                  onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={TipoProdutoTypes}
-                campoDescricao="descricao"
-                campoID="idTipoProduto"
-                dados={produto}
-                mensagemPadraoCampoEmBranco="Escolha um Tipo"
-                field="tipoProduto"
-                label="Tipo de Produto"
-                erros={erros}
-                setState={setProduto}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <ComboBox
+                  opcoes={TipoProdutoTypes}
+                  campoDescricao="descricao"
+                  campoID="idTipoProduto"
+                  dados={produto}
+                  mensagemPadraoCampoEmBranco="Escolha um Tipo"
+                  field="tipoProduto"
+                  label="Tipo de Produto"
+                  erros={erros}
+                  setState={setProduto}
+                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Localização"
-                tipo="uppercase"
-                dados={produto}
-                field="localizacao"
-                setState={setProduto}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={10}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <InputText
+                  label="Localização"
+                  tipo="uppercase"
+                  dados={produto}
+                  field="localizacao"
+                  setState={setProduto}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  maxLength={10}
+                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                tipo='currency'
-                label="Largura"
-                dados={produto}
-                field="largura"
-                setState={setProduto}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                scale={2}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                <InputText
+                  tipo='currency'
+                  label="Largura"
+                  dados={produto}
+                  field="largura"
+                  setState={setProduto}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  scale={2}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                tipo='currency'
-                label="G/M²"
-                dados={produto}
-                field="gm2"
-                setState={setProduto}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                scale={2}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                <InputText
+                  tipo='currency'
+                  label="G/M²"
+                  dados={produto}
+                  field="gm2"
+                  setState={setProduto}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  scale={2}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={3} md={3} sx={{ ml: 8, mt: 5 }}>
-              <InputText
-                label="Ativo"
-                tipo="checkbox"
-                dados={produto}
-                field="ativo"
-                setState={setProduto}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                <InputText
+                  label="Ativo"
+                  tipo="checkbox"
+                  dados={produto}
+                  field="ativo"
+                  setState={setProduto}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
@@ -493,6 +528,7 @@ export default function Produto() {
                     onClick={() => btConfirmar()}
                   >
                     <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+
                   </IconButton>
                 </Tooltip>
               </Condicional>
