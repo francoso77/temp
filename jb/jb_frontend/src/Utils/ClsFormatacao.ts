@@ -31,6 +31,11 @@ export default class ClsFormatacao {
 
   }
 
+  //Retona a data atual no formato dd/MM/yyyy
+  public obterDataAtualSistema = (): string => {
+    const dataAtual = DateTime.now()
+    return this.dataISOtoDatetime(dataAtual.toFormat('dd/MM/yyyy'))
+  }
   /** Converte yyyy-MM-dd para dd/MM/yyyy */
   public dataISOtoUser(data: string): string {
     return DateTime.fromISO(data).toFormat('dd/MM/yyyy')

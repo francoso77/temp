@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { PerdaMalhariaInterface } from '../interfaces/perdaMalharia';
+import { PerdaMalhariaInterface } from '../interfaces/perdaMalhariaInterface';
 import Produto from './produto.entity';
 import Pessoa from './pessoa.entity';
 import Maquina from './maquina.entity';

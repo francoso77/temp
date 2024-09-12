@@ -1,26 +1,27 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface';
-import { TurnoType, TurnoTypes } from '../../types/turnoTypes';
-import ClsCrud from '../../Utils/ClsCrudApi';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
-import ClsValidacao from '../../Utils/ClsValidacao';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { MaquinaInterface } from '../../../../jb_backend/src/interfaces/maquinaInterface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import ComboBox from '../../Componentes/ComboBox';
-import InputText from '../../Componentes/InputText';
-import InputCalc from '../../Componentes/InputCalc';
+import { useContext, useEffect, useRef, useState } from 'react'
+import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface'
+import { TurnoType, TurnoTypes } from '../../types/turnoTypes'
+import ClsCrud from '../../Utils/ClsCrudApi'
+import ClsFormatacao from '../../Utils/ClsFormatacao'
+import ClsValidacao from '../../Utils/ClsValidacao'
+import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
+import { MaquinaInterface } from '../../../../jb_backend/src/interfaces/maquinaInterface'
+import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface'
+import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import ComboBox from '../../Componentes/ComboBox'
+import InputText from '../../Componentes/InputText'
+import InputCalc from '../../Componentes/InputCalc'
 import CloseIcon from '@mui/icons-material/Close'
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import { DateTime } from 'luxon';
-import { useNavigate } from 'react-router-dom';
-import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import Condicional from '../../Componentes/Condicional/Condicional';
-import LeaderboardTwoToneIcon from '@mui/icons-material/LeaderboardTwoTone';
-import Graficos from './Graficos';
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
+import { useNavigate } from 'react-router-dom'
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
+import Condicional from '../../Componentes/Condicional/Condicional'
+import LeaderboardTwoToneIcon from '@mui/icons-material/LeaderboardTwoTone'
+import ContentCutTwoToneIcon from '@mui/icons-material/ContentCutTwoTone'
+import Graficos from './Graficos'
+import PerdasMalharia from './PerdasMalharia'
 interface DadosPecaInterface {
   nomeProduto: string | undefined
   peca: string
@@ -43,10 +44,6 @@ export function ProducaoMalharia() {
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const obterDataAtualSistema = (): string => {
-    const dataAtual = DateTime.now()
-    return clsFormatacao.dataISOtoDatetime(dataAtual.toFormat('dd/MM/yyyy'))
-  }
 
   const ResetDadosPeca: DadosPecaInterface = {
     nomeProduto: '',
@@ -64,7 +61,7 @@ export function ProducaoMalharia() {
     peca: '0',
     idMaquina: 0,
     idProduto: 0,
-    dataProducao: obterDataAtualSistema(),
+    dataProducao: clsFormatacao.obterDataAtualSistema(),
     turno: TurnoType.segundo,
     peso: 0,
     localizacao: '',
@@ -76,7 +73,8 @@ export function ProducaoMalharia() {
   }
 
   const [open, setOpen] = useState(false)
-  const [openGrafico, setOpenGrafico] = useState(false)
+  const [openGraficos, setOpenGraficos] = useState(false)
+  const [openPerdas, setOpenPerdas] = useState(false)
   const [erros, setErros] = useState({})
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
@@ -332,7 +330,11 @@ export function ProducaoMalharia() {
   }
 
   const btGraficos = () => {
-    setOpenGrafico(!openGrafico)
+    setOpenGraficos(!openGraficos)
+  }
+
+  const btPerdas = () => {
+    setOpenPerdas(!openPerdas)
   }
   const btConfirmar = () => {
 
@@ -374,7 +376,7 @@ export function ProducaoMalharia() {
     <>
       <Paper variant="outlined" sx={{ padding: 0.5, m: 0.5 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: 0, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -546,7 +548,10 @@ export function ProducaoMalharia() {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            <Graficos open={openGrafico} clickFechar={btGraficos} />
+            <Graficos open={openGraficos} clickFechar={btGraficos} />
+          </Grid>
+          <Grid item xs={12}>
+            <PerdasMalharia open={openPerdas} clickFechar={btPerdas} />
           </Grid>
         </Grid>
       </Paper>
@@ -604,6 +609,16 @@ export function ProducaoMalharia() {
       </Condicional>
 
       <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+
+        <Tooltip title={'Perdas'}>
+          <IconButton
+            color="secondary"
+            sx={{ mt: 0, mr: 5 }}
+            onClick={() => btPerdas()}
+          >
+            <ContentCutTwoToneIcon sx={{ fontSize: 70 }} />
+          </IconButton>
+        </Tooltip>
 
         <Tooltip title={'Gráficos'}>
           <IconButton

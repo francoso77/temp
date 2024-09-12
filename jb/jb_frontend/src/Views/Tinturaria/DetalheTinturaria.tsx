@@ -119,34 +119,34 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       cb: null
     })
   }
-  const onExcluir = (rs: DetalheTinturariaInterface) => {
+  const onExcluir = (rsDetalhe: DetalheTinturariaInterface) => {
 
-    let tmpDetalhe: Array<DetalheTinturariaInterface> = []
-    dados.forEach(det => {
-      if (det.idMalharia !== rs.idMalharia) {
-        tmpDetalhe.push(det)
+    pesquisarPecaID(rsDetalhe.idMalharia).then((produto) => {
+      const podeExcluir = produto ? MovimentaEstoque(produto, false) : null
+      if (podeExcluir) {
+        let tmpDetalhe: Array<DetalheTinturariaInterface> = []
+        dados.forEach(det => {
+          if (det.idMalharia !== rsDetalhe.idMalharia) {
+            tmpDetalhe.push(det)
+          }
+        })
+        setDados(tmpDetalhe)
+        clsCrud.excluir({
+          entidade: "DetalheTinturaria",
+          criterio: {
+            idMalharia: rsDetalhe.idMalharia
+          }
+        })
+          .then((rs) => {
+            if (!rs.ok) {
+              MensagemErro('Erro no cadastro')
+            }
+          })
+      }
+      if (produto) {
+        AtualizaGradeProdutos(produto, 'Excluir')
       }
     })
-    setDados(tmpDetalhe)
-
-    clsCrud.excluir({
-      entidade: "DetalheTinturaria",
-      criterio: {
-        idMalharia: rs.idMalharia
-      }
-    })
-      .then((rs) => {
-        if (!rs.ok) {
-          MensagemErro('Erro no cadastro')
-        }
-      })
-    pesquisarPecaID(rs.idMalharia).then((rs) => {
-      if (rs) {
-        AtualizaGradeProdutos(rs, 'Excluir')
-        MovimentaEstoque(rs, false)
-      }
-    })
-
   }
 
   const btCancelar = () => {
@@ -169,102 +169,89 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         cb: null
       })
     }
-    return indice < 0;
+    return indice < 0
   }
-  const TemEstrutura = async (id: number): Promise<Array<DetalheEstruturaInterface> | null> => {
+  const TemEstrutura = async (idProduto: number): Promise<Array<DetalheEstruturaInterface> | null> => {
     try {
       const [estrutura] = await clsCrud.pesquisar({
         entidade: 'Estrutura',
         relations: ['detalheEstruturas'],
-        criterio: { idProduto: id },
-      });
+        criterio: { idProduto: idProduto },
+      })
 
       // Verifica se existe a estrutura e retorna detalheEstruturas ou um array vazio
       return estrutura?.detalheEstruturas ?? null;
     } catch (error) {
       MensagemErro('Produto sem estrutua definida')
       console.error('Erro ao buscar estrutura:', error)
-      return []; // Retorna um array vazio em caso de erro
+      return null
     }
-  };
+  }
 
 
-  const TemEstoque = async (id: number, cliente: number): Promise<EstoqueInterface>  => {
+  const TemEstoque = async (idProduto: number, cliente: number): Promise<EstoqueInterface> => {
     const rs = await clsCrud
       .pesquisar({
         entidade: 'Estoque',
         criterio: {
-          idProduto: id,
+          idProduto: idProduto,
           idPessoa_fornecedor: cliente,
         },
-        having: "SUM(qtd)",
-        camposLike: ["idPessoa_fornecedor", "idProduto"],
       })
-
+    //verifica se o resultado não está vazio e retorna o primeiro item   
     if (rs.length > 0) {
       return rs[0];
     } else {
       // MensagemErro('Produto sem estoque')
       const estoqueZerado: EstoqueInterface = {
-        idProduto: id,
+        idProduto: idProduto,
         idPessoa_fornecedor: cliente,
         idCor: null,
         qtd: 0
       }
-      return estoqueZerado;
+      return estoqueZerado
     }
   }
 
   const MovimentaEstoque = async (rs: ProducaoMalhariaInterface, fechado: boolean): Promise<boolean> => {
-
     try {
       const estrutura = await TemEstrutura(rs.idProduto as number)
-      
+
       if (!estrutura) {
         MensagemErro('Produto sem estrutura')
         return false
       }
-  
-      const promises = estrutura.map(async (det) => {
+
+      const detalhes = estrutura.map(async (det) => {
         const estoque = await TemEstoque(det.idProduto, rsMaster.idPessoa_cliente)
-        console.log('qual estoque voltou', estoque)
-
-  
-        if (!estoque) {
-          MensagemErro('Produto sem estoque')
-          return false
-        }
-  
         if (fechado) {
-         
-          estoque.qtd =- (rs.peso * det.qtd)
+          estoque.qtd = Number((estoque.qtd - (rs.peso * det.qtd)).toFixed(2))
         } else {
-          estoque.qtd =+ (rs.peso * det.qtd)
+          estoque.qtd = Number((estoque.qtd + (rs.peso * det.qtd)).toFixed(2))
         }
-
         const rsEstoque = await clsCrud.incluir({
           entidade: 'Estoque',
           criterio: estoque,
         })
-  
         if (!rsEstoque.ok) {
           MensagemErro('Estoque não foi atualizado')
           return false
         }
         return true
       })
-  
+
       // Espera todas as promessas serem resolvidas
-      const results = await Promise.all(promises)
-  
+      const results = await Promise.all(detalhes)
+
       // Verifica se alguma das promessas retornou false
       return results.every(result => result === true)
+
     } catch (error) {
       console.error('Erro ao movimentar estoque:', error)
       return false
     }
   }
-  
+
   const btConfirmar = () => {
 
     clsCrud.incluir({
@@ -313,7 +300,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       ])
 
       AtualizaGradeProdutos(rs, 'Incluir')
-      MovimentaEstoque(rs, true)
     }
   }
 
@@ -327,22 +313,22 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       });
 
       setRsPecasSomadas((prevRsPecasSomadas) => {
-        const tmpProducao = [...prevRsPecasSomadas]; // Cria uma cópia do estado anterior
-        const produtoAtual = rs[0];
-        const produtoExistente = tmpProducao.find((p) => p.produto_nome === produtoAtual.produto_nome);
+        const tmpProducao = [...prevRsPecasSomadas] // Cria uma cópia do estado anterior
+        const produtoAtual = rs[0]
+        const produtoExistente = tmpProducao.find((p) => p.produto_nome === produtoAtual.produto_nome)
 
         if (produtoExistente) {
           if (tipo === 'Incluir') {
-            produtoExistente.total_peca += produtoAtual.total_peca;
-            produtoExistente.qtd_peca += 1;
+            produtoExistente.total_peca = + produtoAtual.total_peca.toFixed(2)
+            produtoExistente.qtd_peca = + 1
           } else {
-            produtoExistente.total_peca -= produtoAtual.total_peca;
-            produtoExistente.qtd_peca -= 1;
+            produtoExistente.total_peca = - produtoAtual.total_peca.toFixed(2)
+            produtoExistente.qtd_peca = - 1
           }
 
           // Remove o produto se o total for zero
           if (produtoExistente.total_peca === 0) {
-            return tmpProducao.filter((item) => item.produto_nome !== produtoAtual.produto_nome);
+            return tmpProducao.filter((item) => item.produto_nome !== produtoAtual.produto_nome)
           }
         } else if (tipo === 'Incluir') {
           // Adiciona novo produto apenas no caso de inclusão
@@ -350,15 +336,15 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
             produto_nome: produtoAtual.produto_nome,
             total_peca: produtoAtual.total_peca,
             qtd_peca: 1,
-          });
+          })
         }
 
-        return tmpProducao;
-      });
+        return tmpProducao
+      })
     } catch (error) {
-      console.error("Erro ao atualizar a grade de produtos:", error);
+      console.error("Erro ao atualizar a grade de produtos:", error)
     }
-  };
+  }
 
   const LimpaPecas = async () => {
     const tinturaria = rsMaster.idTinturaria as number
@@ -375,21 +361,21 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     let tmpProducao: Array<ProducaoMalhariaInterface> = []
 
     const promises = rsDetalhes.map(async (det: DetalheTinturariaInterface) => {
-      const rs = await pesquisarPecaID(det.idMalharia);
+      const rs = await pesquisarPecaID(det.idMalharia)
       if (rs) {
-        rs.dataFechado = clsFormatacao.dataNormalParaDateTime(rsMaster.dataTinturaria);
-        rs.fechado = true;
-        rs.idTinturaria = rsMaster.idTinturaria;
-        return rs;
+        rs.dataFechado = clsFormatacao.dataNormalParaDateTime(rsMaster.dataTinturaria)
+        rs.fechado = true
+        rs.idTinturaria = rsMaster.idTinturaria
+        return rs
       }
       // Se rs for null, retorna null para não adicionar nada ao tmpProducao
-      return null;
+      return null
     });
 
     // Aguarde a resolução de todas as promessas e filtre os valores nulos
-    tmpProducao = (await Promise.all(promises)).filter((item): item is ProducaoMalhariaInterface => item !== null);
+    tmpProducao = (await Promise.all(promises)).filter((item): item is ProducaoMalhariaInterface => item !== null)
 
-    return tmpProducao;
+    return tmpProducao
   }
 
   const pesquisarPecaID = async (id: number): Promise<ProducaoMalhariaInterface | null> => {
@@ -399,14 +385,14 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         criterio: {
           idMalharia: id,
         },
-      });
+      })
 
       // Verifica se o resultado não está vazio e retorna o primeiro item ou null se estiver vazio
-      return rs.length > 0 ? rs[0] : null;
+      return rs.length > 0 ? rs[0] : null
     } catch (error) {
-      console.error("Erro ao pesquisar PecaID:", error);
+      console.error("Erro ao pesquisar PecaID:", error)
       // Retorna null ou lida com o erro conforme necessário
-      return null;
+      return null
     }
   }
 
@@ -433,7 +419,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         'localizacao',
         'idPessoa_revisador',
         'idPessoa_tecelao',
-      ]
+      ],
     }).then((rs: Array<ProducaoMalhariaInterface>) => {
       if (rs.length > 0) {
         SomaPeca(rs[0])
@@ -468,7 +454,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         criterio: {
           idTinturaria: `${rsMaster.idTinturaria}`
         },
-        camposLike: ['idTinturaria']
+        camposLike: ['idTinturaria'],
       }).then((rs: Array<DetalheTinturariaInterface>) => {
         if (rs.length > 0) {
           setLocalState({ action: actionTypes.editando })

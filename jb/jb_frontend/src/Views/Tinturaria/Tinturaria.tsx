@@ -20,6 +20,8 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
 import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface'
+import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface'
+import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
 
 
 
@@ -86,6 +88,16 @@ export function Tinturaria() {
     setOrderBy(property);
   }
 
+  const MensagemErro = (erro: string) => {
+    setMensagemState({
+      titulo: 'Erro...',
+      exibir: true,
+      mensagem: erro.concat(' - Consulte Suporte'),
+      tipo: MensagemTipo.Error,
+      exibirBotao: true,
+      cb: null
+    })
+  }
   const pesquisarID = (id: string | number): Promise<TinturariaInterface> => {
 
     return clsCrud
@@ -260,38 +272,131 @@ export function Tinturaria() {
     return retorno
   }
 
-  const AtualizaProducao = async (id: number): Promise<boolean> => {
+  const TemEstrutura = async (idProduto: number): Promise<Array<DetalheEstruturaInterface> | null> => {
     try {
-      let tmpProducao: Array<ProducaoMalhariaInterface> = await clsCrud.pesquisar({
+      const [estrutura] = await clsCrud.pesquisar({
+        entidade: 'Estrutura',
+        relations: ['detalheEstruturas'],
+        criterio: { idProduto: idProduto },
+      })
+
+      // Verifica se existe a estrutura e retorna detalheEstruturas ou um array vazio
+      return estrutura?.detalheEstruturas ?? null;
+    } catch (error) {
+      MensagemErro('Produto sem estrutua definida')
+      console.error('Erro ao buscar estrutura:', error)
+      return null
+    }
+  }
+  const TemEstoque = async (idProduto: number, cliente: number): Promise<EstoqueInterface> => {
+    const rs = await clsCrud
+      .pesquisar({
+        entidade: 'Estoque',
+        criterio: {
+          idProduto: idProduto,
+          idPessoa_fornecedor: cliente,
+        },
+      })
+    //verifica se o resultado não está vazio e retorna o primeiro item   
+    if (rs.length > 0) {
+      return rs[0];
+    } else {
+      // MensagemErro('Produto sem estoque')
+      const estoqueZerado: EstoqueInterface = {
+        idProduto: idProduto,
+        idPessoa_fornecedor: cliente,
+        idCor: null,
+        qtd: 0
+      }
+      return estoqueZerado;
+    }
+  }
+  const MovimentaEstoque = async (idTinturaria: number): Promise<boolean> => {
+    try {
+      const tmpProducao: Array<any> = await clsCrud.consultar({
         entidade: 'ProducaoMalharia',
-        criterio: { idTinturaria: id },
+        criterio: {
+          idTinturaria: idTinturaria,
+          fechado: true,
+        },
+        groupBy: 'idProduto',
+        select: ['idTinturaria', 'idProduto', 'SUM(peso) AS peso_total', 'fechado'],
       });
 
       if (tmpProducao.length > 0) {
-        tmpProducao.forEach((producao) => {
-          producao.dataFechado = "";
-          producao.fechado = false;
-          producao.idTinturaria = null;
-        });
-      }
+        for (const producao of tmpProducao) {
+          const detalheEstrutura = await TemEstrutura(producao.idProduto);
+          if (detalheEstrutura) {
+            for (const det of detalheEstrutura) {
+              const estoque = await TemEstoque(det.idProduto, tinturaria.idPessoa_cliente);
 
-      const rs = await clsCrud.incluir({
-        entidade: 'ProducaoMalharia',
-        criterio: tmpProducao,
-      });
+              if (estoque) {
+                estoque.qtd = Number((estoque.qtd + (producao.peso_total * det.qtd)).toFixed(2))
 
-      if (!rs.ok) {
-        setMensagemState({
-          titulo: 'Erro...',
-          exibir: true,
-          mensagem: 'Não foi possível alterar os items da produção - Consulte Suporte',
-          tipo: MensagemTipo.Error,
-          exibirBotao: true,
-          cb: null,
-        });
-        return false;
-      } else {
+                const rsEstoque = await clsCrud.incluir({
+                  entidade: 'Estoque',
+                  criterio: estoque,
+                });
+
+                if (!rsEstoque.ok) {
+                  MensagemErro('Estoque não foi atualizado');
+                  return false;
+                }
+              }
+            }
+          } else {
+            MensagemErro('Produto sem estrutura definida');
+            return false;
+          }
+        }
         return true;
+      } else {
+        MensagemErro('Nenhuma produção encontrada para alteração');
+        return false;
+      }
+    } catch (e) {
+      console.log('Erro ao alterar o estoque:', e);
+      return false;
+    }
+  };
+  const AtualizaProducao = async (idTinturaria: number): Promise<boolean> => {
+    try {
+      const podeAtualizarProducao = await MovimentaEstoque(idTinturaria)
+      if (podeAtualizarProducao) {
+
+        let tmpProducao: Array<ProducaoMalhariaInterface> = await clsCrud.pesquisar({
+          entidade: 'ProducaoMalharia',
+          criterio: { idTinturaria: idTinturaria },
+        });
+
+        if (tmpProducao.length > 0) {
+          tmpProducao.forEach((producao) => {
+            producao.dataFechado = "";
+            producao.fechado = false;
+            producao.idTinturaria = null;
+          });
+        }
+
+        const rs = await clsCrud.incluir({
+          entidade: 'ProducaoMalharia',
+          criterio: tmpProducao,
+        });
+
+        if (!rs.ok) {
+          setMensagemState({
+            titulo: 'Erro...',
+            exibir: true,
+            mensagem: 'Não foi possível alterar os itens da produção - Consulte Suporte',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null,
+          });
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return false
       }
     } catch (e) {
       console.log('sem produtos para alteração!');
