@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import Highcharts3D from 'highcharts/highcharts-3d'
+import ClsCrud from '../../Utils/ClsCrudApi'
 import { Dialog, Grid, IconButton, Paper, useMediaQuery, useTheme } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import Accessibility from 'highcharts/modules/accessibility'
@@ -56,6 +57,8 @@ interface PropsInterface {
 }
 
 export default function Graficos({ open = false, clickFechar }: PropsInterface) {
+
+
     const [mesesData, setMesesData] = useState<string[]>([])
     const [pesosData, setPesosData] = useState<number[]>([])
     const [qtdsData, setQtdsData] = useState<number[]>([])
@@ -63,26 +66,54 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
     const [selectedValue, setSelectedValue] = useState('Teste')
     const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pessoa })
 
-    useEffect(() => {
-        if (dadosGraficoColuna) {
-            const mesesData = dadosGraficoColuna.map((item) => obterMes(item.mes))
-            const pesosData = dadosGraficoColuna.map((item) => item.pesoTotal)
-            const qtdsData = dadosGraficoColuna.map((item) => item.qtdTotal)
+
+
+    const clsCrud = new ClsCrud()
+
+    const handleClose = () => {
+
+    }
+
+    const DadosGrafico = async () => {
+        try {
+            const rsColuna: GraficoColunaInterface[] = await clsCrud.consultar({
+                entidade: 'ProducaoMalharia',
+                joins: [{ tabelaRelacao: 'producaomalharia.produto', relacao: 'produto' }],
+                groupBy: 'mes',
+                campoOrder: ['mes'],
+                having: 'pesoTotal > 0',
+                select: ['ROUND(SUM(peso),2) AS pesoTotal', 'COUNT(peso) AS qtdTotal', 'MONTH(dataProducao) AS mes'],
+            })
+
+            const mesesData = rsColuna.map((item) => obterMes(item.mes))
+            const pesosData = rsColuna.map((item) => item.pesoTotal)
+            const qtdsData = rsColuna.map((item) => item.qtdTotal)
 
             setMesesData(mesesData)
             setPesosData(pesosData)
             setQtdsData(qtdsData)
-        }
 
-        if (dadosGraficoPizza) {
-            const produtosAtualizados: [string, number][] = dadosGraficoPizza.map(dado => [dado.produto, dado.pesoTotal])
+            const rsPizza: GraficoPizzaInterface[] = await clsCrud.consultar({
+                entidade: 'ProducaoMalharia',
+                joins: [{ tabelaRelacao: 'producaomalharia.produto', relacao: 'produto' }],
+                groupBy: 'nome',
+                campoOrder: ['nome'],
+                having: 'pesoTotal > 0',
+                select: ['produto.nome AS produto', 'ROUND(SUM(peso),2) AS pesoTotal'],
+            })
+
+            const produtosAtualizados: [string, number][] = rsPizza.map(dado => [dado.produto, dado.pesoTotal])
+
             setPizzaData(produtosAtualizados)
-        }
-    }, [dadosGraficoColuna, dadosGraficoPizza])
 
-    const handleClose = () => {
-        clickFechar()
+        } catch (error) {
+            console.error('Erro ao consultar dados:', error)
+        }
     }
+
+    useEffect(() => {
+        DadosGrafico()
+    }, [])
 
     const setupColuna = {
         chart: {
@@ -123,6 +154,11 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
                 data: pesosData,
                 color: '#7cb5ec', // Cor das colunas para produção
             },
+            // {
+            //   name: 'Quantidade',
+            //   data: qtdsData,
+            //   color: '#434348', // Cor das colunas para quantidade
+            // },
         ],
     }
 
@@ -162,6 +198,7 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
     return (
+
         <Dialog
             open={open}
             onClose={clickFechar}
@@ -175,6 +212,7 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
                     open={open}
                     onClose={handleClose}
                     tipo='dados'
+
                 />
             </Condicional>
             <Condicional condicao={localState.action !== 'pessoa'}>

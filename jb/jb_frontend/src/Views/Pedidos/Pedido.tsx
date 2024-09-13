@@ -230,7 +230,7 @@ export default function Pedido() {
 
   const btPesquisar = () => {
 
-    const campo = isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
+    const campo = validaCampo.isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
     const itemPesquisa = campo === 'data'
       ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)
       : pesquisa.itemPesquisa
@@ -339,11 +339,6 @@ export default function Pedido() {
       .then((rsVendedores: Array<PessoaInterface>) => {
         setRsVendedor(rsVendedores)
       })
-  }
-
-  const isValidDate = (value: any): boolean => {
-    const date = new Date(value)
-    return !isNaN(date.getTime())
   }
 
   // const pesquisaEventos = () => {

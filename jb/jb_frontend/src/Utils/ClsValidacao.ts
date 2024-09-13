@@ -402,13 +402,14 @@ export default class ClsValidacao {
         erros[campo] = mensagemErro
         return false
       }
-
       return retorno && true
-
     }
-
   }
 
+  public isValidDate = (value: any): boolean => {
+    const date = new Date(value)
+    return !isNaN(date.getTime())
+  }
   public eData(campo: string,
     dados: { [key: string]: any },
     erros: { [key: string]: string },

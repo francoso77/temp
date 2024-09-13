@@ -53,6 +53,7 @@ export function Tinturaria() {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
       cabecalho: 'Romaneio',

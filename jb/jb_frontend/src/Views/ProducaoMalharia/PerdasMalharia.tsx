@@ -38,7 +38,7 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.incluindo });
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
   const [rsTecelao, setRsTecelao] = useState<Array<PessoaInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [rsMaquina, setRsMaquina] = useState<Array<MaquinaInterface>>([])
@@ -140,26 +140,37 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
       });
   };
 
+  const btCancelar = () => {
+    setPerda(ResetDados)
+    setErros({})
+    setLocalState({ action: actionTypes.pesquisando })
+  }
 
   const btConfirmar = async () => {
-    if (validarDados()) {
-      const rs = await clsCrud
-        .incluir({
-          entidade: 'PerdaMalharia',
-          criterio: perda,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
+    const isIncluirOuEditar = validarDados() &&
+      (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando)
 
-      if (!rs.ok) {
-        MensagemErro('Erro no cadastro da perda')
-      }
+    const params = {
+      entidade: 'PerdaMalharia',
+      criterio: isIncluirOuEditar ? perda : { idPerdaMalharia: perda.idPerdaMalharia },
+      cb: btPesquisar,
+      localState,
+      setMensagemState,
+    };
 
+    const rs = await clsCrud[isIncluirOuEditar ? 'incluir' : 'excluir'](params)
+
+    if (!rs.ok) {
+      MensagemErro('Erro no cadastro da perda')
+    } else {
+      setLocalState({ action: actionTypes.pesquisando })
     }
   }
 
   const btIncluir = () => {
-
+    setPerda(ResetDados)
+    setErros({})
+    setLocalState({ action: actionTypes.incluindo })
   }
 
   const btPesquisar = () => {
@@ -244,10 +255,19 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
             p: 1.5,
             backgroundColor: '#3c486b'
           }}>
-          <Grid item xs={12} sx={{ textAlign: 'center' }}>
-            <Typography sx={{ color: 'white' }}>
+          <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography sx={{ ml: 5, color: 'white', flexGrow: 1, textAlign: 'center' }}>
               Perdas Malharia
             </Typography>
+            <Tooltip title={'Fechar'} >
+              <IconButton
+                color="secondary"
+                sx={{ color: 'white', marginLeft: 'auto' }}
+                onClick={() => clickFechar()}
+              >
+                <CancelRoundedIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Paper>
         <Condicional condicao={localState.action !== 'pesquisando'}>
@@ -284,6 +304,7 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
                     label="Tecelão"
                     erros={erros}
                     setState={setPerda}
+                    disabled={localState.action === 'excluindo' ? true : false}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event) => btPulaCampo(event, 2)}
                   />
@@ -301,6 +322,7 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
                     label="Produto"
                     erros={erros}
                     setState={setPerda}
+                    disabled={localState.action === 'excluindo' ? true : false}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event) => btPulaCampo(event, 3)}
                   />
@@ -318,6 +340,7 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
                     label="Tear"
                     erros={erros}
                     setState={setPerda}
+                    disabled={localState.action === 'excluindo' ? true : false}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event) => btPulaCampo(event, 4)}
                   />
@@ -348,12 +371,12 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
                     <IconButton
                       color="secondary"
                       sx={{ mt: 3, ml: 2 }}
-                      onClick={() => clickFechar()}
+                      onClick={() => btCancelar()}
                     >
                       <CancelRoundedIcon sx={{ fontSize: 50 }} />
                     </IconButton>
                   </Tooltip>
-                  <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+                  <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
                     <Tooltip title={'Confirmar'}>
                       <IconButton
                         color="secondary"
@@ -369,9 +392,9 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
             </Grid>
           </Paper >
         </Condicional>
-        <Paper sx={{ m: 0, p: 0 }}>
-          <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
-            <Condicional condicao={localState.action !== actionTypes.excluindo}>
+        <Condicional condicao={localState.action === actionTypes.pesquisando}>
+          <Paper sx={{ m: 1, p: 0 }}>
+            <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
               <Tooltip title={'Incluir'}>
                 <IconButton
                   color="secondary"
@@ -381,34 +404,32 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
                   <AddCircleIcon sx={{ fontSize: 50 }} />
                 </IconButton>
               </Tooltip>
-            </Condicional>
-          </Grid>
-          <Grid item xs={12}>
-            <DataTable
-              colunaSoma={['qtd']}
-              temTotal={true}
-              cabecalho={cabecalhoPerda}
-              dados={dadosTabela}
-              acoes={[
-                {
-                  icone: "edit",
-                  onAcionador: (rs: PerdaMalhariaInterface) =>
-                    onEditar(rs.idPerdaMalharia as number),
-                  toolTip: "Editar",
-                },
-                {
-                  icone: "delete",
-                  onAcionador: (rs: PerdaMalhariaInterface) =>
-                    onExcluir(rs.idPerdaMalharia as number),
-                  toolTip: "Excluir",
-                },
-              ]}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-            />
-          </Grid>
-        </Paper>
+            </Grid>
+            <Grid item xs={12}>
+              <DataTable
+                cabecalho={cabecalhoPerda}
+                dados={dadosTabela}
+                acoes={[
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: PerdaMalhariaInterface) =>
+                      onEditar(rs.idPerdaMalharia as number),
+                    toolTip: "Editar",
+                  },
+                  {
+                    icone: "delete",
+                    onAcionador: (rs: PerdaMalhariaInterface) =>
+                      onExcluir(rs.idPerdaMalharia as number),
+                    toolTip: "Excluir",
+                  },
+                ]}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+            </Grid>
+          </Paper>
+        </Condicional>
       </Dialog >
     </>
   )

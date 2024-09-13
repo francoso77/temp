@@ -1,15 +1,19 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState';
 import { URL_BACKEND } from './Servidor';
+import { GraficoType } from '../types/graficoTypes';
 
 interface PropsInterface {
-  method: 'get' | 'post' | 'put' | 'delete';
-  url: string;
-  dados?: Record<string, any>;
-  mensagem?: string;
-  itemPesquisa?: string;
-  campo?: 'data' | 'nome';
-  tinturaria?: number;
+  method: 'get' | 'post' | 'put' | 'delete'
+  url: string
+  dados?: Record<string, any>
+  mensagem?: string
+  itemPesquisa?: string
+  campo?: 'data' | 'nome'
+  tinturaria?: number
+  dtInicial?: string
+  dtFinal?: string
+  grupo?: GraficoType
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>;
 }
 
@@ -64,13 +68,19 @@ export default class ClsApi {
     mensagem,
     tinturaria,
     itemPesquisa,
-    campo
+    campo,
+    dtInicial,
+    dtFinal,
+    grupo,
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
       itemPesquisa,
       campo,
       tinturaria,
+      dtInicial,
+      dtFinal,
+      grupo,
     };
 
     if (setMensagemState) {
@@ -104,4 +114,23 @@ export default class ClsApi {
   public async limpaPecas<T>(props: Omit<PropsInterface, 'itemPesquisa' | 'campo'>): Promise<T> {
     return ClsApi.sendRequest<T>(props);
   }
+
+  public async graficos<T>(props: PropsInterface): Promise<T> {
+    return ClsApi.sendRequest<T>(props);
+  }
 }
+
+
+// public async graficos<T>({
+//   dtInicial,
+//   dtFinal,
+//   grupo
+// }: { dtInicial: string; dtFinal: string; grupo: 'produto' | 'tecelao' | 'mes' }): Promise<T> {
+//   return ClsApi.sendRequest<T>({
+//     method: 'post',  // Usando POST
+//     url: 'graficos',
+//     dtInicial,
+//     dtFinal,
+//     grupo
+//   });
+// }

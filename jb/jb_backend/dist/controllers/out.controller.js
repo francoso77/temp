@@ -53,6 +53,7 @@ var common_1 = require("@nestjs/common");
 var pedido_entity_1 = require("../entities/pedido.entity");
 var data_source_1 = require("../data-source");
 var producaoMalharia_entity_1 = require("../entities/producaoMalharia.entity");
+var perdaMalharia_entity_1 = require("../entities/perdaMalharia.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -76,6 +77,33 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    OutController.prototype.graficos = function (dtInicial, dtFinal, grupo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var repository, repositoryPerda, sqlPerda, select, sql;
+            return __generator(this, function (_a) {
+                repository = data_source_1.AppDataSource.getRepository(producaoMalharia_entity_1.default);
+                repositoryPerda = data_source_1.AppDataSource.getRepository(perdaMalharia_entity_1.default);
+                if (grupo === 'perda') {
+                    sqlPerda = "\n        SELECT\n          ROUND(SUM(qtd),2) AS pesoTotal,\n          COUNT(qtd) AS qtdTotal,\n          pt.nome AS tecelao\n        FROM\n          perdasmalharia pm\n        INNER JOIN\n          pessoas pt ON pt.idPessoa = pm.idPessoa_tecelao\n        INNER JOIN\n          produtos p ON p.idProduto = pm.idProduto\n        INNER JOIN\n          maquinas m ON m.idMaquina = pm.idMaquina\n        WHERE\n          pm.dataPerda BETWEEN ? AND ? \n        GROUP BY\n          pt.nome\n      ";
+                    return [2 /*return*/, repositoryPerda.query(sqlPerda, [dtInicial, dtFinal])];
+                }
+                if (grupo === 'mes') {
+                    select = 'ROUND(SUM(peso),2) AS pesoTotal, MONTH(dataProducao) AS mes';
+                }
+                else if (grupo === 'tecelao') {
+                    select = 'ROUND(SUM(peso),2) AS pesoTotal, pt.nome AS tecelao';
+                }
+                else if (grupo === 'produto') {
+                    select = 'ROUND(SUM(peso),2) AS pesoTotal, p.nome AS produto';
+                }
+                else {
+                    throw new Error('Grupo inválido'); // Tratamento de erro para grupo inválido
+                }
+                sql = "\n      SELECT\n        ".concat(select, "\n      FROM \n        producaomalharias pm\n      INNER JOIN\n        pessoas pt ON pt.idPessoa = pm.idPessoa_tecelao\n      INNER JOIN\n        produtos p ON p.idProduto = pm.idProduto\n      WHERE\n        pm.dataProducao BETWEEN ? AND ? \n      GROUP BY\n        ").concat(grupo, "\n    ");
+                return [2 /*return*/, repository.query(sql, [dtInicial, dtFinal])];
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)("pedidosEmAberto"),
         __param(0, (0, common_1.Body)("itemPesquisa")),
@@ -91,6 +119,15 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [Number]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "limpaPecas", null);
+    __decorate([
+        (0, common_1.Post)("graficos"),
+        __param(0, (0, common_1.Body)("dtInicial")),
+        __param(1, (0, common_1.Body)("dtFinal")),
+        __param(2, (0, common_1.Body)("grupo")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String, String, String]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "graficos", null);
     OutController = __decorate([
         (0, common_1.Controller)()
     ], OutController);

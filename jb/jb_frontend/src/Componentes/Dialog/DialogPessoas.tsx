@@ -20,11 +20,11 @@ export interface SimpleDialogProps {
   tipo: 'pessoas' | 'dados'
 }
 
-export default function SimpleDialog(props: SimpleDialogProps) {
+export default function DialogPessoas(props: SimpleDialogProps) {
   const { onClose, selectedValue, open, tipo } = props;
 
   const handleClose = () => {
-    onClose(selectedValue);
+    onClose('J');
   };
 
   const handleListItemClick = (value: string) => {

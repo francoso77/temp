@@ -16,8 +16,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
-import SimpleDialog from '../../Componentes/Dialog';
 import { THEME } from '../../Layout/Theme';
+import DialogPessoas from '../../Componentes/Dialog/DialogPessoas';
 
 
 export default function Pessoa() {
@@ -342,7 +342,7 @@ export default function Pessoa() {
     <Container maxWidth="md" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt:-1.5, mr:-5, mb:-5}}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -397,7 +397,7 @@ export default function Pessoa() {
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action === 'pessoa'}>
-            <SimpleDialog
+            <DialogPessoas
               selectedValue={selectedValue}
               open={open}
               onClose={handleClose}
