@@ -206,15 +206,15 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
             fullWidth
             maxWidth='md'
         >
-            <Condicional condicao={localState.action === 'pessoa'}>
+           {/** <Condicional condicao={localState.action === 'pessoa'}>
                 <DialogGraficos
                     selectedValue={selectedValue}
                     open={open}
                     onClose={handleClose}
                     tipo='dados'
-
+                    SetDados={*}
                 />
-            </Condicional>
+            </Condicional> */}
             <Condicional condicao={localState.action !== 'pessoa'}>
                 <Grid item xs={12} sx={{ textAlign: 'right', m: { md: 0.5 } }}>
                     <IconButton onClick={() => clickFechar()}>

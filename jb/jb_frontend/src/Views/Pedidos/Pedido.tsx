@@ -22,6 +22,7 @@ import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/pra
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import DetalhePedido from './DetalhePedido';
 import ClsApi from '../../Utils/ClsApi';
+import DataTableSelect from '../testes/tableSelect';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -402,7 +403,7 @@ export default function Pedido() {
               </Tooltip>
             </Grid>
             <Grid item xs={12}>
-              <DataTable
+              <DataTableSelect
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
@@ -419,8 +420,8 @@ export default function Pedido() {
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
+                orderx={order}
+                orderByx={orderBy}
                 onRequestSort={handleRequestSort}
               />
             </Grid>

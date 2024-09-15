@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import Highcharts3D from 'highcharts/highcharts-3d'
@@ -8,6 +8,8 @@ import Accessibility from 'highcharts/modules/accessibility'
 import Condicional from '../../Componentes/Condicional/Condicional'
 import DialogGraficos from '../../Componentes/Dialog/DialogGraficos'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
+import { GraficoType, GraficoTypes } from '../../types/graficoTypes'
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 
 type MesesIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
@@ -56,32 +58,63 @@ interface PropsInterface {
 }
 
 export default function Graficos({ open = false, clickFechar }: PropsInterface) {
-    const [mesesData, setMesesData] = useState<string[]>([])
+    const [categoriaData, setCategoriaData] = useState<string[]>([])
     const [pesosData, setPesosData] = useState<number[]>([])
     const [qtdsData, setQtdsData] = useState<number[]>([])
     const [pizzaData, setPizzaData] = useState<[string, number][]>([])
-    const [selectedValue, setSelectedValue] = useState('Teste')
     const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pessoa })
+    const [dadosGrafico, setDadosGrafico] = useState<any[]>([])
+    const [selectedValueRadio, setSelectedValueRadio] = useState<GraficoType>(GraficoType.mes)
+    const [titulo, setTitulo] = useState("Produção Malharia por Mês")
 
     useEffect(() => {
-        if (dadosGraficoColuna) {
-            const mesesData = dadosGraficoColuna.map((item) => obterMes(item.mes))
-            const pesosData = dadosGraficoColuna.map((item) => item.pesoTotal)
-            const qtdsData = dadosGraficoColuna.map((item) => item.qtdTotal)
+        if (dadosGrafico) {
+            let categoriaData: string[] = []
+            const pesosData = dadosGrafico.map((item) => item.pesoTotal)
 
-            setMesesData(mesesData)
+            if (selectedValueRadio === GraficoType.mes) {
+                categoriaData = dadosGrafico.map((item) => obterMes(item.mes))
+            } else if (selectedValueRadio === GraficoType.tecelao) {
+                categoriaData = dadosGrafico.map((item) => item.tecelao)
+            } else if (selectedValueRadio === GraficoType.produto) {
+                categoriaData = dadosGrafico.map((item) => item.produto)
+            } else if (selectedValueRadio === GraficoType.perda) {
+                categoriaData = dadosGrafico.map((item) => item.tecelao)
+                const qtdsData = dadosGrafico.map((item) => item.qtdTotal)
+            }
+
+            const produtosAtualizados: [string, number][] = dadosGrafico.map(dado =>
+                [
+                    selectedValueRadio === GraficoType.produto ? dado.produto
+                        : selectedValueRadio === GraficoType.mes ? dado.mes
+                            : dado.tecelao, dado.pesoTotal
+                ])
+            setPizzaData(produtosAtualizados)
+            
+            setCategoriaData(categoriaData)
             setPesosData(pesosData)
             setQtdsData(qtdsData)
-        }
 
-        if (dadosGraficoPizza) {
-            const produtosAtualizados: [string, number][] = dadosGraficoPizza.map(dado => [dado.produto, dado.pesoTotal])
-            setPizzaData(produtosAtualizados)
-        }
-    }, [dadosGraficoColuna, dadosGraficoPizza])
+            if (selectedValueRadio === GraficoType.mes) {
+                setTitulo('Produção Malharia por Mês')
+            } else if (selectedValueRadio === GraficoType.perda) {
+                setTitulo('Perdas na Malharia por Tecelão')
+            } else if (selectedValueRadio === GraficoType.produto) {
+                setTitulo('Produção Malharia por Produto')
+            } else if (selectedValueRadio === GraficoType.tecelao) {
+                setTitulo('Produção Malharia por Tecelão')
+            }
 
-    const handleClose = () => {
-        clickFechar()
+            const vazio = dadosGrafico.length
+
+            if (vazio === 0){ setTitulo('NÃO HÁ DADOS NO TIPO OU NO INTERVALO DE DATAS !!!')}
+        } 
+
+    }, [dadosGrafico])
+
+    const btFechar = () => {
+        setLocalState({ action: actionTypes.pessoa })
+        setTitulo('Produção Malharia por Mês')
     }
 
     const setupColuna = {
@@ -96,10 +129,10 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
             },
         },
         title: {
-            text: 'Produção Malharia',
+            text: titulo,
         },
         xAxis: {
-            categories: mesesData,
+            categories: categoriaData,
         },
         yAxis: {
             title: {
@@ -117,7 +150,18 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
                 },
             },
         },
-        series: [
+        series: selectedValueRadio === GraficoType.perda ? [
+            {
+                name: 'Perdas',
+                data: pesosData,
+                color: '#7cb5ec', // Cor das colunas para produção
+            },
+            {
+                name: 'Quantidade',
+                data: qtdsData,
+                color: '#434348', // Cor das colunas para quantidade
+            },
+        ] : [
             {
                 name: 'Produção',
                 data: pesosData,
@@ -137,7 +181,7 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
             },
         },
         title: {
-            text: 'Produção por Artigo',
+            text: '',
         },
         plotOptions: {
             pie: {
@@ -164,22 +208,22 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
     return (
         <Dialog
             open={open}
-            onClose={clickFechar}
+            onClose={btFechar}
             fullScreen={fullScreen}
             fullWidth
             maxWidth='md'
         >
             <Condicional condicao={localState.action === 'pessoa'}>
                 <DialogGraficos
-                    selectedValue={selectedValue}
-                    open={open}
-                    onClose={handleClose}
-                    tipo='dados'
+                    setDados={setDadosGrafico}
+                    setLocalState={setLocalState}
+                    clickFechar={clickFechar}
+                    setSelectedValueRadio={setSelectedValueRadio}
                 />
             </Condicional>
             <Condicional condicao={localState.action !== 'pessoa'}>
                 <Grid item xs={12} sx={{ textAlign: 'right', m: { md: 0.5 } }}>
-                    <IconButton onClick={() => clickFechar()}>
+                    <IconButton onClick={() => btFechar()}>
                         <CloseIcon />
                     </IconButton>
                 </Grid>
@@ -189,9 +233,11 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
                         <Grid item xs={12} md={12} sx={{ mt: 0.5, pl: { md: 0.5 } }}>
                             <HighchartsReact highcharts={Highcharts} options={setupColuna} />
                         </Grid>
-                        <Grid item xs={12} md={12} sx={{ mt: 0.5, pl: { md: 0.5 } }}>
-                            <HighchartsReact highcharts={Highcharts} options={setupPizza} />
-                        </Grid>
+                        <Condicional condicao={selectedValueRadio === GraficoType.produto}>
+                            <Grid item xs={12} md={12} sx={{ mt: 0.5, pl: { md: 0.5 } }}>
+                                <HighchartsReact highcharts={Highcharts} options={setupPizza} />
+                            </Grid>
+                        </Condicional>
                     </Grid>
                 </Paper>
             </Condicional>
