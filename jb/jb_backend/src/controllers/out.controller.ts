@@ -7,6 +7,40 @@ import PerdaMalharia from '../entities/perdaMalharia.entity'
 @Controller()
 export class OutController {
 
+  @Post("gerenciadorPedidosEmAberto")
+  async gerenciadorPedidosEmAberto(): Promise<Array<Pedido>> {
+
+    const sql = `
+    SELECT
+      p.idPedido,
+      p.dataPedido,
+      p.statusPedido,
+      pc.nome AS nomeCliente,
+      pv.nome AS nomeVendedor,
+        JSON_ARRAYAGG(
+    JSON_OBJECT(
+      'idPedido', dp.idPedido,
+      'Produto', pp.nome,
+      'qtdPedida', dp.qtdPedida,
+      'vrUnitario', dp.vrUnitario,
+      'total', dp.qtdPedida * dp.vrUnitario
+    )
+  ) AS details
+    FROM 
+      pedidos p
+    INNER JOIN
+      pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+    INNER JOIN
+      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
+    INNER JOIN
+      detalhepedidos dp ON dp.idPedido = p.idPedido
+    INNER JOIN
+      produtos pp ON pp.idProduto = dp.idProduto
+    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido;  
+  `
+    return AppDataSource.getRepository(Pedido).query(sql)
+  }
+
   @Post("pedidosEmAberto")
   async pedidosEmAberto(
     @Body("itemPesquisa") itemPesquisa: string,

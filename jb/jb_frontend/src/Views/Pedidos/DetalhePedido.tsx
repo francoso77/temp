@@ -339,9 +339,9 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
                     label="Produtos"
                     erros={erros}
                     setState={setDetalhePedido}
+                    disabled={localState.action === 'excluindo' ? true : false}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
-
                   />
                 </Box>
               </Grid>

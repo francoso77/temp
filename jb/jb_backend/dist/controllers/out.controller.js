@@ -57,6 +57,15 @@ var perdaMalharia_entity_1 = require("../entities/perdaMalharia.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
+    OutController.prototype.gerenciadorPedidosEmAberto = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql;
+            return __generator(this, function (_a) {
+                sql = "\n    SELECT\n      p.idPedido,\n      p.dataPedido,\n      p.statusPedido,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor,\n        JSON_ARRAYAGG(\n    JSON_OBJECT(\n      'idPedido', dp.idPedido,\n      'Produto', pp.nome,\n      'qtdPedida', dp.qtdPedida,\n      'vrUnitario', dp.vrUnitario,\n      'total', dp.qtdPedida * dp.vrUnitario\n    )\n  ) AS details\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n    INNER JOIN\n      produtos pp ON pp.idProduto = dp.idProduto\n    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido;  \n  ";
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql)];
+            });
+        });
+    };
     OutController.prototype.pedidosEmAberto = function (itemPesquisa, campo) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
@@ -104,6 +113,12 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    __decorate([
+        (0, common_1.Post)("gerenciadorPedidosEmAberto"),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", []),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "gerenciadorPedidosEmAberto", null);
     __decorate([
         (0, common_1.Post)("pedidosEmAberto"),
         __param(0, (0, common_1.Body)("itemPesquisa")),

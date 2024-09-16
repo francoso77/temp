@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import Highcharts3D from 'highcharts/highcharts-3d'
@@ -8,8 +8,7 @@ import Accessibility from 'highcharts/modules/accessibility'
 import Condicional from '../../Componentes/Condicional/Condicional'
 import DialogGraficos from '../../Componentes/Dialog/DialogGraficos'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
-import { GraficoType, GraficoTypes } from '../../types/graficoTypes'
-import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
+import { GraficoType } from '../../types/graficoTypes'
 
 type MesesIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
@@ -80,17 +79,18 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
                 categoriaData = dadosGrafico.map((item) => item.produto)
             } else if (selectedValueRadio === GraficoType.perda) {
                 categoriaData = dadosGrafico.map((item) => item.tecelao)
-                const qtdsData = dadosGrafico.map((item) => item.qtdTotal)
             }
 
+            const qtdsData = dadosGrafico.map((item) => item.qtdTotal)
             const produtosAtualizados: [string, number][] = dadosGrafico.map(dado =>
                 [
                     selectedValueRadio === GraficoType.produto ? dado.produto
                         : selectedValueRadio === GraficoType.mes ? dado.mes
                             : dado.tecelao, dado.pesoTotal
                 ])
+
             setPizzaData(produtosAtualizados)
-            
+
             setCategoriaData(categoriaData)
             setPesosData(pesosData)
             setQtdsData(qtdsData)
@@ -107,8 +107,8 @@ export default function Graficos({ open = false, clickFechar }: PropsInterface) 
 
             const vazio = dadosGrafico.length
 
-            if (vazio === 0){ setTitulo('NÃO HÁ DADOS NO TIPO OU NO INTERVALO DE DATAS !!!')}
-        } 
+            if (vazio === 0) { setTitulo('NÃO HÁ DADOS NO TIPO OU NO INTERVALO DE DATAS !!!') }
+        }
 
     }, [dadosGrafico])
 

@@ -15,20 +15,21 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { StatusPedidoType } from '../../types/statusPedidoTypes';
+import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import DetalhePedido from './DetalhePedido';
 import ClsApi from '../../Utils/ClsApi';
+import DataTableSelect from '../testes/tableSelect';
+import DetalhePedido from '../Pedidos/DetalhePedido';
 
 export interface SomatorioPedidoInterface {
   total: string
   totalQtd: string
 }
 
-export default function Pedido() {
+export default function GerenciadorPedido() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -91,6 +92,12 @@ export default function Pedido() {
       // campo: 'idPessoa_vendedor',
       // format: (_v, rs: any) => rs.vendedor.nome
     },
+    {
+      cabecalho: 'Status',
+      alinhamento: 'left',
+      campo: 'statusPedido',
+      format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rs.statusPedido)?.descricao
+    },
   ]
 
   const handleRequestSort = (
@@ -127,22 +134,8 @@ export default function Pedido() {
     pesquisarID(id).then((rs) => {
       setPedido(rs)
       AtualizaSomatorio(rs)
-      setLocalState({ action: actionTypes.editando })
-    })
-  }
-
-  const onExcluir = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setPedido(rs)
-      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
-  }
-
-  const btIncluir = () => {
-    setRsSomatorio({ total: '0', totalQtd: '0' })
-    setPedido(ResetDados)
-    setLocalState({ action: actionTypes.incluindo })
   }
 
   const btCancelar = () => {
@@ -180,71 +173,40 @@ export default function Pedido() {
 
   const btConfirmar = () => {
     if (validarDados()) {
-      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-        clsCrud.incluir({
-          entidade: "Pedido",
-          criterio: pedido,
-          localState: localState,
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
+      clsCrud.incluir({
+        entidade: "Pedido",
+        criterio: pedido,
+        localState: localState,
+        cb: () => btPesquisar(),
+        setMensagemState: setMensagemState
+      })
+        .then((rs) => {
+          if (rs.ok) {
+            setLocalState({ action: actionTypes.pesquisando })
+          } else {
+            setMensagemState({
+              titulo: 'Erro...',
+              exibir: true,
+              mensagem: 'Erro no cadastro - Consulte Suporte',
+              tipo: MensagemTipo.Error,
+              exibirBotao: true,
+              cb: null
+            })
+          }
         })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
-          })
-      } else if (localState.action === actionTypes.excluindo) {
-        clsCrud.excluir({
-          entidade: "Pedido",
-          criterio: {
-            idPedido: pedido.idPedido
-          },
-          cb: () => btPesquisar(),
-          setMensagemState: setMensagemState
-        })
-          .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Erro no cadastro - Consulte Suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null
-              })
-            }
-          })
-      }
     }
   }
 
   const btPesquisar = () => {
 
-    const campo = validaCampo.isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
-    const itemPesquisa = campo === 'data'
-      ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)
-      : pesquisa.itemPesquisa
-
     clsApi.execute<Array<PedidoInterface>>({
-      url: 'pedidosEmAberto',
+      url: 'gerenciadorPedidosEmAberto',
       method: 'post',
-      itemPesquisa,
-      campo,
       mensagem: 'Pesquisando pedidos ...',
       setMensagemState: setMensagemState
     })
       .then((rs) => {
+        console.log(rs)
         setRsPesquisa(rs)
       })
     // clsCrud
@@ -306,25 +268,6 @@ export default function Pedido() {
         setRsPrazo(rs)
       })
 
-    // let query: string = `
-    //   SELECT 
-    //       p.*
-    //   FROM 
-    //       pessoas p
-    //   WHERE 
-    //       p.tipoPessoa = 'J' OR
-    //       p.tipoPessoa = 'C';
-    //   `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Pessoa",
-    //     sql: query,
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<PessoaInterface>) => {
-    //     setRsCliente(rs)
-    //   })
-
     clsCrud
       .pesquisar({
         entidade: "Pessoa",
@@ -353,30 +296,9 @@ export default function Pedido() {
       })
   }
 
-  // const pesquisaEventos = () => {
-  //   const campo = isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
-  //   const itemPesquisa = campo === 'data' 
-  //     ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa) 
-  //     : pesquisa.itemPesquisa
-
-  //   clsApi.execute<Array<PedidoInterface>>({
-  //     url: 'pedidosEmAberto',
-  //     method: 'post',
-  //     itemPesquisa,
-  //     campo,
-  //   })
-  //   .then((rs) => {
-  //     console.log(`Resultado da pesquisa com ${campo}: `, rs)
-  //   })
-  // }
-
   useEffect(() => {
     BuscarDados()
   }, [])
-
-  // useEffect(() => {
-  //   pesquisaEventos()
-  // }, [])
 
   return (
 
@@ -407,28 +329,22 @@ export default function Pedido() {
                 <IconButton
                   color="secondary"
                   sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
-                  onClick={() => btIncluir()}
+                // onClick={() => btIncluir()}
                 >
                   <AddCircleIcon sx={{ fontSize: 50 }} />
                 </IconButton>
               </Tooltip>
             </Grid>
             <Grid item xs={12}>
-              <DataTable
+              <DataTableSelect
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
                   {
-                    icone: "edit",
+                    icone: "swap_horiz",
                     onAcionador: (rs: PedidoInterface) =>
                       onEditar(rs.idPedido as number),
-                    toolTip: "Editar",
-                  },
-                  {
-                    icone: "delete",
-                    onAcionador: (rs: PedidoInterface) =>
-                      onExcluir(rs.idPedido as number),
-                    toolTip: "Excluir",
+                    toolTip: "Editar Status",
                   },
                 ]}
                 order={order}
@@ -509,7 +425,7 @@ export default function Pedido() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
               <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                 <InputText
                   type='text'
@@ -524,6 +440,20 @@ export default function Pedido() {
                   onKeyDown={(event: any) => btPulaCampo(event, 0)}
                 />
               </Box>
+            </Grid>
+            <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={StatusPedidoTypes}
+                campoDescricao="descricao"
+                campoID="idStatusPedido"
+                dados={pedido}
+                mensagemPadraoCampoEmBranco="Status do pedido"
+                field="statusPedido"
+                label="Status do pedido"
+                disabled={localState.action === 'excluindo' ? false : true}
+                erros={erros}
+                setState={setPedido}
+              />
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <DetalhePedido
@@ -571,7 +501,7 @@ export default function Pedido() {
                   <CancelRoundedIcon sx={{ fontSize: 50 }} />
                 </IconButton>
               </Tooltip>
-              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+              <Condicional condicao={['incluindo', 'excluindo'].includes(localState.action)}>
                 <Tooltip title={'Confirmar'}>
                   <IconButton
                     color="secondary"
@@ -579,17 +509,6 @@ export default function Pedido() {
                     onClick={() => btConfirmar()}
                   >
                     <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                  </IconButton>
-                </Tooltip>
-              </Condicional>
-              <Condicional condicao={localState.action === 'excluindo'}>
-                <Tooltip title={'Excluir'}>
-                  <IconButton
-                    color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
-                  >
-                    <DeleteIcon sx={{ fontSize: 60 }} />
                   </IconButton>
                 </Tooltip>
               </Condicional>

@@ -321,11 +321,6 @@ export default function DataTable<T>({
                     {clsFormatacao.currency(totalColunas[column])}
                   </StyledTableCell>
                 ))}
-                {/* <StyledTableCell colSpan={2} align="right">
-                  Total {"(".concat(colunaSoma.toUpperCase()).concat(")")}
-                  Total
-                </StyledTableCell>
-                <StyledTableCell align="right">{formattedTotal}</StyledTableCell> */}
               </StyledTableRow>
             </TableFooter>
           </Condicional>

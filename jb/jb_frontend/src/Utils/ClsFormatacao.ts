@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { StatusPedidoType } from '../types/statusPedidoTypes';
 
 export default class ClsFormatacao {
   public telefone(numero: string): null | string {
@@ -31,7 +32,7 @@ export default class ClsFormatacao {
 
   }
 
-  //Retona a data atual no formato dd/MM/yyyy
+  //Retorna a data atual no formato dd/MM/yyyy
   public obterDataAtualSistema = (): string => {
     const dataAtual = DateTime.now()
     return this.dataISOtoDatetime(dataAtual.toFormat('dd/MM/yyyy'))

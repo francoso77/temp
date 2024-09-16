@@ -84,7 +84,6 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
         padding: '1px',
         fontSize: '0.55rem',
-
         [theme.breakpoints.up('md')]: {
             padding: '2px',
             fontSize: '0.75rem',
@@ -149,6 +148,10 @@ function getComparator<Key extends keyof any>(
         : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
+// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
+// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
+// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
     const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
     stabilizedThis.sort((a, b) => {
@@ -161,6 +164,16 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
     return stabilizedThis.map((el) => el[0]);
 }
 
+// //formatando o valor somado
+// const formatNumber = (number: number, locale: string): string => {
+//   return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, }).format(number);
+// };
+
+// //Somando a coluna informada para totalizar na tabela
+// const sumColumn = (data: Array<any>, column: string): number => {
+//   return data.reduce((sum, row) => sum + row[column], 0);
+// };
+
 const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, number> => {
     return columns.reduce((result, column) => {
         result[column] = data.reduce((sum, row) => sum + row[column], 0);
@@ -170,7 +183,10 @@ const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, nu
 
 interface EnhancedTableProps {
     numSelected: number;
+    // onRequestSort: (event: React.MouseEvent<unknown>, property: keyof DataTableCabecalhoInterface) => void;
     onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    // order: Order;
+    // orderBy: string;
     rowCount: number;
     onRequestSort?: (event: React.MouseEvent<unknown>, property: keyof any) => void;
     order: Order;
@@ -188,6 +204,7 @@ export default function DataTableSelect<T>({
     orderBy,
     temTotal = false,
     colunaSoma = [],
+    // qtdColunas
 }: DataTableInterface) {
 
     const clsFormatacao = new ClsFormatacao()
@@ -196,6 +213,8 @@ export default function DataTableSelect<T>({
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [dense, setDense] = React.useState(false)
     const [selected, setSelected] = React.useState<readonly number[]>([])
+    // const [order, setOrder] = React.useState<Order>('asc')
+    // const [orderBy, setOrderBy] = React.useState<keyof DataTableCabecalhoInterface>('campo')
     const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -331,6 +350,14 @@ export default function DataTableSelect<T>({
         );
     }
 
+    // const handleRequestSort = (
+    //     event: React.MouseEvent<unknown>,
+    //     property: keyof DataTableCabecalhoInterface,
+    // ) => {
+    //     const isAsc = orderBy === property && order === 'asc';
+    //     setOrder(isAsc ? 'desc' : 'asc');
+    //     setOrderBy(property);
+    // };
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
@@ -363,6 +390,17 @@ export default function DataTableSelect<T>({
     const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDense(event.target.checked)
     }
+
+    // const emptyRows =
+    //     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - dados.length) : 0;
+
+    // const visibleRows = React.useMemo(
+    //     () =>
+    //         [...dados]
+    //             .sort(getComparator(order, orderBy))
+    //             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    //     [dados, order, orderBy, page, rowsPerPage],
+    // )
 
     return (
         <>
@@ -453,6 +491,15 @@ export default function DataTableSelect<T>({
                                             </TableRow>
                                         );
                                     })}
+                                {/* {emptyRows > 0 && (
+                                    <TableRow
+                                        style={{
+                                            height: (dense ? 33 : 53) * emptyRows,
+                                        }}
+                                    >
+                                        <TableCell colSpan={6} />
+                                    </TableRow>
+                                )} */}
                                 <Condicional condicao={dados.length === 0}>
                                     <StyledTableRow>
                                         <StyledTableCell
