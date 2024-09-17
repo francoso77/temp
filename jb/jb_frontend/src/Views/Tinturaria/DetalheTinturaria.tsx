@@ -309,7 +309,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         entidade: "ProducaoMalharia",
         joins: [{ tabelaRelacao: "producaomalharia.produto", relacao: "produto" }],
         criterio: { idMalharia: rsMalharia.idMalharia },
-        select: ["peso AS total_peca", "nome AS produto_nome"],
+        select: ["ROUND(SUM(peso),2) AS total_peca", "nome AS produto_nome"]
       });
 
       setRsPecasSomadas((prevRsPecasSomadas) => {
@@ -319,11 +319,11 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
 
         if (produtoExistente) {
           if (tipo === 'Incluir') {
-            produtoExistente.total_peca = + produtoAtual.total_peca.toFixed(2)
-            produtoExistente.qtd_peca = + 1
+            produtoExistente.total_peca = produtoExistente.total_peca + produtoAtual.total_peca
+            produtoExistente.qtd_peca = produtoExistente.qtd_peca + 1
           } else {
-            produtoExistente.total_peca = - produtoAtual.total_peca.toFixed(2)
-            produtoExistente.qtd_peca = - 1
+            produtoExistente.total_peca = produtoExistente.total_peca - produtoAtual.total_peca
+            produtoExistente.qtd_peca = produtoExistente.qtd_peca - 1
           }
 
           // Remove o produto se o total for zero

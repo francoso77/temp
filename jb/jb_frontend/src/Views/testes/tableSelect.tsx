@@ -192,12 +192,18 @@ export default function DataTableSelect<T>({
 
     const clsFormatacao = new ClsFormatacao()
     const theme = useTheme()
+    const [openRows, setOpenRows] = useState<number[]>([]);
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [dense, setDense] = React.useState(false)
     const [selected, setSelected] = React.useState<readonly number[]>([])
     const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
+    const handleRowClick = (id: number) => {
+        setOpenRows((prevOpenRows) =>
+            prevOpenRows.includes(id) ? prevOpenRows.filter((rowId) => rowId !== id) : [...prevOpenRows, id]
+        );
+    };
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage)
     }
@@ -224,6 +230,8 @@ export default function DataTableSelect<T>({
         return (
             <TableHead>
                 <StyledTableRow>
+                    <StyledTableCell padding="checkbox">
+                    </StyledTableCell>
                     <StyledTableCell
                         padding="checkbox">
                         <Checkbox
@@ -399,6 +407,11 @@ export default function DataTableSelect<T>({
                                                 selected={isItemSelected}
                                                 sx={{ cursor: 'pointer' }}
                                             >
+                                                <TableCell padding="checkbox">
+                                                    <IconButton onClick={() => handleRowClick(indice)}>
+                                                        {openRows.includes(indice) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                                                    </IconButton>
+                                                </TableCell>
                                                 <TableCell padding="checkbox">
                                                     <Checkbox
                                                         onClick={(event) => handleClick(event, indice)}
