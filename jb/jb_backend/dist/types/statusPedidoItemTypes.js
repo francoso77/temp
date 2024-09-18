@@ -4,9 +4,8 @@ exports.StatusPedidoItemTypes = exports.StatusPedidoItemType = void 0;
 var StatusPedidoItemType;
 (function (StatusPedidoItemType) {
     StatusPedidoItemType[StatusPedidoItemType["aberto"] = 1] = "aberto";
-    StatusPedidoItemType[StatusPedidoItemType["fechado"] = 2] = "fechado";
-    StatusPedidoItemType[StatusPedidoItemType["parcial"] = 3] = "parcial";
-    StatusPedidoItemType[StatusPedidoItemType["programado"] = 4] = "programado";
+    StatusPedidoItemType[StatusPedidoItemType["finalizado"] = 2] = "finalizado";
+    StatusPedidoItemType[StatusPedidoItemType["producao"] = 4] = "producao";
 })(StatusPedidoItemType || (exports.StatusPedidoItemType = StatusPedidoItemType = {}));
 exports.StatusPedidoItemTypes = [
     {
@@ -14,16 +13,12 @@ exports.StatusPedidoItemTypes = [
         descricao: 'Em aberto'
     },
     {
-        idStatusPedidoItem: StatusPedidoItemType.fechado,
-        descricao: 'Fechado'
+        idStatusPedidoItem: StatusPedidoItemType.finalizado,
+        descricao: 'Finalizado'
     },
     {
-        idStatusPedidoItem: StatusPedidoItemType.parcial,
-        descricao: 'Parcial'
-    },
-    {
-        idStatusPedidoItem: StatusPedidoItemType.programado,
-        descricao: 'Programado'
+        idStatusPedidoItem: StatusPedidoItemType.producao,
+        descricao: 'Em produção'
     },
 ];
 //# sourceMappingURL=statusPedidoItemTypes.js.map

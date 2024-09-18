@@ -19,11 +19,12 @@ export class OutController {
       pv.nome AS nomeVendedor,
         JSON_ARRAYAGG(
     JSON_OBJECT(
-      'idPedido', dp.idPedido,
+      'idDetalhePedido', dp.idDetalhePedido,
       'Produto', pp.nome,
-      'qtdPedida', dp.qtdPedida,
+      'qtd', dp.qtdPedida,
       'vrUnitario', dp.vrUnitario,
-      'total', dp.qtdPedida * dp.vrUnitario
+      'total', dp.qtdPedida * dp.vrUnitario,
+      'status', dp.statusItem
     )
   ) AS details
     FROM 

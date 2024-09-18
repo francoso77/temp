@@ -1,33 +1,24 @@
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { Container, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import DeleteIcon from '@mui/icons-material/Delete';
-import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
-import DataTableSelect from '../testes/tableSelect';
-import DetalhePedido from '../Pedidos/DetalhePedido';
+import DataTableSelect from '../../Componentes/DataTable/tableSelect';
+import { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
+import { TipoProdutoType } from '../../types/tipoProdutoypes';
+import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
 
-export interface SomatorioPedidoInterface {
-  total: string
-  totalQtd: string
-}
 
 export default function GerenciadorPedido() {
 
@@ -35,40 +26,32 @@ export default function GerenciadorPedido() {
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
-
-  const ResetDados: PedidoInterface = {
-    dataPedido: '',
-    observacao: '',
-    idPessoa_cliente: 0,
-    idPessoa_vendedor: 0,
-    idPrazoEntrega: 0,
-    statusPedido: StatusPedidoType.aberto,
-    detalhePedidos: []
-  }
-
-  interface PesquisaInterface {
-    itemPesquisa: string
-  }
-
-  const SomatorioDados: SomatorioPedidoInterface = {
-    total: '',
-    totalQtd: ''
+  const ResetDados: DetalhePedidoInterface = {
+    idPedido: null,
+    idProduto: 0,
+    produto: {
+      nome: '',
+      idUnidade: 0,
+      localizacao: '',
+      largura: 0,
+      gm2: 0,
+      ativo: false,
+      tipoProduto: TipoProdutoType.tecidoTinto
+    },
+    qtdPedida: 0,
+    vrUnitario: 0,
+    qtdAtendida: 0,
+    statusItem: StatusPedidoItemType.aberto,
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
-  const [pedido, setPedido] = useState<PedidoInterface>(ResetDados)
-  const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
-  const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
-  const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
+  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
-  const [rsSomatorio, setRsSomatorio] = useState<SomatorioPedidoInterface>(SomatorioDados)
-  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [open, setOpen] = useState<boolean>(false)
 
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -100,6 +83,43 @@ export default function GerenciadorPedido() {
     },
   ]
 
+  const cabecalhoDetalhe: Array<DataTableCabecalhoInterface> = [
+    {
+      cabecalho: 'Produto',
+      alinhamento: 'left',
+      campo: 'Produto',
+      // format: (data) => clsFormatacao.dataISOtoUser(data)
+    },
+    {
+      cabecalho: 'Qtd',
+      alinhamento: 'right',
+      campo: 'qtd',
+      format: (_v, rs: any) => clsFormatacao.currency(rs.qtd)
+      // campo: 'idPessoa_cliente',
+      // format: (_v, rs: any) => rs.cliente.nome
+    },
+    {
+      cabecalho: 'Vr Unitário',
+      alinhamento: 'right',
+      campo: 'vrUnitario',
+      format: (_v, rs: any) => clsFormatacao.currency(rs.vrUnitario)
+      // campo: 'idPessoa_vendedor',
+      // format: (_v, rs: any) => rs.vendedor.nome
+    },
+    {
+      cabecalho: 'Total',
+      alinhamento: 'right',
+      campo: 'total',
+      format: (_v, rs: any) => clsFormatacao.currency(rs.total)
+    },
+    {
+      cabecalho: 'Status Item',
+      alinhamento: 'center',
+      campo: 'status',
+      format: (_v, rs: any) => StatusPedidoItemTypes.find(v => v.idStatusPedidoItem === rs.status)?.descricao
+    },
+  ]
+
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof any,
@@ -109,80 +129,57 @@ export default function GerenciadorPedido() {
     setOrderBy(property);
   };
 
-  const pesquisarID = (id: string | number): Promise<PedidoInterface> => {
-    return clsCrud
+  const pesquisarID = async (id: string | number): Promise<DetalhePedidoInterface> => {
+    const rs = await clsCrud
       .pesquisar({
-        entidade: "Pedido",
-        relations: [
-          "detalhePedidos",
-          "detalhePedidos.produto",
-        ],
+        entidade: "DetalhePedido",
         criterio: {
-          idPedido: id,
+          idDetalhePedido: id,
         },
-      })
-      .then((rs: Array<PedidoInterface>) => {
-        let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataPedido)
-        return {
-          ...rs[0],
-          dataPedido: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
-        }
-      })
+        select: ['idDetalhePedido', 'statusItem']
+      });
+    return rs[0]
   }
 
   const onEditar = (id: string | number) => {
+    console.log('qual o código q está pegando', id)
     pesquisarID(id).then((rs) => {
-      setPedido(rs)
-      AtualizaSomatorio(rs)
-      setLocalState({ action: actionTypes.excluindo })
+      console.log(rs.statusItem)
+      setDetalhePedido(rs)
+      setOpen(true)
+      // AtualizaSomatorio(rs)
+      // setLocalState({ action: actionTypes.excluindo })
     })
   }
 
   const btCancelar = () => {
+    setOpen(false)
     setErros({})
-    setPedido(ResetDados)
-    setLocalState({ action: actionTypes.pesquisando })
+    setDetalhePedido(ResetDados)
   }
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.eData('dataPedido', pedido, erros, retorno)
-    retorno = validaCampo.naoVazio('idPessoa_cliente', pedido, erros, retorno, 'Informe um cliente')
-    retorno = validaCampo.naoVazio('idPessoa_vendedor', pedido, erros, retorno, 'Informe um vendedor')
-    retorno = validaCampo.naoVazio('idPrazoEntrega', pedido, erros, retorno, 'Defina um prazo')
+    retorno = validaCampo.naoVazio('statusItem', detalhePedido, erros, retorno, 'Defina o status')
 
     setErros(erros)
     return retorno
   }
 
-  const AtualizaSomatorio = (rs: PedidoInterface) => {
-
-    let totalQtd: number = 0
-    let total: number = 0
-
-    if (rs.detalhePedidos) {
-      rs.detalhePedidos.forEach((detalhe) => {
-        totalQtd = totalQtd + detalhe.qtdPedida
-        total = total + (detalhe.qtdPedida * detalhe.vrUnitario)
-      })
-      setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
-    }
-  }
 
   const btConfirmar = () => {
     if (validarDados()) {
       clsCrud.incluir({
-        entidade: "Pedido",
-        criterio: pedido,
-        localState: localState,
+        entidade: "DetalhePedido",
+        criterio: detalhePedido,
         cb: () => btPesquisar(),
         setMensagemState: setMensagemState
       })
         .then((rs) => {
           if (rs.ok) {
-            setLocalState({ action: actionTypes.pesquisando })
+            btCancelar()
           } else {
             setMensagemState({
               titulo: 'Erro...',
@@ -209,27 +206,6 @@ export default function GerenciadorPedido() {
         console.log(rs)
         setRsPesquisa(rs)
       })
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "Pedido",
-    //     relations: [
-    //       "cliente",
-    //       "vendedor",
-    //       "prazoEntrega",
-    //       "detalhePedidos",
-    //       "detalhePedidos.produto",
-    //     ],
-    //     criterio: {
-    //       "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%"),
-    //       "statusPedido": StatusPedidoType.aberto
-    //     },
-    //     camposLike: ["idPedido", "statusPedido"],
-    //     msg: 'Pesquisando pedidos ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setRsPesquisa(rs)
-    //   })
   }
 
   const irPara = useNavigate()
@@ -243,279 +219,101 @@ export default function GerenciadorPedido() {
     irPara('/')
   }
 
-  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
-    if (event.key === 'Enter') {
-      const nextField = fieldRefs.current[index];
-      if (nextField) {
-        const input = nextField.querySelector('input');
-        if (input) {
-          input.focus();
-        }
-      }
-    }
-  }
-  const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "PrazoEntrega",
-        campoOrder: ["nome"],
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-      })
-      .then((rs: Array<PrazoEntregaInterface>) => {
-        setRsPrazo(rs)
-      })
-
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        campoOrder: ['nome'],
-        comparador: 'I',
-        criterio: {
-          tipoPessoa: ['J', 'C'],
-        },
-        camposLike: ['tipoPessoa'],
-      })
-      .then((rsClientes: Array<PessoaInterface>) => {
-        setRsCliente(rsClientes)
-      })
-
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        campoOrder: ['nome'],
-        criterio: {
-          tipoPessoa: "V",
-        },
-        camposLike: ["tipoPessoa"],
-      })
-      .then((rsVendedores: Array<PessoaInterface>) => {
-        setRsVendedor(rsVendedores)
-      })
-  }
-
   useEffect(() => {
-    BuscarDados()
+    btPesquisar()
   }, [])
+
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
 
   return (
 
     <Container maxWidth="md" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: 2 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
-              <InputText
-                label="Pesquise por data ou cliente"
-                tipo="uppercase"
-                dados={pesquisa}
-                field="itemPesquisa"
-                setState={setPesquisa}
-                iconeEnd='searchicon'
-                onClickIconeEnd={() => btPesquisar()}
-                mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={2} md={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
-                // onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={12}>
-              <DataTableSelect
-                cabecalho={cabecalhoForm}
-                dados={rsPesquisa}
-                acoes={[
-                  {
-                    icone: "swap_horiz",
-                    onAcionador: (rs: PedidoInterface) =>
-                      onEditar(rs.idPedido as number),
-                    toolTip: "Editar Status",
-                  },
-                ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
-              />
-            </Grid>
-          </Condicional>
-          <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
-                <InputText
-                  type='tel'
-                  tipo="date"
-                  label="Data"
-                  dados={pedido}
-                  field="dataPedido"
-                  setState={setPedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 1)}
-                  autoFocus
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
-              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
-                <ComboBox
-                  opcoes={rsCliente}
-                  campoDescricao="nome"
-                  campoID="idPessoa"
-                  dados={pedido}
-                  mensagemPadraoCampoEmBranco="Escolha um cliente"
-                  field="idPessoa_cliente"
-                  label="Cliente"
-                  erros={erros}
-                  setState={setPedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 2)}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
-              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-                <ComboBox
-                  opcoes={rsVendedor}
-                  campoDescricao="nome"
-                  campoID="idPessoa"
-                  dados={pedido}
-                  mensagemPadraoCampoEmBranco="Escolha um Vendedor"
-                  field="idPessoa_vendedor"
-                  label="Vendedor"
-                  erros={erros}
-                  setState={setPedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
-                <ComboBox
-                  opcoes={rsPrazo}
-                  campoDescricao="nome"
-                  campoID="idPrazoEntrega"
-                  dados={pedido}
-                  mensagemPadraoCampoEmBranco="Prazo de entrega"
-                  field="idPrazoEntrega"
-                  label="Prazo de entrega"
-                  erros={erros}
-                  setState={setPedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
-              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-                <InputText
-                  type='text'
-                  tipo='uppercase'
-                  label="Observação"
-                  dados={pedido}
-                  field="observacao"
-                  setState={setPedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 0)}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={StatusPedidoTypes}
-                campoDescricao="descricao"
-                campoID="idStatusPedido"
-                dados={pedido}
-                mensagemPadraoCampoEmBranco="Status do pedido"
-                field="statusPedido"
-                label="Status do pedido"
-                disabled={localState.action === 'excluindo' ? false : true}
-                erros={erros}
-                setState={setPedido}
-              />
-            </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <DetalhePedido
-                rsMaster={pedido}
-                setRsMaster={setPedido}
-                masterLocalState={localState}
-                setRsSomatorio={setRsSomatorio}
-              />
-            </Grid>
-            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                tipo='currency'
-                scale={2}
-                label="Qtd Total"
-                labelAlign='center'
-                dados={rsSomatorio}
-                field="totalQtd"
-                setState={setRsSomatorio}
-                disabled={true}
-                textAlign='center'
-                tamanhoFonte={30}
-              />
-            </Grid>
-            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                tipo='currency'
-                scale={2}
-                label="Total Pedido"
-                labelAlign='center'
-                dados={rsSomatorio}
-                field="total"
-                setState={setRsSomatorio}
-                disabled={true}
-                textAlign='center'
-                tamanhoFonte={30}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-              <Tooltip title={'Cancelar'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 3, ml: 2 }}
-                  onClick={() => btCancelar()}
-                >
-                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-              <Condicional condicao={['incluindo', 'excluindo'].includes(localState.action)}>
-                <Tooltip title={'Confirmar'}>
-                  <IconButton
-                    color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
-                  >
-                    <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                  </IconButton>
-                </Tooltip>
-              </Condicional>
-            </Grid>
-          </Condicional>
+          <Grid item xs={12}>
+            <DataTableSelect
+              cabecalho={cabecalhoForm}
+              cabecalhoDetalhe={cabecalhoDetalhe}
+              dados={rsPesquisa}
+              acoesDetalhe={[
+                {
+                  icone: "swap_horiz",
+                  onAcionador: (rs: any) =>
+                    onEditar(rs.idDetalhePedido as number),
+                  toolTip: "Editar Status",
+                },
+              ]}
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+            />
+          </Grid>
         </Grid>
       </Paper >
-    </Container >
+
+      <Dialog
+        open={open}
+        fullScreen={fullScreen}
+        fullWidth
+        maxWidth='xs'
+        sx={{ height: '100%' }}
+      >
+        <Paper variant="outlined"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            m: 1,
+            p: 1.5,
+            backgroundColor: '#3c486b',
+          }}>
+          <Typography sx={{ color: 'white', flexGrow: 1, textAlign: 'center' }}>
+            Status do Item
+          </Typography>
+          <Tooltip title={'Fechar'}>
+            <IconButton
+              color="secondary"
+              sx={{ color: 'white', ml: 'auto' }} // Adicionando margem esquerda para mover o ícone à direita
+              onClick={() => btCancelar()}
+            >
+              <CancelRoundedIcon />
+            </IconButton>
+          </Tooltip>
+        </Paper>
+
+        <Paper variant="outlined" sx={{ padding: 2, m: 1 }}>
+          <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={StatusPedidoItemTypes}
+                campoDescricao="descricao"
+                campoID="idStatusPedidoItem"
+                dados={detalhePedido}
+                mensagemPadraoCampoEmBranco="Status do pedido"
+                field="statusItem"
+                label=""
+                erros={erros}
+                setState={setDetalhePedido}
+              />
+            </Grid>
+            <Grid item xs={12} sx={{ mt: 2, textAlign: 'center' }}>
+              <Tooltip title={'Confirmar'}>
+                <IconButton
+                  color="secondary"
+                  onClick={() => btConfirmar()}
+                >
+                  <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Dialog>
+    </Container>
   )
 }

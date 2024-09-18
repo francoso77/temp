@@ -27,7 +27,9 @@ export interface DataTableCabecalhoInterface {
 export interface DataTableInterface {
   dados: Array<any>
   cabecalho: Array<DataTableCabecalhoInterface>
+  cabecalhoDetalhe?: Array<any>
   acoes?: Array<DataTableAcaoInterface<any>>
+  acoesDetalhe?: Array<DataTableAcaoInterface<any>>
   onSelecionarLinha?: (
     rs: { [key: string]: number | string } | Object,
     linha: number
@@ -107,7 +109,7 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }))
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
@@ -117,7 +119,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -127,7 +129,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   return 0;
 }
 
-function getComparator<Key extends keyof any>(
+export function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key,
 ): (
@@ -143,7 +145,7 @@ function getComparator<Key extends keyof any>(
 // stableSort() brings sort stability to non-modern browsers (notably IE11). If you
 // only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
 // with exampleArray.slice().sort(exampleComparator)
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
+export function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -165,7 +167,7 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
 //   return data.reduce((sum, row) => sum + row[column], 0);
 // };
 
-const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, number> => {
+export const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, number> => {
   return columns.reduce((result, column) => {
     result[column] = data.reduce((sum, row) => sum + row[column], 0);
     return result;

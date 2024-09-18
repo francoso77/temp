@@ -13,8 +13,8 @@ import Pedido from '../Views/Pedidos/Pedido';
 import Entrada from '../Views/Entradas/Entrada';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
-import CollapsibleTable from '../Views/testes/subItem';
 import GerenciadorPedido from '../Views/GerenciadorPedidos/Gerenciador';
+import GeneratePDF from '../Views/testes/GeneratePDF';
 
 export const router = createBrowserRouter([
   {
@@ -79,7 +79,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: <CollapsibleTable />,
+        element: <GeneratePDF />,
       },
     ]
   },
