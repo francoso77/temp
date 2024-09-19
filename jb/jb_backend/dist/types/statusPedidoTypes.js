@@ -4,8 +4,8 @@ exports.StatusPedidoTypes = exports.StatusPedidoType = void 0;
 var StatusPedidoType;
 (function (StatusPedidoType) {
     StatusPedidoType["aberto"] = "A";
-    StatusPedidoType["cancelado"] = "C";
-    StatusPedidoType["fechado"] = "F";
+    StatusPedidoType["producao"] = "C";
+    StatusPedidoType["finalizado"] = "F";
     StatusPedidoType["parcial"] = "P";
 })(StatusPedidoType || (exports.StatusPedidoType = StatusPedidoType = {}));
 exports.StatusPedidoTypes = [
@@ -14,12 +14,12 @@ exports.StatusPedidoTypes = [
         descricao: 'Em aberto'
     },
     {
-        idStatusPedido: StatusPedidoType.cancelado,
-        descricao: 'Cancelado'
+        idStatusPedido: StatusPedidoType.producao,
+        descricao: 'Em produção'
     },
     {
-        idStatusPedido: StatusPedidoType.fechado,
-        descricao: 'Fechado'
+        idStatusPedido: StatusPedidoType.finalizado,
+        descricao: 'Finalizado'
     },
     {
         idStatusPedido: StatusPedidoType.parcial,

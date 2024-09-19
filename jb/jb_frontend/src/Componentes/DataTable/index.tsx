@@ -30,6 +30,7 @@ export interface DataTableInterface {
   cabecalhoDetalhe?: Array<any>
   acoes?: Array<DataTableAcaoInterface<any>>
   acoesDetalhe?: Array<DataTableAcaoInterface<any>>
+  onStatus?: (selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) => void
   onSelecionarLinha?: (
     rs: { [key: string]: number | string } | Object,
     linha: number
@@ -111,7 +112,7 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: 'theme.palette.action.hover,'
   },
   // hide last border
   '&:last-child td, &:last-child th': {
@@ -180,6 +181,7 @@ export default function DataTable<T>({
   dados = [],
   cabecalho = [],
   acoes = [],
+  onStatus = undefined,
   onSelecionarLinha = undefined,
   exibirPaginacao = true,
   onRequestSort,

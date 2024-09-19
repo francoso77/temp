@@ -1,7 +1,7 @@
 export enum StatusPedidoItemType {
   aberto = 1,
   finalizado = 2,
-  producao = 4
+  producao = 3
 }
 
 export const StatusPedidoItemTypes = [

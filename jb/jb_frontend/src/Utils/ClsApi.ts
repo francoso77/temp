@@ -11,6 +11,7 @@ interface PropsInterface {
   itemPesquisa?: string
   campo?: 'data' | 'nome'
   tinturaria?: number
+  pedidos?: Array<number>
   dtInicial?: string
   dtFinal?: string
   grupo?: GraficoType
@@ -69,6 +70,7 @@ export default class ClsApi {
     tinturaria,
     itemPesquisa,
     campo,
+    pedidos,
     dtInicial,
     dtFinal,
     grupo,
@@ -77,6 +79,7 @@ export default class ClsApi {
       ...dados,
       itemPesquisa,
       campo,
+      pedidos,
       tinturaria,
       dtInicial,
       dtFinal,
@@ -115,22 +118,5 @@ export default class ClsApi {
     return ClsApi.sendRequest<T>(props);
   }
 
-  public async graficos<T>(props: PropsInterface): Promise<T> {
-    return ClsApi.sendRequest<T>(props);
-  }
 }
 
-
-// public async graficos<T>({
-//   dtInicial,
-//   dtFinal,
-//   grupo
-// }: { dtInicial: string; dtFinal: string; grupo: 'produto' | 'tecelao' | 'mes' }): Promise<T> {
-//   return ClsApi.sendRequest<T>({
-//     method: 'post',  // Usando POST
-//     url: 'graficos',
-//     dtInicial,
-//     dtFinal,
-//     grupo
-//   });
-// }

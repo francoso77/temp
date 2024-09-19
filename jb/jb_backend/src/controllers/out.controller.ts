@@ -19,6 +19,7 @@ export class OutController {
       pv.nome AS nomeVendedor,
         JSON_ARRAYAGG(
     JSON_OBJECT(
+      'idPedido', p.idPedido,
       'idDetalhePedido', dp.idDetalhePedido,
       'Produto', pp.nome,
       'qtd', dp.qtdPedida,
@@ -87,6 +88,27 @@ export class OutController {
 
     const params = [tinturaria]
     return AppDataSource.getRepository(ProducaoMalharia).query(sql, params)
+  }
+
+  @Post("produzirPedidos")
+  async produzirPedidos(
+    @Body("pedidos") pedidos: Array<number>,
+  ): Promise<Array<Pedido>> {
+
+    const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
+    const sql = `
+    UPDATE
+      pedidos p
+    JOIN detalhepedidos dp on dp.idPedido = p.idPedido 
+    SET
+      p.statusPedido = "C",
+      dp.statusItem = 3
+    WHERE
+      p.idPedido IN ${ped};
+  `
+
+    const params = [ped]
+    return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 
   @Post("graficos")

@@ -67,7 +67,7 @@ export default class ClsCrud {
       .then((rs) => {
         if (rs.data.ok && setMensagemState) {
           setMensagemState({
-            titulo: '',
+            titulo: 'Aviso...',
             exibir: false,
             mensagem: '',
             tipo: MensagemTipo.Info,
@@ -138,7 +138,7 @@ export default class ClsCrud {
       .then((rs) => {
         if (rs.data.ok && setMensagemState) {
           setMensagemState({
-            titulo: '',
+            titulo: 'Aviso...',
             exibir: false,
             mensagem: '',
             tipo: MensagemTipo.Info,
@@ -179,7 +179,7 @@ export default class ClsCrud {
     }
     if (setMensagemState) {
       setMensagemState({
-        titulo: '',
+        titulo: 'Aviso...',
         exibir: true,
         mensagem: localState?.action === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
         tipo: MensagemTipo.Info,

@@ -2,7 +2,6 @@ import { Container, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMed
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
-import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
@@ -17,7 +16,7 @@ import DataTableSelect from '../../Componentes/DataTable/tableSelect';
 import { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
 import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 
 
 export default function GerenciadorPedido() {
@@ -76,8 +75,8 @@ export default function GerenciadorPedido() {
       // format: (_v, rs: any) => rs.vendedor.nome
     },
     {
-      cabecalho: 'Status',
-      alinhamento: 'left',
+      cabecalho: 'Status Pedido',
+      alinhamento: 'center',
       campo: 'statusPedido',
       format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rs.statusPedido)?.descricao
     },
@@ -97,20 +96,6 @@ export default function GerenciadorPedido() {
       format: (_v, rs: any) => clsFormatacao.currency(rs.qtd)
       // campo: 'idPessoa_cliente',
       // format: (_v, rs: any) => rs.cliente.nome
-    },
-    {
-      cabecalho: 'Vr Unitário',
-      alinhamento: 'right',
-      campo: 'vrUnitario',
-      format: (_v, rs: any) => clsFormatacao.currency(rs.vrUnitario)
-      // campo: 'idPessoa_vendedor',
-      // format: (_v, rs: any) => rs.vendedor.nome
-    },
-    {
-      cabecalho: 'Total',
-      alinhamento: 'right',
-      campo: 'total',
-      format: (_v, rs: any) => clsFormatacao.currency(rs.total)
     },
     {
       cabecalho: 'Status Item',
@@ -136,19 +121,15 @@ export default function GerenciadorPedido() {
         criterio: {
           idDetalhePedido: id,
         },
-        select: ['idDetalhePedido', 'statusItem']
+        select: ['idDetalhePedido', 'statusItem', 'idPedido']
       });
     return rs[0]
   }
 
   const onEditar = (id: string | number) => {
-    console.log('qual o código q está pegando', id)
     pesquisarID(id).then((rs) => {
-      console.log(rs.statusItem)
       setDetalhePedido(rs)
       setOpen(true)
-      // AtualizaSomatorio(rs)
-      // setLocalState({ action: actionTypes.excluindo })
     })
   }
 
@@ -168,6 +149,30 @@ export default function GerenciadorPedido() {
     return retorno
   }
 
+  const verificaStatusPedido = (pedido: number) => {
+    clsCrud.pesquisar({
+      entidade: "Pedido",
+      relations: ["detalhePedidos"],
+      criterio: {
+        idPedido: pedido
+      }
+    }).then((rs: Array<PedidoInterface>) => {
+      const qtdItens = rs[0].detalhePedidos.length
+      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoInterface) => det.statusItem === 3).length
+
+      if (qtdItens === emProducao) {
+        rs[0].statusPedido = StatusPedidoType.producao
+      } else if (emProducao > 0 && emProducao < qtdItens) {
+        rs[0].statusPedido = StatusPedidoType.parcial
+      } else {
+        rs[0].statusPedido = StatusPedidoType.aberto
+      }
+      clsCrud.incluir({
+        entidade: "Pedido",
+        criterio: rs[0],
+      })
+    })
+  }
 
   const btConfirmar = () => {
     if (validarDados()) {
@@ -179,6 +184,7 @@ export default function GerenciadorPedido() {
       })
         .then((rs) => {
           if (rs.ok) {
+            verificaStatusPedido(detalhePedido.idPedido as number)
             btCancelar()
           } else {
             setMensagemState({
@@ -195,7 +201,6 @@ export default function GerenciadorPedido() {
   }
 
   const btPesquisar = () => {
-
     clsApi.execute<Array<PedidoInterface>>({
       url: 'gerenciadorPedidosEmAberto',
       method: 'post',
@@ -203,23 +208,64 @@ export default function GerenciadorPedido() {
       setMensagemState: setMensagemState
     })
       .then((rs) => {
-        console.log(rs)
         setRsPesquisa(rs)
       })
+  }
+
+  const EmProducao = async (pedidos: Array<number>) => {
+    await clsApi.execute<Array<PedidoInterface>>({
+      url: 'produzirPedidos',
+      method: 'post',
+      pedidos,
+      mensagem: 'Alterando status dos pedidos ...',
+      setMensagemState: setMensagemState
+    })
+  }
+  async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
+
+    const tmpPedidoNaoAberto = selecao.filter((item: any) => rsPesquisa[item].statusPedido !== "A")
+
+    let tmp: Array<number> = []
+    selecao.forEach((sel: any) => {
+      if (rsPesquisa[sel].statusPedido === "A") {
+        tmp.push(rsPesquisa[sel].idPedido)
+      }
+    })
+    if (tmpPedidoNaoAberto.length > 0) {
+      setMensagemState({
+        titulo: 'Atenção...',
+        exibir: true,
+        exibirBotao: true,
+        mensagem: 'Foram selecionados pedidos que não estão EM ABERTO no status!',
+        tipo: MensagemTipo.Error,
+        cb: null
+      })
+    } else {
+
+      await EmProducao(tmp)
+      setSelected([])
+      btPesquisar()
+    }
   }
 
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Cadastro de Pedidos',
+      tituloAnterior: 'Gerenciador de Pedidos',
       pathTitulo: '/',
-      pathTituloAnterior: '/Pedido'
+      pathTituloAnterior: '/GerenciadorPedido'
     })
     irPara('/')
   }
 
   useEffect(() => {
+    setLayoutState({
+      titulo: 'Gerenciador de Pedidos',
+      tituloAnterior: '',
+      pathTitulo: '/GerenciadorPedido',
+      pathTituloAnterior: ''
+    })
     btPesquisar()
   }, [])
 
@@ -252,6 +298,7 @@ export default function GerenciadorPedido() {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
+              onStatus={onStatus}
             />
           </Grid>
         </Grid>

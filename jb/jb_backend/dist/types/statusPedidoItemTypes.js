@@ -5,7 +5,7 @@ var StatusPedidoItemType;
 (function (StatusPedidoItemType) {
     StatusPedidoItemType[StatusPedidoItemType["aberto"] = 1] = "aberto";
     StatusPedidoItemType[StatusPedidoItemType["finalizado"] = 2] = "finalizado";
-    StatusPedidoItemType[StatusPedidoItemType["producao"] = 4] = "producao";
+    StatusPedidoItemType[StatusPedidoItemType["producao"] = 3] = "producao";
 })(StatusPedidoItemType || (exports.StatusPedidoItemType = StatusPedidoItemType = {}));
 exports.StatusPedidoItemTypes = [
     {

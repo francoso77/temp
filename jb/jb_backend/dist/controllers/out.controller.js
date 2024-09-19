@@ -61,7 +61,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql;
             return __generator(this, function (_a) {
-                sql = "\n    SELECT\n      p.idPedido,\n      p.dataPedido,\n      p.statusPedido,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor,\n        JSON_ARRAYAGG(\n    JSON_OBJECT(\n      'idDetalhePedido', dp.idDetalhePedido,\n      'Produto', pp.nome,\n      'qtd', dp.qtdPedida,\n      'vrUnitario', dp.vrUnitario,\n      'total', dp.qtdPedida * dp.vrUnitario,\n      'status', dp.statusItem\n    )\n  ) AS details\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n    INNER JOIN\n      produtos pp ON pp.idProduto = dp.idProduto\n    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido;  \n  ";
+                sql = "\n    SELECT\n      p.idPedido,\n      p.dataPedido,\n      p.statusPedido,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor,\n        JSON_ARRAYAGG(\n    JSON_OBJECT(\n      'idPedido', p.idPedido,\n      'idDetalhePedido', dp.idDetalhePedido,\n      'Produto', pp.nome,\n      'qtd', dp.qtdPedida,\n      'vrUnitario', dp.vrUnitario,\n      'total', dp.qtdPedida * dp.vrUnitario,\n      'status', dp.statusItem\n    )\n  ) AS details\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n    INNER JOIN\n      produtos pp ON pp.idProduto = dp.idProduto\n    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido;  \n  ";
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql)];
             });
         });
@@ -83,6 +83,17 @@ var OutController = /** @class */ (function () {
                 sql = "\n    UPDATE\n      producaomalharias pm\n    SET\n      pm.idTinturaria = null,\n      pm.fechado = 0,\n      pm.dataFechado = null\n    WHERE\n      pm.idTinturaria = ?;\n  ";
                 params = [tinturaria];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(producaoMalharia_entity_1.default).query(sql, params)];
+            });
+        });
+    };
+    OutController.prototype.produzirPedidos = function (pedidos) {
+        return __awaiter(this, void 0, void 0, function () {
+            var ped, sql, params;
+            return __generator(this, function (_a) {
+                ped = '(' + pedidos.map(function (v) { return v; }).join(", ") + ')';
+                sql = "\n    UPDATE\n      pedidos p\n    JOIN detalhepedidos dp on dp.idPedido = p.idPedido \n    SET\n      p.statusPedido = \"C\",\n      dp.statusItem = 3\n    WHERE\n      p.idPedido IN ".concat(ped, ";\n  ");
+                params = [ped];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
         });
     };
@@ -134,6 +145,13 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [Number]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "limpaPecas", null);
+    __decorate([
+        (0, common_1.Post)("produzirPedidos"),
+        __param(0, (0, common_1.Body)("pedidos")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Array]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "produzirPedidos", null);
     __decorate([
         (0, common_1.Post)("graficos"),
         __param(0, (0, common_1.Body)("dtInicial")),

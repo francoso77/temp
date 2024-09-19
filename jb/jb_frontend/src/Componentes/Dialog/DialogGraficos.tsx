@@ -101,7 +101,7 @@ export default function DialogGraficos(props: SimpleDialogProps) {
       const grupo = selectedRadio
 
       console.log('btConfirmar', dtInicial, dtFinal, grupo)
-      const producao = await clsApi.graficos<Array<any>>({
+      const producao = await clsApi.execute<Array<any>>({
         url: 'graficos',
         method: 'post',
         dtInicial,

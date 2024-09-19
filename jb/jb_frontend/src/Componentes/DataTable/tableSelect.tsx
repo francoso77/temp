@@ -1,26 +1,23 @@
 import React, { useContext, useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
-import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
-import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward, Delete, Print, Key } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '../../Componentes/DataTable';
-
+import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
 
 
 interface ItemDetail {
     idDetalhePedido: number,
     Produto: string;
     qtd: number;
-    vrUnitario: number;
-    total: number;
 }
 
 
@@ -40,6 +37,7 @@ export default function DataTableSelect<T>({
     cabecalhoDetalhe = [],
     acoes = [],
     acoesDetalhe = [],
+    onStatus = undefined,
     onSelecionarLinha = undefined,
     exibirPaginacao = true,
     onRequestSort,
@@ -95,6 +93,7 @@ export default function DataTableSelect<T>({
                         padding="checkbox">
                         <Checkbox
                             color="default"
+                            sx={{ color: 'white' }}
                             indeterminate={numSelected > 0 && numSelected < rowCount}
                             checked={rowCount > 0 && numSelected === rowCount}
                             onChange={onSelectAllClick}
@@ -174,17 +173,13 @@ export default function DataTableSelect<T>({
                     </Typography>
                 )}
                 {numSelected > 0 ? (
-                    <Tooltip title="Delete">
+                    <Tooltip title="Em Produção">
                         <IconButton
-                            onClick={() => {
-                                selected.forEach(i => {
-                                    if (i < dados.length) {
-                                        console.log(dados[i]);
-                                    }
-                                })
-                            }}
+                            onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
                         >
-                            <DeleteIcon />
+                            <AutorenewTwoToneIcon
+                                sx={{ fontSize: 40, color: 'green' }}
+                            />
                         </IconButton>
                     </Tooltip>
                 ) : (
@@ -233,8 +228,7 @@ export default function DataTableSelect<T>({
 
     const calculateTotals = (details: ItemDetail[]) => {
         const totalQuantidade = clsFormatacao.currency(details.reduce((sum, detail) => sum + detail.qtd, 0))
-        const totalValor = clsFormatacao.currency(details.reduce((sum, detail) => sum + detail.total, 0))
-        return { totalQuantidade, totalValor };
+        return { totalQuantidade };
     }
 
     return (
@@ -262,7 +256,7 @@ export default function DataTableSelect<T>({
 
                                         const isItemSelected = selected.includes(indice);
                                         const labelId = `enhanced-table-checkbox-${indice}`;
-                                        const { totalQuantidade, totalValor } = calculateTotals(dados[indice].details);
+                                        const { totalQuantidade } = calculateTotals(dados[indice].details);
 
 
                                         return (
@@ -297,6 +291,12 @@ export default function DataTableSelect<T>({
                                                             return (
                                                                 <StyledTableCell
                                                                     key={indice}
+                                                                    sx={{
+                                                                        color: (row as any)[coluna.campo] === "A" ? 'green' :
+                                                                            (row as any)[coluna.campo] === "F" ? 'red' :
+                                                                                (row as any)[coluna.campo] === "C" ? 'orange' :
+                                                                                    (row as any)[coluna.campo] === "P" ? 'royalblue' : 'default'
+                                                                    }}
                                                                     align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
                                                                     {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
                                                                 </StyledTableCell>
@@ -342,8 +342,9 @@ export default function DataTableSelect<T>({
                                                                     <TableHead >
                                                                         <StyledTableRow>
                                                                             {cabecalhoDetalhe.map((coluna, indice) => (
-                                                                                <StyledTableCell
+                                                                                <TableCell
                                                                                     key={indice}
+                                                                                    sx={{ bgcolor: '#1e81b0', m: 0.5, p: 0.5, color: 'white' }}
                                                                                     align={coluna.alinhamento ? coluna.alinhamento : 'left'}
                                                                                     style={{ minWidth: coluna.largura }}
                                                                                     sortDirection={orderBy === coluna.campo ? order : false}
@@ -355,14 +356,15 @@ export default function DataTableSelect<T>({
                                                                                     >
                                                                                         {coluna.cabecalho}
                                                                                     </TableSortLabel>
-                                                                                </StyledTableCell>
+                                                                                </TableCell>
                                                                             ))}
                                                                             <Condicional condicao={acoesDetalhe.length > 0}>
-                                                                                <StyledTableCell align='center'>
-                                                                                    Opções
-                                                                                </StyledTableCell>
+                                                                                <TableCell
+                                                                                    sx={{ bgcolor: '#1e81b0', m: 0.5, p: 0.5, color: 'white' }}
+                                                                                    align='center'>
+                                                                                    Ação
+                                                                                </TableCell>
                                                                             </Condicional>
-
                                                                         </StyledTableRow>
                                                                     </TableHead>
                                                                     <TableBody>
@@ -376,9 +378,15 @@ export default function DataTableSelect<T>({
                                                                                     >
                                                                                         {
                                                                                             cabecalhoDetalhe.map((coluna, indice) => {
+
                                                                                                 return (
                                                                                                     <StyledTableCell
                                                                                                         key={indice}
+                                                                                                        sx={{
+                                                                                                            color: (row as any)[coluna.campo] === 1 ? 'green' :
+                                                                                                                (row as any)[coluna.campo] === 2 ? 'red' :
+                                                                                                                    (row as any)[coluna.campo] === 3 ? 'orange' : 'default'
+                                                                                                        }}
                                                                                                         align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
                                                                                                         {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
                                                                                                     </StyledTableCell>
@@ -433,7 +441,6 @@ export default function DataTableSelect<T>({
                                                                             <StyledTableCell align="left"><strong>Total:</strong></StyledTableCell>
                                                                             <StyledTableCell align='right'><strong>{totalQuantidade}</strong></StyledTableCell>
                                                                             <StyledTableCell ></StyledTableCell>
-                                                                            <StyledTableCell align='right'><strong>{totalValor}</strong></StyledTableCell>
                                                                         </StyledTableRow>
                                                                     </TableBody>
                                                                 </Table>
