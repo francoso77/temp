@@ -61,7 +61,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome');
-  const [tipo, setTipo] = useState<TipoProdutoType>()
+  const [tipo, setTipo] = useState<TipoProdutoType>();
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -108,6 +108,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   const onEditar = (rs: DetalheEstruturaInterface, indice: number) => {
+    pegaTipo()
     setLocalState({ action: actionTypes.editando })
     setIndiceEdicao(indice)
     setDetalheEstrutura(rs)
@@ -153,8 +154,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   const pegaTipo = () => {
     let auxTipo: number | undefined = rsProduto.
       find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
-    setTipo(auxTipo)
-
+    setTipo(auxTipo as number)
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -257,6 +257,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
 
   useEffect(() => {
     BuscarDados()
+    pegaTipo()
   }, [])
 
   const theme = useTheme()
@@ -297,6 +298,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                     label="Produtos"
                     erros={erros}
                     setState={setDetalheEstrutura}
+                    disabled={localState.action === 'excluindo' ? true : false}
                     onSelect={pegaTipo}
                     onKeyDown={
                       tipo === 10 ? (event) => btPulaCampo(event, 1)
@@ -305,7 +307,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                   />
                 </Box>
               </Grid>
-              <Condicional condicao={[2, 3, 6, 10, 11].includes(tipo as number)}>
+              <Condicional condicao={[2, 3, 6, 7, 10, 11].includes(tipo as number)}>
                 <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
                   <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                     <ComboBox
@@ -318,6 +320,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                       label="Cores"
                       erros={erros}
                       setState={setDetalheEstrutura}
+                      disabled={localState.action === 'excluindo' ? true : false}
                       onSelect={pegaTipo}
                       onFocus={(e) => e.target.select()}
                       onKeyDown={(event) => btPulaCampo(event, 2)}

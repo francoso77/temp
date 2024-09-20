@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
@@ -12,7 +12,13 @@ import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '../../Componentes/DataTable';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
-
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import PrintIcon from '@mui/icons-material/Print';
+import ShareIcon from '@mui/icons-material/Share';
+import { styled } from '@mui/material/styles';
+import SpeedDial, { SpeedDialProps } from '@mui/material/SpeedDial';
 
 interface ItemDetail {
     idDetalhePedido: number,
@@ -20,7 +26,17 @@ interface ItemDetail {
     qtd: number;
 }
 
-
+// const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
+//     position: 'absolute',
+//     '&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft': {
+//         bottom: theme.spacing(2),
+//         right: theme.spacing(2),
+//     },
+//     '&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight': {
+//         top: theme.spacing(2),
+//         left: theme.spacing(2),
+//     },
+// }));
 
 interface EnhancedTableProps {
     numSelected: number;
@@ -55,6 +71,16 @@ export default function DataTableSelect<T>({
     const [dense, setDense] = React.useState(false)
     const [selected, setSelected] = React.useState<readonly number[]>([])
     const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+
+    const clicou = (msg: string) => {
+        console.log('clicou aqui ', msg)
+    }
+    const actions = [
+        { icon: <FileCopyIcon />, name: 'Copiar', click: () => clicou('copiar') },
+        { icon: <SaveIcon />, name: 'Salvar', click: () => clicou('salvar') },
+        { icon: <PrintIcon />, name: 'Imprimir', click: () => clicou('imprimir') },
+        { icon: <ShareIcon />, name: 'Compartilhar', click: () => clicou('compartilhar') },
+    ];
 
     const handleRowClick = (id: number) => {
         setOpenRows((prevOpenRows) =>
@@ -183,11 +209,34 @@ export default function DataTableSelect<T>({
                         </IconButton>
                     </Tooltip>
                 ) : (
-                    <Tooltip title="Filtros">
-                        <IconButton>
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
+                    <Box sx={{ position: 'relative', mr: 10, height: 100 }}>
+                        <SpeedDial
+                            ariaLabel="Menu de opções"
+                            icon={<MoreVertIcon />}
+                            direction={'left'}
+                            sx={{
+                                position: 'absolute',
+                                bottom: 23,
+                                right: -77,
+                                // Aumentar o tamanho do SpeedDial
+                                transform: 'scale(1)',
+                                '& .MuiFab-primary': {
+                                    width: 35, // Largura personalizada
+                                    height: 35, // Altura personalizada
+                                },
+                            }}
+
+                        >
+                            {actions.map((action) => (
+                                <SpeedDialAction
+                                    key={action.name}
+                                    icon={action.icon}
+                                    tooltipTitle={action.name}
+                                    onClick={action.click}
+                                />
+                            ))}
+                        </SpeedDial>
+                    </Box>
                 )}
             </Toolbar>
         );

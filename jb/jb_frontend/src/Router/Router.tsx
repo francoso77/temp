@@ -14,7 +14,8 @@ import Entrada from '../Views/Entradas/Entrada';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import GerenciadorPedido from '../Views/GerenciadorPedidos/Gerenciador';
-import GeneratePDF from '../Views/testes/GeneratePDF';
+import DynamicTablePage from '../Views/testes/teste';
+
 
 export const router = createBrowserRouter([
   {
@@ -79,7 +80,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: <GeneratePDF />,
+        element: <DynamicTablePage />,
       },
     ]
   },
