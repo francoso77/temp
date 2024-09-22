@@ -6,7 +6,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
-import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
+import { mensagemPadrao, MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
@@ -19,6 +19,7 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import InputCalc from '../../Componentes/InputCalc';
 import { SomatorioPedidoInterface } from './Pedido';
+import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 
 
 interface PropsInterface {
@@ -216,9 +217,32 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
     return indice < 0;
   }
 
-  const btConfirmaInclusao = () => {
-
-    if (validarDados() && podeIncluirDetalhe()) {
+  const temEstrutura = async (id: number): Promise<boolean> => {
+    try {
+      const estrutura: EstruturaInterface[] = await clsCrud.pesquisar({
+        entidade: "Estrutura",
+        criterio: { idProduto: id },
+      })
+      if(estrutura.length === 0) {
+        setMensagemState({
+          titulo: 'Erro',
+          exibir: true,
+          mensagem: 'Produto sem Estrutura definida!',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null
+        })
+        return false
+      }
+      return estrutura.length > 0;
+    } catch (error) {
+      console.error("Erro ao buscar estrutura:", error)
+      return false; // ou throw error;
+    }
+  }
+  const btConfirmaInclusao = async () => {
+    const estrutura = await temEstrutura(detalhePedido.idProduto)
+    if (validarDados() && podeIncluirDetalhe() && estrutura) {
       let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
       tmpDetalhe.push({
         idPedido: rsMaster.idPedido as number,

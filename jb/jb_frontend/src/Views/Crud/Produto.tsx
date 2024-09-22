@@ -31,7 +31,7 @@ export default function Produto() {
     localizacao: '',
     largura: 0,
     gm2: 0,
-    ativo: false,
+    ativo: true,
     tipoProduto: TipoProdutoType.tecidoTinto
 
   }
