@@ -48,8 +48,8 @@ export default function Produto() {
   const [produto, setProduto] = useState<ProdutoInterface>(ResetDados)
   const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
-  const [order, setOrder] = useState<Order>('asc')
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  // const [order, setOrder] = useState<Order>('asc')
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
 
@@ -84,14 +84,14 @@ export default function Produto() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const pesquisarID = (id: string | number): Promise<ProdutoInterface> => {
     return clsCrud
@@ -395,9 +395,9 @@ export default function Produto() {
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
+              // order={order}
+              // orderBy={orderBy}
+              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

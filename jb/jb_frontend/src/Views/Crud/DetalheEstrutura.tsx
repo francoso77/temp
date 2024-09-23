@@ -59,8 +59,8 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   const [detalheEstrutura, setDetalheEstrutura] = useState<DetalheEstruturaInterface>(ResetDados);
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  // const [order, setOrder] = useState<Order>('asc');
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const [tipo, setTipo] = useState<TipoProdutoType>();
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -85,14 +85,14 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
@@ -409,9 +409,9 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                   toolTip: "Excluir",
                 },
               ]}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
+          // order={order}
+          // orderBy={orderBy}
+          // onRequestSort={handleRequestSort}
           />
         </Grid>
       </Paper>

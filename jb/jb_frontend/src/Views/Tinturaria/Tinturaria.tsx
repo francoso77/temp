@@ -50,8 +50,8 @@ export function Tinturaria() {
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  // const [order, setOrder] = useState<Order>('asc');
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -80,14 +80,14 @@ export function Tinturaria() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc'
-    setOrder(isAsc ? 'desc' : 'asc')
-    setOrderBy(property);
-  }
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc'
+  //   setOrder(isAsc ? 'desc' : 'asc')
+  //   setOrderBy(property);
+  // }
 
   const MensagemErro = (erro: string) => {
     setMensagemState({
@@ -539,9 +539,9 @@ export function Tinturaria() {
                       toolTip: "Romaneio",
                     },
                   ]}
-                  order={order}
-                  orderBy={orderBy}
-                  onRequestSort={handleRequestSort}
+                // order={order}
+                // orderBy={orderBy}
+                // onRequestSort={handleRequestSort}
                 />
               </Grid>
             </Condicional>

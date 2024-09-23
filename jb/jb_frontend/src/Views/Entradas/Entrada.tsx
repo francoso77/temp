@@ -56,8 +56,8 @@ export default function Entrada() {
   const [entrada, setEntrada] = useState<EntradaInterface>(ResetDados)
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  // const [order, setOrder] = useState<Order>('asc');
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioEntradaInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -83,14 +83,14 @@ export default function Entrada() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc'
-    setOrder(isAsc ? 'desc' : 'asc')
-    setOrderBy(property);
-  }
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc'
+  //   setOrder(isAsc ? 'desc' : 'asc')
+  //   setOrderBy(property);
+  // }
 
   const pesquisarID = (id: string | number): Promise<EntradaInterface> => {
     return clsCrud
@@ -482,9 +482,9 @@ export default function Entrada() {
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
+              // order={order}
+              // orderBy={orderBy}
+              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>
@@ -500,6 +500,7 @@ export default function Entrada() {
                   setState={setEntrada}
                   disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 1)}
                   autoFocus
                 />
@@ -536,6 +537,7 @@ export default function Entrada() {
                   setState={setEntrada}
                   disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 3)}
                 />
               </Box>
@@ -551,6 +553,7 @@ export default function Entrada() {
                   setState={setEntrada}
                   disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 0)}
                 />
               </Box>

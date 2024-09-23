@@ -97,8 +97,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
   const [rsTinturaria, setRsTinturaria] = useState<Array<TinturariaInterface>>([])
-  const [order, setOrder] = useState<Order>('asc')
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  // const [order, setOrder] = useState<Order>('asc')
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -130,14 +130,14 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const pegaTipo = () => {
     let auxTipo: number | undefined = rsProduto.
@@ -370,7 +370,7 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
         setRsTinturaria(rsTinturarias)
       })
 
-      clsCrud
+    clsCrud
       .pesquisar({
         entidade: "Pessoa",
         campoOrder: ['nome'],
@@ -693,9 +693,9 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
                   toolTip: "Excluir",
                 },
               ]}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
+          // order={order}
+          // orderBy={orderBy}
+          // onRequestSort={handleRequestSort}
           />
         </Grid>
       </Paper>

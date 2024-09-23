@@ -66,8 +66,8 @@ export default function Pessoa() {
   const [erros, setErros] = useState({})
   const [pessoa, setPessoa] = useState<PessoaInterface>(ResetDados)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  // const [order, setOrder] = useState<Order>('asc');
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -93,14 +93,14 @@ export default function Pessoa() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const pesquisarID = (id: string | number): Promise<PessoaInterface> => {
     return clsCrud
@@ -390,9 +390,9 @@ export default function Pessoa() {
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
+              // order={order}
+              // orderBy={orderBy}
+              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

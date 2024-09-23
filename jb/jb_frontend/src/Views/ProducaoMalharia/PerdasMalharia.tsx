@@ -46,8 +46,8 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
   const [dadosTabela, setDadosTabela] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [order, setOrder] = useState<Order>('asc')
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  // const [order, setOrder] = useState<Order>('asc')
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
 
   const cabecalhoPerda: Array<DataTableCabecalhoInterface> = [
     {
@@ -71,14 +71,14 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
   ]
 
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc'
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property)
-  }
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc'
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property)
+  // }
 
   const MensagemErro = (erro: string) => {
     setMensagemState({
@@ -423,9 +423,9 @@ export default function PerdasMalharia({ open = false, clickFechar }: PropsInter
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
+              // order={order}
+              // orderBy={orderBy}
+              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Paper>

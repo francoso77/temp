@@ -25,6 +25,8 @@ var tinturaria_entity_1 = require("./entities/tinturaria.entity");
 var unidadeMedida_entity_1 = require("./entities/unidadeMedida.entity");
 var user_entity_1 = require("./entities/user.entity");
 var perdaMalharia_entity_1 = require("./entities/perdaMalharia.entity");
+var programacaoDublagem_entity_1 = require("./entities/programacaoDublagem.entity");
+var detalheProgramacaoDublagem_entity_1 = require("./entities/detalheProgramacaoDublagem.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -42,6 +44,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         detalhePedido_entity_1.default,
         detalheProducaoDublagem_entity_1.default,
         detalheProgramacao_entity_1.default,
+        detalheProgramacaoDublagem_entity_1.default,
         detalheTinturaria_entity_1.default,
         entrada_entity_1.default,
         estoque_entity_1.default,
@@ -55,6 +58,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         producaoMalharia_entity_1.default,
         produto_entity_1.default,
         programacao_entity_1.default,
+        programacaoDublagem_entity_1.default,
         tinturaria_entity_1.default,
         unidadeMedida_entity_1.default,
         user_entity_1.User

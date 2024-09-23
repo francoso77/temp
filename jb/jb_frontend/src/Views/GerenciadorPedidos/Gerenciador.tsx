@@ -9,7 +9,6 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import ComboBox from '../../Componentes/ComboBox';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
 import DataTableSelect from '../../Componentes/DataTable/tableSelect';
@@ -17,6 +16,7 @@ import { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable'
 import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 
 
 export default function GerenciadorPedido() {
@@ -282,7 +282,7 @@ export default function GerenciadorPedido() {
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <DataTableSelect
               cabecalho={cabecalhoForm}
               cabecalhoDetalhe={cabecalhoDetalhe}
@@ -300,7 +300,7 @@ export default function GerenciadorPedido() {
               onRequestSort={handleRequestSort}
               onStatus={onStatus}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Paper >
 

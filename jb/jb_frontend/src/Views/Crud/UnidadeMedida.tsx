@@ -38,8 +38,8 @@ export default function UnidadeMedida() {
   const [erros, setErros] = useState({})
   const [unidadeMedida, setUnidadeMedida] = useState<UnidadeMedidaInterface>(ResetDados)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  // const [order, setOrder] = useState<Order>('asc');
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -54,14 +54,14 @@ export default function UnidadeMedida() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const btPesquisar = () => {
     clsCrud
@@ -219,7 +219,7 @@ export default function UnidadeMedida() {
     <Container maxWidth="md" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt:-1.5, mr:-5, mb:-5}}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
@@ -267,9 +267,9 @@ export default function UnidadeMedida() {
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
+              // order={order}
+              // orderBy={orderBy}
+              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

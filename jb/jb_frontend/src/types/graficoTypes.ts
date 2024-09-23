@@ -22,5 +22,4 @@ export const GraficoTypes = [
     idGraficoType: GraficoType.perda,
     descricao: 'Gráfico por Perda'
   },
-
 ]

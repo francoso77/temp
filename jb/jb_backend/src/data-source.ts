@@ -22,6 +22,8 @@ import Tinturaria from './entities/tinturaria.entity'
 import UnidadeMedida from './entities/unidadeMedida.entity'
 import { User } from './entities/user.entity'
 import PerdaMalharia from './entities/perdaMalharia.entity'
+import ProgramacaoDublagem from './entities/programacaoDublagem.entity'
+import DetalheProgramacaoDublagem from './entities/detalheProgramacaoDublagem.entity'
 
 
 export const AppDataSource = new DataSource({
@@ -41,6 +43,7 @@ export const AppDataSource = new DataSource({
     DetalhePedido,
     DetalheProducaoDublagem,
     DetalheProgramacao,
+    DetalheProgramacaoDublagem,
     DetalheTinturaria,
     Entrada,
     Estoque,
@@ -54,6 +57,7 @@ export const AppDataSource = new DataSource({
     ProducaoMalharia,
     Produto,
     Programacao,
+    ProgramacaoDublagem,
     Tinturaria,
     UnidadeMedida,
     User

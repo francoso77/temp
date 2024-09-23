@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { StatusPedidoType } from '../types/statusPedidoTypes';
 
 export default class ClsFormatacao {
   public telefone(numero: string): null | string {
@@ -55,6 +54,9 @@ export default class ClsFormatacao {
     return numero.toLocaleString('pt-br', { minimumFractionDigits: 2 })
   }
 
+  public numeroPadrao(numero: number): string {
+    return numero.toLocaleString('pt-br', { minimumFractionDigits: 0 })
+  }
   public dataAbreviadaParaDataCompleta(dataAbreviada: string): string {
     return dataAbreviada.concat('/').concat(DateTime.now().toFormat('yyyy'))
   }

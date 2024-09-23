@@ -6,7 +6,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
-import { mensagemPadrao, MensagemTipo } from '../../ContextoGlobal/MensagemState';
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
@@ -15,11 +15,11 @@ import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import InputCalc from '../../Componentes/InputCalc';
 import { SomatorioPedidoInterface } from './Pedido';
 import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 
 
 interface PropsInterface {
@@ -61,8 +61,8 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
   const [erros, setErros] = useState({});
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados);
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
-  const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof any>('nome');
+  // const [order, setOrder] = useState<Order>('asc');
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome');
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -93,14 +93,14 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
@@ -223,7 +223,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
         entidade: "Estrutura",
         criterio: { idProduto: id },
       })
-      if(estrutura.length === 0) {
+      if (estrutura.length === 0) {
         setMensagemState({
           titulo: 'Erro',
           exibir: true,
@@ -477,9 +477,9 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
                   toolTip: "Excluir",
                 },
               ]}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
+          // order={order}
+          // orderBy={orderBy}
+          // onRequestSort={handleRequestSort}
           />
         </Grid>
       </Paper>

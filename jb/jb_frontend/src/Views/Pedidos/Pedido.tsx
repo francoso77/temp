@@ -16,12 +16,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/PedidoInterface';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import DetalhePedido from './DetalhePedido';
 import ClsApi from '../../Utils/ClsApi';
+import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import DetalhePedido from './DetalhePedido';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -64,16 +64,23 @@ export default function Pedido() {
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  const [order, setOrder] = useState<Order>('asc')
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
+  // const [order, setOrder] = useState<Order>('asc')
+  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioPedidoInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
+      cabecalho: 'Pedido',
+      alinhamento: 'center',
+      campo: 'idPedido',
+      largura: 15,
+      format: (v) => clsFormatacao.numeroPadrao(v)
+    },
+    {
       cabecalho: 'Data',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'dataPedido',
       format: (data) => clsFormatacao.dataISOtoUser(data)
     },
@@ -93,14 +100,14 @@ export default function Pedido() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  // const handleRequestSort = (
+  //   event: React.MouseEvent<unknown>,
+  //   property: keyof any,
+  // ) => {
+  //   const isAsc = orderBy === property && order === 'asc';
+  //   setOrder(isAsc ? 'desc' : 'asc');
+  //   setOrderBy(property);
+  // };
 
   const pesquisarID = (id: string | number): Promise<PedidoInterface> => {
     return clsCrud
@@ -431,9 +438,9 @@ export default function Pedido() {
                     toolTip: "Excluir",
                   },
                 ]}
-                order={order}
-                orderBy={orderBy}
-                onRequestSort={handleRequestSort}
+              // order={order}
+              // orderBy={orderBy}
+              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

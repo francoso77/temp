@@ -36,9 +36,9 @@ export interface DataTableInterface {
     linha: number
   ) => void
   exibirPaginacao?: boolean
-  onRequestSort?: (event: React.MouseEvent<unknown>, property: keyof any) => void;
-  order: Order;
-  orderBy: string | number | symbol;
+  // onRequestSort?: (event: React.MouseEvent<unknown>, property: keyof any) => void;
+  // order: Order;
+  // orderBy: string | number | symbol;
   temTotal?: boolean;
   colunaSoma?: Array<string>;
   // qtdColunas?: number;
@@ -184,9 +184,9 @@ export default function DataTable<T>({
   onStatus = undefined,
   onSelecionarLinha = undefined,
   exibirPaginacao = true,
-  onRequestSort,
-  order,
-  orderBy,
+  // onRequestSort,
+  // order,
+  // orderBy,
   temTotal = false,
   colunaSoma = [],
   // qtdColunas
@@ -196,6 +196,8 @@ export default function DataTable<T>({
   const theme = useTheme()
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<keyof any>('nome')
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -208,10 +210,19 @@ export default function DataTable<T>({
 
   const createSortHandler =
     (property: keyof any) => (event: React.MouseEvent<unknown>) => {
-      if (typeof onRequestSort == 'function') {
-        onRequestSort(event, property);
+      if (typeof handleRequestSort == 'function') {
+        handleRequestSort(event, property);
       }
     }
+
+  const handleRequestSort = (
+    event: React.MouseEvent<unknown>,
+    property: keyof any,
+  ) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property);
+  }
 
   const totalColunas = sumColumns(dados, colunaSoma)
 

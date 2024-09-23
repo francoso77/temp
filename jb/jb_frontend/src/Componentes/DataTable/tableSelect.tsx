@@ -56,9 +56,9 @@ export default function DataTableSelect<T>({
     onStatus = undefined,
     onSelecionarLinha = undefined,
     exibirPaginacao = true,
-    onRequestSort,
-    order,
-    orderBy,
+    // onRequestSort,
+    // order,
+    // orderBy,
     temTotal = false,
     colunaSoma = [],
 }: DataTableInterface) {
@@ -71,6 +71,8 @@ export default function DataTableSelect<T>({
     const [dense, setDense] = React.useState(false)
     const [selected, setSelected] = React.useState<readonly number[]>([])
     const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+    const [order, setOrder] = useState<Order>('asc');
+    const [orderBy, setOrderBy] = useState<keyof any>('nome')
 
     const clicou = (msg: string) => {
         console.log('clicou aqui ', msg)
@@ -98,10 +100,19 @@ export default function DataTableSelect<T>({
 
     const createSortHandler =
         (property: keyof any) => (event: React.MouseEvent<unknown>) => {
-            if (typeof onRequestSort == 'function') {
-                onRequestSort(event, property);
+            if (typeof handleRequestSort == 'function') {
+                handleRequestSort(event, property);
             }
         }
+
+    const handleRequestSort = (
+        event: React.MouseEvent<unknown>,
+        property: keyof any,
+    ) => {
+        const isAsc = orderBy === property && order === 'asc'
+        setOrder(isAsc ? 'desc' : 'asc')
+        setOrderBy(property);
+    }
 
     const totalColunas = sumColumns(dados, colunaSoma)
 
@@ -296,7 +307,7 @@ export default function DataTableSelect<T>({
                                 order={order}
                                 orderBy={orderBy}
                                 onSelectAllClick={handleSelectAllClick}
-                                onRequestSort={onRequestSort}
+                                onRequestSort={handleRequestSort}
                                 rowCount={dados.length}
                             />
                             <TableBody>
