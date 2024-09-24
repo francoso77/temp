@@ -56,9 +56,6 @@ export default function DataTableSelect<T>({
     onStatus = undefined,
     onSelecionarLinha = undefined,
     exibirPaginacao = true,
-    // onRequestSort,
-    // order,
-    // orderBy,
     temTotal = false,
     colunaSoma = [],
 }: DataTableInterface) {
@@ -199,17 +196,17 @@ export default function DataTableSelect<T>({
                     >
                         {numSelected} selecionado(s)
                     </Typography>
-                ) : (
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        variant="h6"
-                        id="tableTitle"
-                        component="div"
-                    >
-                        {layoutState.titulo}
-                    </Typography>
+                ) : (<></>
+                    // <Typography
+                    //     sx={{ flex: '1 1 100%' }}
+                    //     variant="h6"
+                    //     id="tableTitle"
+                    //     component="div"
+                    // >
+                    //     {layoutState.titulo}
+                    // </Typography>
                 )}
-                {numSelected > 0 ? (
+                {/* {numSelected > 0 ? (
                     <Tooltip title="Em Produção">
                         <IconButton
                             onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
@@ -248,7 +245,7 @@ export default function DataTableSelect<T>({
                             ))}
                         </SpeedDial>
                     </Box>
-                )}
+                )} */}
             </Toolbar>
         );
     }

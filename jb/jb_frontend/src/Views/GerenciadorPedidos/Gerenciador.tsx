@@ -48,8 +48,6 @@ export default function GerenciadorPedido() {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
-  const [order, setOrder] = useState<Order>('asc')
-  const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [open, setOpen] = useState<boolean>(false)
 
 
@@ -105,14 +103,6 @@ export default function GerenciadorPedido() {
     },
   ]
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof any,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
 
   const pesquisarID = async (id: string | number): Promise<DetalhePedidoInterface> => {
     const rs = await clsCrud
@@ -274,15 +264,15 @@ export default function GerenciadorPedido() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 2 }}>
-      <Paper variant="outlined" sx={{ padding: 1 }}>
+    <Container maxWidth="lg" sx={{ ml: 0 }}>
+      <Paper variant="outlined" sx={{ p: 0.5 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: 2 }}>
+          {/* <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: 2 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
-          </Grid>
-          {/* <Grid item xs={12}>
+          </Grid> */}
+          <Grid item xs={12}>
             <DataTableSelect
               cabecalho={cabecalhoForm}
               cabecalhoDetalhe={cabecalhoDetalhe}
@@ -295,12 +285,9 @@ export default function GerenciadorPedido() {
                   toolTip: "Editar Status",
                 },
               ]}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
               onStatus={onStatus}
             />
-          </Grid> */}
+          </Grid>
         </Grid>
       </Paper >
 
@@ -316,7 +303,7 @@ export default function GerenciadorPedido() {
             display: 'flex',
             justifyContent: 'space-between',
             m: 1,
-            p: 1.5,
+            p: 0,
             backgroundColor: '#3c486b',
           }}>
           <Typography sx={{ color: 'white', flexGrow: 1, textAlign: 'center' }}>
@@ -333,7 +320,7 @@ export default function GerenciadorPedido() {
           </Tooltip>
         </Paper>
 
-        <Paper variant="outlined" sx={{ padding: 2, m: 1 }}>
+        <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
           <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
               <ComboBox

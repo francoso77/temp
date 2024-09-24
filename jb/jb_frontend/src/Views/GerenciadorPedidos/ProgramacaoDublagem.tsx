@@ -8,7 +8,6 @@ import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material'
 import Condicional from '../../Componentes/Condicional/Condicional';
 import InputText from '../../Componentes/InputText';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
-import ComboBox from '../../Componentes/ComboBox';
 import AddCircleIcon from "@mui/icons-material/AddCircle"
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
@@ -16,6 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import CloseIcon from '@mui/icons-material/Close'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { useNavigate } from 'react-router-dom';
+import GerenciadorPedido from './Gerenciador';
 
 
 
@@ -135,10 +135,6 @@ export default function ProgramacaoDublagem() {
     return `${year}-${month}-${day} 00:00:00`
   }
 
-  const formatNumber = (numString: string): string => {
-    const paddedNum = numString.padStart(9, '0')
-    return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
-  }
   const btPesquisar = () => {
     const relations = [
       'detalheProgramacaoDublagens',
@@ -163,7 +159,7 @@ export default function ProgramacaoDublagem() {
     }
 
     dadosPesquisa = {
-      entidade: "Entrada",
+      entidade: "ProgramacaoDublagem",
       relations,
       comparador,
       criterio,
@@ -175,6 +171,7 @@ export default function ProgramacaoDublagem() {
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
+        console.log('resultado da pesquisa',rs)
         setRsPesquisa(rs);
       });
   }
@@ -203,27 +200,6 @@ export default function ProgramacaoDublagem() {
       }
     }
   }
-
-  const BuscarDados = () => {
-    console.log('Buscando dados')
-    clsCrud.pesquisar({
-      entidade: 'ProgramacaoDublagem',
-      relations: [
-        'detalheProgramacaoDublagens',
-        'detalheProgramacaoDublagens.pedido',
-        'detalheProgramacaoDublagens.pedido.detalhePedidos',
-      ],
-      criterio: {
-        dataProgramacao: pesquisa.itemPesquisa,
-      },
-      select: ['idProgramacaoDublagem', 'dataProgramacao', 'qtdFilme', 'qtdCola'],
-    }).then((rs: Array<any>) => {
-      console.log('resultado rs', rs)
-    })
-  }
-  useEffect(() => {
-    // BuscarDados()
-  })
 
   return (
 
@@ -334,14 +310,9 @@ export default function ProgramacaoDublagem() {
               </Box>
             </Grid>
 
-            {/* <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <DetalhePedido
-                rsMaster={entrada}
-                setRsMaster={setEntrada}
-                masterLocalState={localState}
-                setRsSomatorio={setRsSomatorio}
-              />
-            </Grid> */}
+             <Grid item xs={12} md={12} sx={{ mt: 2, justifyItems: 'right' }}>
+              <GerenciadorPedido />
+            </Grid>
 
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
