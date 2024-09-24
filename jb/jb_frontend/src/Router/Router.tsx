@@ -14,8 +14,9 @@ import Entrada from '../Views/Entradas/Entrada';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import GerenciadorPedido from '../Views/GerenciadorPedidos/Gerenciador';
-import DynamicTablePage from '../Views/testes/teste';
+import DynamicTablePage from '../Views/testes/paginaHTML';
 import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem';
+import TabelaComCheckbox from '../Views/testes/table';
 
 
 export const router = createBrowserRouter([
@@ -76,16 +77,12 @@ export const router = createBrowserRouter([
         element: <Tinturaria />,
       },
       {
-        path: "/GerenciadorPedido",
-        element: <GerenciadorPedido />,
-      },
-      {
         path: "/ProgramacaoPedido",
         element: <ProgramacaoDublagem />,
       },
       {
         path: "/Testes",
-        element: <DynamicTablePage />,
+        element: <TabelaComCheckbox />,
       },
     ]
   },

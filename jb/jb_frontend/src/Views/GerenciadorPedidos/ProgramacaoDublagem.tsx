@@ -39,7 +39,6 @@ export default function ProgramacaoDublagem() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [programacaoDublagem, setProgramacaoDublagem] = useState<ProgramacaoDublagemInterface>(resetDados)
-  const [rsProgramacaoDublagem, setRsProgramacaoDublagem] = useState<Array<ProgramacaoDublagemInterface>>([])
   const { setMensagemState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
@@ -171,7 +170,7 @@ export default function ProgramacaoDublagem() {
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
-        console.log('resultado da pesquisa',rs)
+        console.log('resultado da pesquisa', rs)
         setRsPesquisa(rs);
       });
   }
@@ -258,12 +257,14 @@ export default function ProgramacaoDublagem() {
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={4} sx={{ mt: 2, ml: 3 }}>
               <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
                 <InputText
                   type='tel'
                   tipo="date"
                   label="Data"
+                  labelAlign='center'
+                  textAlign='center'
                   dados={programacaoDublagem}
                   field="dataProgramacao"
                   setState={setProgramacaoDublagem}
@@ -275,13 +276,15 @@ export default function ProgramacaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={3} sx={{ mt: 2, ml: 5 }}>
               <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                 <InputText
                   type='text'
                   tipo='currency'
                   scale={2}
                   label="Cola"
+                  labelAlign='center'
+                  textAlign='center'
                   dados={programacaoDublagem}
                   field="qtdCola"
                   setState={setProgramacaoDublagem}
@@ -292,13 +295,15 @@ export default function ProgramacaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={3} sx={{ mt: 2, ml: 6 }}>
               <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                 <InputText
                   type='text'
                   tipo='currency'
                   scale={2}
                   label="Filme"
+                  labelAlign='center'
+                  textAlign='center'
                   dados={programacaoDublagem}
                   field="qtdFilme"
                   setState={setProgramacaoDublagem}
@@ -310,8 +315,8 @@ export default function ProgramacaoDublagem() {
               </Box>
             </Grid>
 
-             <Grid item xs={12} md={12} sx={{ mt: 2, justifyItems: 'right' }}>
-              <GerenciadorPedido />
+            <Grid item xs={12} md={12} >
+              <GerenciadorPedido detalhe={programacaoDublagem.detalheProgramacaoDublagens} />
             </Grid>
 
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

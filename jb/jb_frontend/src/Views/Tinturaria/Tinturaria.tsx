@@ -14,7 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import Condicional from '../../Componentes/Condicional/Condicional'
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable'
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
 import ComboBox from '../../Componentes/ComboBox'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
@@ -50,8 +50,6 @@ export function Tinturaria() {
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  // const [order, setOrder] = useState<Order>('asc');
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -79,16 +77,6 @@ export function Tinturaria() {
       format: (_v, rs: any) => rs.fornecedor.nome
     },
   ]
-
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc'
-  //   setOrder(isAsc ? 'desc' : 'asc')
-  //   setOrderBy(property);
-  // }
-
   const MensagemErro = (erro: string) => {
     setMensagemState({
       titulo: 'Erro...',
@@ -539,9 +527,6 @@ export function Tinturaria() {
                       toolTip: "Romaneio",
                     },
                   ]}
-                // order={order}
-                // orderBy={orderBy}
-                // onRequestSort={handleRequestSort}
                 />
               </Grid>
             </Condicional>

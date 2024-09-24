@@ -65,21 +65,22 @@ export default function DataTableSelect<T>({
     const [openRows, setOpenRows] = useState<number[]>([]);
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
-    const [dense, setDense] = React.useState(false)
+    const [dense, setDense] = React.useState(true)
     const [selected, setSelected] = React.useState<readonly number[]>([])
-    const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
     const [order, setOrder] = useState<Order>('asc');
     const [orderBy, setOrderBy] = useState<keyof any>('nome')
+    const [somaQtd, setSomaQtd] = useState<number>(0);
 
-    const clicou = (msg: string) => {
-        console.log('clicou aqui ', msg)
-    }
-    const actions = [
-        { icon: <FileCopyIcon />, name: 'Copiar', click: () => clicou('copiar') },
-        { icon: <SaveIcon />, name: 'Salvar', click: () => clicou('salvar') },
-        { icon: <PrintIcon />, name: 'Imprimir', click: () => clicou('imprimir') },
-        { icon: <ShareIcon />, name: 'Compartilhar', click: () => clicou('compartilhar') },
-    ];
+
+    // const clicou = (msg: string) => {
+    //     console.log('clicou aqui ', msg)
+    // }
+    // const actions = [
+    //     { icon: <FileCopyIcon />, name: 'Copiar', click: () => clicou('copiar') },
+    //     { icon: <SaveIcon />, name: 'Salvar', click: () => clicou('salvar') },
+    //     { icon: <PrintIcon />, name: 'Imprimir', click: () => clicou('imprimir') },
+    //     { icon: <ShareIcon />, name: 'Compartilhar', click: () => clicou('compartilhar') },
+    // ];
 
     const handleRowClick = (id: number) => {
         setOpenRows((prevOpenRows) =>
@@ -188,14 +189,24 @@ export default function DataTableSelect<T>({
                 ]}
             >
                 {numSelected > 0 ? (
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        color="inherit"
-                        variant="subtitle1"
-                        component="div"
-                    >
-                        {numSelected} selecionado(s)
-                    </Typography>
+                    <>
+                        <Typography
+                            sx={{ flex: '1 1 100%', fontSize: '1.5rem' }}
+                            color="inherit"
+                            variant="subtitle1"
+                            component="div"
+                        >
+                            {numSelected} selecionado(s)
+                        </Typography>
+                        <Typography
+                            sx={{ flex: '1 1 100%', textAlign: 'right', fontSize: '1.5rem' }}
+                            color="inherit"
+                            variant="subtitle1"
+                            component="div"
+                        >
+                            {clsFormatacao.currency(somaQtd)} metros
+                        </Typography>
+                    </>
                 ) : (<></>
                     // <Typography
                     //     sx={{ flex: '1 1 100%' }}
@@ -250,11 +261,18 @@ export default function DataTableSelect<T>({
         );
     }
 
-
+    const somaQtdSelected = (sel: readonly number[]) => {
+        let itemSomado = 0
+        sel.map((i) => {
+            itemSomado = itemSomado + calculateTotals(dados[i].details).totalQuantidade
+        })
+        setSomaQtd(itemSomado)
+    }
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             const newSelected = dados.map((_n, i) => i);
             setSelected(newSelected);
+            somaQtdSelected(newSelected)
             return;
         }
         setSelected([]);
@@ -277,6 +295,7 @@ export default function DataTableSelect<T>({
             );
         }
         setSelected(newSelected)
+        somaQtdSelected(newSelected)
     };
 
     const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -284,7 +303,7 @@ export default function DataTableSelect<T>({
     }
 
     const calculateTotals = (details: ItemDetail[]) => {
-        const totalQuantidade = clsFormatacao.currency(details.reduce((sum, detail) => sum + detail.qtd, 0))
+        const totalQuantidade = details.reduce((sum, detail) => sum + detail.qtd, 0)
         return { totalQuantidade };
     }
 
@@ -314,7 +333,6 @@ export default function DataTableSelect<T>({
                                         const isItemSelected = selected.includes(indice);
                                         const labelId = `enhanced-table-checkbox-${indice}`;
                                         const { totalQuantidade } = calculateTotals(dados[indice].details);
-
 
                                         return (
                                             <React.Fragment key={indice}>
@@ -496,7 +514,7 @@ export default function DataTableSelect<T>({
                                                                         </Condicional>
                                                                         <StyledTableRow >
                                                                             <StyledTableCell align="left"><strong>Total:</strong></StyledTableCell>
-                                                                            <StyledTableCell align='right'><strong>{totalQuantidade}</strong></StyledTableCell>
+                                                                            <StyledTableCell align='right'><strong>{clsFormatacao.currency(totalQuantidade)}</strong></StyledTableCell>
                                                                             <StyledTableCell ></StyledTableCell>
                                                                         </StyledTableRow>
                                                                     </TableBody>

@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
@@ -15,7 +15,7 @@ import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsApi from '../../Utils/ClsApi';
-import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
+import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
 
 interface PropsInterface {
@@ -40,25 +40,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
 
-  // const ResetDados: DetalheTinturariaInterface = {
-  //   idTinturaria: 0,
-  //   idMalharia: 0,
-  //   malharia: {
-  //     peca: '',
-  //     idMaquina: 0,
-  //     idProduto: 0,
-  //     dataProducao: '',
-  //     turno: TurnoType.segundo,
-  //     peso: 0,
-  //     localizacao: '',
-  //     idPessoa_revisador: 0,
-  //     idPessoa_tecelao: 0,
-  //     fechado: false,
-  //     dataFechado: undefined,
-  //     idTinturaria: 0
-  //   },
-  // }
-
   const DadosPeca: DadosPecaInterface = {
     peca: ''
   }
@@ -69,8 +50,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
-  // const [order, setOrder] = useState<Order>('asc')
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -100,14 +79,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       format: (qtd) => clsFormatacao.currency(qtd)
     },
   ]
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc';
-  //   setOrder(isAsc ? 'desc' : 'asc');
-  //   setOrderBy(property);
-  // };
 
   const MensagemErro = (erro: string) => {
     setMensagemState({
@@ -552,9 +523,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
                       toolTip: "Excluir",
                     },
                   ]}
-              // order={order}
-              // orderBy={orderBy}
-              // onRequestSort={handleRequestSort}
               />
             </TableContainer>
           </Grid>
@@ -563,9 +531,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
               <DataTable
                 cabecalho={cabecalhoPecas}
                 dados={rsPecasSomadas}
-                // order={order}
-                // orderBy={orderBy}
-                // onRequestSort={handleRequestSort}
                 exibirPaginacao={false}
                 temTotal={true}
                 colunaSoma={['total_peca', 'qtd_peca']}

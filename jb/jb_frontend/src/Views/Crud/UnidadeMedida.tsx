@@ -8,7 +8,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -38,8 +38,6 @@ export default function UnidadeMedida() {
   const [erros, setErros] = useState({})
   const [unidadeMedida, setUnidadeMedida] = useState<UnidadeMedidaInterface>(ResetDados)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
-  // const [order, setOrder] = useState<Order>('asc');
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -53,15 +51,6 @@ export default function UnidadeMedida() {
       campo: 'nome'
     },
   ]
-
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc';
-  //   setOrder(isAsc ? 'desc' : 'asc');
-  //   setOrderBy(property);
-  // };
 
   const btPesquisar = () => {
     clsCrud
@@ -267,9 +256,6 @@ export default function UnidadeMedida() {
                     toolTip: "Excluir",
                   },
                 ]}
-              // order={order}
-              // orderBy={orderBy}
-              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

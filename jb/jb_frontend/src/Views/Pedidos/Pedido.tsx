@@ -7,7 +7,7 @@ import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -64,8 +64,6 @@ export default function Pedido() {
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  // const [order, setOrder] = useState<Order>('asc')
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioPedidoInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -99,15 +97,6 @@ export default function Pedido() {
       // format: (_v, rs: any) => rs.vendedor.nome
     },
   ]
-
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc';
-  //   setOrder(isAsc ? 'desc' : 'asc');
-  //   setOrderBy(property);
-  // };
 
   const pesquisarID = (id: string | number): Promise<PedidoInterface> => {
     return clsCrud
@@ -254,27 +243,6 @@ export default function Pedido() {
       .then((rs) => {
         setRsPesquisa(rs)
       })
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "Pedido",
-    //     relations: [
-    //       "cliente",
-    //       "vendedor",
-    //       "prazoEntrega",
-    //       "detalhePedidos",
-    //       "detalhePedidos.produto",
-    //     ],
-    //     criterio: {
-    //       "idPedido": "%".concat(pesquisa.itemPesquisa).concat("%"),
-    //       "statusPedido": StatusPedidoType.aberto
-    //     },
-    //     camposLike: ["idPedido", "statusPedido"],
-    //     msg: 'Pesquisando pedidos ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setRsPesquisa(rs)
-    //   })
   }
 
   const irPara = useNavigate()
@@ -313,25 +281,6 @@ export default function Pedido() {
         setRsPrazo(rs)
       })
 
-    // let query: string = `
-    //   SELECT 
-    //       p.*
-    //   FROM 
-    //       pessoas p
-    //   WHERE 
-    //       p.tipoPessoa = 'J' OR
-    //       p.tipoPessoa = 'C';
-    //   `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Pessoa",
-    //     sql: query,
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<PessoaInterface>) => {
-    //     setRsCliente(rs)
-    //   })
-
     clsCrud
       .pesquisar({
         entidade: "Pessoa",
@@ -360,30 +309,9 @@ export default function Pedido() {
       })
   }
 
-  // const pesquisaEventos = () => {
-  //   const campo = isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
-  //   const itemPesquisa = campo === 'data' 
-  //     ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa) 
-  //     : pesquisa.itemPesquisa
-
-  //   clsApi.execute<Array<PedidoInterface>>({
-  //     url: 'pedidosEmAberto',
-  //     method: 'post',
-  //     itemPesquisa,
-  //     campo,
-  //   })
-  //   .then((rs) => {
-  //     console.log(`Resultado da pesquisa com ${campo}: `, rs)
-  //   })
-  // }
-
   useEffect(() => {
     BuscarDados()
   }, [])
-
-  // useEffect(() => {
-  //   pesquisaEventos()
-  // }, [])
 
   return (
 
@@ -438,9 +366,6 @@ export default function Pedido() {
                     toolTip: "Excluir",
                   },
                 ]}
-              // order={order}
-              // orderBy={orderBy}
-              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

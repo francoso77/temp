@@ -17,9 +17,12 @@ import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusP
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalheProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
 
-
-export default function GerenciadorPedido() {
+interface PropsInterface {
+  detalhe: Array<DetalheProgramacaoDublagemInterface>
+}
+export default function GerenciadorPedido({ detalhe }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -44,7 +47,6 @@ export default function GerenciadorPedido() {
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
@@ -238,24 +240,24 @@ export default function GerenciadorPedido() {
     }
   }
 
-  const irPara = useNavigate()
-  const btFechar = () => {
-    setLayoutState({
-      titulo: '',
-      tituloAnterior: 'Gerenciador de Pedidos',
-      pathTitulo: '/',
-      pathTituloAnterior: '/GerenciadorPedido'
-    })
-    irPara('/')
-  }
+  // const irPara = useNavigate()
+  // const btFechar = () => {
+  //   setLayoutState({
+  //     titulo: '',
+  //     tituloAnterior: 'Gerenciador de Pedidos',
+  //     pathTitulo: '/',
+  //     pathTituloAnterior: '/GerenciadorPedido'
+  //   })
+  //   irPara('/')
+  // }
 
   useEffect(() => {
-    setLayoutState({
-      titulo: 'Gerenciador de Pedidos',
-      tituloAnterior: '',
-      pathTitulo: '/GerenciadorPedido',
-      pathTituloAnterior: ''
-    })
+    // setLayoutState({
+    //   titulo: 'Gerenciador de Pedidos',
+    //   tituloAnterior: '',
+    //   pathTitulo: '/GerenciadorPedido',
+    //   pathTituloAnterior: ''
+    // })
     btPesquisar()
   }, [])
 

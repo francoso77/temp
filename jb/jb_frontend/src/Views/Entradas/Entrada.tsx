@@ -7,7 +7,7 @@ import Condicional from '../../Componentes/Condicional/Condicional'
 import ClsValidacao from '../../Utils/ClsValidacao'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import ClsCrud from '../../Utils/ClsCrudApi'
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable'
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
 import AddCircleIcon from "@mui/icons-material/AddCircle"
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
@@ -56,8 +56,6 @@ export default function Entrada() {
   const [entrada, setEntrada] = useState<EntradaInterface>(ResetDados)
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  // const [order, setOrder] = useState<Order>('asc');
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioEntradaInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -82,15 +80,6 @@ export default function Entrada() {
       format: (_v, rs: any) => rs.fornecedor.nome
     },
   ]
-
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc'
-  //   setOrder(isAsc ? 'desc' : 'asc')
-  //   setOrderBy(property);
-  // }
 
   const pesquisarID = (id: string | number): Promise<EntradaInterface> => {
     return clsCrud
@@ -237,7 +226,6 @@ export default function Entrada() {
             })
         })
     })
-
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -388,28 +376,6 @@ export default function Entrada() {
 
   const BuscarDados = () => {
 
-    // let query: string = `
-    //   SELECT 
-    //       p.*
-    //   FROM 
-    //       pessoas p
-    //   WHERE 
-    //       p.tipoPessoa = 'J' OR
-    //       p.tipoPessoa = 'C' OR
-    //       p.tipoPessoa = 'F' 
-    //   ORDER BY
-    //       p.nome ASC;
-    //   `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Pessoa",
-    //     sql: query,
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rsFornecedores: Array<PessoaInterface>) => {
-    //     setRsFornecedor(rsFornecedores)
-    //   })
-
     clsCrud
       .pesquisar({
         entidade: "Pessoa",
@@ -482,9 +448,6 @@ export default function Entrada() {
                     toolTip: "Excluir",
                   },
                 ]}
-              // order={order}
-              // orderBy={orderBy}
-              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

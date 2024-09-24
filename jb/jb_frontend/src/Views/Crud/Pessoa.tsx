@@ -7,7 +7,7 @@ import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -66,8 +66,6 @@ export default function Pessoa() {
   const [erros, setErros] = useState({})
   const [pessoa, setPessoa] = useState<PessoaInterface>(ResetDados)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
-  // const [order, setOrder] = useState<Order>('asc');
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome');
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -92,15 +90,6 @@ export default function Pessoa() {
       campo: 'whatsapp'
     },
   ]
-
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc';
-  //   setOrder(isAsc ? 'desc' : 'asc');
-  //   setOrderBy(property);
-  // };
 
   const pesquisarID = (id: string | number): Promise<PessoaInterface> => {
     return clsCrud
@@ -263,24 +252,6 @@ export default function Pessoa() {
           nome: "%".concat(pesquisa.nome).concat("%"),
         },
         camposLike: ["nome"],
-        // select: [
-        //   "idPessoa",
-        //   "nome",
-        //   "telefone",
-        //   "whatsapp",
-        //   "email",
-        //   'endereco',
-        //   'numero',
-        //   'bairro',
-        //   'cidade',
-        //   'uf',
-        //   'cep',
-        //   'apelido',
-        //   'cpf_cnpj',
-        //   'comissao',
-        //   'tipoPessoa',
-        //   'ativo'
-        // ],
         msg: 'Pesquisando pessoas ...',
         setMensagemState: setMensagemState
       })
@@ -390,9 +361,6 @@ export default function Pessoa() {
                     toolTip: "Excluir",
                   },
                 ]}
-              // order={order}
-              // orderBy={orderBy}
-              // onRequestSort={handleRequestSort}
               />
             </Grid>
           </Condicional>

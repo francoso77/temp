@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
@@ -67,8 +67,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
-  // const [order, setOrder] = useState<Order>('asc')
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -98,14 +96,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       format: (qtd) => clsFormatacao.currency(qtd)
     },
   ]
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc';
-  //   setOrder(isAsc ? 'desc' : 'asc');
-  //   setOrderBy(property);
-  // };
 
   const MensagemErro = (erro: string) => {
     setMensagemState({
@@ -455,9 +445,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
                       toolTip: "Excluir",
                     },
                   ]}
-              // order={order}
-              // orderBy={orderBy}
-              // onRequestSort={handleRequestSort}
               />
             </TableContainer>
           </Grid>
@@ -466,9 +453,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
               <DataTable
                 cabecalho={cabecalhoPecas}
                 dados={rsPecasSomadas}
-                // order={order}
-                // orderBy={orderBy}
-                // onRequestSort={handleRequestSort}
                 exibirPaginacao={false}
                 temTotal={true}
                 colunaSoma={['total_peca', 'qtd_peca']}

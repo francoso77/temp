@@ -5,7 +5,7 @@ import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -97,8 +97,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
   const [rsCor, setRsCor] = useState<Array<CorInterface>>([])
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
   const [rsTinturaria, setRsTinturaria] = useState<Array<TinturariaInterface>>([])
-  // const [order, setOrder] = useState<Order>('asc')
-  // const [orderBy, setOrderBy] = useState<keyof any>('nome')
   const [tipo, setTipo] = useState<TipoProdutoType>()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -130,15 +128,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     },
   ]
 
-  // const handleRequestSort = (
-  //   event: React.MouseEvent<unknown>,
-  //   property: keyof any,
-  // ) => {
-  //   const isAsc = orderBy === property && order === 'asc';
-  //   setOrder(isAsc ? 'desc' : 'asc');
-  //   setOrderBy(property);
-  // };
-
   const pegaTipo = () => {
     let auxTipo: number | undefined = rsProduto.
       find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
@@ -153,17 +142,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
     retorno = validaCampo.naoVazio('qtd', detalheEntrada, erros, retorno, 'Quantudade maior que 0')
     retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
-    // if (tipo === 10) {
-    //   retorno = validaCampo.naoVazio('idCor', detalheEntrada, erros, retorno, 'Defina uma cor')
-    //   retorno = validaCampo.naoVazio('qtdPecas', detalheEntrada, erros, retorno, 'Informe a quantidade peças')
-    //   retorno = validaCampo.naoVazio('metro', detalheEntrada, erros, retorno, 'Qual a metragem')
-    //   retorno = validaCampo.naoVazio('gm2', detalheEntrada, erros, retorno, 'Qual a gramatura')
-    //   retorno = validaCampo.naoVazio('idPessoa_revisador', detalheEntrada, erros, retorno, 'Defina um revisador')
-    //   retorno = validaCampo.naoVazio('idTinturaria', detalheEntrada, erros, retorno, 'Defina uma tinturaria')
-    //   retorno = validaCampo.naoVazio('perdaMalharia', detalheEntrada, erros, retorno, 'Qtd perdida em malharia')
-    //   retorno = validaCampo.naoVazio('perdaTinturaria', detalheEntrada, erros, retorno, 'Qtd perdida em tinturaria')
-
-    // }
     setErros(erros)
     return retorno
   }
@@ -693,9 +671,6 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
                   toolTip: "Excluir",
                 },
               ]}
-          // order={order}
-          // orderBy={orderBy}
-          // onRequestSort={handleRequestSort}
           />
         </Grid>
       </Paper>
