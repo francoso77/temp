@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { useNavigate } from 'react-router-dom';
 import GerenciadorPedido from './Gerenciador';
+import DetalheProgramacaoDublagem from './DetalheProgramacaoDublagem';
 
 
 
@@ -314,10 +315,17 @@ export default function ProgramacaoDublagem() {
                 />
               </Box>
             </Grid>
-
-            <Grid item xs={12} md={12} >
-              <GerenciadorPedido detalhe={programacaoDublagem.detalheProgramacaoDublagens} />
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <DetalheProgramacaoDublagem
+                rsMaster={programacaoDublagem}
+                setRsMaster={setProgramacaoDublagem}
+                masterLocalState={localState}
+              />
             </Grid>
+
+            {/* <Grid item xs={12} md={12} >
+              <GerenciadorPedido detalhe={programacaoDublagem.detalheProgramacaoDublagens} />
+            </Grid> */}
 
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>

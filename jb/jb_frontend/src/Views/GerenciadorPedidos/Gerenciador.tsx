@@ -21,8 +21,9 @@ import { DetalheProgramacaoDublagemInterface } from '../../../../jb_backend/src/
 
 interface PropsInterface {
   detalhe: Array<DetalheProgramacaoDublagemInterface>
+  setOpenDetalhe: React.Dispatch<React.SetStateAction<boolean>>
 }
-export default function GerenciadorPedido({ detalhe }: PropsInterface) {
+export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -50,6 +51,7 @@ export default function GerenciadorPedido({ detalhe }: PropsInterface) {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
+  const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
   const [open, setOpen] = useState<boolean>(false)
 
 
@@ -202,16 +204,23 @@ export default function GerenciadorPedido({ detalhe }: PropsInterface) {
       .then((rs) => {
         setRsPesquisa(rs)
       })
+
+    clsCrud.pesquisar({
+      entidade: 'Pedido',
+      relations: ['detalhePedidos'],
+    }).then((rs: Array<PedidoInterface>) => {
+      setRsPedido(rs)
+    })
   }
 
   const EmProducao = async (pedidos: Array<number>) => {
-    await clsApi.execute<Array<PedidoInterface>>({
-      url: 'produzirPedidos',
-      method: 'post',
-      pedidos,
-      mensagem: 'Alterando status dos pedidos ...',
-      setMensagemState: setMensagemState
-    })
+    // await clsApi.execute<Array<PedidoInterface>>({
+    //   url: 'produzirPedidos',
+    //   method: 'post',
+    //   pedidos,
+    //   mensagem: 'Alterando status dos pedidos ...',
+    //   setMensagemState: setMensagemState
+    // })
   }
   async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
 
@@ -221,6 +230,11 @@ export default function GerenciadorPedido({ detalhe }: PropsInterface) {
     selecao.forEach((sel: any) => {
       if (rsPesquisa[sel].statusPedido === "A") {
         tmp.push(rsPesquisa[sel].idPedido)
+        detalhe.push({
+          idProgramacaoDublagem: null,
+          idPedido: rsPesquisa[sel].idPedido,
+          pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === rsPesquisa[sel].idPedido)] },
+        })
       }
     })
     if (tmpPedidoNaoAberto.length > 0) {
@@ -235,6 +249,8 @@ export default function GerenciadorPedido({ detalhe }: PropsInterface) {
     } else {
 
       await EmProducao(tmp)
+      console.log(tmp, 'tmp', detalhe, 'detalhe')
+
       setSelected([])
       btPesquisar()
     }
@@ -251,6 +267,9 @@ export default function GerenciadorPedido({ detalhe }: PropsInterface) {
   //   irPara('/')
   // }
 
+  const btFechar = () => {
+    setOpenDetalhe(false)
+  }
   useEffect(() => {
     // setLayoutState({
     //   titulo: 'Gerenciador de Pedidos',
@@ -266,14 +285,14 @@ export default function GerenciadorPedido({ detalhe }: PropsInterface) {
 
   return (
 
-    <Container maxWidth="lg" sx={{ ml: 0 }}>
-      <Paper variant="outlined" sx={{ p: 0.5 }}>
+    <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
+      <Paper variant="outlined" sx={{ p: 0 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: 2 }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
-          </Grid> */}
+          </Grid>
           <Grid item xs={12}>
             <DataTableSelect
               cabecalho={cabecalhoForm}

@@ -67,10 +67,10 @@ export default function DataTableSelect<T>({
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [dense, setDense] = React.useState(true)
     const [selected, setSelected] = React.useState<readonly number[]>([])
-    const [order, setOrder] = useState<Order>('asc');
+    const [order, setOrder] = useState<Order>('asc')
     const [orderBy, setOrderBy] = useState<keyof any>('nome')
-    const [somaQtd, setSomaQtd] = useState<number>(0);
-
+    const [somaQtd, setSomaQtd] = useState<number>(0)
+    const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
     // const clicou = (msg: string) => {
     //     console.log('clicou aqui ', msg)
@@ -199,25 +199,25 @@ export default function DataTableSelect<T>({
                             {numSelected} selecionado(s)
                         </Typography>
                         <Typography
-                            sx={{ flex: '1 1 100%', textAlign: 'right', fontSize: '1.5rem' }}
+                            sx={{ flex: '1 1 100%', textAlign: 'center', fontSize: '1.5rem' }}
                             color="inherit"
                             variant="subtitle1"
                             component="div"
                         >
-                            {clsFormatacao.currency(somaQtd)} metros
+                            {clsFormatacao.currency(somaQtd)} metros programados
                         </Typography>
                     </>
-                ) : (<></>
-                    // <Typography
-                    //     sx={{ flex: '1 1 100%' }}
-                    //     variant="h6"
-                    //     id="tableTitle"
-                    //     component="div"
-                    // >
-                    //     {layoutState.titulo}
-                    // </Typography>
+                ) : (
+                    <Typography
+                        sx={{ flex: '1 1 100%', textAlign: 'center', fontSize: '1.5rem' }}
+                        variant="h6"
+                        id="tableTitle"
+                        component="div"
+                    >
+                        Gerenciador de Pedidos
+                    </Typography>
                 )}
-                {/* {numSelected > 0 ? (
+                {numSelected > 0 ? (
                     <Tooltip title="Em Produção">
                         <IconButton
                             onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
@@ -227,36 +227,36 @@ export default function DataTableSelect<T>({
                             />
                         </IconButton>
                     </Tooltip>
-                ) : (
-                    <Box sx={{ position: 'relative', mr: 10, height: 100 }}>
-                        <SpeedDial
-                            ariaLabel="Menu de opções"
-                            icon={<MoreVertIcon />}
-                            direction={'left'}
-                            sx={{
-                                position: 'absolute',
-                                bottom: 23,
-                                right: -77,
-                                // Aumentar o tamanho do SpeedDial
-                                transform: 'scale(1)',
-                                '& .MuiFab-primary': {
-                                    width: 35, // Largura personalizada
-                                    height: 35, // Altura personalizada
-                                },
-                            }}
+                ) : (<></>
+                    // <Box sx={{ position: 'relative', mr: 10, height: 100 }}>
+                    //     <SpeedDial
+                    //         ariaLabel="Menu de opções"
+                    //         icon={<MoreVertIcon />}
+                    //         direction={'left'}
+                    //         sx={{
+                    //             position: 'absolute',
+                    //             bottom: 23,
+                    //             right: -77,
+                    //             // Aumentar o tamanho do SpeedDial
+                    //             transform: 'scale(1)',
+                    //             '& .MuiFab-primary': {
+                    //                 width: 35, // Largura personalizada
+                    //                 height: 35, // Altura personalizada
+                    //             },
+                    //         }}
 
-                        >
-                            {actions.map((action) => (
-                                <SpeedDialAction
-                                    key={action.name}
-                                    icon={action.icon}
-                                    tooltipTitle={action.name}
-                                    onClick={action.click}
-                                />
-                            ))}
-                        </SpeedDial>
-                    </Box>
-                )} */}
+                    //     >
+                    //         {actions.map((action) => (
+                    //             <SpeedDialAction
+                    //                 key={action.name}
+                    //                 icon={action.icon}
+                    //                 tooltipTitle={action.name}
+                    //                 onClick={action.click}
+                    //             />
+                    //         ))}
+                    //     </SpeedDial>
+                    // </Box>
+                )}
             </Toolbar>
         );
     }
