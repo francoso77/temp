@@ -12,6 +12,7 @@ interface PropsInterface {
   campo?: 'data' | 'nome'
   tinturaria?: number
   pedidos?: Array<number>
+  tipoProducao?: 'C' | 'A'
   dtInicial?: string
   dtFinal?: string
   grupo?: GraficoType
@@ -71,6 +72,7 @@ export default class ClsApi {
     itemPesquisa,
     campo,
     pedidos,
+    tipoProducao,
     dtInicial,
     dtFinal,
     grupo,
@@ -80,6 +82,7 @@ export default class ClsApi {
       itemPesquisa,
       campo,
       pedidos,
+      tipoProducao,
       tinturaria,
       dtInicial,
       dtFinal,

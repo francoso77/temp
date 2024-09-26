@@ -17,6 +17,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { useNavigate } from 'react-router-dom';
 import GerenciadorPedido from './Gerenciador';
 import DetalheProgramacaoDublagem from './DetalheProgramacaoDublagem';
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 
 
 
@@ -136,44 +137,67 @@ export default function ProgramacaoDublagem() {
   }
 
   const btPesquisar = () => {
-    const relations = [
-      'detalheProgramacaoDublagens',
-      'detalheProgramacaoDublagens.pedido',
-      'detalheProgramacaoDublagens.pedido.detalhePedidos',
-    ]
+    // const relations = [
+    //   'detalheProgramacaoDublagens',
+    //   'detalheProgramacaoDublagens.pedido',
+    //   'detalheProgramacaoDublagens.pedido.detalhePedidos',
+    // ]
 
-    const msg = 'Pesquisando pedidos ...'
-    const setMensagem = setMensagemState
-    let dadosPesquisa = {}
-    let criterio = {}
-    let camposLike = ['dataProgramacao']
+    // const msg = 'Pesquisando pedidos ...'
+    // const setMensagem = setMensagemState
+    // let dadosPesquisa = {}
+    // let criterio = {}
+    // let camposLike = ['dataProgramacao']
 
-    let comparador = "L"
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
+    // let comparador = "L"
+    // const temNumero = /\d/.test(pesquisa.itemPesquisa)
 
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-      criterio = {
-        dataProgramacao: formattedDateTime
-      }
-    }
+    // if (temNumero && pesquisa.itemPesquisa.includes('/')) {
+    //   const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
+    //   criterio = {
+    //     dataProgramacao: formattedDateTime
+    //   }
+    // }
 
-    dadosPesquisa = {
-      entidade: "ProgramacaoDublagem",
-      relations,
-      comparador,
-      criterio,
-      camposLike,
-      msg,
-      setMensagemState: setMensagem
-    }
+    // dadosPesquisa = {
+    //   entidade: "ProgramacaoDublagem",
+    //   relations,
+    //   comparador,
+    //   criterio,
+    //   camposLike,
+    //   msg,
+    //   setMensagemState: setMensagem
+    // }
 
-    clsCrud
-      .pesquisar(dadosPesquisa)
-      .then((rs: Array<any>) => {
+    // clsCrud
+    //   .pesquisar(dadosPesquisa)
+    //   .then((rs: Array<any>) => {
+    //     console.log('resultado da pesquisa', rs)
+    //     setRsPesquisa(rs);
+    //   });
+
+    return clsCrud
+      .pesquisar({
+        entidade: 'ProgramacaoDublagem',
+        // relations: [
+        //   'detalheProgramacaoDublagens',
+        //   'detalheProgramacaoDublagens.pedido',
+        //   'detalheProgramacaoDublagens.pedido.detalhePedidos',
+        // ],
+        criterio: {
+          idProgramacaoDublagem: parseInt(pesquisa.itemPesquisa) || pesquisa.itemPesquisa,
+        },
+      })
+      .then((rs: Array<ProgramacaoDublagemInterface>) => {
+        // let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataProgramacao)
+        // return {
+        //   ...rs[0],
+        //   dataProgramacao: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+        // }
         console.log('resultado da pesquisa', rs)
         setRsPesquisa(rs);
-      });
+      })
+
   }
 
   const validarDados = (): boolean => {
@@ -187,7 +211,30 @@ export default function ProgramacaoDublagem() {
   }
 
   const btConfirmar = () => {
-
+    if (validarDados()) {
+      console.log('dados validados', programacaoDublagem)
+      if (localState.action === actionTypes.incluindo) {
+        clsCrud.incluir({
+          entidade: "ProgramacaoDublagem",
+          criterio: programacaoDublagem,
+          cb: () => btPesquisar(),
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      }
+    }
   }
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
     if (event.key === 'Enter') {

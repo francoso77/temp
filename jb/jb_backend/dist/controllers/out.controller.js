@@ -86,13 +86,13 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.produzirPedidos = function (pedidos) {
+    OutController.prototype.produzirPedidos = function (pedidos, tipoProducao) {
         return __awaiter(this, void 0, void 0, function () {
             var ped, sql, params;
             return __generator(this, function (_a) {
                 ped = '(' + pedidos.map(function (v) { return v; }).join(", ") + ')';
-                sql = "\n    UPDATE\n      pedidos p\n    JOIN detalhepedidos dp on dp.idPedido = p.idPedido \n    SET\n      p.statusPedido = \"C\",\n      dp.statusItem = 3\n    WHERE\n      p.idPedido IN ".concat(ped, ";\n  ");
-                params = [ped];
+                sql = "\n    UPDATE\n      pedidos p\n    JOIN detalhepedidos dp on dp.idPedido = p.idPedido \n    SET\n      p.statusPedido = '".concat(tipoProducao, "',\n      dp.statusItem = '").concat(tipoProducao === 'C' ? 3 : 1, "'\n    WHERE\n      p.idPedido IN ").concat(ped, ";\n  ");
+                params = [ped, tipoProducao];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
         });
@@ -148,8 +148,9 @@ var OutController = /** @class */ (function () {
     __decorate([
         (0, common_1.Post)("produzirPedidos"),
         __param(0, (0, common_1.Body)("pedidos")),
+        __param(1, (0, common_1.Body)("tipoProducao")),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [Array]),
+        __metadata("design:paramtypes", [Array, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "produzirPedidos", null);
     __decorate([

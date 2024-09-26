@@ -93,6 +93,7 @@ export class OutController {
   @Post("produzirPedidos")
   async produzirPedidos(
     @Body("pedidos") pedidos: Array<number>,
+    @Body("tipoProducao") tipoProducao: 'C' | 'A',
   ): Promise<Array<Pedido>> {
 
     const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
@@ -101,13 +102,13 @@ export class OutController {
       pedidos p
     JOIN detalhepedidos dp on dp.idPedido = p.idPedido 
     SET
-      p.statusPedido = "C",
-      dp.statusItem = 3
+      p.statusPedido = '${tipoProducao}',
+      dp.statusItem = '${tipoProducao === 'C' ? 3 : 1}'
     WHERE
       p.idPedido IN ${ped};
   `
 
-    const params = [ped]
+    const params = [ped, tipoProducao]
     return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 

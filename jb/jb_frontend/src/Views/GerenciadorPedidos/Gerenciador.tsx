@@ -173,7 +173,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       clsCrud.incluir({
         entidade: "DetalhePedido",
         criterio: detalhePedido,
-        cb: () => btPesquisar(),
+        cb: () => BuscaDados(),
         setMensagemState: setMensagemState
       })
         .then((rs) => {
@@ -194,7 +194,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     }
   }
 
-  const btPesquisar = () => {
+  const BuscaDados = () => {
     clsApi.execute<Array<PedidoInterface>>({
       url: 'gerenciadorPedidosEmAberto',
       method: 'post',
@@ -213,30 +213,20 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     })
   }
 
-  const EmProducao = async (pedidos: Array<number>) => {
-    // await clsApi.execute<Array<PedidoInterface>>({
-    //   url: 'produzirPedidos',
-    //   method: 'post',
-    //   pedidos,
-    //   mensagem: 'Alterando status dos pedidos ...',
-    //   setMensagemState: setMensagemState
-    // })
+  const AlterandoStatusProducao = async (pedidos: Array<number>) => {
+    await clsApi.execute<Array<PedidoInterface>>({
+      url: 'produzirPedidos',
+      method: 'post',
+      pedidos,
+      tipoProducao: 'C',
+      mensagem: 'Alterando status dos pedidos ...',
+      setMensagemState: setMensagemState
+    })
   }
   async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
 
     const tmpPedidoNaoAberto = selecao.filter((item: any) => rsPesquisa[item].statusPedido !== "A")
 
-    let tmp: Array<number> = []
-    selecao.forEach((sel: any) => {
-      if (rsPesquisa[sel].statusPedido === "A") {
-        tmp.push(rsPesquisa[sel].idPedido)
-        detalhe.push({
-          idProgramacaoDublagem: null,
-          idPedido: rsPesquisa[sel].idPedido,
-          pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === rsPesquisa[sel].idPedido)] },
-        })
-      }
-    })
     if (tmpPedidoNaoAberto.length > 0) {
       setMensagemState({
         titulo: 'Atenção...',
@@ -247,12 +237,20 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
         cb: null
       })
     } else {
-
-      await EmProducao(tmp)
-      console.log(tmp, 'tmp', detalhe, 'detalhe')
-
+      let tmp: Array<number> = []
+      selecao.forEach((sel: any) => {
+        if (rsPesquisa[sel].statusPedido === "A") {
+          tmp.push(rsPesquisa[sel].idPedido)
+          detalhe.push({
+            idProgramacaoDublagem: null,
+            idPedido: rsPesquisa[sel].idPedido,
+            pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === rsPesquisa[sel].idPedido)] },
+          })
+        }
+      })
+      await AlterandoStatusProducao(tmp)
       setSelected([])
-      btPesquisar()
+      BuscaDados()
     }
   }
 
@@ -277,7 +275,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     //   pathTitulo: '/GerenciadorPedido',
     //   pathTituloAnterior: ''
     // })
-    btPesquisar()
+    BuscaDados()
   }, [])
 
   const theme = useTheme()

@@ -23,6 +23,7 @@ import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } fro
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import GerenciadorPedido from './Gerenciador';
+import ClsApi from '../../Utils/ClsApi';
 
 
 interface PropsInterface {
@@ -37,6 +38,7 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
+  const clsApi = new ClsApi()
 
   const ResetDados: DetalheProgramacaoDublagemInterface = {
 
@@ -62,7 +64,6 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
   const [detalheProgramacaoDublagem, setDetalheProgramacaoDublagem] = useState<DetalheProgramacaoDublagemInterface>(ResetDados);
   const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([]);
   const [rsPessoa, setRsPessoa] = useState<Array<PessoaInterface>>([]);
-  // const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([]);
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([]);
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -115,46 +116,27 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
     return retorno
   }
 
-  // const onEditar = (rs: DetalheProgramacaoDublagemInterface, indice: number) => {
-
-  //   if (rs.statusItem === 1) {
-  //     setLocalState({ action: actionTypes.editando })
-  //     setIndiceEdicao(indice)
-  //     setDetalheProgramacaoDublagem(rs)
-  //     setOpen(true)
-  //   } else {
-  //     setMensagemState({
-  //       titulo: 'Atenção',
-  //       exibir: true,
-  //       mensagem: 'Item em produção, não pode ser alterado!',
-  //       tipo: MensagemTipo.Error,
-  //       exibirBotao: true,
-  //       cb: null
-  //     })
-  //   }
-  // }
-
+  const AlterandoStatusProducao = async (pedidos: Array<number>) => {
+    await clsApi.execute<Array<PedidoInterface>>({
+      url: 'produzirPedidos',
+      method: 'post',
+      pedidos,
+      tipoProducao: 'A',
+      mensagem: 'Alterando status dos pedidos ...',
+      setMensagemState: setMensagemState
+    })
+  }
   const onExcluir = (rs: DetalheProgramacaoDublagemInterface) => {
-    // if (rs.statusItem === 1) {
 
-    //   let tmpDetalhe: Array<DetalheProgramacaoDublagemInterface> = []
-    //   rsMaster.detalhePedidos.forEach(det => {
-    //     if (det.idDetalhePedido !== rs.idDetalhePedido) {
-    //       tmpDetalhe.push(det)
-    //     }
-    //   })
-    //   setRsMaster({ ...rsMaster, detalhePedidos: tmpDetalhe })
-    //   AtualizaSomatorio(tmpDetalhe)
-    // } else {
-    //   setMensagemState({
-    //     titulo: 'Atenção',
-    //     exibir: true,
-    //     mensagem: 'Item em produção, não pode ser alterado!',
-    //     tipo: MensagemTipo.Error,
-    //     exibirBotao: true,
-    //     cb: null
-    //   })
-    // }
+    const pedido: number[] = [rs.idPedido]
+    let tmpDetalhe: Array<DetalheProgramacaoDublagemInterface> = []
+    rsMaster.detalheProgramacaoDublagens.forEach(det => {
+      if (det.idPedido !== rs.idPedido) {
+        tmpDetalhe.push(det)
+      }
+    })
+    setRsMaster({ ...rsMaster, detalheProgramacaoDublagens: tmpDetalhe })
+    AlterandoStatusProducao(pedido)
   }
 
   const btIncluir = () => {
@@ -225,42 +207,31 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
   //     return false; // ou throw error;
   //   }
   // }
-  const btConfirmaInclusao = async () => {
-    // const estrutura = await temEstrutura(detalhePedido.idProduto)
-    // if (validarDados() && podeIncluirDetalhe() && estrutura) {
-    //   let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
-    //   tmpDetalhe.push({
-    //     idPedido: rsMaster.idPedido as number,
-    //     idProduto: detalhePedido.idProduto,
-    //     qtdPedida: detalhePedido.qtdPedida,
-    //     qtdAtendida: 0,
-    //     vrUnitario: detalhePedido.vrUnitario,
-    //     statusItem: StatusPedidoItemType.aberto,
-    //     produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
+  // const btConfirmaInclusao = async () => {
+  //   if (validarDados()) {
+  //     let tmpDetalhe: Array<DetalheProgramacaoDublagemInterface> = [...rsMaster.detalheProgramacaoDublagens]
+  //     tmpDetalhe.push({
+  //       idProgramacaoDublagem: rsMaster.idProgramacaoDublagem as number,
+  //       idPedido: detalheProgramacaoDublagem.idPedido,
+  //       pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === detalheProgramacaoDublagem.idPedido)] },
+  //     })
+  //     setRsMaster({
+  //       ...rsMaster, detalheProgramacaoDublagens:
+  //         [
+  //           ...rsMaster.detalheProgramacaoDublagens,
 
-    //   })
-    //   setRsMaster({
-    //     ...rsMaster, detalhePedidos:
-    //       [
-    //         ...rsMaster.detalhePedidos,
-
-    //         {
-    //           idPedido: rsMaster.idPedido as number,
-    //           idProduto: detalhePedido.idProduto,
-    //           qtdPedida: detalhePedido.qtdPedida,
-    //           qtdAtendida: 0,
-    //           vrUnitario: detalhePedido.vrUnitario,
-    //           statusItem: StatusPedidoItemType.aberto,
-    //           produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
-    //         }
-    //       ]
-    //   })
-    //   AtualizaSomatorio(tmpDetalhe)
-    //   setLocalState({ action: actionTypes.pesquisando })
-    //   setDetalheProgramacaoDublagem(ResetDados)
-    //   setOpen(false)
-    // }
-  }
+  //           {
+  //             idProgramacaoDublagem: rsMaster.idProgramacaoDublagem as number,
+  //             idPedido: detalheProgramacaoDublagem.idPedido,
+  //             pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === detalheProgramacaoDublagem.idPedido)] },
+  //           }
+  //         ]
+  //     })
+  //     setLocalState({ action: actionTypes.pesquisando })
+  //     setDetalheProgramacaoDublagem(ResetDados)
+  //     setOpen(false)
+  //   }
+  // }
 
   const btConfirmaAlteracao = () => {
 
@@ -304,7 +275,6 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
       })
       .then((rsPedidos: Array<PedidoInterface>) => {
         setRsPedido(rsPedidos)
-        console.log(rsPedidos, 'pedidos')
       })
 
     clsCrud
@@ -331,7 +301,7 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
 
   useEffect(() => {
     BuscarDados()
-  }, [])
+  })
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -474,12 +444,6 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
             dados={rsMaster.detalheProgramacaoDublagens}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
               [
-                // {
-                //   icone: "edit",
-                //   onAcionador: (rs: DetalheProgramacaoDublagemInterface, indice: number) =>
-                //     onEditar(rs, indice),
-                //   toolTip: "Editar",
-                // },
                 {
                   icone: "delete",
                   onAcionador: (rs: DetalheProgramacaoDublagemInterface) =>
