@@ -54,6 +54,7 @@ var pedido_entity_1 = require("../entities/pedido.entity");
 var data_source_1 = require("../data-source");
 var producaoMalharia_entity_1 = require("../entities/producaoMalharia.entity");
 var perdaMalharia_entity_1 = require("../entities/perdaMalharia.entity");
+var programacaoDublagem_entity_1 = require("../entities/programacaoDublagem.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -124,6 +125,15 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    OutController.prototype.programacaoPedidos = function (itemPesquisa) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql;
+            return __generator(this, function (_a) {
+                sql = "\n    SELECT \n      pd.idProgramacaoDublagem,\n      pd.dataProgramacao,\n      pd.qtdCola,\n      pd.qtdFilme,\n      SUM(dp.qtdPedida) AS metros\n    FROM \n      programacaodublagens pd\n    INNER JOIN\n      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n    INNER JOIN \n      pedidos p ON p.idPedido = dpd.idPedido\n    INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n    WHERE\n      (pd.dataProgramacao = IFNULL(?, pd.dataProgramacao))\n    GROUP BY\n      pd.idProgramacaoDublagem,\n      pd.dataProgramacao,\n      pd.qtdCola,\n      pd.qtdFilme;\n      ";
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacaoDublagem_entity_1.default).query(sql, [itemPesquisa || null])];
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)("gerenciadorPedidosEmAberto"),
         __metadata("design:type", Function),
@@ -162,6 +172,13 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [String, String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "graficos", null);
+    __decorate([
+        (0, common_1.Post)("programacaoPedidos"),
+        __param(0, (0, common_1.Body)("itemPesquisa")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "programacaoPedidos", null);
     OutController = __decorate([
         (0, common_1.Controller)()
     ], OutController);

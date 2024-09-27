@@ -1,7 +1,6 @@
 import { Container, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { useNavigate } from 'react-router-dom';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
@@ -12,7 +11,7 @@ import ComboBox from '../../Componentes/ComboBox';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
 import DataTableSelect from '../../Componentes/DataTable/tableSelect';
-import { DataTableCabecalhoInterface, Order } from '../../Componentes/DataTable';
+import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
@@ -29,6 +28,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
+
   const ResetDados: DetalhePedidoInterface = {
     idPedido: null,
     idProduto: 0,
@@ -66,15 +66,11 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       cabecalho: 'Cliente',
       alinhamento: 'left',
       campo: 'nomeCliente'
-      // campo: 'idPessoa_cliente',
-      // format: (_v, rs: any) => rs.cliente.nome
     },
     {
       cabecalho: 'Vendedor',
       alinhamento: 'left',
       campo: 'nomeVendedor'
-      // campo: 'idPessoa_vendedor',
-      // format: (_v, rs: any) => rs.vendedor.nome
     },
     {
       cabecalho: 'Status Pedido',
@@ -89,7 +85,6 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       cabecalho: 'Produto',
       alinhamento: 'left',
       campo: 'Produto',
-      // format: (data) => clsFormatacao.dataISOtoUser(data)
     },
     {
       cabecalho: 'Qtd',
@@ -213,7 +208,25 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     })
   }
 
-  const AlterandoStatusProducao = async (pedidos: Array<number>) => {
+
+  const podeIncluirDetalhe = (): boolean => {
+    const indice = detalhe.findIndex(
+      (v, i) => v.idPedido === detalhePedido.idPedido && i !== (-1)
+    )
+
+    if (indice >= 0) {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Pedido já cadastrado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
+    return indice < 0;
+  }
+  const AlterarStatusPedido = async (pedidos: Array<number>) => {
     await clsApi.execute<Array<PedidoInterface>>({
       url: 'produzirPedidos',
       method: 'post',
@@ -241,40 +254,26 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       selecao.forEach((sel: any) => {
         if (rsPesquisa[sel].statusPedido === "A") {
           tmp.push(rsPesquisa[sel].idPedido)
-          detalhe.push({
-            idProgramacaoDublagem: null,
-            idPedido: rsPesquisa[sel].idPedido,
-            pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === rsPesquisa[sel].idPedido)] },
-          })
+          if (podeIncluirDetalhe()) {
+            detalhe.push({
+              idProgramacaoDublagem: null,
+              idPedido: rsPesquisa[sel].idPedido,
+              pedido: { ...rsPedido[rsPedido.findIndex(v => v.idPedido === rsPesquisa[sel].idPedido)] },
+            })
+          }
         }
       })
-      await AlterandoStatusProducao(tmp)
+      await AlterarStatusPedido(tmp)
       setSelected([])
       BuscaDados()
     }
   }
 
-  // const irPara = useNavigate()
-  // const btFechar = () => {
-  //   setLayoutState({
-  //     titulo: '',
-  //     tituloAnterior: 'Gerenciador de Pedidos',
-  //     pathTitulo: '/',
-  //     pathTituloAnterior: '/GerenciadorPedido'
-  //   })
-  //   irPara('/')
-  // }
-
   const btFechar = () => {
     setOpenDetalhe(false)
   }
+
   useEffect(() => {
-    // setLayoutState({
-    //   titulo: 'Gerenciador de Pedidos',
-    //   tituloAnterior: '',
-    //   pathTitulo: '/GerenciadorPedido',
-    //   pathTituloAnterior: ''
-    // })
     BuscaDados()
   }, [])
 
@@ -284,7 +283,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
   return (
 
     <Container maxWidth="lg" sx={{ mt: 2, mb: 2 }}>
-      <Paper variant="outlined" sx={{ p: 0 }}>
+      <Paper variant="outlined" sx={{ p: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5 }}>
             <IconButton onClick={() => btFechar()}>

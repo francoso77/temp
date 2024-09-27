@@ -4,7 +4,7 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Box, Container, Grid, IconButton, Paper, selectClasses, Tooltip } from '@mui/material';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import InputText from '../../Componentes/InputText';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
@@ -15,9 +15,10 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import CloseIcon from '@mui/icons-material/Close'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { useNavigate } from 'react-router-dom';
-import GerenciadorPedido from './Gerenciador';
 import DetalheProgramacaoDublagem from './DetalheProgramacaoDublagem';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
+import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import ClsApi from '../../Utils/ClsApi';
 
 
 
@@ -26,6 +27,7 @@ export default function ProgramacaoDublagem() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
+  const clsApi = new ClsApi()
 
   const resetDados = {
     dataProgramacao: '',
@@ -65,12 +67,12 @@ export default function ProgramacaoDublagem() {
       campo: 'qtdFilme',
       format: (qtd) => clsFormatacao.numeroPadrao(qtd)
     },
-    // {
-    //   cabecalho: 'Fornecedor',
-    //   alinhamento: 'left',
-    //   campo: 'idPessoa_fornecedor',
-    //   format: (_v, rs: any) => rs.fornecedor.nome
-    // },
+    {
+      cabecalho: 'Metros Programados',
+      alinhamento: 'center',
+      campo: 'metros',
+      format: (qtd) => clsFormatacao.numeroPadrao(qtd)
+    },
   ]
 
   const pesquisarID = (id: string | number): Promise<ProgramacaoDublagemInterface> => {
@@ -83,7 +85,7 @@ export default function ProgramacaoDublagem() {
           'detalheProgramacaoDublagens.pedido.detalhePedidos',
         ],
         criterio: {
-          idProgramacaoDublagem: pesquisa.itemPesquisa,
+          idProgramacaoDublagem: id,
         },
       })
       .then((rs: Array<ProgramacaoDublagemInterface>) => {
@@ -94,18 +96,37 @@ export default function ProgramacaoDublagem() {
         }
       })
   }
+
+  const formatarData = (data: string): string => {
+    if (data.length === 8) {
+      const dia = data.substring(0, 2)
+      const mes = data.substring(2, 4)
+      const ano = data.substring(4, 8)
+      const dt = `${ano}-${mes}-${dia}`
+      return dt
+    }
+    return data
+  }
+
+  const onProgramacao = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      rs.dataProgramacao = formatarData(rs.dataProgramacao)
+      setProgramacaoDublagem(rs)
+      setLocalState({ action: actionTypes.editando })
+    })
+  }
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      rs.dataProgramacao = formatarData(rs.dataProgramacao)
       setProgramacaoDublagem(rs)
-      // AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
 
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      rs.dataProgramacao = formatarData(rs.dataProgramacao)
       setProgramacaoDublagem(rs)
-      // AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
@@ -135,69 +156,21 @@ export default function ProgramacaoDublagem() {
     const [day, month, year] = dateString.split('/')
     return `${year}-${month}-${day} 00:00:00`
   }
-
-  const btPesquisar = () => {
-    // const relations = [
-    //   'detalheProgramacaoDublagens',
-    //   'detalheProgramacaoDublagens.pedido',
-    //   'detalheProgramacaoDublagens.pedido.detalhePedidos',
-    // ]
-
-    // const msg = 'Pesquisando pedidos ...'
-    // const setMensagem = setMensagemState
-    // let dadosPesquisa = {}
-    // let criterio = {}
-    // let camposLike = ['dataProgramacao']
-
-    // let comparador = "L"
-    // const temNumero = /\d/.test(pesquisa.itemPesquisa)
-
-    // if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-    //   const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-    //   criterio = {
-    //     dataProgramacao: formattedDateTime
-    //   }
-    // }
-
-    // dadosPesquisa = {
-    //   entidade: "ProgramacaoDublagem",
-    //   relations,
-    //   comparador,
-    //   criterio,
-    //   camposLike,
-    //   msg,
-    //   setMensagemState: setMensagem
-    // }
-
-    // clsCrud
-    //   .pesquisar(dadosPesquisa)
-    //   .then((rs: Array<any>) => {
-    //     console.log('resultado da pesquisa', rs)
-    //     setRsPesquisa(rs);
-    //   });
-
-    return clsCrud
-      .pesquisar({
-        entidade: 'ProgramacaoDublagem',
-        // relations: [
-        //   'detalheProgramacaoDublagens',
-        //   'detalheProgramacaoDublagens.pedido',
-        //   'detalheProgramacaoDublagens.pedido.detalhePedidos',
-        // ],
-        criterio: {
-          idProgramacaoDublagem: parseInt(pesquisa.itemPesquisa) || pesquisa.itemPesquisa,
-        },
-      })
-      .then((rs: Array<ProgramacaoDublagemInterface>) => {
-        // let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataProgramacao)
-        // return {
-        //   ...rs[0],
-        //   dataProgramacao: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
-        // }
-        console.log('resultado da pesquisa', rs)
-        setRsPesquisa(rs);
-      })
-
+  const btPesquisar = async () => {
+    let itemPesquisado = pesquisa.itemPesquisa
+    const temNumero = /\d/.test(itemPesquisado)
+    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
+      itemPesquisado = formatDateTimeForMySQL(itemPesquisado)
+    }
+    clsApi.execute<Array<ProgramacaoDublagemInterface>>({
+      url: 'programacaoPedidos',
+      method: 'post',
+      itemPesquisa: itemPesquisado,
+      mensagem: 'Pesquisando Programação de Dublagem ...',
+      setMensagemState: setMensagemState
+    }).then((rs: Array<any>) => {
+      setRsPesquisa(rs)
+    })
   }
 
   const validarDados = (): boolean => {
@@ -210,17 +183,56 @@ export default function ProgramacaoDublagem() {
     return retorno
   }
 
+  const AlterarStatusPedido = async (pedidos: Array<number>) => {
+    await clsApi.execute<Array<PedidoInterface>>({
+      url: 'produzirPedidos',
+      method: 'post',
+      pedidos,
+      tipoProducao: 'A',
+      mensagem: 'Alterando status dos pedidos ...',
+      setMensagemState: setMensagemState
+    })
+  }
   const btConfirmar = () => {
     if (validarDados()) {
-      console.log('dados validados', programacaoDublagem)
-      if (localState.action === actionTypes.incluindo) {
+      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
           entidade: "ProgramacaoDublagem",
           criterio: programacaoDublagem,
-          cb: () => btPesquisar(),
+          localState: localState,
+          setMensagemState: setMensagemState,
+          cb: () => btPesquisar()
         })
           .then((rs) => {
             if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      } else {
+        clsCrud.excluir({
+          entidade: "ProgramacaoDublagem",
+          criterio: {
+            idProgramacaoDublagem: programacaoDublagem.idProgramacaoDublagem
+          },
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              let tmpPedidos: Array<number> = []
+              programacaoDublagem.detalheProgramacaoDublagens.map((d) => {
+                tmpPedidos.push(d.idPedido)
+              })
+              AlterarStatusPedido(tmpPedidos)
               setLocalState({ action: actionTypes.pesquisando })
             } else {
               setMensagemState({
@@ -291,8 +303,26 @@ export default function ProgramacaoDublagem() {
                   {
                     icone: "find_in_page_two_tone",
                     onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                      onProgramacao(rs.idProgramacaoDublagem as number),
+                    toolTip: "Programação",
+                  },
+                  {
+                    icone: "sell_two_tone",
+                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                      onProgramacao(rs.idProgramacaoDublagem as number),
+                    toolTip: "Etiqueta",
+                  },
+                  {
+                    icone: "receipt_long.two_tone",
+                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                      onProgramacao(rs.idProgramacaoDublagem as number),
+                    toolTip: "Ficha de Corte",
+                  },
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
                       onEditar(rs.idProgramacaoDublagem as number),
-                    toolTip: "Visualizar",
+                    toolTip: "Editar",
                   },
                   {
                     icone: "delete",
@@ -316,7 +346,7 @@ export default function ProgramacaoDublagem() {
                   dados={programacaoDublagem}
                   field="dataProgramacao"
                   setState={setProgramacaoDublagem}
-                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
+                  disabled={['excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 1)}
@@ -336,7 +366,7 @@ export default function ProgramacaoDublagem() {
                   dados={programacaoDublagem}
                   field="qtdCola"
                   setState={setProgramacaoDublagem}
-                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
+                  disabled={['excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 2)}
@@ -355,7 +385,7 @@ export default function ProgramacaoDublagem() {
                   dados={programacaoDublagem}
                   field="qtdFilme"
                   setState={setProgramacaoDublagem}
-                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
+                  disabled={['excluindo'].includes(localState.action) ? true : false}
                   erros={erros}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 0)}
@@ -369,11 +399,6 @@ export default function ProgramacaoDublagem() {
                 masterLocalState={localState}
               />
             </Grid>
-
-            {/* <Grid item xs={12} md={12} >
-              <GerenciadorPedido detalhe={programacaoDublagem.detalheProgramacaoDublagens} />
-            </Grid> */}
-
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
@@ -384,7 +409,7 @@ export default function ProgramacaoDublagem() {
                   <CancelRoundedIcon sx={{ fontSize: 50 }} />
                 </IconButton>
               </Tooltip>
-              <Condicional condicao={['incluindo'].includes(localState.action)}>
+              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
                 <Tooltip title={'Confirmar'}>
                   <IconButton
                     color="secondary"

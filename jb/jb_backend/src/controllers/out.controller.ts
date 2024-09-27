@@ -3,6 +3,7 @@ import Pedido from '../entities/pedido.entity'
 import { AppDataSource } from '../data-source'
 import ProducaoMalharia from '../entities/producaoMalharia.entity'
 import PerdaMalharia from '../entities/perdaMalharia.entity'
+import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
 
 @Controller()
 export class OutController {
@@ -171,6 +172,37 @@ export class OutController {
     `;
 
     return repository.query(sql, [dtInicial, dtFinal]);
+  }
+
+  @Post("programacaoPedidos")
+  async programacaoPedidos(
+    @Body("itemPesquisa") itemPesquisa: string,
+  ): Promise<Array<ProgramacaoDublagem>> {
+
+    const sql = `
+    SELECT 
+      pd.idProgramacaoDublagem,
+      pd.dataProgramacao,
+      pd.qtdCola,
+      pd.qtdFilme,
+      SUM(dp.qtdPedida) AS metros
+    FROM 
+      programacaodublagens pd
+    INNER JOIN
+      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem
+    INNER JOIN 
+      pedidos p ON p.idPedido = dpd.idPedido
+    INNER JOIN
+      detalhepedidos dp ON dp.idPedido = p.idPedido
+    WHERE
+      (pd.dataProgramacao = IFNULL(?, pd.dataProgramacao))
+    GROUP BY
+      pd.idProgramacaoDublagem,
+      pd.dataProgramacao,
+      pd.qtdCola,
+      pd.qtdFilme;
+      `
+    return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, [itemPesquisa || null])
   }
 
 }
