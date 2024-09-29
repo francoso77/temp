@@ -1,0 +1,42 @@
+/* Esconder todos os outros elementos exceto a tabela na impressão */
+@media print {
+    body * {
+      visibility: hidden; /* Esconde todos os elementos */
+    }
+  
+    .print-table-container, 
+    .print-table-container * {
+      visibility: visible; /* Mantém visível apenas a tabela */
+    }
+  
+    .print-table-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      border: none;  /* Remove a borda do contêiner */
+      box-shadow: none;  /* Remove qualquer sombra do contêiner */
+    }
+  
+    /* Ajustar margens para impressão */
+    body {
+      margin: 10mm 15mm 10mm 15mm; /* Margem da impressão */
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+  
+    /* Remover bordas das células e da tabela */
+    th, td {
+      border: none;  /* Remove a borda das células */
+      padding: 10px;
+      text-align: left;
+    }
+  
+    th {
+      background-color: #f5f5f5;
+    }
+  }
+  

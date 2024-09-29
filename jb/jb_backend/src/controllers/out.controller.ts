@@ -70,6 +70,94 @@ export class OutController {
     return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 
+  @Post("pedidosEspumasProgramadas")
+  async pedidosEspumasProgramadas(
+    @Body("itemPesquisa") itemPesquisa: string,
+  ): Promise<Array<Pedido>> {
+
+    const sql = `
+      SELECT 
+        pro2.idProduto AS idProduto,
+        SUM(dp.qtdPedida * de.qtd) AS qtdTotalEspuma,
+        pro2.nome AS materiaPrima,
+        c.idCor AS idCor,
+        c.nome AS cor
+        
+      FROM
+        pedidos p
+      INNER JOIN 
+        detalhepedidos dp ON dp.idPedido = p.idPedido
+      INNER JOIN
+        produtos pro1 ON pro1.idProduto = dp.idProduto
+      INNER JOIN
+        estruturas e ON e.idProduto = dp.idProduto
+      INNER JOIN
+        detalheestruturas de ON de.idEstrutura = e.idEstrutura
+      INNER JOIN
+        produtos pro2 ON pro2.idProduto = de.idProduto
+      INNER JOIN 
+        cores c ON c.idCor = de.idCor
+      INNER JOIN
+        pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+      INNER JOIN 
+        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido
+      INNER JOIN 
+        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem
+
+      WHERE 
+        pro2.tipoProduto = 2 AND
+        dp.statusItem = 3 AND
+        pd.dataProgramacao = ?
+      GROUP BY
+        idProduto, materiaPrima, idCor, cor
+        ;
+      `
+    const params = [itemPesquisa]
+    return AppDataSource.getRepository(Pedido).query(sql, params)
+  }
+
+  @Post("pedidosTecidosProgramadas")
+  async pedidosTecidosProgramadas(
+    @Body("itemPesquisa") itemPesquisa: string,
+  ): Promise<Array<Pedido>> {
+
+    const sql = `
+      SELECT 
+      pro2.idProduto AS idProduto,
+     	p.idPedido AS idPedido,
+      pro2.nome AS produto,
+      pro2.tipoProduto AS tipoProduto,
+      c.nome AS cor,
+      (de.qtd * dp.qtdPedida) AS metros
+      FROM
+        pedidos p
+      INNER JOIN 
+        detalhepedidos dp ON dp.idPedido = p.idPedido
+      INNER JOIN
+        produtos pro1 ON pro1.idProduto = dp.idProduto
+      INNER JOIN
+        estruturas e ON e.idProduto = dp.idProduto
+      INNER JOIN
+        detalheestruturas de ON de.idEstrutura = e.idEstrutura
+      INNER JOIN
+        produtos pro2 ON pro2.idProduto = de.idProduto
+      INNER JOIN 
+        cores c ON c.idCor = de.idCor
+      INNER JOIN
+        pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+      INNER JOIN 
+        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido
+      INNER JOIN 
+        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem
+      WHERE 
+        pro2.tipoProduto IN(2,10) AND
+        dp.statusItem = 3 AND
+        pd.dataProgramacao = ?
+        ;       
+      `
+    const params = [itemPesquisa]
+    return AppDataSource.getRepository(Pedido).query(sql, params)
+  }
 
   @Post("limpaPecas")
   async limpaPecas(

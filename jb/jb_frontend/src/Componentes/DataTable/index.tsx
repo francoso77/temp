@@ -36,9 +36,6 @@ export interface DataTableInterface {
     linha: number
   ) => void
   exibirPaginacao?: boolean
-  // onRequestSort?: (event: React.MouseEvent<unknown>, property: keyof any) => void;
-  // order: Order;
-  // orderBy: string | number | symbol;
   temTotal?: boolean;
   colunaSoma?: Array<string>;
   // qtdColunas?: number;
@@ -184,9 +181,6 @@ export default function DataTable<T>({
   onStatus = undefined,
   onSelecionarLinha = undefined,
   exibirPaginacao = true,
-  // onRequestSort,
-  // order,
-  // orderBy,
   temTotal = false,
   colunaSoma = [],
   // qtdColunas
