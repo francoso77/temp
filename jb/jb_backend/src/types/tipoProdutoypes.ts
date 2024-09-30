@@ -4,12 +4,11 @@ export enum TipoProdutoType {
   eva = 3,
   filme = 4,
   fio = 5,
-  manta = 6,
+  forro = 6,
   nylon = 7,
   palmilha = 8,
   tecidoCru = 9,
   tecidoTinto = 10,
-  tnt = 11,
 }
 
 export const TipoProdutoTypes = [
@@ -34,8 +33,8 @@ export const TipoProdutoTypes = [
     descricao: "FIO"
   },
   {
-    idTipoProduto: TipoProdutoType.manta,
-    descricao: "MANTA"
+    idTipoProduto: TipoProdutoType.forro,
+    descricao: "FORRO"
   },
   {
     idTipoProduto: TipoProdutoType.nylon,
@@ -52,9 +51,5 @@ export const TipoProdutoTypes = [
   {
     idTipoProduto: TipoProdutoType.tecidoTinto,
     descricao: "TECIDO TINTO"
-  },
-  {
-    idTipoProduto: TipoProdutoType.tnt,
-    descricao: "TNT"
   },
 ]

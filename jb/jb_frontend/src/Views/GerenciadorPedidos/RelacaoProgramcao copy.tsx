@@ -8,7 +8,7 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import Condicional from '../../Componentes/Condicional/Condicional';
-import './printStyles.css';
+// import './printStyles.css';
 
 type Order = 'asc' | 'desc'
 

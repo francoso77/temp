@@ -8,12 +8,11 @@ var TipoProdutoType;
     TipoProdutoType[TipoProdutoType["eva"] = 3] = "eva";
     TipoProdutoType[TipoProdutoType["filme"] = 4] = "filme";
     TipoProdutoType[TipoProdutoType["fio"] = 5] = "fio";
-    TipoProdutoType[TipoProdutoType["manta"] = 6] = "manta";
+    TipoProdutoType[TipoProdutoType["forro"] = 6] = "forro";
     TipoProdutoType[TipoProdutoType["nylon"] = 7] = "nylon";
     TipoProdutoType[TipoProdutoType["palmilha"] = 8] = "palmilha";
     TipoProdutoType[TipoProdutoType["tecidoCru"] = 9] = "tecidoCru";
     TipoProdutoType[TipoProdutoType["tecidoTinto"] = 10] = "tecidoTinto";
-    TipoProdutoType[TipoProdutoType["tnt"] = 11] = "tnt";
 })(TipoProdutoType || (exports.TipoProdutoType = TipoProdutoType = {}));
 exports.TipoProdutoTypes = [
     {
@@ -37,8 +36,8 @@ exports.TipoProdutoTypes = [
         descricao: "FIO"
     },
     {
-        idTipoProduto: TipoProdutoType.manta,
-        descricao: "MANTA"
+        idTipoProduto: TipoProdutoType.forro,
+        descricao: "FORRO"
     },
     {
         idTipoProduto: TipoProdutoType.nylon,
@@ -55,10 +54,6 @@ exports.TipoProdutoTypes = [
     {
         idTipoProduto: TipoProdutoType.tecidoTinto,
         descricao: "TECIDO TINTO"
-    },
-    {
-        idTipoProduto: TipoProdutoType.tnt,
-        descricao: "TNT"
     },
 ];
 //# sourceMappingURL=tipoProdutoypes.js.map

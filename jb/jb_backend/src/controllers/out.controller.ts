@@ -39,7 +39,9 @@ export class OutController {
       detalhepedidos dp ON dp.idPedido = p.idPedido
     INNER JOIN
       produtos pp ON pp.idProduto = dp.idProduto
-    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido;  
+    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido
+    ORDER BY p.dataPedido DESC
+    ;  
   `
     return AppDataSource.getRepository(Pedido).query(sql)
   }
@@ -110,6 +112,8 @@ export class OutController {
         pd.dataProgramacao = ?
       GROUP BY
         idProduto, materiaPrima, idCor, cor
+      ORDER BY
+        materiaPrima, cor
         ;
       `
     const params = [itemPesquisa]
@@ -125,6 +129,7 @@ export class OutController {
       SELECT 
       pro2.idProduto AS idProduto,
      	p.idPedido AS idPedido,
+      pc.nome AS cliente,
       pro2.nome AS produto,
       pro2.tipoProduto AS tipoProduto,
       c.nome AS cor,
@@ -153,6 +158,8 @@ export class OutController {
         pro2.tipoProduto IN(2,10) AND
         dp.statusItem = 3 AND
         pd.dataProgramacao = ?
+      ORDER BY
+        produto, cor
         ;       
       `
     const params = [itemPesquisa]

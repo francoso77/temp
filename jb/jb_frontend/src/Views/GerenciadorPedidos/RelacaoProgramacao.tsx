@@ -1,9 +1,11 @@
 import React, { useContext, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Button, Typography, Box, Grid } from '@mui/material';
 import ClsApi from "../../Utils/ClsApi";
 import ClsFormatacao from "../../Utils/ClsFormatacao";
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable'; // Importa corretamente o autoTable
 import './printStyles.css';
 
 interface Dados {
@@ -19,15 +21,8 @@ interface DadosFilter {
   produto: string;
   tipoProduto: number;
   cor: string;
-  metros: string;
-}
-
-interface PaginaDataTableCabecalhoInterface {
-  campo: string;
-  cabecalho: string;
-  alinhamento?: 'left' | 'right' | 'center';
-  largura?: number;
-  format?: (arg: any, row: any) => string | number | undefined;
+  metros: number;
+  cliente: string;
 }
 
 export default function RelacaoProgramcao() {
@@ -38,50 +33,9 @@ export default function RelacaoProgramcao() {
   const [dadosFilter, setDadosFilter] = React.useState<DadosFilter[]>([]);
   const [dados, setDados] = React.useState<Dados[]>([]);
 
-  const cabecalhoTabela: PaginaDataTableCabecalhoInterface[] = [
-    {
-      cabecalho: 'Metros',
-      alinhamento: 'left',
-      campo: 'qtdTotalEspuma',
-      format: (qtd) => clsFormatacao.currency(qtd),
-      largura: 100,
-    },
-    {
-      cabecalho: 'Espuma',
-      alinhamento: 'left',
-      campo: 'materiaPrima',
-      largura: 100,
-    },
-    {
-      cabecalho: 'Cor',
-      alinhamento: 'left',
-      campo: 'cor',
-      largura: 100,
-    },
-  ];
-
-  const cabecalhoTabelaDetalhes: PaginaDataTableCabecalhoInterface[] = [
-    {
-      cabecalho: 'Metros',
-      alinhamento: 'right',
-      campo: 'metros',
-      format: (qtd) => clsFormatacao.currency(qtd),
-    },
-    {
-      cabecalho: 'Tecido',
-      alinhamento: 'center',
-      campo: 'produto',
-    },
-    {
-      cabecalho: 'Cor',
-      alinhamento: 'center',
-      campo: 'cor',
-    },
-  ];
-
   const BuscarDados = () => {
     const campo = 'nome';
-    const itemPesquisa = '2024-09-28';
+    const itemPesquisa = '2024-09-25';
 
     clsApi.execute<Array<PedidoInterface>>({
       url: 'pedidosEspumasProgramadas',
@@ -110,89 +64,120 @@ export default function RelacaoProgramcao() {
     BuscarDados();
   }, []);
 
-  const handlePrint = () => {
-    window.print();
+  const renderDetalhes = (row: Dados): Array<{ metros: string; produto: string; cor: string, pedido: number, cliente: string }> => {
+    const detalhesFiltrados = dadosFilter.filter(filtro => filtro.idProduto === row.idProduto && filtro.cor === row.cor);
+    const itensFiltrados = dadosFilter.filter(item =>
+      detalhesFiltrados.some(detalhe => detalhe.idPedido === item.idPedido) && item.tipoProduto === 10
+    );
+
+    if (itensFiltrados.length === 0) {
+      return []; // Retorna array vazio se não houver itens
+    }
+
+    return itensFiltrados.map(item => ({
+      metros: clsFormatacao.currency(item.metros),
+      produto: item.produto,
+      cor: item.cor,
+      pedido: item.idPedido,
+      cliente: item.cliente
+    }));
   };
 
-  const renderTableRows = (rows: any[], cabecalho: PaginaDataTableCabecalhoInterface[], isDetalhe = false) => {
-    return rows.map((row, rowIndex) => (
-      <React.Fragment key={rowIndex}>
-        <TableRow>
-          {cabecalho.map((coluna, colIndex) => (
-            <TableCell key={colIndex} align={coluna.alinhamento || 'left'}>
-              {coluna.format ? coluna.format(row[coluna.campo], row) : row[coluna.campo]}
-            </TableCell>
-          ))}
-        </TableRow>
-        {isDetalhe && renderTableDetalhes(row)}
-      </React.Fragment>
-    ));
+  const gerarPDF = () => {
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const title = 'Programação de Dublagem' + ' - Data: ' + clsFormatacao.dataISOtoUser(new Date().toISOString())
+
+    doc.setFontSize(14);
+    doc.text(title, 10, 10);
+
+    let startY = 20; // Início da primeira linha do conteúdo
+
+    dados.forEach((espuma, index) => {
+      doc.setFontSize(12);
+      doc.text(`${clsFormatacao.currency(espuma.qtdTotalEspuma)} metros - ${espuma.materiaPrima} - ${espuma.cor}`, 20, startY);
+
+      const detalhes = renderDetalhes(espuma);
+
+      if (detalhes.length > 0) {
+        autoTable(doc, {
+          startY: startY + 10, // Ajusta para iniciar a tabela logo após o texto
+          head: [['Metros', 'Produto', 'Cor', 'Pedido', 'Cliente']],
+          body: detalhes.map(item => [item.metros, item.produto, item.cor, item.pedido, item.cliente]),
+          headStyles: {
+            fillColor: [220, 220, 220], // Cor de fundo (cinza claro)
+            textColor: [0, 0, 0], // Cor do texto (branco)
+            fontSize: 10, // Tamanho da fonte dos cabeçalhos
+          },
+          columnStyles: {
+            0: { halign: 'right', cellWidth: 20 },
+            1: { halign: 'left', cellWidth: 30 },
+            2: { halign: 'left', cellWidth: 20 },
+            3: { halign: 'right', cellWidth: 20 },
+            4: { halign: 'left', cellWidth: 60 },
+          },
+          bodyStyles: {
+            // fillColor: [255, 255, 255], // Cor de fundo das células do corpo (branco)
+            // textColor: [0, 0, 0], // Cor do texto (preto)
+            // lineColor: [255, 255, 255], // Cor das linhas (branco)
+            fontSize: 8, // Tamanho da fonte do corpo da tabela
+          },
+          styles: {
+            // lineColor: [255, 255, 255], // Cor das bordas das células (branco)
+            // lineWidth: 0.5, // Espessura da linha
+            lineColor: [0, 0, 0], // Cor das linhas (branco)
+            fillColor: [255, 255, 255], // Cor de fundo das celulas (branco)
+          },
+        });
+
+        // Atualiza o startY para a próxima iteração, considerando onde a tabela terminou
+        startY = (doc as any).lastAutoTable.finalY + 10;
+      } else {
+        // Caso não tenha tabela, apenas aumenta o espaçamento entre os blocos
+        startY += 30;
+      }
+    });
+
+    doc.save('programacao_dublagem - ' + clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
   };
-  
-  const renderTableDetalhes = (row: Dados) => {
-    // Filtra os detalhes com base no idProduto
-    const detalhesFiltrados = dadosFilter.filter(filtro => filtro.idProduto === row.idProduto);
-  
-    // Filtra itens que correspondem ao idPedido e ao idProduto
-    const itensFiltrados = dadosFilter.filter(item => 
-      detalhesFiltrados.some(detalhe => detalhe.idPedido === item.idPedido) && item.idProduto === 10
-    );
-  
-    if (itensFiltrados.length === 0) {
-      return null; // Não renderiza nada se não houver detalhes correspondentes
-    }
-  
-    return (
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {cabecalhoTabelaDetalhes.map((coluna, colIndex) => (
-                <TableCell
-                  key={colIndex}
-                  align={coluna.alinhamento || 'left'}
-                  style={{ minWidth: coluna.largura }}
-                >
-                  {coluna.cabecalho}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {renderTableRows(itensFiltrados, cabecalhoTabelaDetalhes)}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
-    
+
+
   return (
-    <div className="print-container">
-      <h1>Relatório de Dados</h1>
-      <Button variant="contained" color="primary" onClick={handlePrint}>
-        Imprimir
-      </Button>
-      <TableContainer component={Paper} className="print-table-container">
-        <Table>
-          <TableHead>
-            <TableRow>
-              {cabecalhoTabela.map((coluna, colIndex) => (
-                <TableCell
-                  key={colIndex}
-                  align={coluna.alinhamento || 'left'}
-                  style={{
-                    minWidth: coluna.largura,
-                    width: coluna.largura,
-                    maxWidth: coluna.largura,
-                  }}                >
-                  {coluna.cabecalho}
-                </TableCell>
+    <div>
+      {/* Elementos que não devem ser impressos */}
+      <div className="no-print">
+        <Button variant="contained" color="primary" onClick={gerarPDF}>
+          Gerar PDF
+        </Button>
+      </div>
+      {/* Elementos que devem ser impressos */}
+      <div className="print-container">
+        <h1>Programação de dublagem</h1>
+
+        {dados.map((espuma, espumaIndex) => (
+          <React.Fragment key={espumaIndex}>
+            <Grid container spacing={2} sx={{ mt: 1, ml: 2 }}>
+              <Grid item sx={{ textAlign: 'left' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  {clsFormatacao.currency(espuma.qtdTotalEspuma)} metros
+                </Typography>
+              </Grid>
+              <Grid item sx={{ textAlign: 'left' }} >
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  {espuma.materiaPrima} - {espuma.cor}
+                </Typography>
+              </Grid>
+            </Grid>
+            <Box sx={{ p: 2, border: '1px solid #ccc' }}>
+              {/* Renderização dos detalhes */}
+              {renderDetalhes(espuma).map((detalhe, detalheIndex) => (
+                <Typography key={detalheIndex} sx={{ mt: 2, ml: 5 }}>
+                  {detalhe.metros} -- {detalhe.produto} {detalhe.cor} {detalhe.pedido} {detalhe.cliente}
+                </Typography>
               ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>{renderTableRows(dados, cabecalhoTabela, true)}</TableBody>
-        </Table>
-      </TableContainer>
+            </Box>
+          </React.Fragment>
+        ))}
+      </div>
     </div>
   );
 }
