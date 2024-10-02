@@ -10,6 +10,9 @@ export default class Cor implements CorInterface {
   @Column({ length: 35 })
   nome: string
 
+  @Column()
+  nivel: number
+
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date;
 

@@ -72,15 +72,25 @@ export class OutController {
     return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 
-  @Post("pedidosEspumasProgramadas")
-  async pedidosEspumasProgramadas(
+  @Post("pedidosEspumasEForrosProgramadas")
+  async pedidosEspumasEForrosProgramadas(
     @Body("itemPesquisa") itemPesquisa: string,
+    @Body("tipo") tipo: 'Espuma' | 'Forro',
   ): Promise<Array<Pedido>> {
+    const tipos = [2, 6]
+    let tp: any = 0
+    if (tipo === 'Espuma') {
+      tp = 2
+    } else if (tipo === 'Forro') {
+      tp = 6
+    } else {
+      tp = '(' + tipos.map((v) => v).join(", ") + ')'
 
+    }
     const sql = `
       SELECT 
         pro2.idProduto AS idProduto,
-        SUM(dp.qtdPedida * de.qtd) AS qtdTotalEspuma,
+        SUM(dp.qtdPedida * de.qtd) AS qtdTotal,
         pro2.nome AS materiaPrima,
         c.idCor AS idCor,
         c.nome AS cor
@@ -107,7 +117,7 @@ export class OutController {
         programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem
 
       WHERE 
-        pro2.tipoProduto = 2 AND
+        pro2.tipoProduto IN (?) AND
         dp.statusItem = 3 AND
         pd.dataProgramacao = ?
       GROUP BY
@@ -116,7 +126,7 @@ export class OutController {
         materiaPrima, cor
         ;
       `
-    const params = [itemPesquisa]
+    const params = [tp, itemPesquisa]
     return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 
@@ -133,6 +143,7 @@ export class OutController {
       pro2.nome AS produto,
       pro2.tipoProduto AS tipoProduto,
       c.nome AS cor,
+      c.nivel AS corNivel,
       (de.qtd * dp.qtdPedida) AS metros
       FROM
         pedidos p
@@ -159,7 +170,7 @@ export class OutController {
         dp.statusItem = 3 AND
         pd.dataProgramacao = ?
       ORDER BY
-        produto, cor
+        produto, corNivel
         ;       
       `
     const params = [itemPesquisa]

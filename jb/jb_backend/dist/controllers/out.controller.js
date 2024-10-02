@@ -77,12 +77,23 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.pedidosEspumasProgramadas = function (itemPesquisa) {
+    OutController.prototype.pedidosEspumasEForrosProgramadas = function (itemPesquisa, tipo) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, params;
+            var tipos, tp, sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pro2.idProduto AS idProduto,\n        SUM(dp.qtdPedida * de.qtd) AS qtdTotalEspuma,\n        pro2.nome AS materiaPrima,\n        c.idCor AS idCor,\n        c.nome AS cor\n        \n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n\n      WHERE \n        pro2.tipoProduto = 2 AND\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n      GROUP BY\n        idProduto, materiaPrima, idCor, cor\n      ORDER BY\n        materiaPrima, cor\n        ;\n      ";
-                params = [itemPesquisa];
+                tipos = [2, 6];
+                tp = 0;
+                if (tipo === 'Espuma') {
+                    tp = 2;
+                }
+                else if (tipo === 'Forro') {
+                    tp = 6;
+                }
+                else {
+                    tp = '(' + tipos.map(function (v) { return v; }).join(", ") + ')';
+                }
+                sql = "\n      SELECT \n        pro2.idProduto AS idProduto,\n        SUM(dp.qtdPedida * de.qtd) AS qtdTotal,\n        pro2.nome AS materiaPrima,\n        c.idCor AS idCor,\n        c.nome AS cor\n        \n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n\n      WHERE \n        pro2.tipoProduto IN (?) AND\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n      GROUP BY\n        idProduto, materiaPrima, idCor, cor\n      ORDER BY\n        materiaPrima, cor\n        ;\n      ";
+                params = [tp, itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
         });
@@ -91,7 +102,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n      pro2.idProduto AS idProduto,\n     \tp.idPedido AS idPedido,\n      pc.nome AS cliente,\n      pro2.nome AS produto,\n      pro2.tipoProduto AS tipoProduto,\n      c.nome AS cor,\n      (de.qtd * dp.qtdPedida) AS metros\n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n      WHERE \n        pro2.tipoProduto IN(2,10) AND\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n      ORDER BY\n        produto, cor\n        ;       \n      ";
+                sql = "\n      SELECT \n      pro2.idProduto AS idProduto,\n     \tp.idPedido AS idPedido,\n      pc.nome AS cliente,\n      pro2.nome AS produto,\n      pro2.tipoProduto AS tipoProduto,\n      c.nome AS cor,\n      c.nivel AS corNivel,\n      (de.qtd * dp.qtdPedida) AS metros\n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n      WHERE \n        pro2.tipoProduto IN(2,10) AND\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n      ORDER BY\n        produto, corNivel\n        ;       \n      ";
                 params = [itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
@@ -169,12 +180,13 @@ var OutController = /** @class */ (function () {
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "pedidosEmAberto", null);
     __decorate([
-        (0, common_1.Post)("pedidosEspumasProgramadas"),
+        (0, common_1.Post)("pedidosEspumasEForrosProgramadas"),
         __param(0, (0, common_1.Body)("itemPesquisa")),
+        __param(1, (0, common_1.Body)("tipo")),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String]),
+        __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
-    ], OutController.prototype, "pedidosEspumasProgramadas", null);
+    ], OutController.prototype, "pedidosEspumasEForrosProgramadas", null);
     __decorate([
         (0, common_1.Post)("pedidosTecidosProgramadas"),
         __param(0, (0, common_1.Body)("itemPesquisa")),

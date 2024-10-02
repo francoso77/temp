@@ -22,6 +22,10 @@ var Cor = /** @class */ (function () {
         __metadata("design:type", String)
     ], Cor.prototype, "nome", void 0);
     __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], Cor.prototype, "nivel", void 0);
+    __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Cor.prototype, "createAD", void 0);

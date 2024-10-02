@@ -10,7 +10,7 @@ import './printStyles.css';
 
 interface Dados {
   idProduto: number;
-  qtdTotalEspuma: number;
+  qtdTotal: number;
   materiaPrima: string;
   cor: string;
 }
@@ -30,22 +30,36 @@ export default function RelacaoProgramcao() {
   const clsFormatacao = new ClsFormatacao();
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
-  const [dadosFilter, setDadosFilter] = React.useState<DadosFilter[]>([]);
-  const [dados, setDados] = React.useState<Dados[]>([]);
+  const [tecidos, setTecidos] = React.useState<DadosFilter[]>([]);
+  const [forros, setForros] = React.useState<Dados[]>([]);
+  const [espumas, setEspumas] = React.useState<Dados[]>([]);
 
   const BuscarDados = () => {
     const campo = 'nome';
     const itemPesquisa = '2024-09-25';
 
     clsApi.execute<Array<PedidoInterface>>({
-      url: 'pedidosEspumasProgramadas',
+      url: 'pedidosEspumasEForrosProgramadas',
       method: 'post',
       itemPesquisa,
       campo,
+      tipo: 'Forro',
+      mensagem: 'Pesquisando forros ...',
+      setMensagemState,
+    }).then((rs: any) => {
+      setForros(rs);
+    });
+
+    clsApi.execute<Array<PedidoInterface>>({
+      url: 'pedidosEspumasEForrosProgramadas',
+      method: 'post',
+      itemPesquisa,
+      campo,
+      tipo: 'Espuma',
       mensagem: 'Pesquisando espumas ...',
       setMensagemState,
     }).then((rs: any) => {
-      setDados(rs);
+      setEspumas(rs);
     });
 
     clsApi.execute<Array<PedidoInterface>>({
@@ -56,7 +70,7 @@ export default function RelacaoProgramcao() {
       mensagem: 'Pesquisando tecidos ...',
       setMensagemState,
     }).then((rs: any) => {
-      setDadosFilter(rs);
+      setTecidos(rs);
     });
   };
 
@@ -65,8 +79,8 @@ export default function RelacaoProgramcao() {
   }, []);
 
   const renderDetalhes = (row: Dados): Array<{ metros: string; produto: string; cor: string, pedido: number, cliente: string }> => {
-    const detalhesFiltrados = dadosFilter.filter(filtro => filtro.idProduto === row.idProduto && filtro.cor === row.cor);
-    const itensFiltrados = dadosFilter.filter(item =>
+    const detalhesFiltrados = tecidos.filter(tecido => tecido.idProduto === row.idProduto && tecido.cor === row.cor);
+    const itensFiltrados = tecidos.filter(item =>
       detalhesFiltrados.some(detalhe => detalhe.idPedido === item.idPedido) && item.tipoProduto === 10
     );
 
@@ -87,54 +101,63 @@ export default function RelacaoProgramcao() {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const title = 'Programação de Dublagem' + ' - Data: ' + clsFormatacao.dataISOtoUser(new Date().toISOString())
 
-    doc.setFontSize(14);
+    doc.setFontSize(15);
     doc.text(title, 10, 10);
 
     let startY = 20; // Início da primeira linha do conteúdo
 
-    dados.forEach((espuma, index) => {
-      doc.setFontSize(12);
-      doc.text(`${clsFormatacao.currency(espuma.qtdTotalEspuma)} metros - ${espuma.materiaPrima} - ${espuma.cor}`, 20, startY);
+    espumas.forEach((espuma, _index) => {
 
-      const detalhes = renderDetalhes(espuma);
+      forros.forEach((forro, _index) => {
+        if (forro.qtdTotal !== espuma.qtdTotal) {
+          doc.setFontSize(13);
+          doc.text(`${clsFormatacao.currency(espuma.qtdTotal)} metros - ${espuma.materiaPrima} - ${espuma.cor}`, 20, startY);
 
-      if (detalhes.length > 0) {
-        autoTable(doc, {
-          startY: startY + 10, // Ajusta para iniciar a tabela logo após o texto
-          head: [['Metros', 'Produto', 'Cor', 'Pedido', 'Cliente']],
-          body: detalhes.map(item => [item.metros, item.produto, item.cor, item.pedido, item.cliente]),
-          headStyles: {
-            fillColor: [220, 220, 220], // Cor de fundo (cinza claro)
-            textColor: [0, 0, 0], // Cor do texto (branco)
-            fontSize: 10, // Tamanho da fonte dos cabeçalhos
-          },
-          columnStyles: {
-            0: { halign: 'right', cellWidth: 20 },
-            1: { halign: 'left', cellWidth: 30 },
-            2: { halign: 'left', cellWidth: 20 },
-            3: { halign: 'right', cellWidth: 20 },
-            4: { halign: 'left', cellWidth: 60 },
-          },
-          bodyStyles: {
-            // fillColor: [255, 255, 255], // Cor de fundo das células do corpo (branco)
-            // textColor: [0, 0, 0], // Cor do texto (preto)
-            // lineColor: [255, 255, 255], // Cor das linhas (branco)
-            fontSize: 8, // Tamanho da fonte do corpo da tabela
-          },
-          styles: {
-            // lineColor: [255, 255, 255], // Cor das bordas das células (branco)
-            // lineWidth: 0.5, // Espessura da linha
-            lineColor: [0, 0, 0], // Cor das linhas (branco)
-            fillColor: [255, 255, 255], // Cor de fundo das celulas (branco)
-          },
-        });
+        } else {
+          doc.text(`${clsFormatacao.currency(espuma.qtdTotal)} metros - ${espuma.materiaPrima} - ${espuma.cor} com ${forro.materiaPrima} - ${forro.cor}`, 20, startY);
 
-        // Atualiza o startY para a próxima iteração, considerando onde a tabela terminou
-        startY = (doc as any).lastAutoTable.finalY + 10;
-      } else {
-        // Caso não tenha tabela, apenas aumenta o espaçamento entre os blocos
-        startY += 30;
-      }
+        }
+
+        const detalhes = renderDetalhes(espuma);
+
+        if (detalhes.length > 0) {
+          autoTable(doc, {
+            startY: startY + 10, // Ajusta para iniciar a tabela logo após o texto
+            head: [['Metros', 'Produto', 'Cor', 'Pedido', 'Cliente']],
+            body: detalhes.map(item => [item.metros, item.produto, item.cor, item.pedido, item.cliente]),
+            headStyles: {
+              fillColor: [220, 220, 220], // Cor de fundo (cinza claro)
+              textColor: [0, 0, 0], // Cor do texto (branco)
+              fontSize: 11, // Tamanho da fonte dos cabeçalhos
+            },
+            columnStyles: {
+              0: { halign: 'right', cellWidth: 20 },
+              1: { halign: 'left', cellWidth: 30 },
+              2: { halign: 'left', cellWidth: 20 },
+              3: { halign: 'right', cellWidth: 20 },
+              4: { halign: 'left', cellWidth: 60 },
+            },
+            bodyStyles: {
+              // fillColor: [255, 255, 255], // Cor de fundo das células do corpo (branco)
+              // textColor: [0, 0, 0], // Cor do texto (preto)
+              // lineColor: [255, 255, 255], // Cor das linhas (branco)
+              fontSize: 9, // Tamanho da fonte do corpo da tabela
+            },
+            styles: {
+              // lineColor: [255, 255, 255], // Cor das bordas das células (branco)
+              // lineWidth: 0.5, // Espessura da linha
+              lineColor: [0, 0, 0], // Cor das linhas (branco)
+              fillColor: [255, 255, 255], // Cor de fundo das celulas (branco)
+            },
+          });
+
+          // Atualiza o startY para a próxima iteração, considerando onde a tabela terminou
+          startY = (doc as any).lastAutoTable.finalY + 10;
+        } else {
+          // Caso não tenha tabela, apenas aumenta o espaçamento entre os blocos
+          startY += 30;
+        }
+      })
     });
 
     doc.save('programacao_dublagem - ' + clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
@@ -153,12 +176,12 @@ export default function RelacaoProgramcao() {
       <div className="print-container">
         <h1>Programação de dublagem</h1>
 
-        {dados.map((espuma, espumaIndex) => (
+        {espumas.map((espuma, espumaIndex) => (
           <React.Fragment key={espumaIndex}>
             <Grid container spacing={2} sx={{ mt: 1, ml: 2 }}>
               <Grid item sx={{ textAlign: 'left' }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                  {clsFormatacao.currency(espuma.qtdTotalEspuma)} metros
+                  {clsFormatacao.currency(espuma.qtdTotal)} metros
                 </Typography>
               </Grid>
               <Grid item sx={{ textAlign: 'left' }} >
