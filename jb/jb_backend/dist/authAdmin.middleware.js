@@ -6,22 +6,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.AuthAdminMiddleware = void 0;
 var common_1 = require("@nestjs/common");
-var crud_controller_1 = require("./controllers/crud.controller");
-var out_controller_1 = require("./controllers/out.controller");
-var loginUsuario_controller_1 = require("./controllers/loginUsuario.controller");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var AuthAdminMiddleware = /** @class */ (function () {
+    function AuthAdminMiddleware() {
     }
-    AppModule = __decorate([
-        (0, common_1.Module)({
-            imports: [],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController],
-            providers: [],
-        })
-    ], AppModule);
-    return AppModule;
+    AuthAdminMiddleware.prototype.use = function (req, res, next) {
+        // pegar token e verificar se o token e valido
+        // verificar se tem permissao
+        console.log("Request Admin...");
+        next();
+    };
+    AuthAdminMiddleware = __decorate([
+        (0, common_1.Injectable)()
+    ], AuthAdminMiddleware);
+    return AuthAdminMiddleware;
 }());
-exports.AppModule = AppModule;
-//# sourceMappingURL=app.module.js.map
+exports.AuthAdminMiddleware = AuthAdminMiddleware;
+//# sourceMappingURL=authAdmin.middleware.js.map

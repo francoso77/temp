@@ -47,7 +47,8 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
       tipoProduto: TipoProdutoType.tecidoTinto
     },
     cor: {
-      nome: ''
+      nome: '',
+      nivel: 0
     }
   }
 

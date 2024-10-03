@@ -30,7 +30,7 @@ interface PaginaDataTableCabecalhoInterface {
   format?: (arg: any, row: any) => string | number | undefined;
 }
 
-export default function RelacaoProgramcao() {
+export default function xxxRelacaoProgramcaoxx() {
   const clsApi = new ClsApi();
   const clsFormatacao = new ClsFormatacao();
 

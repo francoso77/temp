@@ -9,9 +9,9 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import GerenciadorPedido from './Gerenciador';
+import GerenciadorPedido from './GerenciadorPedidos';
 import ClsApi from '../../Utils/ClsApi';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 

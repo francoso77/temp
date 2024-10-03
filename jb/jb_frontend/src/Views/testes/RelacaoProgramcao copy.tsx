@@ -36,7 +36,7 @@ interface PaginaDataTableInterface {
     colunaSoma?: Array<string>
     // qtdColunas?: number;
 }
-export default function RelacaoProgramcao() {
+export default function xxxRelacaoProgramcaoxxx() {
     const clsApi = new ClsApi();
     const clsCrud = new ClsCrud();
     const clsFormatacao = new ClsFormatacao();

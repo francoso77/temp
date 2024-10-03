@@ -23,10 +23,11 @@ var produto_entity_1 = require("./entities/produto.entity");
 var programacao_entity_1 = require("./entities/programacao.entity");
 var tinturaria_entity_1 = require("./entities/tinturaria.entity");
 var unidadeMedida_entity_1 = require("./entities/unidadeMedida.entity");
-var user_entity_1 = require("./entities/user.entity");
 var perdaMalharia_entity_1 = require("./entities/perdaMalharia.entity");
 var programacaoDublagem_entity_1 = require("./entities/programacaoDublagem.entity");
 var detalheProgramacaoDublagem_entity_1 = require("./entities/detalheProgramacaoDublagem.entity");
+var usuario_entity_1 = require("./entities/sistema/usuario.entity");
+var usuarioSessao_entity_1 = require("./entities/sistema/usuarioSessao.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -61,7 +62,8 @@ exports.AppDataSource = new typeorm_1.DataSource({
         programacaoDublagem_entity_1.default,
         tinturaria_entity_1.default,
         unidadeMedida_entity_1.default,
-        user_entity_1.User
+        usuario_entity_1.Usuario,
+        usuarioSessao_entity_1.UsuarioSessao
     ],
     migrations: [],
     subscribers: [],

@@ -54,7 +54,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     vrUnitario: 0,
     idCor: null,
     cor: {
-      nome: ''
+      nome: '',
+      nivel: 0
     },
     qtdPecas: 0,
     metro: 0,

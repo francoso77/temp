@@ -13,11 +13,8 @@ import Pedido from '../Views/Pedidos/Pedido';
 import Entrada from '../Views/Entradas/Entrada';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
-import GerenciadorPedido from '../Views/GerenciadorPedidos/Gerenciador';
-import DynamicTablePage from '../Views/testes/paginaHTML';
 import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem';
-import TabelaComCheckbox from '../Views/testes/table';
-import RelacaoProgramacao from "../Views/GerenciadorPedidos/RelacaoProgramacao";
+import RelacaoProgramacao from '../Views/testes/RelacaoProgramacao';
 
 
 export const router = createBrowserRouter([
@@ -83,7 +80,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: <RelacaoProgramacao />,
+        element: < />,
       },
     ]
   },

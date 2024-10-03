@@ -6,7 +6,6 @@ import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInt
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable'; // Importa corretamente o autoTable
-import './printStyles.css';
 
 interface Dados {
   idProduto: number;
@@ -25,7 +24,7 @@ interface DadosFilter {
   cliente: string;
 }
 
-export default function RelacaoProgramcao() {
+export default function RelacaoProgramacao() {
   const clsApi = new ClsApi();
   const clsFormatacao = new ClsFormatacao();
 

@@ -6,22 +6,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppModule = void 0;
+exports.AuthUsuarioMiddleware = void 0;
 var common_1 = require("@nestjs/common");
-var crud_controller_1 = require("./controllers/crud.controller");
-var out_controller_1 = require("./controllers/out.controller");
-var loginUsuario_controller_1 = require("./controllers/loginUsuario.controller");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var AuthUsuarioMiddleware = /** @class */ (function () {
+    function AuthUsuarioMiddleware() {
     }
-    AppModule = __decorate([
-        (0, common_1.Module)({
-            imports: [],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController],
-            providers: [],
-        })
-    ], AppModule);
-    return AppModule;
+    AuthUsuarioMiddleware.prototype.use = function (req, res, next) {
+        console.log("Request Usuário...");
+        console.log("req.headers.authorization: ", req.headers.authorization);
+    };
+    AuthUsuarioMiddleware = __decorate([
+        (0, common_1.Injectable)()
+    ], AuthUsuarioMiddleware);
+    return AuthUsuarioMiddleware;
 }());
-exports.AppModule = AppModule;
-//# sourceMappingURL=app.module.js.map
+exports.AuthUsuarioMiddleware = AuthUsuarioMiddleware;
+//# sourceMappingURL=authUsuario.middleware.js.map

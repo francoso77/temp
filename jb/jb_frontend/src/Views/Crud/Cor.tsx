@@ -15,6 +15,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
+import HoverColorIntensityRating from '../../Componentes/Rating';
 
 
 
@@ -24,7 +25,8 @@ export default function Cor() {
   const clsCrud = new ClsCrud()
 
   const ResetDados: CorInterface = {
-    nome: ''
+    nome: '',
+    nivel: 0
   }
   interface PesquisaInterface {
     nome: string
@@ -44,6 +46,11 @@ export default function Cor() {
       alinhamento: 'left',
       campo: 'nome'
     },
+    {
+      cabecalho: 'Intesidade',
+      alinhamento: 'center',
+      campo: 'nivel'
+    },
   ]
 
   const btPesquisar = () => {
@@ -54,7 +61,7 @@ export default function Cor() {
           nome: "%".concat(pesquisa.nome).concat("%"),
         },
         camposLike: ["nome"],
-        select: ["idCor", "nome"],
+        select: ["idCor", "nome", "nivel"],
         msg: 'Pesquisando cores ...',
         setMensagemState: setMensagemState
       })
@@ -253,7 +260,7 @@ export default function Cor() {
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <InputText
                 label="Nome"
                 tipo="uppercase"
@@ -264,6 +271,26 @@ export default function Cor() {
                 erros={erros}
                 maxLength={35}
                 autoFocus
+              />
+            </Grid>
+            {/* <Grid item xs={6}>
+              <InputText
+                label="Nível de Cor"
+                tipo="number"
+                dados={cor}
+                field="nivel"
+                setState={setCor}
+                disabled={localState.action === 'excluindo' ? true : false}
+                erros={erros}
+                maxLength={2}
+              />
+            </Grid> */}
+            <Grid item xs={6}>
+              <HoverColorIntensityRating
+                color="#FF5733"
+                dados={cor}
+                field="nivel"
+                setState={setCor}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

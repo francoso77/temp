@@ -4,7 +4,7 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { Box, Container, Grid, IconButton, Paper, selectClasses, Tooltip } from '@mui/material';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import InputText from '../../Componentes/InputText';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
@@ -19,6 +19,8 @@ import DetalheProgramacaoDublagem from './DetalheProgramacaoDublagem';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import ClsApi from '../../Utils/ClsApi';
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
+import { gerarPDFComTabelasMultiples } from '../testes/tabelaCorte';
 
 
 
@@ -28,6 +30,7 @@ export default function ProgramacaoDublagem() {
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
+  const clsRelatorioProgramacao = new ClsRelatorioProgramacao()
 
   const resetDados = {
     dataProgramacao: '',
@@ -108,12 +111,17 @@ export default function ProgramacaoDublagem() {
     return data
   }
 
-  const onProgramacao = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      rs.dataProgramacao = formatarData(rs.dataProgramacao)
-      setProgramacaoDublagem(rs)
-      setLocalState({ action: actionTypes.editando })
-    })
+  const onProgramacao = async (id: string | number) => {
+    const { dataProgramacao } = await pesquisarID(id);
+    const dataPesquisa = formatarData(dataProgramacao);
+    clsRelatorioProgramacao.render(dataPesquisa);
+  }
+
+  const onFicha = async (id: string | number) => {
+    // const { dataProgramacao } = await pesquisarID(id);
+    // const dataPesquisa = formatarData(dataProgramacao);
+    // clsRelatorioProgramacao.render(dataPesquisa);
+    // gerarPDFComTabelasMultiples();
   }
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
@@ -315,7 +323,7 @@ export default function ProgramacaoDublagem() {
                   {
                     icone: "receipt_long.two_tone",
                     onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onProgramacao(rs.idProgramacaoDublagem as number),
+                      onFicha(rs.idProgramacaoDublagem as number),
                     toolTip: "Ficha de Corte",
                   },
                   {
