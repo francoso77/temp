@@ -29,9 +29,9 @@ export const gerarPDFComTabelasMultiples = () => {
       tableLineColor: [0, 0, 0],
       columnStyles: {
         0: { cellWidth: 25 },
-        1: { cellWidth: 70 },
+        1: { cellWidth: 50 },
         2: { cellWidth: 25 },
-        3: { cellWidth: 70 }
+        3: { cellWidth: 50 }
       },
     });
 
@@ -58,12 +58,8 @@ export const gerarPDFComTabelasMultiples = () => {
     });
   };
 
-  // Gerar 4 tabelas em uma única página
-  const tabelaAltura = 70; // Altura estimada de cada bloco de tabela
+  const tabelaAltura = 50; // Altura estimada de cada bloco de tabela
   gerarTabela(20);  // Primeira tabela começa a partir de Y=20
-  // gerarTabela(20 + tabelaAltura);  // Segunda tabela
-  // gerarTabela(20 + 2 * tabelaAltura);  // Terceira tabela
-  // gerarTabela(20 + 3 * tabelaAltura);  // Quarta tabela
 
   // Salva o PDF gerado
   doc.save('tabelas_por_pagina.pdf');

@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Login from '../Login/Login';
 import Layout from '../Layout/Layout';
-import User from '../Views/Users/User';
 import Cor from '../Views/Crud/Cor';
 import UnidadeMedida from '../Views/Crud/UnidadeMedida';
 import Maquina from '../Views/Crud/Maquina';
@@ -15,6 +14,7 @@ import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem';
 import RelacaoProgramacao from '../Views/testes/RelacaoProgramacao';
+import Usuario from '../Views/Usuario/Usuario';
 
 
 export const router = createBrowserRouter([
@@ -31,8 +31,8 @@ export const router = createBrowserRouter([
         element: <Cor />,
       },
       {
-        path: "/User",
-        element: <User />,
+        path: "/Usuario",
+        element: <Usuario />,
       },
       {
         path: "/UnidadeMedida",
@@ -80,7 +80,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: < />,
+        element: <RelacaoProgramacao />,
       },
     ]
   },

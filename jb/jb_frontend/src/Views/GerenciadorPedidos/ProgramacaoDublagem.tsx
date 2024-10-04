@@ -20,8 +20,8 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import ClsApi from '../../Utils/ClsApi';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
-import { gerarPDFComTabelasMultiples } from '../testes/tabelaCorte';
-
+import jsPDF from 'jspdf';
+import autoTable, { UserOptions } from 'jspdf-autotable';
 
 
 export default function ProgramacaoDublagem() {
@@ -122,7 +122,140 @@ export default function ProgramacaoDublagem() {
     // const dataPesquisa = formatarData(dataProgramacao);
     // clsRelatorioProgramacao.render(dataPesquisa);
     // gerarPDFComTabelasMultiples();
+    const dados: Array<any> = [
+      {
+        pedido: '1',
+        cliente: 'cliente1',
+        produto: 'produto1',
+        qtdPedida: 1000
+      },
+      {
+        pedido: '2',
+        cliente: 'cliente2',
+        produto: 'produto2',
+        qtdPedida: 1000
+      },
+      // {
+      //   pedido: '3',
+      //   cliente: 'cliente3',
+      //   produto: 'produto3',
+      //   qtdPedida: 1000
+      // },
+      // {
+      //   pedido: '4',
+      //   cliente: 'cliente4',
+      //   produto: 'produto4',
+      //   qtdPedida: 1000
+      // },
+      // {
+      //   pedido: '5',
+      //   cliente: 'cliente5',
+      //   produto: 'produto5',
+      //   qtdPedida: 1000
+      // },
+      // {
+      //   pedido: '6',
+      //   cliente: 'cliente6',
+      //   produto: 'produto6',
+      //   qtdPedida: 1000
+      // },
+      // {
+      //   pedido: '7',
+      //   cliente: 'cliente7',
+      //   produto: 'produto7',
+      //   qtdPedida: 1000
+      // },
+      // {
+      //   pedido: '8',
+      //   cliente: 'cliente8',
+      //   produto: 'produto8',
+      //   qtdPedida: 1000
+      // },
+    ]
+    // Função para gerar uma única tabela com base na posição Y
+    //const gerarTabela = (startY: number) => {
+
+
+    // Informações do pedido e produto
+    // const pedidoInfo = [
+    //   ['Pedido:', 'Cliente:'],
+    //   ['1', 'Nova Serrana Couros'],
+    //   ['Produto:', 'Nylon Rodeio Pto D40/3'],
+    //   ['QtdPedida:', '1000']
+    // ];
+
+    let startY = 4
+    let colunaTitulo = 134
+    let ml = 1
+    let qtdFichas = dados.length
+    const doc = new jsPDF({
+      orientation: 'portrait',   // 'portrait' ou 'landscape'
+      unit: 'mm',                // Unidade: 'mm', 'cm', 'in', etc.
+      // format: [105, 149]
+      format: 'a4'         // Dimensões personalizadas: Largura e Altura (em milímetros para A4)
+    });
+    doc.setFontSize(12);
+
+    let dadosPedidos = [];
+    dados.forEach((item: any, index: number) => {
+      dadosPedidos = [
+        ['Pedido', 'Cliente'],
+        [item.pedido, item.cliente],
+        ['Produto', item.produto],
+        ['QtdPedida', item.qtdPedida],
+      ];
+
+
+      doc.text('Produção Dublados', colunaTitulo, startY - 1);
+
+
+      // Tabela de pedido
+      autoTable(doc, {
+        body: dadosPedidos,
+        startY: startY,
+        margin: { left: ml },
+        theme: 'plain',
+        styles: { halign: 'left', fontSize: 10, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        tableWidth: 70,
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 65 },
+        },
+      });
+
+      // Dados da tabela principal (60 linhas, 4 colunas numeradas)
+      const numeros = Array.from({ length: 15 }, (_, i) => [
+        (i + 1).toString(), '', (i + 16).toString(), '', (i + 31).toString(), ''
+      ]);
+
+      // Tabela de números e MTS
+      autoTable(doc, {
+        head: [['Nº', 'MTS', 'Nº', 'MTS', 'Nº', 'MTS']],
+        body: numeros,
+        startY: (doc as any).lastAutoTable.finalY + 1,  // Inicia após a tabela anterior
+        margin: { left: ml },
+        theme: 'grid',
+        styles: { halign: 'center', valign: 'middle', fontSize: 8, lineWidth: 0.1, lineColor: [0, 0, 0] },
+        columnStyles: {
+          0: { cellWidth: 10, minCellHeight: 1 },
+          1: { cellWidth: 20, minCellHeight: 1 },
+          2: { cellWidth: 10, minCellHeight: 1 },
+          3: { cellWidth: 20, minCellHeight: 1 },
+          4: { cellWidth: 10, minCellHeight: 1 },
+          5: { cellWidth: 20, minCellHeight: 1 },
+        },
+      });
+    })
+
+    //}
+
+    //const tabelaAltura = 50; // Altura estimada de cada bloco de tabela
+    //gerarTabela(4);  // Primeira tabela começa a partir de Y=20
+    // Salva o PDF gerado
+    doc.save('tabelas_por_pagina.pdf');
+
   }
+
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       rs.dataProgramacao = formatarData(rs.dataProgramacao)

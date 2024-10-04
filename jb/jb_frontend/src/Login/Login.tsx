@@ -5,8 +5,8 @@ import Text from '../Componentes/Text';
 import { useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../ContextoGlobal/MensagemState';
-import { UserInterface } from '../../../jb_backend/src/interfaces/userInterface';
 import ClsCrud from '../Utils/ClsCrudApi';
+import { UsuarioInterface } from '../../../jb_backend/src/interfaces/sistema/usuarioInterface';
 
 const APPLE: string = '/apple.png';
 const FACEBOOK: string = '/facebook.png';
@@ -45,7 +45,7 @@ export default function Login() {
           },
           camposLike: ["cpf"],
         })
-        .then((rs: Array<UserInterface>) => {
+        .then((rs: Array<UsuarioInterface>) => {
           if (dados.cpf === rs[0].cpf && dados.senha === rs[0].senha) {
             contextGlobal.setUsuarioState({
               usuario: rs[0].cpf ? rs[0].cpf : 'sem id',

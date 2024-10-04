@@ -6,7 +6,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { UserInterface } from '../../../../jb_backend/src/interfaces/userInterface';
+import { UsuarioInterface } from '../../../../jb_backend/src/interfaces/sistema/usuarioInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -15,15 +15,15 @@ import InputText from '../../Componentes/InputText';
 
 
 
-const ResetDados: UserInterface = {
+const ResetDados: UsuarioInterface = {
   cpf: '',
-  email: '',
-  whatsapp: '',
   senha: '',
   ativo: true,
+  nome: '',
+  tentativasLogin: 0
 }
 
-export default function User() {
+export default function Usuario() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -31,7 +31,7 @@ export default function User() {
   const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.incluindo })
   const [erros, setErros] = useState({})
-  const [user, setUser] = useState<UserInterface>(ResetDados)
+  const [usuario, setUsuario] = useState<UsuarioInterface>(ResetDados)
 
 
   const irpara = useNavigate()
@@ -41,7 +41,7 @@ export default function User() {
 
   const btCancelar = () => {
     setErros({})
-    setUser(ResetDados)
+    setUsuario(ResetDados)
     btFechar()
     setLocalState({ action: actionTypes.incluindo })
   }
@@ -50,10 +50,9 @@ export default function User() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.eCPF('cpf', user, erros, retorno, false)
-    retorno = validaCampo.eTelefone('whatsapp', user, erros, retorno, false)
-    retorno = validaCampo.naoVazio('senha', user, erros, retorno, 'A senha não pode ser vázio')
-    retorno = validaCampo.eEmail('email', user, erros, retorno, false)
+    retorno = validaCampo.eCPF('cpf', usuario, erros, retorno, false)
+    retorno = validaCampo.naoVazio('nome', usuario, erros, retorno, 'Digite um nome para o usuário')
+    retorno = validaCampo.naoVazio('senha', usuario, erros, retorno, 'A senha não pode ser vázio')
     setErros(erros)
     return retorno
   }
@@ -70,9 +69,9 @@ export default function User() {
     let _cpf: boolean = false
     clsCrud
       .pesquisar({
-        entidade: "User",
+        entidade: "Usuario",
         criterio: {
-          cpf: user.cpf
+          cpf: usuario.cpf
         },
         select: ['cpf']
       })
@@ -123,8 +122,8 @@ export default function User() {
 
       if (localState.action === actionTypes.incluindo) {
         clsCrud.incluir({
-          entidade: "User",
-          criterio: user
+          entidade: "Usuario",
+          criterio: usuario
         })
           .then((rs) => {
             if (rs.ok) {
@@ -170,9 +169,9 @@ export default function User() {
               <Text
                 label="Ativo"
                 tipo="checkbox"
-                dados={user}
+                dados={usuario}
                 field="ativo"
-                setState={setUser}
+                setState={setUsuario}
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
@@ -181,8 +180,8 @@ export default function User() {
                 label="CPF"
                 mask="cpf"
                 // onChange={() => TemCPF()}
-                setState={setUser}
-                dados={user}
+                setState={setUsuario}
+                dados={usuario}
                 field="cpf"
                 erros={erros}
                 type='tel'
@@ -193,13 +192,13 @@ export default function User() {
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
-                label="WhatsApp"
-                setState={setUser}
-                dados={user}
-                field="whatsapp"
+                label="Nome"
+                setState={setUsuario}
+                dados={usuario}
+                field="nome"
                 erros={erros}
-                type="tel"
-                mask='tel'
+                type="text"
+                tipo='uppercase'
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
@@ -207,21 +206,10 @@ export default function User() {
               <Text
                 field="senha"
                 label="Senha"
-                dados={user}
-                setState={setUser}
+                dados={usuario}
+                setState={setUsuario}
                 tipo='pass'
                 erros={erros}
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <Text
-                label="E-mail"
-                setState={setUser}
-                dados={user}
-                field="email"
-                erros={erros}
-                type="email"
                 disabled={localState.action === 'excluindo' ? true : false}
               />
             </Grid>
