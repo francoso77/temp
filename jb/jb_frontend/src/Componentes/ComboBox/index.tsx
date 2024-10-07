@@ -135,7 +135,7 @@ export default function ComboBox<T>(
   return (
     <>
       <Autocomplete
-        sx={{ fontSize: tamanhoFonte}}
+        sx={{ fontSize: tamanhoFonte }}
         autoFocus={autoFocus}
         ref={Ref}
         onSelect={(e) => {
@@ -161,35 +161,30 @@ export default function ComboBox<T>(
         onKeyDown={onKeyDown}
         getOptionLabel={(opcao) => {
 
+          // Verifica se é um número e igual ao valor padrão
           if (typeof opcao === 'number' && opcao === valorPadraoCampoEmBranco) {
-            return mensagemPadraoCampoEmBranco
+            return mensagemPadraoCampoEmBranco;
 
+            // Verifica se é um número e tenta encontrar a correspondência
           } else if (typeof opcao === 'number') {
+            const retorno = opcoes.find((v) => v[campoID] === opcao);
+            return retorno ? String(retorno[campoDescricao]) : 'Sem Correspondência';
 
-            const retorno = opcoes.find((v) => {
-              return v[campoID] === opcao
-            })
-
-            return retorno ? retorno[campoDescricao] : 'Sem Correspondência'
-
+            // Verifica se é uma string e tenta encontrar a correspondência
           } else if (typeof opcao === 'string') {
+            const retorno = opcoes.find((v) => v[campoID] === opcao);
+            return retorno ? String(retorno[campoDescricao]) : opcao;
 
-            const retorno = opcoes.find((v) => {
-              return v[campoID] === opcao
-            })
+            // Verifica se é um objeto que contém a propriedade `campoDescricao`
+          } else if (typeof opcao === 'object' && opcao !== null && campoDescricao in opcao) {
+            return String(opcao[campoDescricao]);
 
-            return typeof retorno == 'object' ? retorno[campoDescricao] : opcao
-
-          } else if (typeof opcao === 'object' && opcao[campoDescricao]) {
-            return opcao[campoDescricao]
-
+            // Qualquer outro tipo de valor
           } else {
-
-            return 'Erro na Opção....'
-
+            return 'Erro na Opção....';
           }
-
         }}
+
         onChange={(_e, v) => {
           if (onChange) {
             onChange(v)

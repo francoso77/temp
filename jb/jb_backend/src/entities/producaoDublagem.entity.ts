@@ -1,7 +1,9 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
 import { ProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
 import { TipoColagemType } from '../types/tipoColagemTypes';
+import Produto from './produto.entity';
+import Pedido from './pedido.entity';
 
 @Entity({ name: 'producaodublagens' })
 export default class ProducaoDublagem implements ProducaoDublagemInterface {
@@ -15,10 +17,23 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   @Column()
   tipoColagem: TipoColagemType;
 
-  @Column({ type: 'float', precision: 4 })
-  qtdColagem: number
+  @Column()
+  idPedido: number;
 
-  @OneToMany(() => DetalheProducaoDublagem, detalheProducaoDublagem => detalheProducaoDublagem.ProducaoDublagem)
+  @JoinColumn({ name: 'idPedido' })
+  @ManyToOne(() => Pedido)
+  pedido: Pedido
+
+  @Column()
+  idProduto: number;
+
+  @JoinColumn({ name: 'idProduto' })
+  @ManyToOne(() => Produto)
+  produto: Produto
+
+  @JoinColumn({ name: 'idDublagem' })
+  @OneToMany(() => DetalheProducaoDublagem,
+    detalheProducaoDublagem => detalheProducaoDublagem.producaoDublagem, { cascade: true })
   detalheProducaoDublagens: DetalheProducaoDublagem[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })

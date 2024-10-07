@@ -15,6 +15,7 @@ import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem';
 import RelacaoProgramacao from '../Views/testes/RelacaoProgramacao';
 import Usuario from '../Views/Usuario/Usuario';
+import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
 
 
 export const router = createBrowserRouter([
@@ -80,7 +81,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Testes",
-        element: <RelacaoProgramacao />,
+        element: <ProducaoDublagem />,
       },
     ]
   },

@@ -58,6 +58,16 @@ var programacaoDublagem_entity_1 = require("../entities/programacaoDublagem.enti
 var OutController = /** @class */ (function () {
     function OutController() {
     }
+    OutController.prototype.etiquetasPedidos = function (itemPesquisa) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n      SELECT \n        pd.dataProgramacao,\n        p.idPedido AS pedido,\n        pc.nome AS cliente,\n        pros.nome AS produto,\n        c.nome AS cor,\n       \tpros.tipoProduto AS tipoProduto,\n        (dp.qtdPedida * de.qtd )AS metros\n        \n      FROM \n      programacaodublagens pd\n      INNER JOIN\n      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n      pedidos p ON p.idPedido = dpd.idPedido\n      INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN\n      produtos pro ON pro.idProduto = dp.idProduto\n      INNER JOIN\n      estruturas e ON e.idProduto = pro.idProduto\n      INNER JOIN\n      detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n      produtos pros ON pros.idProduto = de.idProduto\n      INNER JOIN \n      cores c ON c.idCor = de.idCor\n      WHERE\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n        ;\n\n    ";
+                params = [itemPesquisa];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacaoDublagem_entity_1.default).query(sql, params)];
+            });
+        });
+    };
     OutController.prototype.fichasCortesPedidos = function (itemPesquisa) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
@@ -74,6 +84,16 @@ var OutController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 sql = "\n    SELECT\n      p.idPedido,\n      p.dataPedido,\n      p.statusPedido,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor,\n        JSON_ARRAYAGG(\n    JSON_OBJECT(\n      'idPedido', p.idPedido,\n      'idDetalhePedido', dp.idDetalhePedido,\n      'Produto', pp.nome,\n      'qtd', dp.qtdPedida,\n      'vrUnitario', dp.vrUnitario,\n      'total', dp.qtdPedida * dp.vrUnitario,\n      'status', dp.statusItem\n    )\n  ) AS details\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n    INNER JOIN\n      produtos pp ON pp.idProduto = dp.idProduto\n    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido\n    ORDER BY p.dataPedido DESC\n    ;  \n  ";
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql)];
+            });
+        });
+    };
+    OutController.prototype.pedidosEmProducao = function (itemPesquisa, campo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n    SELECT\n      p.*,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    WHERE \n      statusPedido = 'C' AND\n      ".concat(campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?', "\n  ");
+                params = [campo === 'data' ? itemPesquisa : "%".concat(itemPesquisa, "%")];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
         });
     };
@@ -176,6 +196,13 @@ var OutController = /** @class */ (function () {
         });
     };
     __decorate([
+        (0, common_1.Post)("etiquetasPedidos"),
+        __param(0, (0, common_1.Body)("itemPesquisa")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "etiquetasPedidos", null);
+    __decorate([
         (0, common_1.Post)("fichasCortesPedidos"),
         __param(0, (0, common_1.Body)("itemPesquisa")),
         __metadata("design:type", Function),
@@ -188,6 +215,14 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "gerenciadorPedidosEmAberto", null);
+    __decorate([
+        (0, common_1.Post)("pedidosEmProducao"),
+        __param(0, (0, common_1.Body)("itemPesquisa")),
+        __param(1, (0, common_1.Body)("campo")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String, String]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "pedidosEmProducao", null);
     __decorate([
         (0, common_1.Post)("pedidosEmAberto"),
         __param(0, (0, common_1.Body)("itemPesquisa")),

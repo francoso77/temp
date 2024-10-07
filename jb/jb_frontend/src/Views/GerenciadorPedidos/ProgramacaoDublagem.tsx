@@ -124,6 +124,12 @@ export default function ProgramacaoDublagem() {
     clsRelatorioProgramacao.renderFicha(dataPesquisa);
   }
 
+  const onEtiqueta = async (id: string | number) => {
+    const { dataProgramacao } = await pesquisarID(id);
+    const dataPesquisa = formatarData(dataProgramacao);
+    clsRelatorioProgramacao.renderEtiqueta(dataPesquisa);
+  }
+
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       rs.dataProgramacao = formatarData(rs.dataProgramacao)
@@ -318,7 +324,7 @@ export default function ProgramacaoDublagem() {
                   {
                     icone: "sell_two_tone",
                     onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onProgramacao(rs.idProgramacaoDublagem as number),
+                      onEtiqueta(rs.idProgramacaoDublagem as number),
                     toolTip: "Etiqueta",
                   },
                   {

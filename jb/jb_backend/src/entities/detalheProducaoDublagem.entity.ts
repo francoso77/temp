@@ -1,6 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import ProducaoDublagem from './producaoDublagem.entity';
-import Produto from './produto.entity';
 import { DetalheProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
 
 @Entity({ name: 'detalheproducaodublagens' })
@@ -10,20 +9,18 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   idDetalheProducaoDublagem: number;
 
   @Column()
-  idProducaoDublagem: number;
+  idDublagem: number;
 
-  @ManyToOne(() => ProducaoDublagem)
-  ProducaoDublagem: ProducaoDublagem;
-
-  @Column()
-  idProduto: number;
-
-  @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto)
-  produto: Produto
+  @JoinColumn({ name: 'idDublagem' })
+  @ManyToOne(() => ProducaoDublagem, producaoDublagem => producaoDublagem.detalheProducaoDublagens, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
+  producaoDublagem: ProducaoDublagem
 
   @Column({ type: 'float', precision: 4 })
-  metro: number
+  metros: number
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAD: Date

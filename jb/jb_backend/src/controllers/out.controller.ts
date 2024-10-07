@@ -8,6 +8,51 @@ import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
 @Controller()
 export class OutController {
 
+  @Post("etiquetasPedidos")
+  async etiquetasPedidos(
+    @Body("itemPesquisa") itemPesquisa: string,
+  ): Promise<Array<ProgramacaoDublagem>> {
+
+    const sql = `
+      SELECT 
+        pd.dataProgramacao,
+        p.idPedido AS pedido,
+        pc.nome AS cliente,
+        pros.nome AS produto,
+        c.nome AS cor,
+       	pros.tipoProduto AS tipoProduto,
+        (dp.qtdPedida * de.qtd )AS metros
+        
+      FROM 
+      programacaodublagens pd
+      INNER JOIN
+      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem
+      INNER JOIN
+      pedidos p ON p.idPedido = dpd.idPedido
+      INNER JOIN
+      detalhepedidos dp ON dp.idPedido = p.idPedido
+      INNER JOIN
+      pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+      INNER JOIN
+      produtos pro ON pro.idProduto = dp.idProduto
+      INNER JOIN
+      estruturas e ON e.idProduto = pro.idProduto
+      INNER JOIN
+      detalheestruturas de ON de.idEstrutura = e.idEstrutura
+      INNER JOIN
+      produtos pros ON pros.idProduto = de.idProduto
+      INNER JOIN 
+      cores c ON c.idCor = de.idCor
+      WHERE
+        dp.statusItem = 3 AND
+        pd.dataProgramacao = ?
+        ;
+
+    `
+    const params = [itemPesquisa]
+    return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, params)
+  }
+
   @Post("fichasCortesPedidos")
   async fichasCortesPedidos(
     @Body("itemPesquisa") itemPesquisa: string,
@@ -78,6 +123,32 @@ export class OutController {
     ;  
   `
     return AppDataSource.getRepository(Pedido).query(sql)
+  }
+
+  @Post("pedidosEmProducao")
+  async pedidosEmProducao(
+    @Body("itemPesquisa") itemPesquisa: string,
+    @Body("campo") campo: 'data' | 'nome',
+  ): Promise<Array<Pedido>> {
+
+    const sql = `
+    SELECT
+      p.*,
+      pc.nome AS nomeCliente,
+      pv.nome AS nomeVendedor
+    FROM 
+      pedidos p
+    INNER JOIN
+      pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+    INNER JOIN
+      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
+    WHERE 
+      statusPedido = 'C' AND
+      ${campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?'}
+  `
+
+    const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
+    return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 
   @Post("pedidosEmAberto")

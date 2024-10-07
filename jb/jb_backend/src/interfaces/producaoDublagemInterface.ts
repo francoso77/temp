@@ -4,12 +4,13 @@ export interface ProducaoDublagemInterface {
   idDublagem?: number
   dataProducao: string
   tipoColagem: TipoColagemType
-  qtdColagem: number
+  idPedido: number
+  idProduto: number
+  detalheProducaoDublagens: DetalheProducaoDublagemInterface[]
 }
 
 export interface DetalheProducaoDublagemInterface {
   idDetalheProducaoDublagem?: number;
-  idProducaoDublagem: number;
-  idProduto: number;
-  metro: number;
+  idDublagem: number;
+  metros: number;
 }
