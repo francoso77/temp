@@ -8,6 +8,40 @@ import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
 @Controller()
 export class OutController {
 
+  @Post("fichasCortesPedidos")
+  async fichasCortesPedidos(
+    @Body("itemPesquisa") itemPesquisa: string,
+  ): Promise<Array<ProgramacaoDublagem>> {
+
+    const sql = `
+      SELECT 
+        pd.dataProgramacao,
+        p.idPedido AS pedido,
+        pe.nome AS cliente,
+        pro.nome AS produto,
+        dp.qtdPedida AS metros
+      FROM
+        programacaodublagens pd
+      INNER JOIN
+        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem
+      INNER JOIN
+        pedidos p ON p.idPedido = dpd.idPedido
+      INNER JOIN
+        detalhepedidos dp ON dp.idPedido = p.idPedido
+      INNER JOIN
+        produtos pro ON pro.idProduto = dp.idProduto
+      INNER JOIN
+        pessoas pe ON pe.idPessoa = p.idPessoa_cliente
+      WHERE 
+        dp.statusItem = 3 AND
+        pd.dataProgramacao = ?
+        ;
+
+    `
+    const params = [itemPesquisa]
+    return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, params)
+  }
+
   @Post("gerenciadorPedidosEmAberto")
   async gerenciadorPedidosEmAberto(): Promise<Array<Pedido>> {
 
@@ -94,7 +128,6 @@ export class OutController {
         pro2.nome AS materiaPrima,
         c.idCor AS idCor,
         c.nome AS cor
-        
       FROM
         pedidos p
       INNER JOIN 
