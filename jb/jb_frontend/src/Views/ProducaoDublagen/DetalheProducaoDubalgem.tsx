@@ -20,38 +20,27 @@ import InputCalc from '../../Componentes/InputCalc';
 // import { SomatorioPedidoInterface } from './ProducaoDublagem';
 import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { TipoColagemType } from '../../../../jb_backend/src/types/tipoColagemTypes';
 
 
 interface PropsInterface {
-  rsMaster: PedidoInterface
-  setRsMaster: React.Dispatch<React.SetStateAction<PedidoInterface>>,
+  rsMaster: ProducaoDublagemInterface
+  setRsMaster: React.Dispatch<React.SetStateAction<ProducaoDublagemInterface>>,
   masterLocalState: ActionInterface,
   // setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioPedidoInterface>>,
 }
 
 
-export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
+export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const ResetDados: DetalhePedidoInterface = {
-    idPedido: null,
-    idProduto: 0,
-    produto: {
-      nome: '',
-      idUnidade: 0,
-      localizacao: '',
-      largura: 0,
-      gm2: 0,
-      ativo: false,
-      tipoProduto: TipoProdutoType.tecidoTinto
-    },
-    qtdPedida: 0,
-    vrUnitario: 0,
-    qtdAtendida: 0,
-    statusItem: StatusPedidoItemType.aberto,
+  const ResetDados: DetalheProducaoDublagemInterface = {
+    idDublagem: 0,
+    metros: 0,
   }
 
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
@@ -59,35 +48,14 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
   const [erros, setErros] = useState({});
-  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados);
-  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
-  const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [detalheProducaoDublagem, setDetalheProducaoDublagem] = useState<DetalheProducaoDublagemInterface>(ResetDados);
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Produto',
-      alinhamento: 'left',
-      campo: 'idProduto',
-      format: (_v, rs: any) => rsProduto.find(x => x.idProduto === rs.idProduto)?.nome
-    },
-    {
-      cabecalho: 'Qtd',
+      cabecalho: 'Metros',
       alinhamento: 'right',
-      campo: 'qtdPedida',
+      campo: 'metros',
       format: (qtd) => clsFormatacao.currency(qtd)
-    },
-    {
-      cabecalho: 'Vr Unitário',
-      alinhamento: 'right',
-      campo: 'vrUnitario',
-      format: (qtd) => clsFormatacao.currency(qtd)
-    },
-    {
-      cabecalho: 'Total Item',
-      alinhamento: 'right',
-      campo: 'qtdPedida',
-      format: (_v, rs: any) => rs.qtdPedida ?
-        clsFormatacao.currency(rs.qtdPedida * rs.vrUnitario) : ""
     },
   ]
 
@@ -95,73 +63,70 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('idProduto', detalhePedido, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('qtdPedida', detalhePedido, erros, retorno, 'Valor maior que 0')
-    retorno = validaCampo.naoVazio('vrUnitario', detalhePedido, erros, retorno, 'Valor maior que 0')
+    retorno = validaCampo.naoVazio('metros', detalheProducaoDublagem, erros, retorno, 'maior que 0')
 
     setErros(erros)
     return retorno
   }
 
-  const onEditar = (rs: DetalhePedidoInterface, indice: number) => {
+  const onEditar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
 
-    if (rs.statusItem === 1) {
-      setLocalState({ action: actionTypes.editando })
-      setIndiceEdicao(indice)
-      setDetalhePedido(rs)
-      setOpen(true)
-    } else {
-      setMensagemState({
-        titulo: 'Atenção',
-        exibir: true,
-        mensagem: 'Item em produção, não pode ser alterado!',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
-    }
+    // if (rs.statusItem === 1) {
+    //   setLocalState({ action: actionTypes.editando })
+    //   setIndiceEdicao(indice)
+    //   setDetalhePedido(rs)
+    //   setOpen(true)
+    // } else {
+    //   setMensagemState({
+    //     titulo: 'Atenção',
+    //     exibir: true,
+    //     mensagem: 'Item em produção, não pode ser alterado!',
+    //     tipo: MensagemTipo.Error,
+    //     exibirBotao: true,
+    //     cb: null
+    //   })
+    // }
   }
 
-  const onExcluir = (rs: DetalhePedidoInterface) => {
-    if (rs.statusItem === 1) {
+  const onExcluir = (rs: DetalheProducaoDublagemInterface) => {
+    // if (rs.statusItem === 1) {
 
-      let tmpDetalhe: Array<DetalhePedidoInterface> = []
-      rsMaster.detalhePedidos.forEach(det => {
-        if (det.idDetalhePedido !== rs.idDetalhePedido) {
-          tmpDetalhe.push(det)
-        }
-      })
-      setRsMaster({ ...rsMaster, detalhePedidos: tmpDetalhe })
-      AtualizaSomatorio(tmpDetalhe)
-    } else {
-      setMensagemState({
-        titulo: 'Atenção',
-        exibir: true,
-        mensagem: 'Item em produção, não pode ser alterado!',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
-    }
+    //   let tmpDetalhe: Array<DetalhePedidoInterface> = []
+    //   rsMaster.detalhePedidos.forEach(det => {
+    //     if (det.idDetalhePedido !== rs.idDetalhePedido) {
+    //       tmpDetalhe.push(det)
+    //     }
+    //   })
+    //   setRsMaster({ ...rsMaster, detalhePedidos: tmpDetalhe })
+    //   AtualizaSomatorio(tmpDetalhe)
+    // } else {
+    //   setMensagemState({
+    //     titulo: 'Atenção',
+    //     exibir: true,
+    //     mensagem: 'Item em produção, não pode ser alterado!',
+    //     tipo: MensagemTipo.Error,
+    //     exibirBotao: true,
+    //     cb: null
+    //   })
+    // }
   }
 
   const btIncluir = () => {
     if (
-      rsMaster.dataPedido !== "" &&
-      rsMaster.idPrazoEntrega !== 0 &&
-      rsMaster.idPessoa_cliente !== 0 &&
-      rsMaster.idPessoa_vendedor !== 0
+      rsMaster.dataProducao !== "" &&
+      rsMaster.idPedido !== 0 &&
+      rsMaster.idProduto !== 0 
     ) {
       setIndiceEdicao(-1)
       setOpen(true)
       BuscarDados()
-      setDetalhePedido(ResetDados)
+      setDetalheProducaoDublagem(ResetDados)
       setLocalState({ action: actionTypes.incluindo })
     } else {
       setMensagemState({
         titulo: 'Atenção',
         exibir: true,
-        mensagem: 'Informe os dados do Pedido!',
+        mensagem: 'Informe os dados da Produção!',
         tipo: MensagemTipo.Error,
         exibirBotao: true,
         cb: null
@@ -172,116 +137,53 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
   const btCancelar = () => {
     setOpen(false)
     setErros({})
-    setDetalhePedido(ResetDados)
+    setDetalheProducaoDublagem(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
-  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
-    if (event.key === 'Enter') {
-      const nextField = fieldRefs.current[index];
-      if (nextField) {
-        const input = nextField.querySelector('input');
-        if (input) {
-          input.focus();
-        }
-      }
-    }
-  }
-
-  const podeIncluirDetalhe = (): boolean => {
-    const indice = rsMaster.detalhePedidos.findIndex(
-      (v, i) => v.idProduto === detalhePedido.idProduto && i !== indiceEdicao
-    )
-
-    if (indice >= 0) {
-      setMensagemState({
-        titulo: 'Aviso',
-        exibir: true,
-        mensagem: 'Produto já cadastrado!',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: null
-      })
-    }
-    return indice < 0;
-  }
-
-  const temEstrutura = async (id: number): Promise<boolean> => {
-    try {
-      const estrutura: EstruturaInterface[] = await clsCrud.pesquisar({
-        entidade: "Estrutura",
-        criterio: { idProduto: id },
-      })
-      if (estrutura.length === 0) {
-        setMensagemState({
-          titulo: 'Erro',
-          exibir: true,
-          mensagem: 'Produto sem Estrutura definida!',
-          tipo: MensagemTipo.Error,
-          exibirBotao: true,
-          cb: null
-        })
-        return false
-      }
-      return estrutura.length > 0;
-    } catch (error) {
-      console.error("Erro ao buscar estrutura:", error)
-      return false; // ou throw error;
-    }
-  }
   const btConfirmaInclusao = async () => {
-    const estrutura = await temEstrutura(detalhePedido.idProduto)
-    if (validarDados() && podeIncluirDetalhe() && estrutura) {
-      let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
+
+    if (validarDados()) {
+      let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
       tmpDetalhe.push({
-        idPedido: rsMaster.idPedido as number,
-        idProduto: detalhePedido.idProduto,
-        qtdPedida: detalhePedido.qtdPedida,
-        qtdAtendida: 0,
-        vrUnitario: detalhePedido.vrUnitario,
-        statusItem: StatusPedidoItemType.aberto,
-        produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
+        idDublagem: rsMaster.idDublagem as number,
+        metros: detalheProducaoDublagem.metros,
 
       })
       setRsMaster({
-        ...rsMaster, detalhePedidos:
+        ...rsMaster, detalheProducaoDublagens:
           [
-            ...rsMaster.detalhePedidos,
+            ...rsMaster.detalheProducaoDublagens,
 
             {
-              idPedido: rsMaster.idPedido as number,
-              idProduto: detalhePedido.idProduto,
-              qtdPedida: detalhePedido.qtdPedida,
-              qtdAtendida: 0,
-              vrUnitario: detalhePedido.vrUnitario,
-              statusItem: StatusPedidoItemType.aberto,
-              produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
+              idDublagem: rsMaster.idDublagem as number,
+              metros: detalheProducaoDublagem.metros,
             }
           ]
       })
-      AtualizaSomatorio(tmpDetalhe)
+      // AtualizaSomatorio(tmpDetalhe)
       setLocalState({ action: actionTypes.pesquisando })
-      setDetalhePedido(ResetDados)
+      setDetalheProducaoDublagem(ResetDados)
       setOpen(false)
     }
   }
 
   const btConfirmaAlteracao = () => {
 
-    if (validarDados() && podeIncluirDetalhe()) {
+    // if (validarDados()) {
 
-      let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
-      tmpDetalhe[indiceEdicao] = { ...detalhePedido, produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] } }
+    //   let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
+    //   tmpDetalhe[indiceEdicao] = { ...detalheProducaoDublagem, metros: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] } }
 
-      setRsMaster({
-        ...rsMaster,
-        detalhePedidos: [...tmpDetalhe]
-      })
-      setLocalState({ action: actionTypes.pesquisando })
-      setDetalhePedido(ResetDados)
-      setOpen(false)
-      AtualizaSomatorio(tmpDetalhe)
-    }
+    //   setRsMaster({
+    //     ...rsMaster,
+    //     detalhePedidos: [...tmpDetalhe]
+    //   })
+    //   setLocalState({ action: actionTypes.pesquisando })
+    //   setDetalhePedido(ResetDados)
+    //   setOpen(false)
+    //   AtualizaSomatorio(tmpDetalhe)
+    // }
   }
 
   const AtualizaSomatorio = (rs: Array<DetalhePedidoInterface>) => {
@@ -299,14 +201,14 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
   }
 
   const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        campoOrder: ["nome"],
-      })
-      .then((rsProdutos: Array<ProdutoInterface>) => {
-        setRsProduto(rsProdutos)
-      })
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "Produto",
+    //     campoOrder: ["nome"],
+    //   })
+    //   .then((rsProdutos: Array<ProdutoInterface>) => {
+    //     setRsProduto(rsProdutos)
+    //   })
 
   }
 
@@ -333,76 +235,26 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
           }}>
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: 'white' }}>
-              Item do Pedido
+              Item do Corte
             </Typography>
           </Grid>
         </Paper>
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
-                <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
-                  <ComboBox
-                    opcoes={rsProduto}
-                    campoDescricao="nome"
-                    campoID="idProduto"
-                    dados={detalhePedido}
-                    mensagemPadraoCampoEmBranco="Escolha um produto"
-                    field="idProduto"
-                    label="Produtos"
-                    erros={erros}
-                    setState={setDetalhePedido}
-                    disabled={localState.action === 'excluindo' ? true : false}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 1)}
-                  />
-                </Box>
-              </Grid>
               <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                   <InputText
                     tipo='currency'
                     scale={2}
-                    label="Qtd"
-                    dados={detalhePedido}
-                    field="qtdPedida"
-                    setState={setDetalhePedido}
+                    label="Metros"
+                    dados={detalheProducaoDublagem}
+                    field="metros"
+                    setState={setDetalheProducaoDublagem}
                     disabled={localState.action === 'excluindo' ? true : false}
                     erros={erros}
                     onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 2)}
                     textAlign='right'
                   />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-                  <InputText
-                    tipo='currency'
-                    scale={2}
-                    label="Vr Unitário"
-                    dados={detalhePedido}
-                    field="vrUnitario"
-                    setState={setDetalhePedido}
-                    disabled={localState.action === 'excluindo' ? true : false}
-                    erros={erros}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
-                    textAlign='right'
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-
-                <InputCalc
-                  label='Total Item'
-                  tipo='currency'
-                  scale={4}
-                  disabled={true}
-                  value={(detalhePedido.qtdPedida * detalhePedido.vrUnitario).toString()}
-                  textAlign='right'
-
-                />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
@@ -450,18 +302,18 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState 
         <Grid item xs={12}>
           <DataTable
             cabecalho={cabecalhoForm}
-            dados={rsMaster.detalhePedidos}
+            dados={rsMaster.detalheProducaoDublagens}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
               [
                 {
                   icone: "edit",
-                  onAcionador: (rs: DetalhePedidoInterface, indice: number) =>
+                  onAcionador: (rs: DetalheProducaoDublagemInterface, indice: number) =>
                     onEditar(rs, indice),
                   toolTip: "Editar",
                 },
                 {
                   icone: "delete",
-                  onAcionador: (rs: DetalhePedidoInterface) =>
+                  onAcionador: (rs: DetalheProducaoDublagemInterface) =>
                     onExcluir(rs),
                   toolTip: "Excluir",
                 },

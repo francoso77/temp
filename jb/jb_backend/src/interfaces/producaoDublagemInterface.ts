@@ -11,6 +11,6 @@ export interface ProducaoDublagemInterface {
 
 export interface DetalheProducaoDublagemInterface {
   idDetalheProducaoDublagem?: number;
-  idDublagem: number;
+  idDublagem: number | null;
   metros: number;
 }

@@ -15,17 +15,13 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { StatusPedidoType } from '../../types/statusPedidoTypes';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
 import { ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
-import DetalhePedido from './DetalheProducaoDubalgem';
-import { TipoColagemType } from '../../types/tipoColagemTypes';
+import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { idID } from '@mui/material/locale';
+import DetalheProducaoDubalgem from './DetalheProducaoDubalgem';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
@@ -37,7 +33,6 @@ export default function ProducaoDublagem() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
-  const clsApi = new ClsApi()
 
   const ResetDados: ProducaoDublagemInterface = {
     dataProducao: '',
@@ -243,6 +238,8 @@ export default function ProducaoDublagem() {
     })
       .then((rs) => {
         setRsPesquisa(rs)
+        console.log(itemPesquisa, 'itemPesquisa')
+        console.log('resultado da btPesquisar',rs)
       })
   }
 
@@ -406,7 +403,7 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                 <ComboBox
                   opcoes={rsPedido}
@@ -424,7 +421,7 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                 <ComboBox
                   opcoes={rsProduto}
@@ -442,14 +439,32 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            {/* <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <DetalhePedido
+            <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <ComboBox
+                  opcoes={TipoColagemTypes}
+                  campoDescricao="descricao"
+                  campoID="idTipoColagem"
+                  dados={producaoDublagem}
+                  mensagemPadraoCampoEmBranco="Defina um tipo"
+                  field="tipoColagem"
+                  label="Tipo de Colagem"
+                  erros={erros}
+                  setState={setProducaoDublagem}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <DetalheProducaoDubalgem
                 rsMaster={producaoDublagem}
                 setRsMaster={setProducaoDublagem}
                 masterLocalState={localState}
-                setRsSomatorio={setRsSomatorio}
+                // setRsSomatorio={setRsSomatorio}
               />
-            </Grid> */}
+            </Grid>
             <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 tipo='currency'
