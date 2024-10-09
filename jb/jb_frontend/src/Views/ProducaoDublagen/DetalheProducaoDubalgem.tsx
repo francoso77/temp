@@ -1,41 +1,31 @@
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useContext, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
-import ComboBox from '../../Componentes/ComboBox';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
-import InputCalc from '../../Componentes/InputCalc';
-// import { SomatorioPedidoInterface } from './ProducaoDublagem';
-import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
-import { TipoColagemType } from '../../../../jb_backend/src/types/tipoColagemTypes';
+import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 
 
 interface PropsInterface {
   rsMaster: ProducaoDublagemInterface
   setRsMaster: React.Dispatch<React.SetStateAction<ProducaoDublagemInterface>>,
   masterLocalState: ActionInterface,
-  // setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioPedidoInterface>>,
+  setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioProducaoDublagemInterface>>,
 }
 
 
-export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterLocalState }: PropsInterface) {
+export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
-  const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
   const ResetDados: DetalheProducaoDublagemInterface = {
@@ -43,7 +33,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     metros: 0,
   }
 
-  const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false);
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
@@ -71,55 +60,30 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
   const onEditar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
 
-    // if (rs.statusItem === 1) {
-    //   setLocalState({ action: actionTypes.editando })
-    //   setIndiceEdicao(indice)
-    //   setDetalhePedido(rs)
-    //   setOpen(true)
-    // } else {
-    //   setMensagemState({
-    //     titulo: 'Atenção',
-    //     exibir: true,
-    //     mensagem: 'Item em produção, não pode ser alterado!',
-    //     tipo: MensagemTipo.Error,
-    //     exibirBotao: true,
-    //     cb: null
-    //   })
-    // }
+    setLocalState({ action: actionTypes.editando })
+    setDetalheProducaoDublagem(rs)
+    setOpen(true)
   }
 
   const onExcluir = (rs: DetalheProducaoDublagemInterface) => {
-    // if (rs.statusItem === 1) {
-
-    //   let tmpDetalhe: Array<DetalhePedidoInterface> = []
-    //   rsMaster.detalhePedidos.forEach(det => {
-    //     if (det.idDetalhePedido !== rs.idDetalhePedido) {
-    //       tmpDetalhe.push(det)
-    //     }
-    //   })
-    //   setRsMaster({ ...rsMaster, detalhePedidos: tmpDetalhe })
-    //   AtualizaSomatorio(tmpDetalhe)
-    // } else {
-    //   setMensagemState({
-    //     titulo: 'Atenção',
-    //     exibir: true,
-    //     mensagem: 'Item em produção, não pode ser alterado!',
-    //     tipo: MensagemTipo.Error,
-    //     exibirBotao: true,
-    //     cb: null
-    //   })
-    // }
+    let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
+    rsMaster.detalheProducaoDublagens.forEach(det => {
+      if (det.idDetalheProducaoDublagem !== rs.idDetalheProducaoDublagem) {
+        tmpDetalhe.push(det)
+      }
+    })
+    setRsMaster({ ...rsMaster, detalheProducaoDublagens: tmpDetalhe })
+    AtualizaSomatorio(tmpDetalhe)
   }
 
   const btIncluir = () => {
     if (
       rsMaster.dataProducao !== "" &&
       rsMaster.idPedido !== 0 &&
-      rsMaster.idProduto !== 0 
+      rsMaster.idProduto !== 0
     ) {
-      setIndiceEdicao(-1)
       setOpen(true)
-      BuscarDados()
+      // BuscarDados()
       setDetalheProducaoDublagem(ResetDados)
       setLocalState({ action: actionTypes.incluindo })
     } else {
@@ -161,7 +125,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
             }
           ]
       })
-      // AtualizaSomatorio(tmpDetalhe)
+      AtualizaSomatorio(tmpDetalhe)
       setLocalState({ action: actionTypes.pesquisando })
       setDetalheProducaoDublagem(ResetDados)
       setOpen(false)
@@ -170,61 +134,49 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
   const btConfirmaAlteracao = () => {
 
-    // if (validarDados()) {
+    if (validarDados()) {
 
-    //   let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
-    //   tmpDetalhe[indiceEdicao] = { ...detalheProducaoDublagem, metros: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] } }
+      const indice = rsMaster.detalheProducaoDublagens.findIndex(
+        (v, i) => v.idDublagem === detalheProducaoDublagem.idDublagem
+      )
 
-    //   setRsMaster({
-    //     ...rsMaster,
-    //     detalhePedidos: [...tmpDetalhe]
-    //   })
-    //   setLocalState({ action: actionTypes.pesquisando })
-    //   setDetalhePedido(ResetDados)
-    //   setOpen(false)
-    //   AtualizaSomatorio(tmpDetalhe)
-    // }
+      let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
+      tmpDetalhe[indice] = {
+        ...detalheProducaoDublagem,
+      }
+
+      setRsMaster({
+        ...rsMaster,
+        detalheProducaoDublagens: [...tmpDetalhe]
+      })
+      setLocalState({ action: actionTypes.pesquisando })
+      setDetalheProducaoDublagem(ResetDados)
+      setOpen(false)
+      AtualizaSomatorio(tmpDetalhe)
+    }
   }
 
-  const AtualizaSomatorio = (rs: Array<DetalhePedidoInterface>) => {
+  const AtualizaSomatorio = (rs: Array<DetalheProducaoDublagemInterface>) => {
 
-    let totalQtd: number = 0
     let total: number = 0
 
     if (rs) {
       rs.forEach((detalhe) => {
-        totalQtd = totalQtd + detalhe.qtdPedida
-        total = total + (detalhe.qtdPedida * detalhe.vrUnitario)
+        total = total + detalhe.metros
       })
-      // setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
+      setRsSomatorio({ total: total.toString() })
     }
   }
 
-  const BuscarDados = () => {
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "Produto",
-    //     campoOrder: ["nome"],
-    //   })
-    //   .then((rsProdutos: Array<ProdutoInterface>) => {
-    //     setRsProduto(rsProdutos)
-    //   })
-
-  }
-
-  useEffect(() => {
-    BuscarDados()
-  }, [])
-
   const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
   return (
     <>
       <Dialog
         open={open}
         fullScreen={fullScreen}
         fullWidth
-        maxWidth='md'>
+        maxWidth='sm'>
         <Paper variant="outlined"
           sx={{
             display: 'flex',
@@ -243,18 +195,19 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
               <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                  <InputText
-                    tipo='currency'
-                    scale={2}
-                    label="Metros"
-                    dados={detalheProducaoDublagem}
-                    field="metros"
-                    setState={setDetalheProducaoDublagem}
-                    disabled={localState.action === 'excluindo' ? true : false}
-                    erros={erros}
-                    onFocus={(e) => e.target.select()}
-                    textAlign='right'
-                  />
+                <InputText
+                  tipo='currency'
+                  scale={2}
+                  label="Metros"
+                  dados={detalheProducaoDublagem}
+                  field="metros"
+                  setState={setDetalheProducaoDublagem}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                  textAlign='center'
+                  labelAlign='center'
+                />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

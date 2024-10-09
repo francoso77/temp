@@ -4,6 +4,7 @@ import { AppDataSource } from '../data-source'
 import ProducaoMalharia from '../entities/producaoMalharia.entity'
 import PerdaMalharia from '../entities/perdaMalharia.entity'
 import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
+import ProducaoDublagem from '../entities/producaoDublagem.entity'
 
 @Controller()
 export class OutController {
@@ -124,6 +125,44 @@ export class OutController {
   `
     return AppDataSource.getRepository(Pedido).query(sql)
   }
+
+  @Post("corteProducaoDublagem")
+  async corteProducaoDublagem(
+    @Body("itemPesquisa") itemPesquisa: string,
+    @Body("campo") campo: 'data' | 'nome',
+  ): Promise<Array<ProducaoDublagem>> {
+
+    const sql = `
+      SELECT 
+        pd.dataProducao AS dataProducao,
+        pd.idPedido AS pedido,
+        pc.nome AS cliente,
+        ped.statusPedido AS statusPedido,
+        SUM(dpd.metros) AS metros
+        
+      FROM 
+        producaodublagens pd
+      INNER JOIN
+        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
+      INNER JOIN
+        produtos p ON p.idProduto = pd.idProduto
+      INNER JOIN 
+        pedidos ped ON ped.idPedido = pd.idPedido
+      INNER JOIN
+        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
+      WHERE
+        statusPedido = 'C' AND
+        ${campo === 'data' ? 'pd.dataProducao = ?' : 'pc.nome LIKE ?'}
+      GROUP BY
+        dataProducao, pedido, cliente, statusPedido
+      ORDER BY
+        dataProducao, pedido, cliente
+  `
+
+    const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
+    return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
+  }
+
 
   @Post("pedidosEmProducao")
   async pedidosEmProducao(

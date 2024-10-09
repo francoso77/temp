@@ -64,6 +64,8 @@ interface ComboBoxInterface<T> {
   inputRef?: React.Ref<unknown> | undefined
   //Definição de uma cor para o fundo do componente
   corFundo?: string
+  textAlign?: "left" | "right" | "center"
+  labelAlign?: "left" | "right" | "center"
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -107,7 +109,9 @@ export default function ComboBox<T>(
     onFocus = undefined,
     tamanhoFonte = 16,
     onBlur,
-    corFundo = ''
+    corFundo = '',
+    textAlign = 'left',
+    labelAlign = 'left'
   }: ComboBoxInterface<T>) {
 
 
@@ -219,7 +223,7 @@ export default function ComboBox<T>(
               <Condicional condicao={typeof label === 'string' && label.length > 0}>
                 <Typography
                   variant='body2'
-                  textAlign='left'
+                  textAlign={labelAlign}
                   sx={{
                     mt:
                       theme && theme.inputs && theme.inputs.marginTop
@@ -238,6 +242,7 @@ export default function ComboBox<T>(
                   '& .MuiInputBase-input': {
                     fontSize: tamanhoFonte, // Aumenta o tamanho da fonte do input
                     bgcolor: corFundo,
+                    textAlign: textAlign,
                   }
                 }}
                 size='small'

@@ -55,6 +55,7 @@ var data_source_1 = require("../data-source");
 var producaoMalharia_entity_1 = require("../entities/producaoMalharia.entity");
 var perdaMalharia_entity_1 = require("../entities/perdaMalharia.entity");
 var programacaoDublagem_entity_1 = require("../entities/programacaoDublagem.entity");
+var producaoDublagem_entity_1 = require("../entities/producaoDublagem.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -84,6 +85,16 @@ var OutController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 sql = "\n    SELECT\n      p.idPedido,\n      p.dataPedido,\n      p.statusPedido,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor,\n        JSON_ARRAYAGG(\n    JSON_OBJECT(\n      'idPedido', p.idPedido,\n      'idDetalhePedido', dp.idDetalhePedido,\n      'Produto', pp.nome,\n      'qtd', dp.qtdPedida,\n      'vrUnitario', dp.vrUnitario,\n      'total', dp.qtdPedida * dp.vrUnitario,\n      'status', dp.statusItem\n    )\n  ) AS details\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n    INNER JOIN\n      produtos pp ON pp.idProduto = dp.idProduto\n    GROUP BY p.idPedido, p.dataPedido, p.idPrazoEntrega, pc.nome, pv.nome, p.statusPedido\n    ORDER BY p.dataPedido DESC\n    ;  \n  ";
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql)];
+            });
+        });
+    };
+    OutController.prototype.corteProducaoDublagem = function (itemPesquisa, campo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n      SELECT \n        pd.dataProducao AS dataProducao,\n        pd.idPedido AS pedido,\n        pc.nome AS cliente,\n        ped.statusPedido AS statusPedido,\n        SUM(dpd.metros) AS metros\n        \n      FROM \n        producaodublagens pd\n      INNER JOIN\n        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem\n      INNER JOIN\n        produtos p ON p.idProduto = pd.idProduto\n      INNER JOIN \n        pedidos ped ON ped.idPedido = pd.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      WHERE\n        statusPedido = 'C' AND\n        ".concat(campo === 'data' ? 'pd.dataProducao = ?' : 'pc.nome LIKE ?', "\n      GROUP BY\n        dataProducao, pedido, cliente, statusPedido\n      ORDER BY\n        dataProducao, pedido, cliente\n  ");
+                params = [campo === 'data' ? itemPesquisa : "%".concat(itemPesquisa, "%")];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(producaoDublagem_entity_1.default).query(sql, params)];
             });
         });
     };
@@ -215,6 +226,14 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "gerenciadorPedidosEmAberto", null);
+    __decorate([
+        (0, common_1.Post)("corteProducaoDublagem"),
+        __param(0, (0, common_1.Body)("itemPesquisa")),
+        __param(1, (0, common_1.Body)("campo")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String, String]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "corteProducaoDublagem", null);
     __decorate([
         (0, common_1.Post)("pedidosEmProducao"),
         __param(0, (0, common_1.Body)("itemPesquisa")),

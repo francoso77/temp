@@ -19,13 +19,13 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
 import { ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
 import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDubalgem';
+import { StatusPedidoType } from '../../types/statusPedidoTypes';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
-  totalQtd: string
 }
 
 export default function ProducaoDublagem() {
@@ -33,6 +33,7 @@ export default function ProducaoDublagem() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
+  const clsApi = new ClsApi()
 
   const ResetDados: ProducaoDublagemInterface = {
     dataProducao: '',
@@ -48,7 +49,6 @@ export default function ProducaoDublagem() {
 
   const SomatorioDados: SomatorioProducaoDublagemInterface = {
     total: '',
-    totalQtd: ''
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
@@ -61,6 +61,7 @@ export default function ProducaoDublagem() {
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioProducaoDublagemInterface>(SomatorioDados)
+  const [rsQtdPedida, setRsQtdPedida] = useState<SomatorioProducaoDublagemInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
 
@@ -75,24 +76,23 @@ export default function ProducaoDublagem() {
     {
       cabecalho: 'Pedido',
       alinhamento: 'center',
-      campo: 'idPedido',
+      campo: 'pedido',
       largura: 15,
       format: (v) => clsFormatacao.numeroPadrao(v)
     },
-    // {
-    //   cabecalho: 'Cliente',
-    //   alinhamento: 'left',
-    //   campo: 'nomeCliente'
-    //   // campo: 'idPessoa_cliente',
-    //   // format: (_v, rs: any) => rs.cliente.nome
-    // },
-    // {
-    //   cabecalho: 'Vendedor',
-    //   alinhamento: 'left',
-    //   campo: 'nomeVendedor'
-    //   // campo: 'idPessoa_vendedor',
-    //   // format: (_v, rs: any) => rs.vendedor.nome
-    // },
+    {
+      cabecalho: 'Cliente',
+      alinhamento: 'left',
+      campo: 'cliente'
+      // campo: 'idPessoa_cliente',
+      // format: (_v, rs: any) => rs.cliente.nome
+    },
+    {
+      cabecalho: 'Metros Cortados',
+      alinhamento: 'right',
+      campo: 'metros',
+      format: (v) => clsFormatacao.currency(v)
+    },
   ]
 
   const pesquisarID = (id: string | number): Promise<ProducaoDublagemInterface> => {
@@ -118,7 +118,7 @@ export default function ProducaoDublagem() {
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setProducaoDublagem(rs)
-      // AtualizaSomatorio(rs)
+      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
     })
   }
@@ -126,13 +126,14 @@ export default function ProducaoDublagem() {
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setProducaoDublagem(rs)
-      // AtualizaSomatorio(rs)
+      AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
     })
   }
 
   const btIncluir = () => {
-    // setRsSomatorio({ total: '0', totalQtd: '0' })
+    setRsSomatorio({ total: '0' })
+    setRsQtdPedida({ total: '0' })
     setProducaoDublagem(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
@@ -156,19 +157,103 @@ export default function ProducaoDublagem() {
     return retorno
   }
 
-  // const AtualizaSomatorio = (rs: ProducaoDublagemInterface) => {
+  const AtualizaSomatorio = (rs: ProducaoDublagemInterface) => {
 
-  //   let totalQtd: number = 0
-  //   let total: number = 0
+    let total: number = 0
 
-  //   if (rs.detalhePedidos) {
-  //     rs.detalhePedidos.forEach((detalhe) => {
-  //       totalQtd = totalQtd + detalhe.qtdPedida
-  //       total = total + (detalhe.qtdPedida * detalhe.vrUnitario)
-  //     })
-  //     setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
-  //   }
-  // }
+    if (rs.detalheProducaoDublagens) {
+      rs.detalheProducaoDublagens.forEach((detalhe) => {
+        total = total + detalhe.metros
+      })
+      setRsSomatorio({ total: total.toString() })
+    }
+
+    btPesquisarQtd(rs.idProduto)
+
+  }
+
+  const pesquisarPedido = async (pedido: number, produto: number): Promise<any> => {
+    return await clsCrud
+      .pesquisar({
+        entidade: "Pedido",
+        relations: [
+          "detalhePedidos",
+        ],
+        criterio: {
+          idPedido: pedido,
+        },
+      })
+      .then((rs: Array<PedidoInterface>) => {
+        return rs[0].detalhePedidos.filter((d: any) => d.statusItem === 3 && d.idProduto === produto)
+      })
+  }
+  const alterarStatus = (tp: "Incluir" | "Excluir") => {
+    pesquisarPedido(producaoDublagem.idPedido, producaoDublagem.idProduto)
+      .then((rs: PedidoInterface) => {
+        let qtdAtendida: number = parseFloat(rsSomatorio.total) > 0 ? parseFloat(rsSomatorio.total) : 0;
+        let tmpPedido: PedidoInterface = rs;
+        let statusItem: number = 0;
+        let statusPedido: StatusPedidoType = StatusPedidoType.finalizado;
+
+        if (rs) {
+          if (tp === "Incluir") {
+            statusItem = 2; // Status para "Incluir"
+            statusPedido = StatusPedidoType.finalizado;
+          } else {
+            statusItem = 3; // Status para "Excluir"
+            statusPedido = StatusPedidoType.producao;
+            qtdAtendida = 0; // Zera a quantidade atendida ao excluir
+          }
+
+          // Verifica se tmpPedido.detalhePedidos está definido e é um array
+          const detalhePedidosAtualizado = Array.isArray(tmpPedido.detalhePedidos)
+            ? tmpPedido.detalhePedidos.map((detalhe) =>
+              detalhe.idProduto === producaoDublagem.idProduto
+                ? {
+                  ...detalhe,
+                  statusItem: statusItem,
+                  qtdAtendida: qtdAtendida,
+                }
+                : detalhe
+            )
+            : [];
+
+          // Atualiza tmpPedido com o array atualizado
+          tmpPedido = {
+            ...tmpPedido,
+            statusPedido: statusPedido,
+            detalhePedidos: detalhePedidosAtualizado
+          };
+
+          console.log('tmp', tmpPedido);
+          // Chama a função de inclusão/atualização
+          clsCrud.incluir({
+            entidade: "Pedido",
+            criterio: tmpPedido,
+          }).then((rs) => {
+            if (rs.ok) {
+              setMensagemState({
+                titulo: 'Pedidos...',
+                exibir: true,
+                mensagem: 'Status do pedido atualizado com sucesso!',
+                tipo: MensagemTipo.Ok,
+                exibirBotao: true,
+                cb: () => btPesquisar(),
+              });
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Status não foi atualizado - consulte o suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null,
+              });
+            }
+          });
+        }
+      });
+  };
 
   const btConfirmar = () => {
     if (validarDados()) {
@@ -183,6 +268,7 @@ export default function ProducaoDublagem() {
           .then((rs) => {
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
+              alterarStatus("Incluir")
             } else {
               setMensagemState({
                 titulo: 'Erro...',
@@ -225,31 +311,29 @@ export default function ProducaoDublagem() {
 
     const campo = validaCampo.isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
     const itemPesquisa = campo === 'data'
-      ? { dataProducao: clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa) }
-      : { idPedido: pesquisa.itemPesquisa }
+      ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)
+      : pesquisa.itemPesquisa
 
-    clsCrud.pesquisar({
-      entidade: 'ProducaoDublagem',
-      relations: [
-        'detalheProducaoDublagens'
-      ],
-      criterio: itemPesquisa,
+    clsApi.execute<Array<ProducaoDublagemInterface>>({
+      url: 'corteProducaoDublagem',
+      method: 'post',
+      itemPesquisa,
+      campo,
+      mensagem: 'Pesquisando produção dublagem ...',
       setMensagemState: setMensagemState
     })
       .then((rs) => {
         setRsPesquisa(rs)
-        console.log(itemPesquisa, 'itemPesquisa')
-        console.log('resultado da btPesquisar',rs)
       })
   }
 
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
-      titulo: '',
-      tituloAnterior: 'Produção Dublagem',
-      pathTitulo: '/',
-      pathTituloAnterior: '/ProducaoDublagem'
+      titulo: 'Produção Dublagem',
+      tituloAnterior: '',
+      pathTitulo: '/ProducaoDublagem',
+      pathTituloAnterior: '/'
     })
     irPara('/')
   }
@@ -311,7 +395,10 @@ export default function ProducaoDublagem() {
       })
       .then((rs: Array<PedidoInterface>) => {
 
-        let produtos = rs.map((p: any) => p.detalhePedidos.map((d: any) => d.produto.idProduto))
+        let produtos = rs[0].detalhePedidos
+          .filter((d: any) => d.statusItem === 3)
+          .map((d: any) => d.produto.idProduto)
+
         clsCrud.pesquisar({
           entidade: 'Produto',
           comparador: 'I',
@@ -325,6 +412,25 @@ export default function ProducaoDublagem() {
       })
   }
 
+  const btPesquisarQtd = (produto: number) => {
+    clsCrud
+      .pesquisar({
+        entidade: "DetalhePedido",
+        relations: [
+          "produto",
+        ],
+        criterio: {
+          idProduto: produto,
+        },
+        camposLike: ['idProduto'],
+      })
+      .then((rs: Array<DetalhePedidoInterface>) => {
+        if (rs.length > 0 && rs[0].statusItem === 3) {
+
+          setRsQtdPedida({ total: rs[0].qtdPedida.toString() })
+        }
+      })
+  }
   useEffect(() => {
     BuscarDados()
   }, [])
@@ -342,7 +448,7 @@ export default function ProducaoDublagem() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
               <InputText
-                label="Pesquise por data ou pedido"
+                label="Pesquise por data ou cliente"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"
@@ -392,6 +498,8 @@ export default function ProducaoDublagem() {
                   type='tel'
                   tipo="date"
                   label="Data"
+                  labelAlign='center'
+                  textAlign='center'
                   dados={producaoDublagem}
                   field="dataProducao"
                   setState={setProducaoDublagem}
@@ -413,9 +521,11 @@ export default function ProducaoDublagem() {
                   mensagemPadraoCampoEmBranco="Escolha um pedido"
                   field="idPedido"
                   label="Pedido"
+                  labelAlign='center'
+                  textAlign='center'
                   erros={erros}
                   setState={setProducaoDublagem}
-                  disabled={localState.action === 'excluindo' ? true : false}
+                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 2)}
                 />
@@ -431,11 +541,14 @@ export default function ProducaoDublagem() {
                   mensagemPadraoCampoEmBranco="Escolha um item"
                   field="idProduto"
                   label="Item do Pedido"
+                  labelAlign='center'
+                  textAlign='center'
                   erros={erros}
                   setState={setProducaoDublagem}
-                  disabled={localState.action === 'excluindo' ? true : false}
+                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   onFocus={() => btPesquisarItem(producaoDublagem.idPedido)}
                   onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                  onSelect={() => btPesquisarQtd(producaoDublagem.idProduto)}
                 />
               </Box>
             </Grid>
@@ -449,6 +562,8 @@ export default function ProducaoDublagem() {
                   mensagemPadraoCampoEmBranco="Defina um tipo"
                   field="tipoColagem"
                   label="Tipo de Colagem"
+                  labelAlign='center'
+                  textAlign='center'
                   erros={erros}
                   setState={setProducaoDublagem}
                   disabled={localState.action === 'excluindo' ? true : false}
@@ -457,23 +572,15 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <DetalheProducaoDubalgem
-                rsMaster={producaoDublagem}
-                setRsMaster={setProducaoDublagem}
-                masterLocalState={localState}
-                // setRsSomatorio={setRsSomatorio}
-              />
-            </Grid>
             <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Qtd Total"
+                label="Qtd Pedida"
                 labelAlign='center'
-                dados={rsSomatorio}
-                field="totalQtd"
-                setState={setRsSomatorio}
+                dados={rsQtdPedida}
+                field="total"
+                setState={setRsQtdPedida}
                 disabled={true}
                 textAlign='center'
                 tamanhoFonte={30}
@@ -483,7 +590,7 @@ export default function ProducaoDublagem() {
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Total Pedido"
+                label="Qtd Cortado"
                 labelAlign='center'
                 dados={rsSomatorio}
                 field="total"
@@ -491,6 +598,15 @@ export default function ProducaoDublagem() {
                 disabled={true}
                 textAlign='center'
                 tamanhoFonte={30}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <DetalheProducaoDubalgem
+                rsMaster={producaoDublagem}
+                setRsMaster={setProducaoDublagem}
+                masterLocalState={localState}
+                setRsSomatorio={setRsSomatorio}
               />
             </Grid>
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>

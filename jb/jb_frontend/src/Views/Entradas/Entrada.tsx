@@ -106,8 +106,8 @@ export default function Entrada() {
       })
   }
 
-  const pesquisarEstoque = (fornecedor: number, produto: number): Promise<EstoqueInterface> => {
-    return clsCrud
+  const pesquisarEstoque = async (fornecedor: number, produto: number): Promise<EstoqueInterface> => {
+    return await clsCrud
       .pesquisar({
         entidade: "Estoque",
         criterio: {
