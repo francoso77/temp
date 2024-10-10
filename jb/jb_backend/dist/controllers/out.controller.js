@@ -92,12 +92,44 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pd.dataProducao AS dataProducao,\n        pd.idPedido AS pedido,\n        pc.nome AS cliente,\n        ped.statusPedido AS statusPedido,\n        SUM(dpd.metros) AS metros\n        \n      FROM \n        producaodublagens pd\n      INNER JOIN\n        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem\n      INNER JOIN\n        produtos p ON p.idProduto = pd.idProduto\n      INNER JOIN \n        pedidos ped ON ped.idPedido = pd.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      WHERE\n        statusPedido = 'C' AND\n        ".concat(campo === 'data' ? 'pd.dataProducao = ?' : 'pc.nome LIKE ?', "\n      GROUP BY\n        dataProducao, pedido, cliente, statusPedido\n      ORDER BY\n        dataProducao, pedido, cliente\n  ");
+                sql = "\n      SELECT \n        pd.dataProducao AS dataProducao,\n        pd.idPedido AS pedido,\n        pc.nome AS cliente,\n        ped.statusPedido AS statusPedido,\n        SUM(dp.metros) AS metros\n        \n      FROM \n        producaodublagens pd\n      INNER JOIN\n        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem\n      INNER JOIN\n        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem\n      INNER JOIN\n        produtos p ON p.idProduto = dpd.idProduto\n      INNER JOIN \n        pedidos ped ON ped.idPedido = pd.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      WHERE\n        statusPedido = 'C' AND\n        ".concat(campo === 'data' ? 'pd.dataProducao = ?' : 'pc.nome LIKE ?', "\n      GROUP BY\n        dataProducao, pedido, cliente, statusPedido\n      ORDER BY\n        dataProducao, pedido, cliente\n  ");
                 params = [campo === 'data' ? itemPesquisa : "%".concat(itemPesquisa, "%")];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(producaoDublagem_entity_1.default).query(sql, params)];
             });
         });
     };
+    // @Post("pedidosEmCorteProducaoDublagem")
+    // async pedidosEmCorteProducaoDublagem(
+    //   @Body("pedido") pedido: number,
+    // ): Promise<Array<ProducaoDublagem>> {
+    //   const sql = `
+    //     SELECT 
+    //       pd.idPedido AS pedido,
+    //       p.nome AS produto, 
+    //       SUM(dp.metros) AS metros,
+    //       COUNT(dp.metros) AS pecas
+    //     FROM 
+    //       producaodublagens pd
+    //     INNER JOIN
+    //       detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
+    //     INNER JOIN
+    //       detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
+    //     INNER JOIN
+    //       produtos p ON p.idProduto = pd.idProduto
+    //     INNER JOIN 
+    //       pedidos ped ON ped.idPedido = pd.idPedido
+    //     INNER JOIN
+    //       pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
+    //     WHERE
+    //       pd.idPedido = ?
+    //     GROUP BY
+    //       pedido, produto
+    //     ORDER BY
+    //       produto
+    // `
+    //   const params = [pedido]
+    //   return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
+    // }
     OutController.prototype.pedidosEmProducao = function (itemPesquisa, campo) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
@@ -156,6 +188,28 @@ var OutController = /** @class */ (function () {
                 sql = "\n    UPDATE\n      producaomalharias pm\n    SET\n      pm.idTinturaria = null,\n      pm.fechado = 0,\n      pm.dataFechado = null\n    WHERE\n      pm.idTinturaria = ?;\n  ";
                 params = [tinturaria];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(producaoMalharia_entity_1.default).query(sql, params)];
+            });
+        });
+    };
+    OutController.prototype.atualizarStatusPedido = function (pedido, tipoStatus, produto, qtd) {
+        return __awaiter(this, void 0, void 0, function () {
+            var novoStatusPedido, novoStatusItem, sql, params;
+            return __generator(this, function (_a) {
+                novoStatusPedido = 'F';
+                novoStatusItem = 2;
+                console.log(tipoStatus);
+                console.log(pedido);
+                console.log(produto);
+                console.log(qtd);
+                console.log(novoStatusPedido);
+                console.log(novoStatusItem);
+                if (tipoStatus === 'Excluir') {
+                    novoStatusPedido = 'C';
+                    novoStatusItem = 3;
+                }
+                sql = "\n      UPDATE \n          pedidos p\n      INNER JOIN \n          detalhepedidos dp ON dp.idPedido = p.idPedido\n      SET \n          p.statusPedido = ?,\n          dp.statusItem = ?,\n          dp.qtdAtendida = ?\n      WHERE \n          p.idPedido = ? \n          AND dp.idProduto = ?\n    ;\n\n  ";
+                params = [novoStatusPedido, novoStatusItem, qtd, pedido, produto];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
         });
     };
@@ -272,6 +326,16 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [Number]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "limpaPecas", null);
+    __decorate([
+        (0, common_1.Post)("atualizarStatusPedido"),
+        __param(0, (0, common_1.Body)("pedido")),
+        __param(1, (0, common_1.Body)("tipoStatus")),
+        __param(2, (0, common_1.Body)('produto')),
+        __param(3, (0, common_1.Body)('qtd')),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Number, String, Number, Number]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "atualizarStatusPedido", null);
     __decorate([
         (0, common_1.Post)("produzirPedidos"),
         __param(0, (0, common_1.Body)("pedidos")),

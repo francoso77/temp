@@ -17,6 +17,10 @@ interface PropsInterface {
   dtInicial?: string
   dtFinal?: string
   grupo?: GraficoType
+  tipoStatus?: 'Incluir' | 'Excluir'
+  pedido?: number
+  produto?: number
+  qtd?: number
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>;
 }
 
@@ -78,6 +82,10 @@ export default class ClsApi {
     dtInicial,
     dtFinal,
     grupo,
+    tipoStatus,
+    pedido,
+    produto,
+    qtd,
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
@@ -90,6 +98,10 @@ export default class ClsApi {
       dtInicial,
       dtFinal,
       grupo,
+      tipoStatus,
+      pedido,
+      produto,
+      qtd,
     };
 
     if (setMensagemState) {

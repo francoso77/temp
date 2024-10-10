@@ -2,7 +2,6 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, Pri
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
 import { ProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
 import { TipoColagemType } from '../types/tipoColagemTypes';
-import Produto from './produto.entity';
 import Pedido from './pedido.entity';
 
 @Entity({ name: 'producaodublagens' })
@@ -23,13 +22,6 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   @JoinColumn({ name: 'idPedido' })
   @ManyToOne(() => Pedido)
   pedido: Pedido
-
-  @Column()
-  idProduto: number;
-
-  @JoinColumn({ name: 'idProduto' })
-  @ManyToOne(() => Produto)
-  produto: Produto
 
   @JoinColumn({ name: 'idDublagem' })
   @OneToMany(() => DetalheProducaoDublagem,

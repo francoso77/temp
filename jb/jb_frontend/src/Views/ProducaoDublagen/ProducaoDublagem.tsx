@@ -23,6 +23,7 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDubalgem';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
+import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
@@ -39,7 +40,6 @@ export default function ProducaoDublagem() {
     dataProducao: '',
     tipoColagem: TipoColagemType.cola,
     idPedido: 0,
-    idProduto: 0,
     detalheProducaoDublagens: []
   }
 
@@ -58,7 +58,6 @@ export default function ProducaoDublagem() {
   const [erros, setErros] = useState({})
   const [producaoDublagem, setProducaoDublagem] = useState<ProducaoDublagemInterface>(ResetDados)
   const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
-  const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioProducaoDublagemInterface>(SomatorioDados)
   const [rsQtdPedida, setRsQtdPedida] = useState<SomatorioProducaoDublagemInterface>(SomatorioDados)
@@ -95,8 +94,8 @@ export default function ProducaoDublagem() {
     },
   ]
 
-  const pesquisarID = (id: string | number): Promise<ProducaoDublagemInterface> => {
-    return clsCrud
+  const pesquisarID = async (id: string | number): Promise<ProducaoDublagemInterface> => {
+    return await clsCrud
       .pesquisar({
         entidade: "ProducaoDublagem",
         relations: [
@@ -131,6 +130,14 @@ export default function ProducaoDublagem() {
     })
   }
 
+  useEffect(() => {
+    if (producaoDublagem) {
+      if (localState.action === actionTypes.excluindo || localState.action === actionTypes.editando) {
+        alterarStatusItem('Excluir');
+      }
+    }
+  }, [producaoDublagem])
+
   const btIncluir = () => {
     setRsSomatorio({ total: '0' })
     setRsQtdPedida({ total: '0' })
@@ -150,7 +157,6 @@ export default function ProducaoDublagem() {
 
     retorno = validaCampo.eData('dataProducao', producaoDublagem, erros, retorno)
     retorno = validaCampo.naoVazio('idPedido', producaoDublagem, erros, retorno, 'Informe o pedido')
-    retorno = validaCampo.naoVazio('idProduto', producaoDublagem, erros, retorno, 'Informe o item')
     retorno = validaCampo.naoVazio('tipoColagem', producaoDublagem, erros, retorno, 'Qual o tipo de colagem?')
 
     setErros(erros)
@@ -159,101 +165,113 @@ export default function ProducaoDublagem() {
 
   const AtualizaSomatorio = (rs: ProducaoDublagemInterface) => {
 
-    let total: number = 0
+    // let total: number = 0
 
-    if (rs.detalheProducaoDublagens) {
-      rs.detalheProducaoDublagens.forEach((detalhe) => {
-        total = total + detalhe.metros
-      })
-      setRsSomatorio({ total: total.toString() })
-    }
+    // if (rs.detalheProducaoDublagens) {
+    //   rs.detalheProducaoDublagens.forEach((detalhe) => {
+    //     total = total + detalhe.metros
+    //   })
+    //   setRsSomatorio({ total: total.toString() })
+    // }
 
-    btPesquisarQtd(rs.idProduto)
+    // btPesquisarQtd(rs.idProduto)
 
   }
 
-  const pesquisarPedido = async (pedido: number, produto: number): Promise<any> => {
+  const pesquisarPedidoItem = async (pedido: number, produto: number): Promise<DetalhePedidoInterface | null> => {
     return await clsCrud
       .pesquisar({
-        entidade: "Pedido",
-        relations: [
-          "detalhePedidos",
-        ],
+        entidade: "DetalhePedido",
         criterio: {
           idPedido: pedido,
+          idProduto: produto,
         },
       })
-      .then((rs: Array<PedidoInterface>) => {
-        return rs[0].detalhePedidos.filter((d: any) => d.statusItem === 3 && d.idProduto === produto)
+      .then((rs: Array<DetalhePedidoInterface>) => {
+
+        if (rs.length > 0) {
+          return rs[0]
+        } else {
+          return null
+        }
       })
   }
-  const alterarStatus = (tp: "Incluir" | "Excluir") => {
-    pesquisarPedido(producaoDublagem.idPedido, producaoDublagem.idProduto)
-      .then((rs: PedidoInterface) => {
-        let qtdAtendida: number = parseFloat(rsSomatorio.total) > 0 ? parseFloat(rsSomatorio.total) : 0;
-        let tmpPedido: PedidoInterface = rs;
-        let statusItem: number = 0;
-        let statusPedido: StatusPedidoType = StatusPedidoType.finalizado;
 
-        if (rs) {
-          if (tp === "Incluir") {
-            statusItem = 2; // Status para "Incluir"
-            statusPedido = StatusPedidoType.finalizado;
-          } else {
-            statusItem = 3; // Status para "Excluir"
-            statusPedido = StatusPedidoType.producao;
-            qtdAtendida = 0; // Zera a quantidade atendida ao excluir
-          }
+  const verificaStatusPedido = async (pedido: number, tipo: "Incluir" | "Excluir") => {
+    await clsCrud.pesquisar({
+      entidade: "Pedido",
+      relations: [
+        "detalhePedidos",
+      ],
+      criterio: {
+        idPedido: pedido
+      }
+    })
+      .then((ped: Array<PedidoInterface>) => {
 
-          // Verifica se tmpPedido.detalhePedidos está definido e é um array
-          const detalhePedidosAtualizado = Array.isArray(tmpPedido.detalhePedidos)
-            ? tmpPedido.detalhePedidos.map((detalhe) =>
-              detalhe.idProduto === producaoDublagem.idProduto
-                ? {
-                  ...detalhe,
-                  statusItem: statusItem,
-                  qtdAtendida: qtdAtendida,
-                }
-                : detalhe
-            )
-            : [];
+        if (ped.length > 0) {
+          let tmpPedido: PedidoInterface = ped[0]
+          let tmpDetalhe: Array<DetalhePedidoInterface> = ped[0].detalhePedidos
+          if (tipo === "Incluir") {
 
-          // Atualiza tmpPedido com o array atualizado
-          tmpPedido = {
-            ...tmpPedido,
-            statusPedido: statusPedido,
-            detalhePedidos: detalhePedidosAtualizado
-          };
+            let temPedidoAberto = tmpDetalhe.findIndex((rs: any) => rs.statusItem !== StatusPedidoItemType.finalizado)
 
-          console.log('tmp', tmpPedido);
-          // Chama a função de inclusão/atualização
-          clsCrud.incluir({
-            entidade: "Pedido",
-            criterio: tmpPedido,
-          }).then((rs) => {
-            if (rs.ok) {
-              setMensagemState({
-                titulo: 'Pedidos...',
-                exibir: true,
-                mensagem: 'Status do pedido atualizado com sucesso!',
-                tipo: MensagemTipo.Ok,
-                exibirBotao: true,
-                cb: () => btPesquisar(),
-              });
-            } else {
-              setMensagemState({
-                titulo: 'Erro...',
-                exibir: true,
-                mensagem: 'Status não foi atualizado - consulte o suporte',
-                tipo: MensagemTipo.Error,
-                exibirBotao: true,
-                cb: null,
-              });
+            if (temPedidoAberto < 0) {
+
+              tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.finalizado }
+              clsCrud.incluir({
+                entidade: "Pedido",
+                criterio: tmpPedido,
+              })
             }
-          });
+          } else {
+            tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao }
+            clsCrud.incluir({
+              entidade: "Pedido",
+              criterio: tmpPedido,
+            })
+          }
         }
-      });
-  };
+      })
+  }
+
+  const alterarStatusItem = async (tp: "Incluir" | "Excluir") => {
+
+    // await pesquisarPedidoItem(producaoDublagem.idPedido, 0)
+    //   .then((rs: DetalhePedidoInterface | null) => {
+    //     let qtdAtendida: number = parseFloat(rsSomatorio.total) > 0 ? parseFloat(rsSomatorio.total) : 0
+    //     let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
+
+    //     if (rs) {
+
+    //       let tmpDetalhe: DetalhePedidoInterface = rs
+    //       if (tp === "Excluir") {
+    //         statusItem = StatusPedidoItemType.producao
+    //         qtdAtendida = 0
+    //       }
+
+    //       tmpDetalhe = { ...tmpDetalhe, qtdAtendida: qtdAtendida, statusItem: statusItem }
+
+    //       clsCrud.incluir({
+    //         entidade: "DetalhePedido",
+    //         criterio: tmpDetalhe,
+    //       }).then((rsPed) => {
+    //         if (!rsPed.ok) {
+    //           setMensagemState({
+    //             titulo: 'Erro...',
+    //             exibir: true,
+    //             mensagem: 'Status não foi atualizado - consulte o suporte',
+    //             tipo: MensagemTipo.Error,
+    //             exibirBotao: true,
+    //             cb: null,
+    //           })
+    //         }
+    //       })
+    //     }
+    //   })
+
+    // await verificaStatusPedido(producaoDublagem.idPedido, tp)
+  }
 
   const btConfirmar = () => {
     if (validarDados()) {
@@ -268,7 +286,7 @@ export default function ProducaoDublagem() {
           .then((rs) => {
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
-              alterarStatus("Incluir")
+              alterarStatusItem("Incluir")
             } else {
               setMensagemState({
                 titulo: 'Erro...',
@@ -330,10 +348,10 @@ export default function ProducaoDublagem() {
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
-      titulo: 'Produção Dublagem',
-      tituloAnterior: '',
-      pathTitulo: '/ProducaoDublagem',
-      pathTituloAnterior: '/'
+      titulo: '',
+      tituloAnterior: 'Produção Dublagem',
+      pathTitulo: '/',
+      pathTituloAnterior: '/ProducaoDublagem'
     })
     irPara('/')
   }
@@ -365,51 +383,51 @@ export default function ProducaoDublagem() {
         setRsPedido(rsPedidos)
       })
 
-    clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        campoOrder: ['nome'],
-        criterio: {
-          tipoProduto: [7],
-        },
-        camposLike: ['tipoProduto'],
-      })
-      .then((rsProdutos: Array<ProdutoInterface>) => {
-        setRsProduto(rsProdutos)
-      })
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "Produto",
+    //     campoOrder: ['nome'],
+    //     criterio: {
+    //       tipoProduto: [7],
+    //     },
+    //     camposLike: ['tipoProduto'],
+    //   })
+    //   .then((rsProdutos: Array<ProdutoInterface>) => {
+    //     setRsProduto(rsProdutos)
+    //   })
 
   }
 
   const btPesquisarItem = (pedido: number) => {
-    clsCrud
-      .pesquisar({
-        entidade: "Pedido",
-        relations: [
-          "detalhePedidos",
-          "detalhePedidos.produto",
-        ],
-        criterio: {
-          idPedido: pedido,
-        },
-        camposLike: ['idPedido'],
-      })
-      .then((rs: Array<PedidoInterface>) => {
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "Pedido",
+    //     relations: [
+    //       "detalhePedidos",
+    //       "detalhePedidos.produto",
+    //     ],
+    //     criterio: {
+    //       idPedido: pedido,
+    //     },
+    //     camposLike: ['idPedido'],
+    //   })
+    //   .then((rs: Array<PedidoInterface>) => {
 
-        let produtos = rs[0].detalhePedidos
-          .filter((d: any) => d.statusItem === 3)
-          .map((d: any) => d.produto.idProduto)
+    //     let produtos = rs[0].detalhePedidos
+    //       .filter((d: any) => d.statusItem === 3)
+    //       .map((d: any) => d.produto.idProduto)
 
-        clsCrud.pesquisar({
-          entidade: 'Produto',
-          comparador: 'I',
-          criterio: {
-            idProduto: produtos,
-          },
-          camposLike: ['idProduto'],
-        }).then((rsProdutos: Array<ProdutoInterface>) => {
-          setRsProduto(rsProdutos)
-        })
-      })
+    //     clsCrud.pesquisar({
+    //       entidade: 'Produto',
+    //       comparador: 'I',
+    //       criterio: {
+    //         idProduto: produtos,
+    //       },
+    //       camposLike: ['idProduto'],
+    //     }).then((rsProdutos: Array<ProdutoInterface>) => {
+    //       setRsProduto(rsProdutos)
+    //     })
+    //   })
   }
 
   const btPesquisarQtd = (produto: number) => {
@@ -433,6 +451,13 @@ export default function ProducaoDublagem() {
   }
   useEffect(() => {
     BuscarDados()
+    btPesquisar()
+    setLayoutState({
+      titulo: 'Produção Dublagem',
+      tituloAnterior: '',
+      pathTitulo: '/ProducaoDublagem',
+      pathTituloAnterior: '/'
+    })
   }, [])
 
   return (
@@ -492,7 +517,7 @@ export default function ProducaoDublagem() {
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
               <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
                 <InputText
                   type='tel'
@@ -511,7 +536,7 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                 <ComboBox
                   opcoes={rsPedido}
@@ -531,7 +556,7 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+            {/* <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                 <ComboBox
                   opcoes={rsProduto}
@@ -551,8 +576,8 @@ export default function ProducaoDublagem() {
                   onSelect={() => btPesquisarQtd(producaoDublagem.idProduto)}
                 />
               </Box>
-            </Grid>
-            <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
+            </Grid> */}
+            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox
                   opcoes={TipoColagemTypes}
@@ -614,7 +639,8 @@ export default function ProducaoDublagem() {
                 <IconButton
                   color="secondary"
                   sx={{ mt: 3, ml: 2 }}
-                  onClick={() => btCancelar()}
+                  onClick={producaoDublagem.idPedido !== 0 ? () => btConfirmar() :
+                    () => btCancelar()}
                 >
                   <CancelRoundedIcon sx={{ fontSize: 50 }} />
                 </IconButton>

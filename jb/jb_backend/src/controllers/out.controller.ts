@@ -138,14 +138,16 @@ export class OutController {
         pd.idPedido AS pedido,
         pc.nome AS cliente,
         ped.statusPedido AS statusPedido,
-        SUM(dpd.metros) AS metros
+        SUM(dp.metros) AS metros
         
       FROM 
         producaodublagens pd
       INNER JOIN
         detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
       INNER JOIN
-        produtos p ON p.idProduto = pd.idProduto
+        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
+      INNER JOIN
+        produtos p ON p.idProduto = dpd.idProduto
       INNER JOIN 
         pedidos ped ON ped.idPedido = pd.idPedido
       INNER JOIN
@@ -162,6 +164,42 @@ export class OutController {
     const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
     return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
   }
+
+  // @Post("pedidosEmCorteProducaoDublagem")
+  // async pedidosEmCorteProducaoDublagem(
+  //   @Body("pedido") pedido: number,
+  // ): Promise<Array<ProducaoDublagem>> {
+
+  //   const sql = `
+  //     SELECT 
+  //       pd.idPedido AS pedido,
+  //       p.nome AS produto, 
+  //       SUM(dp.metros) AS metros,
+  //       COUNT(dp.metros) AS pecas
+
+  //     FROM 
+  //       producaodublagens pd
+  //     INNER JOIN
+  //       detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
+  //     INNER JOIN
+  //       detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
+  //     INNER JOIN
+  //       produtos p ON p.idProduto = pd.idProduto
+  //     INNER JOIN 
+  //       pedidos ped ON ped.idPedido = pd.idPedido
+  //     INNER JOIN
+  //       pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
+  //     WHERE
+  //       pd.idPedido = ?
+  //     GROUP BY
+  //       pedido, produto
+  //     ORDER BY
+  //       produto
+  // `
+
+  //   const params = [pedido]
+  //   return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
+  // }
 
 
   @Post("pedidosEmProducao")
@@ -338,6 +376,47 @@ export class OutController {
 
     const params = [tinturaria]
     return AppDataSource.getRepository(ProducaoMalharia).query(sql, params)
+  }
+
+  @Post("atualizarStatusPedido")
+  async atualizarStatusPedido(
+    @Body("pedido") pedido: number,
+    @Body("tipoStatus") tipoStatus: 'Incluir' | 'Excluir',
+    @Body('produto') produto: number,
+    @Body('qtd') qtd: number,
+  ): Promise<Array<Pedido>> {
+
+    let novoStatusPedido = 'F'
+    let novoStatusItem = 2
+
+    console.log(tipoStatus)
+    console.log(pedido)
+    console.log(produto)
+    console.log(qtd)
+    console.log(novoStatusPedido)
+    console.log(novoStatusItem)
+
+    if (tipoStatus === 'Excluir') {
+      novoStatusPedido = 'C'
+      novoStatusItem = 3
+    }
+    const sql = `
+      UPDATE 
+          pedidos p
+      INNER JOIN 
+          detalhepedidos dp ON dp.idPedido = p.idPedido
+      SET 
+          p.statusPedido = ?,
+          dp.statusItem = ?,
+          dp.qtdAtendida = ?
+      WHERE 
+          p.idPedido = ? 
+          AND dp.idProduto = ?
+    ;
+
+  `
+    const params = [novoStatusPedido, novoStatusItem, qtd, pedido, produto]
+    return AppDataSource.getRepository(Pedido).query(sql, params)
   }
 
   @Post("produzirPedidos")

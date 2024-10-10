@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var detalheProducaoDublagem_entity_1 = require("./detalheProducaoDublagem.entity");
 var tipoColagemTypes_1 = require("../types/tipoColagemTypes");
-var produto_entity_1 = require("./produto.entity");
 var pedido_entity_1 = require("./pedido.entity");
 var ProducaoDublagem = /** @class */ (function () {
     function ProducaoDublagem() {
@@ -38,15 +37,6 @@ var ProducaoDublagem = /** @class */ (function () {
         (0, typeorm_1.ManyToOne)(function () { return pedido_entity_1.default; }),
         __metadata("design:type", pedido_entity_1.default)
     ], ProducaoDublagem.prototype, "pedido", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", Number)
-    ], ProducaoDublagem.prototype, "idProduto", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
-        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
-        __metadata("design:type", produto_entity_1.default)
-    ], ProducaoDublagem.prototype, "produto", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idDublagem' }),
         (0, typeorm_1.OneToMany)(function () { return detalheProducaoDublagem_entity_1.default; }, function (detalheProducaoDublagem) { return detalheProducaoDublagem.producaoDublagem; }, { cascade: true }),

@@ -11,6 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var producaoDublagem_entity_1 = require("./producaoDublagem.entity");
+var produto_entity_1 = require("./produto.entity");
+var detalhePecas_entity_1 = require("./detalhePecas.entity");
 var DetalheProducaoDublagem = /** @class */ (function () {
     function DetalheProducaoDublagem() {
     }
@@ -23,6 +25,23 @@ var DetalheProducaoDublagem = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheProducaoDublagem.prototype, "idDublagem", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        __metadata("design:type", Number)
+    ], DetalheProducaoDublagem.prototype, "metrosTotal", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: 'int', precision: 0 }),
+        __metadata("design:type", Number)
+    ], DetalheProducaoDublagem.prototype, "pecasTotal", void 0);
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", Number)
+    ], DetalheProducaoDublagem.prototype, "idProduto", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idProduto' }),
+        (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
+        __metadata("design:type", produto_entity_1.default)
+    ], DetalheProducaoDublagem.prototype, "produto", void 0);
+    __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idDublagem' }),
         (0, typeorm_1.ManyToOne)(function () { return producaoDublagem_entity_1.default; }, function (producaoDublagem) { return producaoDublagem.detalheProducaoDublagens; }, {
             onDelete: 'CASCADE',
@@ -32,9 +51,10 @@ var DetalheProducaoDublagem = /** @class */ (function () {
         __metadata("design:type", producaoDublagem_entity_1.default)
     ], DetalheProducaoDublagem.prototype, "producaoDublagem", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
-        __metadata("design:type", Number)
-    ], DetalheProducaoDublagem.prototype, "metros", void 0);
+        (0, typeorm_1.JoinColumn)({ name: 'idDetalheProducaoDublagem' }),
+        (0, typeorm_1.OneToMany)(function () { return detalhePecas_entity_1.default; }, function (detalhePeca) { return detalhePeca.detalheProducaoDublagem; }, { cascade: true }),
+        __metadata("design:type", Array)
+    ], DetalheProducaoDublagem.prototype, "detalhePecas", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)

@@ -28,6 +28,7 @@ var programacaoDublagem_entity_1 = require("./entities/programacaoDublagem.entit
 var detalheProgramacaoDublagem_entity_1 = require("./entities/detalheProgramacaoDublagem.entity");
 var usuario_entity_1 = require("./entities/sistema/usuario.entity");
 var usuarioSessao_entity_1 = require("./entities/sistema/usuarioSessao.entity");
+var detalhePecas_entity_1 = require("./entities/detalhePecas.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -42,6 +43,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         cor_entity_1.default,
         detalheEntrada_entity_1.default,
         detalheEstrutura_entity_1.default,
+        detalhePecas_entity_1.default,
         detalhePedido_entity_1.default,
         detalheProducaoDublagem_entity_1.default,
         detalheProgramacao_entity_1.default,
