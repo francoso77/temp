@@ -16,9 +16,12 @@ import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import ComboBox from '../../Componentes/ComboBox';
 import ClsApi from '../../Utils/ClsApi';
+import DetalhePeca from './DetalhePeca';
+import CloseIcon from '@mui/icons-material/Close'
+
 
 
 interface PropsInterface {
@@ -55,6 +58,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false)
+  const [openMetros, setOpenMetros] = useState(false)
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
@@ -110,6 +114,9 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     AtualizaSomatorio(tmpDetalhe)
   }
 
+  const onCortar = (id: number) => {
+    setOpenMetros(true)
+  }
   const btIncluir = () => {
     if (
       rsMaster.dataProducao !== "" &&
@@ -214,6 +221,9 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     }
   }
 
+  const btFechar = () => {
+    setOpenMetros(false)
+  }
   const AtualizaSomatorio = (rs: Array<DetalheProducaoDublagemInterface>) => {
 
     // let total: number = 0
@@ -229,21 +239,17 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const buscarDados = () => {
     clsCrud
       .pesquisar({
-        entidade: "Pedido",
-        relations: [
-          "detalhePedidos",
-          "detalhePedidos.produto",
-        ],
+        entidade: "DetalhePedido",
         criterio: {
           idPedido: rsMaster.idPedido,
         },
         camposLike: ['idPedido'],
       })
-      .then((rs: Array<PedidoInterface>) => {
+      .then((rs: Array<DetalhePedidoInterface>) => {
 
-        let produtos = rs[0].detalhePedidos
+        let produtos = rs
           .filter((d: any) => d.statusItem === 3)
-          .map((d: any) => d.produto.idProduto)
+          .map((d: any) => d.idProduto)
 
         clsCrud.pesquisar({
           entidade: 'Produto',
@@ -252,6 +258,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
             idProduto: produtos,
           },
           camposLike: ['idProduto'],
+          campoOrder: ['nome'],
         }).then((rsProdutos: Array<ProdutoInterface>) => {
           setRsProduto(rsProdutos)
         })
@@ -260,7 +267,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
   useEffect(() => {
     buscarDados()
-  })
+  }, [open])
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
@@ -301,8 +308,8 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
                   textAlign='center'
                   erros={erros}
                   setState={setDetalheProducaoDublagem}
-                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
-                  onFocus={(e) => e.target.select()}
+                  disabled={['excluindo'].includes(localState.action) ? true : false}
+                // onFocus={(e) => e.target.select()}
 
                 // onFocus={() => btPesquisarItem(producaoDublagem.idPedido)}
                 // onSelect={() => btPesquisarQtd(producaoDublagem.idProduto)}
@@ -352,6 +359,44 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
           </Paper >
         </Condicional>
       </Dialog >
+      <Dialog
+        open={openMetros}
+        fullScreen={fullScreen}
+        fullWidth
+        maxWidth='sm'>
+        <Paper variant="outlined"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            m: 1,
+            p: 1.5,
+            backgroundColor: '#3c486b'
+          }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', ml: 15 }}>
+            <Typography sx={{ color: 'white' }}>
+              Peças Cortadas
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+            <IconButton onClick={() => btFechar()}>
+              <CloseIcon sx={{ color: 'white', fontSize: 30 }} />
+            </IconButton>
+          </Grid>
+        </Paper>
+        <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+              <DetalhePeca
+                rsMaster={detalheProducaoDublagem}
+                setRsMaster={setDetalheProducaoDublagem}
+                masterLocalState={localState}
+                setRsSomatorio={setRsSomatorio}
+                setOpenMetros={setOpenMetros}
+              />
+            </Grid>
+          </Grid>
+        </Paper >
+      </Dialog >
       <Paper sx={{ m: 0, p: 1 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
           <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
@@ -383,6 +428,12 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
                   onAcionador: (rs: DetalheProducaoDublagemInterface) =>
                     onExcluir(rs),
                   toolTip: "Excluir",
+                },
+                {
+                  icone: "content_cut_two_tone_icon",
+                  onAcionador: (rs: DetalheProducaoDublagemInterface) =>
+                    onCortar(rs.idDetalheProducaoDublagem as number),
+                  toolTip: "Cortar",
                 },
               ]}
           />

@@ -383,6 +383,7 @@ export default function ProducaoDublagem() {
         setRsPedido(rsPedidos)
       })
 
+
     // clsCrud
     //   .pesquisar({
     //     entidade: "Produto",
@@ -398,39 +399,7 @@ export default function ProducaoDublagem() {
 
   }
 
-  const btPesquisarItem = (pedido: number) => {
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "Pedido",
-    //     relations: [
-    //       "detalhePedidos",
-    //       "detalhePedidos.produto",
-    //     ],
-    //     criterio: {
-    //       idPedido: pedido,
-    //     },
-    //     camposLike: ['idPedido'],
-    //   })
-    //   .then((rs: Array<PedidoInterface>) => {
-
-    //     let produtos = rs[0].detalhePedidos
-    //       .filter((d: any) => d.statusItem === 3)
-    //       .map((d: any) => d.produto.idProduto)
-
-    //     clsCrud.pesquisar({
-    //       entidade: 'Produto',
-    //       comparador: 'I',
-    //       criterio: {
-    //         idProduto: produtos,
-    //       },
-    //       camposLike: ['idProduto'],
-    //     }).then((rsProdutos: Array<ProdutoInterface>) => {
-    //       setRsProduto(rsProdutos)
-    //     })
-    //   })
-  }
-
-  const btPesquisarQtd = (produto: number) => {
+  const btPesquisarQtd = (pedido: number) => {
     clsCrud
       .pesquisar({
         entidade: "DetalhePedido",
@@ -438,14 +407,17 @@ export default function ProducaoDublagem() {
           "produto",
         ],
         criterio: {
-          idProduto: produto,
+          idPedido: pedido,
         },
-        camposLike: ['idProduto'],
+        camposLike: ['idPedido'],
       })
       .then((rs: Array<DetalhePedidoInterface>) => {
-        if (rs.length > 0 && rs[0].statusItem === 3) {
-
-          setRsQtdPedida({ total: rs[0].qtdPedida.toString() })
+        if (rs.length > 0) {
+          let total: number = 0
+          rs.forEach((detalhe) => {
+            total = total + detalhe.qtdPedida
+          })
+          setRsQtdPedida({ total: total.toString() })
         }
       })
   }
@@ -553,6 +525,7 @@ export default function ProducaoDublagem() {
                   disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                  onBlur={() => btPesquisarQtd(producaoDublagem.idPedido)}
                 />
               </Box>
             </Grid>
@@ -639,8 +612,9 @@ export default function ProducaoDublagem() {
                 <IconButton
                   color="secondary"
                   sx={{ mt: 3, ml: 2 }}
-                  onClick={producaoDublagem.idPedido !== 0 ? () => btConfirmar() :
-                    () => btCancelar()}
+                  onClick={() => btCancelar()}
+                // onClick={producaoDublagem.idPedido !== 0 ? () => btConfirmar() :
+                //   () => btCancelar()}
                 >
                   <CancelRoundedIcon sx={{ fontSize: 50 }} />
                 </IconButton>
