@@ -25,7 +25,7 @@ import ProgramacaoDublagem from './entities/programacaoDublagem.entity'
 import DetalheProgramacaoDublagem from './entities/detalheProgramacaoDublagem.entity'
 import { Usuario } from './entities/sistema/usuario.entity'
 import { UsuarioSessao } from './entities/sistema/usuarioSessao.entity'
-import DetalhePeca from './entities/detalhePecas.entity'
+import DetalhePeca from './entities/detalhePeca.entity'
 
 
 export const AppDataSource = new DataSource({

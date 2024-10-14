@@ -37,7 +37,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsFormatacao = new ClsFormatacao()
   const clsCrud = new ClsCrud()
-  const clsApi = new ClsApi()
 
   const ResetDados: DetalheProducaoDublagemInterface = {
     idDublagem: 0,
@@ -62,6 +61,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
+  const [rsDetalhePeca, setRsDetalhePeca] = useState<Array<DetalhePecaInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [detalheProducaoDublagem, setDetalheProducaoDublagem] = useState<DetalheProducaoDublagemInterface>(ResetDados)
 
@@ -96,14 +96,15 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     return retorno
   }
 
-  const onEditar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
+  // const onEditar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
 
-    setLocalState({ action: actionTypes.editando })
-    setDetalheProducaoDublagem(rs)
-    setOpen(true)
-  }
+  //   // setLocalState({ action: actionTypes.editando })
+  //   setDetalheProducaoDublagem(rs)
+  //   setOpen(true)
+  // }
 
   const onExcluir = (rs: DetalheProducaoDublagemInterface) => {
+
     let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
     rsMaster.detalheProducaoDublagens.forEach(det => {
       if (det.idDetalheProducaoDublagem !== rs.idDetalheProducaoDublagem) {
@@ -114,7 +115,13 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     AtualizaSomatorio(tmpDetalhe)
   }
 
-  const onCortar = (id: number) => {
+  const onCortar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
+
+    console.log('rs', rs)
+    console.log('indice', indice)
+
+    let tmpDetalhe: Array<DetalhePecaInterface> = rs.detalhePecas
+    setRsDetalhePeca(tmpDetalhe)
     setOpenMetros(true)
   }
   const btIncluir = () => {
@@ -123,7 +130,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       rsMaster.idPedido !== 0
     ) {
       setOpen(true)
-      // BuscarDados()
       setIndiceEdicao(-1)
       setDetalheProducaoDublagem(ResetDados)
       setLocalState({ action: actionTypes.incluindo })
@@ -142,7 +148,8 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const btCancelar = () => {
     setOpen(false)
     setErros({})
-    setDetalheProducaoDublagem(ResetDados)
+    setOpenMetros(false)
+    // setDetalheProducaoDublagem(ResetDados)
     setLocalState({ action: actionTypes.pesquisando })
   }
 
@@ -165,8 +172,10 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   }
 
   const btConfirmaInclusao = async () => {
+    console.log('peças', detalheProducaoDublagem)
 
     if (validarDados() && podeIncluirDetalhe()) {
+
 
       let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
       tmpDetalhe.push({
@@ -200,26 +209,31 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     }
   }
 
-  const btConfirmaAlteracao = () => {
+  // const btConfirmaAlteracao = () => {
 
-    if (validarDados() && podeIncluirDetalhe()) {
+  //   const indice = rsMaster.detalheProducaoDublagens.findIndex(
+  //     (v, i) => v.idDetalheProducaoDublagem === detalheProducaoDublagem.idDetalheProducaoDublagem
+  //   )
 
-      let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
-      tmpDetalhe[indiceEdicao] = {
-        ...detalheProducaoDublagem,
-        produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheProducaoDublagem.idProduto)] },
-      }
+  //   console.log(indice)
 
-      setRsMaster({
-        ...rsMaster,
-        detalheProducaoDublagens: [...tmpDetalhe]
-      })
-      setLocalState({ action: actionTypes.pesquisando })
-      setDetalheProducaoDublagem(ResetDados)
-      setOpen(false)
-      AtualizaSomatorio(tmpDetalhe)
-    }
-  }
+  //   let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
+  //   tmpDetalhe[indice] = {
+  //     ...detalheProducaoDublagem,
+  //     detalhePecas: detalheProducaoDublagem.detalhePecas,
+  //     produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheProducaoDublagem.idProduto)] },
+  //   }
+
+  //   setRsMaster({
+  //     ...rsMaster,
+  //     detalheProducaoDublagens: [...tmpDetalhe]
+  //   })
+  //   setLocalState({ action: actionTypes.pesquisando })
+  //   setDetalheProducaoDublagem(ResetDados)
+  //   setOpen(false)
+  //   setOpenMetros(false)
+  //   AtualizaSomatorio(tmpDetalhe)
+  // }
 
   const btFechar = () => {
     setOpenMetros(false)
@@ -292,72 +306,45 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
             </Typography>
           </Grid>
         </Paper>
-        <Condicional condicao={localState.action !== 'pesquisando'}>
-          <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-            <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
-                <ComboBox
-                  opcoes={rsProduto}
-                  campoDescricao="nome"
-                  campoID="idProduto"
-                  dados={detalheProducaoDublagem}
-                  mensagemPadraoCampoEmBranco="Escolha um produto"
-                  field="idProduto"
-                  label=""
-                  labelAlign='center'
-                  textAlign='center'
-                  erros={erros}
-                  setState={setDetalheProducaoDublagem}
-                  disabled={['excluindo'].includes(localState.action) ? true : false}
-                // onFocus={(e) => e.target.select()}
-
-                // onFocus={() => btPesquisarItem(producaoDublagem.idPedido)}
-                // onSelect={() => btPesquisarQtd(producaoDublagem.idProduto)}
-                />
-              </Grid>
-              {/* <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={2}
-                  label="Metros"
-                  dados={detalheProducaoDublagem}
-                  field="metros"
-                  setState={setDetalheProducaoDublagem}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  textAlign='center'
-                  labelAlign='center'
-                />
-              </Grid> */}
-              <Condicional condicao={localState.action !== 'pesquisando'}>
-                <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-                  <Tooltip title={'Cancelar'}>
-                    <IconButton
-                      color="secondary"
-                      sx={{ mt: 3, ml: 2 }}
-                      onClick={() => btCancelar()}
-                    >
-                      <CancelRoundedIcon sx={{ fontSize: 50 }} />
-                    </IconButton>
-                  </Tooltip>
-                  <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                    <Tooltip title={'Confirmar'}>
-                      <IconButton
-                        color="secondary"
-                        sx={{ mt: 3, ml: 2 }}
-                        onClick={localState.action === actionTypes.incluindo ?
-                          () => btConfirmaInclusao() : () => btConfirmaAlteracao()}
-                      >
-                        <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Condicional>
-                </Grid>
-              </Condicional>
+        <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+              <ComboBox
+                opcoes={rsProduto}
+                campoDescricao="nome"
+                campoID="idProduto"
+                dados={detalheProducaoDublagem}
+                mensagemPadraoCampoEmBranco="Escolha um produto"
+                field="idProduto"
+                label=""
+                labelAlign='center'
+                textAlign='center'
+                erros={erros}
+                setState={setDetalheProducaoDublagem}
+              />
             </Grid>
-          </Paper >
-        </Condicional>
+            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+              <Tooltip title={'Cancelar'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: 2 }}
+                  onClick={() => btCancelar()}
+                >
+                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={'Confirmar'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: 2 }}
+                  onClick={() => btConfirmaInclusao()}
+                >
+                  <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Paper >
       </Dialog >
       <Dialog
         open={openMetros}
@@ -372,28 +359,49 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
             p: 1.5,
             backgroundColor: '#3c486b'
           }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', ml: 15 }}>
+          <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: 'white' }}>
               Peças Cortadas
             </Typography>
           </Grid>
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          {/* <Grid item xs={12} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon sx={{ color: 'white', fontSize: 30 }} />
             </IconButton>
-          </Grid>
+          </Grid> */}
         </Paper>
         <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
               <DetalhePeca
-                rsMaster={detalheProducaoDublagem}
-                setRsMaster={setDetalheProducaoDublagem}
-                masterLocalState={localState}
+                indiceMaster={0}
+                rsMaster={rsDetalhePeca}
+                setRsMaster={setRsDetalhePeca}
+                masterLocalState={masterLocalState}
                 setRsSomatorio={setRsSomatorio}
                 setOpenMetros={setOpenMetros}
               />
             </Grid>
+          </Grid>
+          <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+            <Tooltip title={'Cancelar'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: 3, ml: 2 }}
+                onClick={() => btCancelar()}
+              >
+                <CancelRoundedIcon sx={{ fontSize: 50 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={'Confirmar'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: 3, ml: 2 }}
+                onClick={() => btConfirmaInclusao()}
+              >
+                <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Paper >
       </Dialog >
@@ -417,12 +425,12 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
             dados={rsMaster.detalheProducaoDublagens}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
               [
-                {
-                  icone: "edit",
-                  onAcionador: (rs: DetalheProducaoDublagemInterface, indice: number) =>
-                    onEditar(rs, indice),
-                  toolTip: "Editar",
-                },
+                // {
+                //   icone: "edit",
+                //   onAcionador: (rs: DetalheProducaoDublagemInterface, indice: number) =>
+                //     onEditar(rs, indice),
+                //   toolTip: "Editar",
+                // },
                 {
                   icone: "delete",
                   onAcionador: (rs: DetalheProducaoDublagemInterface) =>
@@ -431,8 +439,8 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
                 },
                 {
                   icone: "content_cut_two_tone_icon",
-                  onAcionador: (rs: DetalheProducaoDublagemInterface) =>
-                    onCortar(rs.idDetalheProducaoDublagem as number),
+                  onAcionador: (rs: DetalheProducaoDublagemInterface, indice: number) =>
+                    onCortar(rs, indice),
                   toolTip: "Cortar",
                 },
               ]}

@@ -19,19 +19,19 @@ import ComboBox from '../../Componentes/ComboBox';
 
 
 interface PropsInterface {
-  rsMaster: DetalheProducaoDublagemInterface
-  setRsMaster: React.Dispatch<React.SetStateAction<DetalheProducaoDublagemInterface>>,
+  indiceMaster: number
+  rsMaster: Array<DetalhePecaInterface>
+  setRsMaster: React.Dispatch<React.SetStateAction<DetalhePecaInterface[]>>,
   masterLocalState: ActionInterface,
   setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioProducaoDublagemInterface>>,
   setOpenMetros: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio, setOpenMetros }: PropsInterface) {
+export default function DetalhePeca({ indiceMaster, rsMaster, setRsMaster, masterLocalState, setRsSomatorio, setOpenMetros }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsFormatacao = new ClsFormatacao()
-  const clsCrud = new ClsCrud()
 
   const ResetDados: DetalhePecaInterface = {
     idDetalheProducaoDublagem: null,
@@ -69,16 +69,17 @@ export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, s
     setOpen(true)
   }
 
-  const onExcluir = (rs: DetalhePecaInterface) => {
+  const onExcluir = (rs: DetalhePecaInterface, indice: number) => {
+
     let tmpDetalhe: Array<DetalhePecaInterface> = []
 
-    rsMaster.detalhePecas.forEach(det => {
-      if (det.idDetalhePeca !== rs.idDetalhePeca) {
+    rsMaster.forEach((det, i) => {
+      if (i !== indice) {
         tmpDetalhe.push(det)
       }
     })
-    setRsMaster({ ...rsMaster, detalhePecas: tmpDetalhe })
-    //AtualizaSomatorio(tmpDetalhe)
+    setRsMaster(tmpDetalhe)
+    AtualizaSomatorio(tmpDetalhe)
   }
 
   const btIncluir = () => {
@@ -99,24 +100,14 @@ export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, s
 
     if (validarDados()) {
 
-      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster.detalhePecas]
+      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster]
       tmpDetalhe.push({
-        idDetalheProducaoDublagem: rsMaster.idDetalheProducaoDublagem as number,
+        idDetalheProducaoDublagem: 0,
         metros: detalhePeca.metros,
       })
 
-      setRsMaster({
-        ...rsMaster, detalhePecas:
-          [
-            ...rsMaster.detalhePecas,
-
-            {
-              idDetalheProducaoDublagem: rsMaster.idDetalheProducaoDublagem as number,
-              metros: detalhePeca.metros,
-            }
-          ]
-      })
-      //AtualizaSomatorio(tmpDetalhe)
+      setRsMaster(tmpDetalhe)
+      AtualizaSomatorio(tmpDetalhe)
       setLocalState({ action: actionTypes.pesquisando })
       setDetalhePeca(ResetDados)
       setOpen(false)
@@ -124,40 +115,37 @@ export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, s
   }
 
   const btConfirmaAlteracao = () => {
-
     if (validarDados()) {
 
-      const indice = rsMaster.detalhePecas.findIndex(
+      const indice = rsMaster.findIndex(
         (v, i) => v.idDetalhePeca === detalhePeca.idDetalhePeca
       )
 
-      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster.detalhePecas]
+      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster]
       tmpDetalhe[indice] = {
         ...detalhePeca,
       }
 
-      setRsMaster({
-        ...rsMaster,
-        detalhePecas: [...tmpDetalhe]
-      })
+      setRsMaster(tmpDetalhe)
       setLocalState({ action: actionTypes.pesquisando })
       setDetalhePeca(ResetDados)
       setOpen(false)
-      //AtualizaSomatorio(tmpDetalhe)
+      AtualizaSomatorio(tmpDetalhe)
     }
   }
 
-  const AtualizaSomatorio = (rs: Array<DetalheProducaoDublagemInterface>) => {
+  const AtualizaSomatorio = (rs: Array<DetalhePecaInterface>) => {
 
-    // let total: number = 0
+    let total: number = 0
 
-    // if (rs) {
-    //   rs.forEach((detalhe) => {
-    //     total = total + detalhe.metros
-    //   })
-    //   setRsSomatorio({ total: total.toString() })
-    // }
+    if (rs) {
+      rs.forEach((detalhe) => {
+        total = total + detalhe.metros
+      })
+      setRsSomatorio({ total: total.toString() })
+    }
   }
+
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
@@ -182,56 +170,53 @@ export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, s
             </Typography>
           </Grid>
         </Paper>
-        <Condicional condicao={localState.action !== 'pesquisando'}>
-          <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
-            <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-                <InputText
-                  tipo='currency'
-                  scale={2}
-                  label="Metros"
-                  dados={detalhePeca}
-                  field="metros"
-                  setState={setDetalhePeca}
-                  disabled={localState.action === 'excluindo' ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  textAlign='center'
-                  labelAlign='center'
-                />
-              </Grid>
-              <Condicional condicao={localState.action !== 'pesquisando'}>
-                <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-                  <Tooltip title={'Cancelar'}>
+        <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                tipo='currency'
+                scale={2}
+                label="Metros"
+                dados={detalhePeca}
+                field="metros"
+                setState={setDetalhePeca}
+                erros={erros}
+                onFocus={(e) => e.target.select()}
+                textAlign='center'
+                labelAlign='center'
+              />
+            </Grid>
+            <Condicional condicao={localState.action !== 'pesquisando'}>
+              <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+                <Tooltip title={'Cancelar'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 3, ml: 2 }}
+                    onClick={() => btCancelar()}
+                  >
+                    <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                  </IconButton>
+                </Tooltip>
+                <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+                  <Tooltip title={'Confirmar'}>
                     <IconButton
                       color="secondary"
                       sx={{ mt: 3, ml: 2 }}
-                      onClick={() => btCancelar()}
+                      onClick={localState.action === actionTypes.incluindo ?
+                        () => btConfirmaInclusao() : () => btConfirmaAlteracao()}
                     >
-                      <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                      <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
                     </IconButton>
                   </Tooltip>
-                  <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                    <Tooltip title={'Confirmar'}>
-                      <IconButton
-                        color="secondary"
-                        sx={{ mt: 3, ml: 2 }}
-                        onClick={localState.action === actionTypes.incluindo ?
-                          () => btConfirmaInclusao() : () => btConfirmaAlteracao()}
-                      >
-                        <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
-                      </IconButton>
-                    </Tooltip>
-                  </Condicional>
-                </Grid>
-              </Condicional>
-            </Grid>
-          </Paper >
-        </Condicional>
+                </Condicional>
+              </Grid>
+            </Condicional>
+          </Grid>
+        </Paper >
       </Dialog >
       <Paper sx={{ m: 0, p: 1 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
-          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+          <Condicional condicao={localState.action !== actionTypes.excluindo}>
             <Tooltip title={'Incluir'}>
               <IconButton
                 color="secondary"
@@ -245,8 +230,10 @@ export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, s
         </Grid>
         <Grid item xs={12}>
           <DataTable
+            colunaSoma={['metros']}
+            temTotal={true}
             cabecalho={cabecalhoForm}
-            dados={rsMaster.detalhePecas}
+            dados={rsMaster}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
               [
                 {
@@ -257,8 +244,8 @@ export default function DetalhePeca({ rsMaster, setRsMaster, masterLocalState, s
                 },
                 {
                   icone: "delete",
-                  onAcionador: (rs: DetalhePecaInterface) =>
-                    onExcluir(rs),
+                  onAcionador: (rs: DetalhePecaInterface, indice: number) =>
+                    onExcluir(rs, indice),
                   toolTip: "Excluir",
                 },
               ]}

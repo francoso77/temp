@@ -529,27 +529,6 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            {/* <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-                <ComboBox
-                  opcoes={rsProduto}
-                  campoDescricao="nome"
-                  campoID="idProduto"
-                  dados={producaoDublagem}
-                  mensagemPadraoCampoEmBranco="Escolha um item"
-                  field="idProduto"
-                  label="Item do Pedido"
-                  labelAlign='center'
-                  textAlign='center'
-                  erros={erros}
-                  setState={setProducaoDublagem}
-                  disabled={['editando', 'excluindo'].includes(localState.action) ? true : false}
-                  onFocus={() => btPesquisarItem(producaoDublagem.idPedido)}
-                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
-                  onSelect={() => btPesquisarQtd(producaoDublagem.idProduto)}
-                />
-              </Box>
-            </Grid> */}
             <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var producaoDublagem_entity_1 = require("./producaoDublagem.entity");
 var produto_entity_1 = require("./produto.entity");
-var detalhePecas_entity_1 = require("./detalhePecas.entity");
+var detalhePeca_entity_1 = require("./detalhePeca.entity");
 var DetalheProducaoDublagem = /** @class */ (function () {
     function DetalheProducaoDublagem() {
     }
@@ -52,7 +52,7 @@ var DetalheProducaoDublagem = /** @class */ (function () {
     ], DetalheProducaoDublagem.prototype, "producaoDublagem", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idDetalheProducaoDublagem' }),
-        (0, typeorm_1.OneToMany)(function () { return detalhePecas_entity_1.default; }, function (detalhePeca) { return detalhePeca.detalheProducaoDublagem; }, { cascade: true }),
+        (0, typeorm_1.OneToMany)(function () { return detalhePeca_entity_1.default; }, function (detalhePeca) { return detalhePeca.detalheProducaoDublagem; }, { cascade: true }),
         __metadata("design:type", Array)
     ], DetalheProducaoDublagem.prototype, "detalhePecas", void 0);
     __decorate([

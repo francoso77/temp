@@ -2,7 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDa
 import ProducaoDublagem from './producaoDublagem.entity';
 import { DetalheProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
 import Produto from './produto.entity';
-import DetalhePeca from './detalhePecas.entity';
+import DetalhePeca from './detalhePeca.entity';
 
 @Entity({ name: 'detalheproducaodublagens' })
 export default class DetalheProducaoDublagem implements DetalheProducaoDublagemInterface {
