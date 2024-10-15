@@ -24,11 +24,54 @@ import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoI
 import DetalheProducaoDubalgem from './DetalheProducaoDubalgem';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
+import { TipoProdutoType } from '../../types/tipoProdutoypes';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
 }
 
+// {
+//   "entidade": "ProducaoDublagem",
+//     "criterio": {
+//     "dataProducao": "2024-10-15",
+//       "tipoColagem": 1,
+//         "idPedido": 13,
+//           "detalheProducaoDublagens": [
+//             {
+//               "idDublagem": null,
+//               "idProduto": 18,
+//               "metrosTotal": 1000,
+//               "pecasTotal": 22,
+//               "produto": {
+//                 "idProduto": 18,
+//                 "nome": "NYLON RODEIO PTO D40/3 TNT 120",
+//                 "idUnidade": 2,
+//                 "localizacao": "",
+//                 "largura": 1.45,
+//                 "gm2": 0,
+//                 "ativo": 1,
+//                 "tipoProduto": 7
+//               },
+//               "detalhePecas": [
+//                 {
+//                   "idDetalheProducaoDublagem": null,
+//                   "metros": 40
+//                 },
+//                 {
+
+//                   "idDetalheProducaoDublagem": null,
+//                   "metros": 41
+//                 },
+//                 {
+
+//                   "idDetalheProducaoDublagem": null,
+//                   "metros": 42
+//                 }
+//               ]
+//             }
+//           ]
+//   }
+// }
 export default function ProducaoDublagem() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -40,7 +83,24 @@ export default function ProducaoDublagem() {
     dataProducao: '',
     tipoColagem: TipoColagemType.cola,
     idPedido: 0,
-    detalheProducaoDublagens: []
+    detalheProducaoDublagens: [
+      {
+        idDublagem: 0,
+        idProduto: 0,
+        metrosTotal: 0,
+        pecasTotal: 0,
+        produto: {
+          nome: '',
+          idUnidade: 0,
+          localizacao: '',
+          largura: 0,
+          gm2: 0,
+          ativo: false,
+          tipoProduto: TipoProdutoType.tecidoTinto
+        },
+        detalhePecas: [{ idDetalheProducaoDublagem: 0, metros: 0 }]
+      }
+    ]
   }
 
   interface PesquisaInterface {
