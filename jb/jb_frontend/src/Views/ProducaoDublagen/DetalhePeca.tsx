@@ -10,7 +10,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProducaoDublagemInterface, DetalhePecaInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { DetalheProducaoDublagemInterface, DetalhePecaInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
 import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
@@ -19,16 +19,16 @@ import ComboBox from '../../Componentes/ComboBox';
 
 
 interface PropsInterface {
-  indiceMaster: number
-  rsMaster: Array<DetalhePecaInterface>
-  setRsMaster: React.Dispatch<React.SetStateAction<DetalhePecaInterface[]>>,
+  indiceEdicao: number
+  rsMaster: ProducaoDublagemInterface
+  setRsMaster: React.Dispatch<React.SetStateAction<ProducaoDublagemInterface>>,
   masterLocalState: ActionInterface,
   setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioProducaoDublagemInterface>>,
   setOpenMetros: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-export default function DetalhePeca({ indiceMaster, rsMaster, setRsMaster, masterLocalState, setRsSomatorio, setOpenMetros }: PropsInterface) {
+export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, masterLocalState, setRsSomatorio, setOpenMetros }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsFormatacao = new ClsFormatacao()
@@ -73,18 +73,23 @@ export default function DetalhePeca({ indiceMaster, rsMaster, setRsMaster, maste
 
     let tmpDetalhe: Array<DetalhePecaInterface> = []
 
-    rsMaster.forEach((det, i) => {
+    rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.forEach((det, i) => {
       if (i !== indice) {
         tmpDetalhe.push(det)
       }
     })
-    setRsMaster(tmpDetalhe)
-    AtualizaSomatorio(tmpDetalhe)
+    setRsMaster({
+      ...rsMaster,
+      detalheProducaoDublagens: rsMaster.detalheProducaoDublagens.map((item, index) =>
+        index === indiceEdicao
+          ? { ...item, detalhePecas: tmpDetalhe }
+          : item
+      )
+    })
   }
 
   const btIncluir = () => {
     setOpen(true)
-    // BuscarDados()
     setDetalhePeca(ResetDados)
     setLocalState({ action: actionTypes.incluindo })
   }
@@ -100,16 +105,23 @@ export default function DetalhePeca({ indiceMaster, rsMaster, setRsMaster, maste
 
     if (validarDados()) {
 
-      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster]
+      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas]
+
       tmpDetalhe.push({
-        idDetalheProducaoDublagem: 0,
+        idDetalheProducaoDublagem: rsMaster.detalheProducaoDublagens[indiceEdicao].idDetalheProducaoDublagem as number,
         metros: detalhePeca.metros,
       })
 
-      setRsMaster(tmpDetalhe)
-      AtualizaSomatorio(tmpDetalhe)
+      setRsMaster({
+        ...rsMaster,
+        detalheProducaoDublagens: rsMaster.detalheProducaoDublagens.map((item, index) =>
+          index === indiceEdicao
+            ? { ...item, detalhePecas: tmpDetalhe }
+            : item
+        )
+      })
+
       setLocalState({ action: actionTypes.pesquisando })
-      setDetalhePeca(ResetDados)
       setOpen(false)
     }
   }
@@ -117,32 +129,26 @@ export default function DetalhePeca({ indiceMaster, rsMaster, setRsMaster, maste
   const btConfirmaAlteracao = () => {
     if (validarDados()) {
 
-      const indice = rsMaster.findIndex(
+      const indice = rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.findIndex(
         (v, i) => v.idDetalhePeca === detalhePeca.idDetalhePeca
       )
 
-      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster]
+      let tmpDetalhe: Array<DetalhePecaInterface> = [...rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas]
       tmpDetalhe[indice] = {
         ...detalhePeca,
       }
 
-      setRsMaster(tmpDetalhe)
+      setRsMaster({
+        ...rsMaster,
+        detalheProducaoDublagens: rsMaster.detalheProducaoDublagens.map((item, index) =>
+          index === indiceEdicao
+            ? { ...item, detalhePecas: tmpDetalhe }
+            : item
+        )
+      })
       setLocalState({ action: actionTypes.pesquisando })
       setDetalhePeca(ResetDados)
       setOpen(false)
-      AtualizaSomatorio(tmpDetalhe)
-    }
-  }
-
-  const AtualizaSomatorio = (rs: Array<DetalhePecaInterface>) => {
-
-    let total: number = 0
-
-    if (rs) {
-      rs.forEach((detalhe) => {
-        total = total + detalhe.metros
-      })
-      setRsSomatorio({ total: total.toString() })
     }
   }
 
@@ -233,7 +239,7 @@ export default function DetalhePeca({ indiceMaster, rsMaster, setRsMaster, maste
             colunaSoma={['metros']}
             temTotal={true}
             cabecalho={cabecalhoForm}
-            dados={rsMaster}
+            dados={rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
               [
                 {

@@ -61,7 +61,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
-  const [rsDetalhePeca, setRsDetalhePeca] = useState<Array<DetalhePecaInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [detalheProducaoDublagem, setDetalheProducaoDublagem] = useState<DetalheProducaoDublagemInterface>(ResetDados)
 
@@ -107,7 +106,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
     let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
     rsMaster.detalheProducaoDublagens.forEach(det => {
-      if (det.idDetalheProducaoDublagem !== rs.idDetalheProducaoDublagem) {
+      if (det.idProduto !== rs.idProduto) {
         tmpDetalhe.push(det)
       }
     })
@@ -117,11 +116,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
   const onCortar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
 
-    console.log('rs', rs)
-    console.log('indice', indice)
-
-    let tmpDetalhe: Array<DetalhePecaInterface> = rs.detalhePecas
-    setRsDetalhePeca(tmpDetalhe)
+    setIndiceEdicao(indice)
     setOpenMetros(true)
   }
   const btIncluir = () => {
@@ -172,10 +167,8 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   }
 
   const btConfirmaInclusao = async () => {
-    console.log('peças', detalheProducaoDublagem)
 
     if (validarDados() && podeIncluirDetalhe()) {
-
 
       let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
       tmpDetalhe.push({
@@ -188,69 +181,63 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       })
 
       setRsMaster({
-        ...rsMaster, detalheProducaoDublagens:
-          [
-            ...rsMaster.detalheProducaoDublagens,
-
-            {
-              idDublagem: rsMaster.idDublagem as number,
-              idProduto: detalheProducaoDublagem.idProduto,
-              metrosTotal: detalheProducaoDublagem.metrosTotal,
-              pecasTotal: detalheProducaoDublagem.pecasTotal,
-              produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheProducaoDublagem.idProduto)] },
-              detalhePecas: detalheProducaoDublagem.detalhePecas,
-            }
-          ]
+        ...rsMaster,
+        detalheProducaoDublagens: tmpDetalhe,
       })
+
       AtualizaSomatorio(tmpDetalhe)
-      setLocalState({ action: actionTypes.pesquisando })
-      setDetalheProducaoDublagem(ResetDados)
-      setOpen(false)
+    }
+    setLocalState({ action: actionTypes.pesquisando })
+    setOpen(false)
+    setOpenMetros(false)
+  }
+
+  const btConfirmaAlteracao = () => {
+
+    let pecasTotal = rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.length
+    let metrosTotal = rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.reduce((a, b) => a + b.metros, 0)
+    let produto = { ...rsProduto[rsProduto.findIndex(v => v.idProduto === rsMaster.detalheProducaoDublagens[indiceEdicao].idProduto)] }
+    let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
+
+    tmpDetalhe[indiceEdicao] = {
+      ...detalheProducaoDublagem,
+      detalhePecas: rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas,
+      idProduto: rsMaster.detalheProducaoDublagens[indiceEdicao].idProduto,
+      pecasTotal: pecasTotal,
+      metrosTotal: metrosTotal,
+      produto: produto,
+    }
+
+    setRsMaster({
+      ...rsMaster,
+      detalheProducaoDublagens: [...tmpDetalhe]
+    })
+    setLocalState({ action: actionTypes.pesquisando })
+    // setDetalheProducaoDublagem(ResetDados)
+    setOpen(false)
+    setOpenMetros(false)
+    AtualizaSomatorio(tmpDetalhe)
+  }
+
+
+  const AtualizaSomatorio = (rs: Array<DetalheProducaoDublagemInterface>) => {
+
+    let total: number = 0
+
+    if (rs) {
+      rs.forEach((detalhe) => {
+
+        detalhe.detalhePecas.forEach((peca) => {
+
+          total = total + peca.metros
+        })
+      })
+      setRsSomatorio({ total: total.toString() })
     }
   }
 
-  // const btConfirmaAlteracao = () => {
-
-  //   const indice = rsMaster.detalheProducaoDublagens.findIndex(
-  //     (v, i) => v.idDetalheProducaoDublagem === detalheProducaoDublagem.idDetalheProducaoDublagem
-  //   )
-
-  //   console.log(indice)
-
-  //   let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
-  //   tmpDetalhe[indice] = {
-  //     ...detalheProducaoDublagem,
-  //     detalhePecas: detalheProducaoDublagem.detalhePecas,
-  //     produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheProducaoDublagem.idProduto)] },
-  //   }
-
-  //   setRsMaster({
-  //     ...rsMaster,
-  //     detalheProducaoDublagens: [...tmpDetalhe]
-  //   })
-  //   setLocalState({ action: actionTypes.pesquisando })
-  //   setDetalheProducaoDublagem(ResetDados)
-  //   setOpen(false)
-  //   setOpenMetros(false)
-  //   AtualizaSomatorio(tmpDetalhe)
-  // }
-
-  const btFechar = () => {
-    setOpenMetros(false)
-  }
-  const AtualizaSomatorio = (rs: Array<DetalheProducaoDublagemInterface>) => {
-
-    // let total: number = 0
-
-    // if (rs) {
-    //   rs.forEach((detalhe) => {
-    //     total = total + detalhe.metros
-    //   })
-    //   setRsSomatorio({ total: total.toString() })
-    // }
-  }
-
   const buscarDados = () => {
+
     clsCrud
       .pesquisar({
         entidade: "DetalhePedido",
@@ -374,9 +361,9 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
               <DetalhePeca
-                indiceMaster={0}
-                rsMaster={rsDetalhePeca}
-                setRsMaster={setRsDetalhePeca}
+                indiceEdicao={indiceEdicao}
+                rsMaster={rsMaster}
+                setRsMaster={setRsMaster}
                 masterLocalState={masterLocalState}
                 setRsSomatorio={setRsSomatorio}
                 setOpenMetros={setOpenMetros}
@@ -397,7 +384,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
               <IconButton
                 color="secondary"
                 sx={{ mt: 3, ml: 2 }}
-                onClick={() => btConfirmaInclusao()}
+                onClick={() => btConfirmaAlteracao()}
               >
                 <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
               </IconButton>

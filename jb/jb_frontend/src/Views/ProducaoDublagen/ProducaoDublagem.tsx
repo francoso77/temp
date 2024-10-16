@@ -83,24 +83,7 @@ export default function ProducaoDublagem() {
     dataProducao: '',
     tipoColagem: TipoColagemType.cola,
     idPedido: 0,
-    detalheProducaoDublagens: [
-      {
-        idDublagem: 0,
-        idProduto: 0,
-        metrosTotal: 0,
-        pecasTotal: 0,
-        produto: {
-          nome: '',
-          idUnidade: 0,
-          localizacao: '',
-          largura: 0,
-          gm2: 0,
-          ativo: false,
-          tipoProduto: TipoProdutoType.tecidoTinto
-        },
-        detalhePecas: [{ idDetalheProducaoDublagem: 0, metros: 0 }]
-      }
-    ]
+    detalheProducaoDublagens: []
   }
 
   interface PesquisaInterface {
@@ -159,10 +142,11 @@ export default function ProducaoDublagem() {
       .pesquisar({
         entidade: "ProducaoDublagem",
         relations: [
-          "detalheProducaoDublagens"
+          "detalheProducaoDublagens",
+          "detalheProducaoDublagens.detalhePecas",
         ],
         criterio: {
-          idDublagem: id,
+          idPedido: id,
         },
       })
       .then((rs: Array<ProducaoDublagemInterface>) => {
@@ -174,16 +158,17 @@ export default function ProducaoDublagem() {
       })
   }
 
-  const onEditar = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
+  const onEditar = (pedido: number) => {
+    pesquisarID(pedido).then((rs) => {
       setProducaoDublagem(rs)
       AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
     })
+    btPesquisarQtd(pedido)
   }
 
-  const onExcluir = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
+  const onExcluir = (pedido: number) => {
+    pesquisarID(pedido).then((rs) => {
       setProducaoDublagem(rs)
       AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
@@ -225,17 +210,18 @@ export default function ProducaoDublagem() {
 
   const AtualizaSomatorio = (rs: ProducaoDublagemInterface) => {
 
-    // let total: number = 0
+    let total: number = 0
 
-    // if (rs.detalheProducaoDublagens) {
-    //   rs.detalheProducaoDublagens.forEach((detalhe) => {
-    //     total = total + detalhe.metros
-    //   })
-    //   setRsSomatorio({ total: total.toString() })
-    // }
+    let tmpDetalhe = rs.detalheProducaoDublagens
 
-    // btPesquisarQtd(rs.idProduto)
-
+    if (tmpDetalhe) {
+      tmpDetalhe.forEach((detalhe) => {
+        detalhe.detalhePecas.forEach((peca) => {
+          total = total + peca.metros
+        })
+      })
+      setRsSomatorio({ total: total.toString() })
+    }
   }
 
   const pesquisarPedidoItem = async (pedido: number, produto: number): Promise<DetalhePedidoInterface | null> => {
@@ -400,7 +386,7 @@ export default function ProducaoDublagem() {
       mensagem: 'Pesquisando produção dublagem ...',
       setMensagemState: setMensagemState
     })
-      .then((rs) => {
+      .then((rs: Array<ProducaoDublagemInterface>) => {
         setRsPesquisa(rs)
       })
   }
@@ -534,14 +520,14 @@ export default function ProducaoDublagem() {
                 acoes={[
                   {
                     icone: "edit",
-                    onAcionador: (rs: ProducaoDublagemInterface) =>
-                      onEditar(rs.idDublagem as number),
+                    onAcionador: (rs: any) =>
+                      onEditar(rs.pedido),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: ProducaoDublagemInterface) =>
-                      onExcluir(rs.idDublagem as number),
+                    onAcionador: (rs: any) =>
+                      onExcluir(rs.pedido),
                     toolTip: "Excluir",
                   },
                 ]}
@@ -627,7 +613,7 @@ export default function ProducaoDublagem() {
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Qtd Cortado"
+                label="Qtd Cortada"
                 labelAlign='center'
                 dados={rsSomatorio}
                 field="total"
