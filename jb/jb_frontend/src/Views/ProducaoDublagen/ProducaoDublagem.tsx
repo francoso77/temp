@@ -22,7 +22,7 @@ import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes'
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDubalgem';
-import { StatusPedidoType } from '../../types/statusPedidoTypes';
+import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 
@@ -130,6 +130,18 @@ export default function ProducaoDublagem() {
       // format: (_v, rs: any) => rs.cliente.nome
     },
     {
+      cabecalho: 'Status Pedido',
+      alinhamento: 'center',
+      campo: 'statusPedido',
+      format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rs.statusPedido)?.descricao
+    },
+    {
+      cabecalho: 'Metros Pedido',
+      alinhamento: 'right',
+      campo: 'metrosPedido',
+      format: (v) => clsFormatacao.currency(v)
+    },
+    {
       cabecalho: 'Metros Cortados',
       alinhamento: 'right',
       campo: 'metros',
@@ -175,14 +187,6 @@ export default function ProducaoDublagem() {
     })
   }
 
-  useEffect(() => {
-    if (producaoDublagem) {
-      if (localState.action === actionTypes.excluindo || localState.action === actionTypes.editando) {
-        alterarStatusItem('Excluir');
-      }
-    }
-  }, [producaoDublagem])
-
   const btIncluir = () => {
     setRsSomatorio({ total: '0' })
     setRsQtdPedida({ total: '0' })
@@ -203,6 +207,7 @@ export default function ProducaoDublagem() {
     retorno = validaCampo.eData('dataProducao', producaoDublagem, erros, retorno)
     retorno = validaCampo.naoVazio('idPedido', producaoDublagem, erros, retorno, 'Informe o pedido')
     retorno = validaCampo.naoVazio('tipoColagem', producaoDublagem, erros, retorno, 'Qual o tipo de colagem?')
+    retorno = producaoDublagem.detalheProducaoDublagens.length > 0 ? true : false
 
     setErros(erros)
     return retorno
@@ -223,100 +228,39 @@ export default function ProducaoDublagem() {
       setRsSomatorio({ total: total.toString() })
     }
   }
+  const verificaStatusPedido = async (pedido: number) => {
 
-  const pesquisarPedidoItem = async (pedido: number, produto: number): Promise<DetalhePedidoInterface | null> => {
-    return await clsCrud
-      .pesquisar({
-        entidade: "DetalhePedido",
+    let status: StatusPedidoType = StatusPedidoType.finalizado
+    try {
+      const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
+        entidade: "Pedido",
+        relations: ["detalhePedidos"],
         criterio: {
-          idPedido: pedido,
-          idProduto: produto,
-        },
+          idPedido: pedido
+        }
       })
-      .then((rs: Array<DetalhePedidoInterface>) => {
 
-        if (rs.length > 0) {
-          return rs[0]
+      if (rsPedido.length > 0) {
+        let tmpPedido: PedidoInterface = rsPedido[0]
+        let tmpDetalhe: Array<DetalhePedidoInterface> = tmpPedido.detalhePedidos
+
+        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem !== StatusPedidoItemType.finalizado)
+
+        if (temPedidoAberto > 0) {
+
+          tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao }
         } else {
-          return null
-        }
-      })
-  }
+          tmpPedido = { ...tmpPedido, statusPedido: status }
 
-  const verificaStatusPedido = async (pedido: number, tipo: "Incluir" | "Excluir") => {
-    await clsCrud.pesquisar({
-      entidade: "Pedido",
-      relations: [
-        "detalhePedidos",
-      ],
-      criterio: {
-        idPedido: pedido
+        }
+        await clsCrud.incluir({
+          entidade: "Pedido",
+          criterio: tmpPedido,
+        })
       }
-    })
-      .then((ped: Array<PedidoInterface>) => {
-
-        if (ped.length > 0) {
-          let tmpPedido: PedidoInterface = ped[0]
-          let tmpDetalhe: Array<DetalhePedidoInterface> = ped[0].detalhePedidos
-          if (tipo === "Incluir") {
-
-            let temPedidoAberto = tmpDetalhe.findIndex((rs: any) => rs.statusItem !== StatusPedidoItemType.finalizado)
-
-            if (temPedidoAberto < 0) {
-
-              tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.finalizado }
-              clsCrud.incluir({
-                entidade: "Pedido",
-                criterio: tmpPedido,
-              })
-            }
-          } else {
-            tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao }
-            clsCrud.incluir({
-              entidade: "Pedido",
-              criterio: tmpPedido,
-            })
-          }
-        }
-      })
-  }
-
-  const alterarStatusItem = async (tp: "Incluir" | "Excluir") => {
-
-    // await pesquisarPedidoItem(producaoDublagem.idPedido, 0)
-    //   .then((rs: DetalhePedidoInterface | null) => {
-    //     let qtdAtendida: number = parseFloat(rsSomatorio.total) > 0 ? parseFloat(rsSomatorio.total) : 0
-    //     let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
-
-    //     if (rs) {
-
-    //       let tmpDetalhe: DetalhePedidoInterface = rs
-    //       if (tp === "Excluir") {
-    //         statusItem = StatusPedidoItemType.producao
-    //         qtdAtendida = 0
-    //       }
-
-    //       tmpDetalhe = { ...tmpDetalhe, qtdAtendida: qtdAtendida, statusItem: statusItem }
-
-    //       clsCrud.incluir({
-    //         entidade: "DetalhePedido",
-    //         criterio: tmpDetalhe,
-    //       }).then((rsPed) => {
-    //         if (!rsPed.ok) {
-    //           setMensagemState({
-    //             titulo: 'Erro...',
-    //             exibir: true,
-    //             mensagem: 'Status não foi atualizado - consulte o suporte',
-    //             tipo: MensagemTipo.Error,
-    //             exibirBotao: true,
-    //             cb: null,
-    //           })
-    //         }
-    //       })
-    //     }
-    //   })
-
-    // await verificaStatusPedido(producaoDublagem.idPedido, tp)
+    } catch (error) {
+      console.error("Erro ao verificar status do pedido:", error);
+    }
   }
 
   const btConfirmar = () => {
@@ -332,7 +276,7 @@ export default function ProducaoDublagem() {
           .then((rs) => {
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
-              alterarStatusItem("Incluir")
+              //verificaStatusPedido(producaoDublagem.idPedido)
             } else {
               setMensagemState({
                 titulo: 'Erro...',
@@ -345,6 +289,7 @@ export default function ProducaoDublagem() {
             }
           })
       } else if (localState.action === actionTypes.excluindo) {
+        //verificaStatusPedido(producaoDublagem.idPedido)
         clsCrud.excluir({
           entidade: "ProducaoDublagem",
           criterio: {
@@ -356,7 +301,6 @@ export default function ProducaoDublagem() {
           .then((rs) => {
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
-            } else {
               setMensagemState({
                 titulo: 'Erro...',
                 exibir: true,
@@ -368,6 +312,15 @@ export default function ProducaoDublagem() {
             }
           })
       }
+    } else {
+      setMensagemState({
+        titulo: 'Atenção...',
+        exibir: true,
+        mensagem: 'Informe os dados do pedido e adicione produtos!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
     }
   }
 

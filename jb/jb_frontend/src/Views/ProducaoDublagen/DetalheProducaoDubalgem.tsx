@@ -16,11 +16,10 @@ import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalhePedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import ComboBox from '../../Componentes/ComboBox';
-import ClsApi from '../../Utils/ClsApi';
 import DetalhePeca from './DetalhePeca';
-import CloseIcon from '@mui/icons-material/Close'
+import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 
 
 
@@ -59,7 +58,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const [open, setOpen] = useState(false)
   const [openMetros, setOpenMetros] = useState(false)
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [detalheProducaoDublagem, setDetalheProducaoDublagem] = useState<DetalheProducaoDublagemInterface>(ResetDados)
@@ -95,23 +93,21 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     return retorno
   }
 
-  // const onEditar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
+  const onExcluir = async (rs: DetalheProducaoDublagemInterface) => {
+    console.log(rs, 'clicou aqui')
 
-  //   // setLocalState({ action: actionTypes.editando })
-  //   setDetalheProducaoDublagem(rs)
-  //   setOpen(true)
-  // }
+    // let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
+    // rsMaster.detalheProducaoDublagens.forEach(det => {
 
-  const onExcluir = (rs: DetalheProducaoDublagemInterface) => {
+    //   if (det.idProduto !== rs.idProduto) {
+    //     tmpDetalhe.push(det)
+    //   }
+    // })
 
-    let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
-    rsMaster.detalheProducaoDublagens.forEach(det => {
-      if (det.idProduto !== rs.idProduto) {
-        tmpDetalhe.push(det)
-      }
-    })
-    setRsMaster({ ...rsMaster, detalheProducaoDublagens: tmpDetalhe })
-    AtualizaSomatorio(tmpDetalhe)
+    // setRsMaster({ ...rsMaster, detalheProducaoDublagens: tmpDetalhe })
+    // AtualizaSomatorio(tmpDetalhe)
+    // buscarDados()
+    //alterarStatusItem()
   }
 
   const onCortar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
@@ -127,7 +123,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       setOpen(true)
       setIndiceEdicao(-1)
       setDetalheProducaoDublagem(ResetDados)
-      setLocalState({ action: actionTypes.incluindo })
     } else {
       setMensagemState({
         titulo: 'Atenção',
@@ -144,8 +139,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     setOpen(false)
     setErros({})
     setOpenMetros(false)
-    // setDetalheProducaoDublagem(ResetDados)
-    setLocalState({ action: actionTypes.pesquisando })
   }
 
   const podeIncluirDetalhe = (): boolean => {
@@ -187,7 +180,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
       AtualizaSomatorio(tmpDetalhe)
     }
-    setLocalState({ action: actionTypes.pesquisando })
     setOpen(false)
     setOpenMetros(false)
   }
@@ -212,11 +204,80 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       ...rsMaster,
       detalheProducaoDublagens: [...tmpDetalhe]
     })
-    setLocalState({ action: actionTypes.pesquisando })
-    // setDetalheProducaoDublagem(ResetDados)
     setOpen(false)
     setOpenMetros(false)
     AtualizaSomatorio(tmpDetalhe)
+    alterarStatusItem()
+
+  }
+
+  const pesquisarPedidoItem = async (pedido: number): Promise<Array<DetalhePedidoInterface> | []> => {
+    return await clsCrud
+      .pesquisar({
+        entidade: "DetalhePedido",
+        criterio: {
+          idPedido: pedido,
+        },
+      })
+      .then((rs: Array<DetalhePedidoInterface>) => {
+
+        if (rs.length > 0) {
+          return rs
+        } else {
+          return []
+        }
+      })
+  }
+  const alterarStatusItem = async () => {
+    let qtdAtendida: number = 0
+    let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
+
+    try {
+      const rsDetalhePedidos = await pesquisarPedidoItem(rsMaster.idPedido)
+      let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsDetalhePedidos]
+
+      if (tmpDetalhe) {
+        tmpDetalhe.forEach((detalhe) => {
+          rsMaster.detalheProducaoDublagens.forEach((item) => {
+            if (detalhe.idProduto === item.idProduto) {
+              item.detalhePecas.forEach((peca) => {
+                qtdAtendida += peca.metros
+              })
+              if (qtdAtendida === 0) {
+                statusItem = StatusPedidoItemType.producao
+              } else {
+                statusItem = StatusPedidoItemType.finalizado
+              }
+            } else {
+              statusItem = StatusPedidoItemType.producao
+              qtdAtendida = 0
+            }
+          })
+
+          tmpDetalhe = [
+            ...tmpDetalhe,
+            { ...detalhe, statusItem: statusItem, qtdAtendida: qtdAtendida },
+          ]
+        })
+
+        const rsPed = await clsCrud.incluir({
+          entidade: "DetalhePedido",
+          criterio: tmpDetalhe,
+        })
+        if (!rsPed.ok) {
+          setMensagemState({
+            titulo: "Erro...",
+            exibir: true,
+            mensagem: "Status não foi atualizado - consulte o suporte",
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null,
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao alterar status do item:", error)
+    }
   }
 
 
@@ -412,12 +473,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
             dados={rsMaster.detalheProducaoDublagens}
             acoes={masterLocalState.action === actionTypes.excluindo ? [] :
               [
-                // {
-                //   icone: "edit",
-                //   onAcionador: (rs: DetalheProducaoDublagemInterface, indice: number) =>
-                //     onEditar(rs, indice),
-                //   toolTip: "Editar",
-                // },
                 {
                   icone: "delete",
                   onAcionador: (rs: DetalheProducaoDublagemInterface) =>

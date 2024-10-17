@@ -1,21 +1,16 @@
 import { Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
-import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProducaoDublagemInterface, DetalhePecaInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { DetalhePecaInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
 import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import ClsCrud from '../../Utils/ClsCrudApi';
-import { DetalhePedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
-import ComboBox from '../../Componentes/ComboBox';
 
 
 interface PropsInterface {
@@ -70,7 +65,7 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
   }
 
   const onExcluir = (rs: DetalhePecaInterface, indice: number) => {
-
+    console.log(indice, rs, rsMaster.detalheProducaoDublagens[indiceEdicao], "delete")
     let tmpDetalhe: Array<DetalhePecaInterface> = []
 
     rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.forEach((det, i) => {
@@ -86,6 +81,7 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
           : item
       )
     })
+    console.log(tmpDetalhe, "depois delete")
   }
 
   const btIncluir = () => {

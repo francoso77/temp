@@ -138,22 +138,22 @@ export class OutController {
         pd.idPedido AS pedido,
         pc.nome AS cliente,
         ped.statusPedido AS statusPedido,
-        SUM(dp.metros) AS metros
+        SUM(dped.qtdPedida) AS metrosPedido,
+        SUM(dpd.metrosTotal) AS metros
         
       FROM 
         producaodublagens pd
       INNER JOIN
         detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
       INNER JOIN
-        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
-      INNER JOIN
         produtos p ON p.idProduto = dpd.idProduto
       INNER JOIN 
         pedidos ped ON ped.idPedido = pd.idPedido
       INNER JOIN
+        detalhepedidos dped ON dped.idPedido = ped.idPedido
+      INNER JOIN
         pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
       WHERE
-        statusPedido = 'C' AND
         ${campo === 'data' ? 'pd.dataProducao = ?' : 'pc.nome LIKE ?'}
       GROUP BY
         dataProducao, pedido, cliente, statusPedido

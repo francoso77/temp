@@ -80,6 +80,10 @@ export const router = createBrowserRouter([
         element: <ProgramacaoDublagem />,
       },
       {
+        path: "/ProducaoDublagem",
+        element: <ProducaoDublagem />,
+      },
+      {
         path: "/Testes",
         element: <ProducaoDublagem />,
       },
