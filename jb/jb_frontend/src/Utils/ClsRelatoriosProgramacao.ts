@@ -264,58 +264,100 @@ class ClsRelatorioProgramacao {
     })
 
     const startX = 10; // Margem esquerda
-    let startY = 5;   // Margem superior
-    const lineHeight = 8; // Altura de cada linha
+    let startY = 10;   // Margem superior
+    const lineHeight = 7; // Altura de cada linha
     const smallLineHeight = 6; // Altura para linhas menores (espuma, forro, código)
     const pageHeight = 50; // Altura total da página
 
-    const pedidosAgrupados = Array.from(new Set(this.etiquetas.map(item => item.pedido)))
+    const pedidosAgrupados = Array.from(
+      new Set(this.etiquetas.map(item => item.pedido))
+    ).map(pedido => {
+      const metros = Math.round(
 
-    pedidosAgrupados.forEach((pedidos: any, index: number) => {
-      this.etiquetas.forEach((item: any, index: number) => {
+        this.etiquetas
+          .filter(item => item.pedido === pedido && item.tipoProduto === 10)
+          .reduce((acc, curr) => acc + curr.metros, 0) / 50,
+      )
 
-        const qtdEtiquetas = item.tipoProduto === 10 ? Math.round(item.metros / 50) : 0
-
-        for (let etiqueta = 0; etiqueta < qtdEtiquetas; etiqueta++) {
-          if (pedidos === item.pedido) {
-
-            // Verifica se a altura atual não ultrapassa a página, se sim, cria uma nova página
-
-            // if (startY + lineHeight * 2 + smallLineHeight * 3 > pageHeight) {
-            //   doc.addPage();
-            //   startY = 10; // Reinicia o Y na nova página
-            // }
-
-            if (item.tipoProduto === 10) {
-
-              doc.setFont('helvetica', 'bold');
-              doc.setFontSize(14);
-              doc.text(item.produto, startX, startY);
-              startY += lineHeight;
-              doc.text(item.cor, startX, startY);
-              startY += lineHeight;
-            } else if (item.tipoProduto === 2 || item.tipoProduto === 6) {
-              doc.setFont('helvetica', 'normal');
-              doc.setFontSize(10);
-              doc.text(item.produto, startX, startY);
-              doc.text(item.cor, 30, startY);
-              startY += smallLineHeight;
-
-            } else {
-              doc.setFont('helvetica', 'normal');
-              doc.setFontSize(10);
-              doc.text(item.pedido, startX, startY);
-              startY += smallLineHeight;
-              if (startY > pageHeight) {
-                doc.addPage();
-                startY = 10; // Reinicia o Y na nova página 
-              }
-            }
-
-          }
-        }
-      })
+      return {
+        pedido, // retorna o número do pedido
+        metros // retorna a soma de metros para o pedido
+      }
     })
+    console.log(pedidosAgrupados, 'pedidosAgrupados')
+    console.log(this.etiquetas, 'this.etiquetas')
+
+
+    //this.etiquetas.forEach((item: any, index: number) => {
+
+    const item: any[] = this.etiquetas
+
+    for (let i = 0; i < this.etiquetas.length; i++) {
+
+      if (item[i].tipoProduto === 10) {
+        // Campo 'produto' e 'cor' com fonte tamanho 13
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(item[i].produto, 10, startY);
+        startY += lineHeight;
+        doc.text(item[i].cor, 10, startY);
+        startY += lineHeight;
+      } else if (item[i].tipoProduto === 2 || item[i].tipoProduto === 6) {
+        // Campo 'produto' e 'cor' com fonte tamanho 10
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(10);
+        doc.text(item[i].produto, 10, startY);
+        doc.text(item[i].cor, 30, startY); // Ajuste a frente do produto
+        startY += lineHeight;
+        if (item[i + 1].tipoProduto === 10) {
+          doc.setFont('helvetica', 'bold')
+          doc.setFontSize(12);
+          doc.text(`Pedido: ${item[i].pedido}`, 10, startY);
+          startY += lineHeight;
+          doc.addPage();
+          startY = 10; // Resetar Y na nova página
+        }
+
+      }
+    }
+
+
+    //})
+    // Verifica se a altura atual não ultrapassa a página, se sim, cria uma nova página
+
+    // if (startY + lineHeight * 2 + smallLineHeight * 3 > pageHeight) {
+    //   doc.addPage();
+    //   startY = 10; // Reinicia o Y na nova página
+    // }
+
+    // if (item.tipoProduto === 10) {
+
+    //   doc.setFont('helvetica', 'bold');
+    //   doc.setFontSize(14);
+    //   doc.text(item.produto, startX, startY);
+    //   startY += lineHeight;
+    //   doc.text(item.cor, startX, startY);
+    //   startY += lineHeight;
+    // } else if (item.tipoProduto === 2 || item.tipoProduto === 6) {
+    //   doc.setFont('helvetica', 'normal');
+    //   doc.setFontSize(10);
+    //   doc.text(item.produto, startX, startY);
+    //   doc.text(item.cor, 30, startY);
+    //   startY += smallLineHeight;
+
+    // } else {
+    //   doc.setFont('helvetica', 'normal');
+    //   doc.setFontSize(10);
+    //   doc.text(item.pedido, startX, startY);
+    //   startY += smallLineHeight;
+    //   if (startY > pageHeight) {
+    //     doc.addPage();
+    //     startY = 10; 
+    //   }
+    // }
+
+
+
 
 
     doc.save('Etiqueta_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');

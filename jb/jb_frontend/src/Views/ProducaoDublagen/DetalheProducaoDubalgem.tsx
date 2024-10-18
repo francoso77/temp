@@ -94,21 +94,25 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   }
 
   const onExcluir = async (rs: DetalheProducaoDublagemInterface) => {
-    console.log(rs, 'clicou aqui')
 
-    // let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
-    // rsMaster.detalheProducaoDublagens.forEach(det => {
+    let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = []
+    rsMaster.detalheProducaoDublagens.forEach(det => {
 
-    //   if (det.idProduto !== rs.idProduto) {
-    //     tmpDetalhe.push(det)
-    //   }
-    // })
+      if (det.idProduto !== rs.idProduto) {
+        tmpDetalhe.push(det)
+      }
+    })
 
-    // setRsMaster({ ...rsMaster, detalheProducaoDublagens: tmpDetalhe })
-    // AtualizaSomatorio(tmpDetalhe)
-    // buscarDados()
-    //alterarStatusItem()
+    setRsMaster({ ...rsMaster, detalheProducaoDublagens: tmpDetalhe })
+    AtualizaSomatorio(tmpDetalhe)
+    buscarDados()
   }
+
+  useEffect(() => {
+    if (rsMaster) {
+      alterarStatusItem()
+    }
+  }, [rsMaster])
 
   const onCortar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
 
@@ -207,7 +211,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     setOpen(false)
     setOpenMetros(false)
     AtualizaSomatorio(tmpDetalhe)
-    alterarStatusItem()
 
   }
 
@@ -243,12 +246,13 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
               item.detalhePecas.forEach((peca) => {
                 qtdAtendida += peca.metros
               })
-              if (qtdAtendida === 0) {
+              if (qtdAtendida <= 0) {
                 statusItem = StatusPedidoItemType.producao
               } else {
                 statusItem = StatusPedidoItemType.finalizado
               }
             } else {
+              console.log("não achou o código")
               statusItem = StatusPedidoItemType.producao
               qtdAtendida = 0
             }
@@ -310,7 +314,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       .then((rs: Array<DetalhePedidoInterface>) => {
 
         let produtos = rs
-          .filter((d: any) => d.statusItem === 3)
+          // .filter((d: any) => d.statusItem === 3)
           .map((d: any) => d.idProduto)
 
         clsCrud.pesquisar({

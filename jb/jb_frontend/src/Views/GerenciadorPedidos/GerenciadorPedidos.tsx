@@ -63,6 +63,12 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       format: (data) => clsFormatacao.dataISOtoUser(data)
     },
     {
+      cabecalho: 'Pedido',
+      alinhamento: 'left',
+      campo: 'idPedido',
+      format: (v) => clsFormatacao.numeroPadrao(v)
+    },
+    {
       cabecalho: 'Cliente',
       alinhamento: 'left',
       campo: 'nomeCliente'

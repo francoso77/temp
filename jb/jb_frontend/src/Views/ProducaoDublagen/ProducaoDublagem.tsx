@@ -263,6 +263,38 @@ export default function ProducaoDublagem() {
     }
   }
 
+  const alterarStatusPedido = async (pedido: number) => {
+
+    try {
+      const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
+        entidade: "Pedido",
+        relations: ["detalhePedidos"],
+        criterio: {
+          idPedido: pedido
+        }
+      })
+
+      if (rsPedido.length > 0) {
+        let tmpPedido: PedidoInterface = rsPedido[0]
+        let tmpDetalhe: Array<DetalhePedidoInterface> = tmpPedido.detalhePedidos
+
+        tmpDetalhe.map((detalhe) => {
+
+          detalhe.statusItem = StatusPedidoItemType.producao
+          detalhe.qtdAtendida = 0
+        })
+        tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao, detalhePedidos: tmpDetalhe }
+
+        await clsCrud.incluir({
+          entidade: "Pedido",
+          criterio: tmpPedido,
+        })
+      }
+    } catch (error) {
+      console.error("Erro ao verificar status do pedido:", error);
+    }
+  }
+
   const btConfirmar = () => {
     if (validarDados()) {
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
@@ -276,7 +308,6 @@ export default function ProducaoDublagem() {
           .then((rs) => {
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
-              //verificaStatusPedido(producaoDublagem.idPedido)
             } else {
               setMensagemState({
                 titulo: 'Erro...',
@@ -289,7 +320,6 @@ export default function ProducaoDublagem() {
             }
           })
       } else if (localState.action === actionTypes.excluindo) {
-        //verificaStatusPedido(producaoDublagem.idPedido)
         clsCrud.excluir({
           entidade: "ProducaoDublagem",
           criterio: {
@@ -299,8 +329,9 @@ export default function ProducaoDublagem() {
           setMensagemState: setMensagemState
         })
           .then((rs) => {
-            if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
+            alterarStatusPedido(producaoDublagem.idPedido)
+            setLocalState({ action: actionTypes.pesquisando })
+            if (!rs.ok) {
               setMensagemState({
                 titulo: 'Erro...',
                 exibir: true,
@@ -322,6 +353,9 @@ export default function ProducaoDublagem() {
         cb: null
       })
     }
+
+    verificaStatusPedido(producaoDublagem.idPedido)
+
   }
 
   const btPesquisar = () => {
