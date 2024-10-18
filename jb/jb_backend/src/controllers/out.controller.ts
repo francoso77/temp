@@ -165,42 +165,6 @@ export class OutController {
     return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
   }
 
-  // @Post("pedidosEmCorteProducaoDublagem")
-  // async pedidosEmCorteProducaoDublagem(
-  //   @Body("pedido") pedido: number,
-  // ): Promise<Array<ProducaoDublagem>> {
-
-  //   const sql = `
-  //     SELECT 
-  //       pd.idPedido AS pedido,
-  //       p.nome AS produto, 
-  //       SUM(dp.metros) AS metros,
-  //       COUNT(dp.metros) AS pecas
-
-  //     FROM 
-  //       producaodublagens pd
-  //     INNER JOIN
-  //       detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
-  //     INNER JOIN
-  //       detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
-  //     INNER JOIN
-  //       produtos p ON p.idProduto = pd.idProduto
-  //     INNER JOIN 
-  //       pedidos ped ON ped.idPedido = pd.idPedido
-  //     INNER JOIN
-  //       pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
-  //     WHERE
-  //       pd.idPedido = ?
-  //     GROUP BY
-  //       pedido, produto
-  //     ORDER BY
-  //       produto
-  // `
-
-  //   const params = [pedido]
-  //   return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
-  // }
-
 
   @Post("pedidosEmProducao")
   async pedidosEmProducao(
