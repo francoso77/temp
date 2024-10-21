@@ -18,7 +18,9 @@ export class OutController {
       SELECT 
         pd.dataProgramacao,
         p.idPedido AS pedido,
+        pc.idPessoa AS idCliente,
         pc.nome AS cliente,
+        e.idProduto AS idProduto,
         pros.nome AS produto,
         c.nome AS cor,
        	pros.tipoProduto AS tipoProduto,

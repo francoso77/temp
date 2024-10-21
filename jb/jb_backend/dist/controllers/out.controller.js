@@ -63,7 +63,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pd.dataProgramacao,\n        p.idPedido AS pedido,\n        pc.nome AS cliente,\n        pros.nome AS produto,\n        c.nome AS cor,\n       \tpros.tipoProduto AS tipoProduto,\n        (dp.qtdPedida * de.qtd )AS metros\n        \n      FROM \n      programacaodublagens pd\n      INNER JOIN\n      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n      pedidos p ON p.idPedido = dpd.idPedido\n      INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN\n      produtos pro ON pro.idProduto = dp.idProduto\n      INNER JOIN\n      estruturas e ON e.idProduto = pro.idProduto\n      INNER JOIN\n      detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n      produtos pros ON pros.idProduto = de.idProduto\n      INNER JOIN \n      cores c ON c.idCor = de.idCor\n      WHERE\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n        ;\n\n    ";
+                sql = "\n      SELECT \n        pd.dataProgramacao,\n        p.idPedido AS pedido,\n        pc.idPessoa AS idCliente,\n        pc.nome AS cliente,\n        e.idProduto AS idProduto,\n        pros.nome AS produto,\n        c.nome AS cor,\n       \tpros.tipoProduto AS tipoProduto,\n        (dp.qtdPedida * de.qtd )AS metros\n        \n      FROM \n      programacaodublagens pd\n      INNER JOIN\n      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n      pedidos p ON p.idPedido = dpd.idPedido\n      INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN\n      produtos pro ON pro.idProduto = dp.idProduto\n      INNER JOIN\n      estruturas e ON e.idProduto = pro.idProduto\n      INNER JOIN\n      detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n      produtos pros ON pros.idProduto = de.idProduto\n      INNER JOIN \n      cores c ON c.idCor = de.idCor\n      WHERE\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n        ;\n\n    ";
                 params = [itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacaoDublagem_entity_1.default).query(sql, params)];
             });
@@ -98,38 +98,6 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    // @Post("pedidosEmCorteProducaoDublagem")
-    // async pedidosEmCorteProducaoDublagem(
-    //   @Body("pedido") pedido: number,
-    // ): Promise<Array<ProducaoDublagem>> {
-    //   const sql = `
-    //     SELECT 
-    //       pd.idPedido AS pedido,
-    //       p.nome AS produto, 
-    //       SUM(dp.metros) AS metros,
-    //       COUNT(dp.metros) AS pecas
-    //     FROM 
-    //       producaodublagens pd
-    //     INNER JOIN
-    //       detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
-    //     INNER JOIN
-    //       detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
-    //     INNER JOIN
-    //       produtos p ON p.idProduto = pd.idProduto
-    //     INNER JOIN 
-    //       pedidos ped ON ped.idPedido = pd.idPedido
-    //     INNER JOIN
-    //       pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
-    //     WHERE
-    //       pd.idPedido = ?
-    //     GROUP BY
-    //       pedido, produto
-    //     ORDER BY
-    //       produto
-    // `
-    //   const params = [pedido]
-    //   return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
-    // }
     OutController.prototype.pedidosEmProducao = function (itemPesquisa, campo) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;

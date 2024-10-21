@@ -4,11 +4,14 @@ import ClsFormatacao from "./ClsFormatacao";
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import ClsCrud from './ClsCrudApi';
+import { EstruturaInterface } from '../../../jb_backend/src/interfaces/estruturaInterface';
 
 interface DadosPedidos {
   pedido: number;
+  idCliente?: number;
   cliente: string;
   dataProgramacao: string;
+  idProduto: number;
   produto: string;
   metros: number;
   cor?: string;
@@ -32,12 +35,23 @@ interface DadosFilter {
   cliente: string;
 }
 
+interface DadosEtiqueta {
+  tecido: string;
+  corTecido: string;
+  espuma: string;
+  corEspuma: string;
+  forro: string;
+  corForro: string;
+  cliente: number;
+  pedido: number;
+}
 class ClsRelatorioProgramacao {
   public tecidos: DadosFilter[] = [];
   public forros: Dados[] = [];
   public espumas: Dados[] = [];
   public pedidos: DadosPedidos[] = [];
   public etiquetas: DadosPedidos[] = [];
+  public dadosEtiqueta: DadosEtiqueta[] = [];
   public clsFormatacao = new ClsFormatacao();
   public clsApi = new ClsApi();
   public clsCrud = new ClsCrud();
@@ -263,11 +277,10 @@ class ClsRelatorioProgramacao {
       format: [100, 50]
     })
 
-    const startX = 10; // Margem esquerda
-    let startY = 10;   // Margem superior
+    const startX = 5; // Margem esquerda
+    let startY = 7;   // Margem superior
     const lineHeight = 7; // Altura de cada linha
-    const smallLineHeight = 6; // Altura para linhas menores (espuma, forro, código)
-    const pageHeight = 50; // Altura total da página
+    const pageHeight = 45; // Altura total da página
 
     const pedidosAgrupados = Array.from(
       new Set(this.etiquetas.map(item => item.pedido))
@@ -284,45 +297,140 @@ class ClsRelatorioProgramacao {
         metros // retorna a soma de metros para o pedido
       }
     })
-    console.log(pedidosAgrupados, 'pedidosAgrupados')
-    console.log(this.etiquetas, 'this.etiquetas')
+    const produtos = this.etiquetas
+      .map(item => item.idProduto)
+      .filter((idProduto, index, array) => array.indexOf(idProduto) === index);
 
 
-    //this.etiquetas.forEach((item: any, index: number) => {
-
-    const item: any[] = this.etiquetas
-
-    for (let i = 0; i < this.etiquetas.length; i++) {
-
-      if (item[i].tipoProduto === 10) {
-        // Campo 'produto' e 'cor' com fonte tamanho 13
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text(item[i].produto, 10, startY);
-        startY += lineHeight;
-        doc.text(item[i].cor, 10, startY);
-        startY += lineHeight;
-      } else if (item[i].tipoProduto === 2 || item[i].tipoProduto === 6) {
-        // Campo 'produto' e 'cor' com fonte tamanho 10
-        doc.setFont('helvetica', 'normal')
-        doc.setFontSize(10);
-        doc.text(item[i].produto, 10, startY);
-        doc.text(item[i].cor, 30, startY); // Ajuste a frente do produto
-        startY += lineHeight;
-        if (item[i + 1].tipoProduto === 10) {
-          doc.setFont('helvetica', 'bold')
-          doc.setFontSize(12);
-          doc.text(`Pedido: ${item[i].pedido}`, 10, startY);
-          startY += lineHeight;
-          doc.addPage();
-          startY = 10; // Resetar Y na nova página
-        }
-
-      }
+    let printEtiquetas: DadosEtiqueta[] = []
+    function adicionarEtiqueta(cliente: number, pedido: number, tecido: string, corTecido: string) {
+      printEtiquetas.push({
+        tecido: tecido,
+        corTecido: corTecido,
+        espuma: '',
+        corEspuma: '',
+        forro: 'NT',
+        corForro: 'NT',
+        cliente: cliente,
+        pedido: pedido
+      });
     }
 
+    function adicionarEspuma(indice: number, espuma: string, corEspuma: string) {
+      printEtiquetas[indice].espuma = espuma;
+      printEtiquetas[indice].corEspuma = corEspuma;
+    }
+    function adicionarForro(indice: number, forro: string, corForro: string) {
+      printEtiquetas[indice].forro = forro;
+      printEtiquetas[indice].corForro = corForro;
+    }
 
-    //})
+    pedidosAgrupados.forEach((ped: any) => {
+
+      const itensFiltrados = this.etiquetas.filter(item => item.pedido === ped.pedido && item.tipoProduto === 10);
+
+      if (itensFiltrados.length > 0) {
+        itensFiltrados.forEach((item: any) => {
+          for (let i = 0; i < item.metros / 50; i++) {
+            if (item.pedido === 10) {
+              adicionarEtiqueta(item.pedido, item.cliente, item.produto, item.cor);
+            }
+          }
+        });
+      }
+    });
+
+    let somaItens = 0
+    pedidosAgrupados.forEach((ped: any) => {
+
+      const itensFiltrados = this.etiquetas.filter(item => item.pedido === ped.pedido && item.tipoProduto === 2);
+
+      if (itensFiltrados.length > 0) {
+        itensFiltrados.forEach((item: any) => {
+          for (let i = 0; i < item.metros / 50; i++) {
+            console.log(somaItens, 'somaItens')
+            if (item.pedido === 10) {
+              if (i === somaItens) {
+                console.log(item.idProduto, 'item', i, 'i', item.produto, 'produto', item.cor, 'cor')
+                adicionarEspuma(i, item.produto, item.cor)
+              } else {
+                console.log(item.idProduto, 'item-DEPOIS', i, 'i', item.produto, 'produto', item.cor, 'cor')
+                adicionarEspuma(somaItens, item.produto, item.cor)
+              }
+              somaItens++
+            }
+          }
+        })
+      }
+    })
+    // pedidosAgrupados.forEach((ped: any) => {
+
+    //   const itensFiltrados = this.etiquetas.filter(item => item.pedido === ped.pedido && item.tipoProduto === 6);
+
+    //   if (itensFiltrados.length > 0) {
+    //     itensFiltrados.forEach((item: any) => {
+
+
+    //       for (let i = 0; i < ped.metros; i++) {
+    //         if (item.pedido === 10) {
+    //           adicionarForro(i, item.produto, item.cor)
+    //         }
+    //       }
+    //     })
+    //   }
+    // })
+    console.log(printEtiquetas, 'printEtiquetas')
+    // doc.setFontSize(12);
+    // doc.text('linha1', 5, 7);
+    // doc.text('linha2', 5, 14);
+    // doc.text('linha3', 5, 21);
+    // doc.text('linha4', 5, 28);
+    // doc.text('linha5', 5, 35);
+    // doc.text('linha6', 5, 42);
+    // doc.addPage();
+    // doc.text('linha7', 5, 7);
+    // doc.text('linha8', 5, 14);
+    // doc.text('linha9', 5, 21);
+
+
+    // this.etiquetas.forEach((item: any, index: number) => {
+
+    //   const TotalEtiquetas = item.tipoProduto === 10 ? item.metros / 50 : 1
+
+    //   for (let i = 0; i < TotalEtiquetas; i++) {
+
+    //     if (item[i].tipoProduto === 10) {
+    //       // Campo 'produto' e 'cor' com fonte tamanho 13
+    //       doc.setFont('helvetica', 'bold');
+    //       doc.setFontSize(14);
+    //       doc.text(item[i].produto, startX, startY);
+    //       startY += lineHeight;
+    //       doc.text(item[i].cor, startX, startY);
+    //       startY += lineHeight;
+    //     } else if (item[i].tipoProduto === 2 || item[i].tipoProduto === 6) {
+    //       // Campo 'produto' e 'cor' com fonte tamanho 10
+    //       doc.setFont('helvetica', 'normal')
+    //       doc.setFontSize(10);
+    //       doc.text(item[i].produto, startX, startY);
+    //       doc.text(item[i].cor, 30, startY); // Ajuste a frente do produto
+    //       startY += lineHeight;
+    //       const valor = item[i + 1].tipoProduto
+    //       console.log(valor, 'valor')
+    //       if (item[i].tipoProduto === 10) {
+    //         doc.setFont('helvetica', 'bold')
+    //         doc.setFontSize(12);
+    //         doc.text(`Pedido: ${item[i].pedido}`, startX, startY);
+    //         startY += lineHeight;
+    //         if (startY > pageHeight) {
+    //           doc.addPage();
+    //           startY = 7;
+    //         }
+    //       }
+    //     }
+    //   }
+
+
+    // })
     // Verifica se a altura atual não ultrapassa a página, se sim, cria uma nova página
 
     // if (startY + lineHeight * 2 + smallLineHeight * 3 > pageHeight) {
@@ -360,7 +468,7 @@ class ClsRelatorioProgramacao {
 
 
 
-    doc.save('Etiqueta_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    // doc.save('Etiqueta_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
 
   }
 
