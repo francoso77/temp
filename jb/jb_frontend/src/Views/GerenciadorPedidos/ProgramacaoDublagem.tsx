@@ -4,7 +4,7 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Box, Container, Grid, IconButton, Paper, Tooltip, useMediaQuery, useTheme, Dialog } from '@mui/material';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import InputText from '../../Componentes/InputText';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
@@ -20,8 +20,7 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import ClsApi from '../../Utils/ClsApi';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao';
-import jsPDF from 'jspdf';
-import autoTable, { UserOptions } from 'jspdf-autotable';
+import EtiquetasPedido from './EtiquetasPedido';
 
 
 export default function ProgramacaoDublagem() {
@@ -50,6 +49,8 @@ export default function ProgramacaoDublagem() {
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [open, setOpen] = useState(false)
+  const [id, setId] = useState(0)
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -78,8 +79,8 @@ export default function ProgramacaoDublagem() {
     },
   ]
 
-  const pesquisarID = (id: string | number): Promise<ProgramacaoDublagemInterface> => {
-    return clsCrud
+  const pesquisarID = async (id: string | number): Promise<ProgramacaoDublagemInterface> => {
+    return await clsCrud
       .pesquisar({
         entidade: 'ProgramacaoDublagem',
         relations: [
@@ -114,7 +115,6 @@ export default function ProgramacaoDublagem() {
   const onProgramacao = async (id: string | number) => {
     const { dataProgramacao } = await pesquisarID(id);
     const dataPesquisa = formatarData(dataProgramacao);
-    console.log(dataPesquisa, 'dataPesquisa')
     clsRelatorioProgramacao.renderRelacao(dataPesquisa);
   }
 
@@ -124,10 +124,12 @@ export default function ProgramacaoDublagem() {
     clsRelatorioProgramacao.renderFicha(dataPesquisa);
   }
 
-  const onEtiqueta = async (id: string | number) => {
-    const { dataProgramacao } = await pesquisarID(id);
-    const dataPesquisa = formatarData(dataProgramacao);
-    clsRelatorioProgramacao.renderEtiqueta(dataPesquisa);
+  const onEtiqueta = async (id: number) => {
+    // const { dataProgramacao } = await pesquisarID(id);
+    // const dataPesquisa = formatarData(dataProgramacao);
+    // clsRelatorioProgramacao.renderEtiqueta(dataPesquisa);
+    setId(id)
+    setOpen(true)
   }
 
   const onEditar = (id: string | number) => {
@@ -275,183 +277,197 @@ export default function ProgramacaoDublagem() {
     }
   }
 
-  return (
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-    <Container maxWidth="md" sx={{ mt: 2 }}>
-      <Paper variant="outlined" sx={{ padding: 1 }}>
-        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
-          </Grid>
-          <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
-              <InputText
-                label="Pesquisa"
-                tipo="uppercase"
-                dados={pesquisa}
-                field="itemPesquisa"
-                setState={setPesquisa}
-                iconeEnd='searchicon'
-                onClickIconeEnd={() => btPesquisar()}
-                mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autoFocus
-              />
+  return (
+    <>
+      <Container maxWidth="md" sx={{ mt: 2 }}>
+        <Paper variant="outlined" sx={{ padding: 1 }}>
+          <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
             </Grid>
-            <Grid item xs={2} md={1}>
-              <Tooltip title={'Incluir'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
-                  onClick={() => btIncluir()}
-                >
-                  <AddCircleIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={12}>
-              <DataTable
-                cabecalho={cabecalhoForm}
-                dados={rsPesquisa}
-                acoes={[
-                  {
-                    icone: "find_in_page_two_tone",
-                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onProgramacao(rs.idProgramacaoDublagem as number),
-                    toolTip: "Programação",
-                  },
-                  {
-                    icone: "sell_two_tone",
-                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onEtiqueta(rs.idProgramacaoDublagem as number),
-                    toolTip: "Etiqueta",
-                  },
-                  {
-                    icone: "receipt_long.two_tone",
-                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onFicha(rs.idProgramacaoDublagem as number),
-                    toolTip: "Ficha de Corte",
-                  },
-                  {
-                    icone: "edit",
-                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onEditar(rs.idProgramacaoDublagem as number),
-                    toolTip: "Editar",
-                  },
-                  {
-                    icone: "delete",
-                    onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                      onExcluir(rs.idProgramacaoDublagem as number),
-                    toolTip: "Excluir",
-                  },
-                ]}
-              />
-            </Grid>
-          </Condicional>
-          <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} md={4} sx={{ mt: 2, ml: 3 }}>
-              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+            <Condicional condicao={localState.action === 'pesquisando'}>
+              <Grid item xs={10} md={11}>
                 <InputText
-                  type='tel'
-                  tipo="date"
-                  label="Data"
-                  labelAlign='center'
-                  textAlign='center'
-                  dados={programacaoDublagem}
-                  field="dataProgramacao"
-                  setState={setProgramacaoDublagem}
-                  disabled={['excluindo'].includes(localState.action) ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                  label="Pesquisa"
+                  tipo="uppercase"
+                  dados={pesquisa}
+                  field="itemPesquisa"
+                  setState={setPesquisa}
+                  iconeEnd='searchicon'
+                  onClickIconeEnd={() => btPesquisar()}
+                  mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                   autoFocus
                 />
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, ml: 5 }}>
-              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
-                <InputText
-                  type='text'
-                  tipo='currency'
-                  scale={2}
-                  label="Cola"
-                  labelAlign='center'
-                  textAlign='center'
-                  dados={programacaoDublagem}
-                  field="qtdCola"
-                  setState={setProgramacaoDublagem}
-                  disabled={['excluindo'].includes(localState.action) ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 2)}
+              </Grid>
+              <Grid item xs={2} md={1}>
+                <Tooltip title={'Incluir'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
+                    onClick={() => btIncluir()}
+                  >
+                    <AddCircleIcon sx={{ fontSize: 50 }} />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={12}>
+                <DataTable
+                  cabecalho={cabecalhoForm}
+                  dados={rsPesquisa}
+                  acoes={[
+                    {
+                      icone: "find_in_page_two_tone",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onProgramacao(rs.idProgramacaoDublagem as number),
+                      toolTip: "Programação",
+                    },
+                    {
+                      icone: "sell_two_tone",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onEtiqueta(rs.idProgramacaoDublagem as number),
+                      toolTip: "Etiqueta",
+                    },
+                    // {
+                    //   icone: "receipt_long.two_tone",
+                    //   onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                    //     onFicha(rs.idProgramacaoDublagem as number),
+                    //   toolTip: "Ficha de Corte",
+                    // },
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onEditar(rs.idProgramacaoDublagem as number),
+                      toolTip: "Editar",
+                    },
+                    {
+                      icone: "delete",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onExcluir(rs.idProgramacaoDublagem as number),
+                      toolTip: "Excluir",
+                    },
+                  ]}
                 />
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, ml: 6 }}>
-              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-                <InputText
-                  type='text'
-                  tipo='currency'
-                  scale={2}
-                  label="Filme"
-                  labelAlign='center'
-                  textAlign='center'
-                  dados={programacaoDublagem}
-                  field="qtdFilme"
-                  setState={setProgramacaoDublagem}
-                  disabled={['excluindo'].includes(localState.action) ? true : false}
-                  erros={erros}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 0)}
+              </Grid>
+            </Condicional>
+            <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
+              <Grid item xs={12} md={4} sx={{ mt: 2, ml: 3 }}>
+                <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                  <InputText
+                    type='tel'
+                    tipo="date"
+                    label="Data"
+                    labelAlign='center'
+                    textAlign='center'
+                    dados={programacaoDublagem}
+                    field="dataProgramacao"
+                    setState={setProgramacaoDublagem}
+                    disabled={['excluindo'].includes(localState.action) ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                    autoFocus
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={3} sx={{ mt: 2, ml: 5 }}>
+                <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                  <InputText
+                    type='text'
+                    tipo='currency'
+                    scale={2}
+                    label="Cola"
+                    labelAlign='center'
+                    textAlign='center'
+                    dados={programacaoDublagem}
+                    field="qtdCola"
+                    setState={setProgramacaoDublagem}
+                    disabled={['excluindo'].includes(localState.action) ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={3} sx={{ mt: 2, ml: 6 }}>
+                <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                  <InputText
+                    type='text'
+                    tipo='currency'
+                    scale={2}
+                    label="Filme"
+                    labelAlign='center'
+                    textAlign='center'
+                    dados={programacaoDublagem}
+                    field="qtdFilme"
+                    setState={setProgramacaoDublagem}
+                    disabled={['excluindo'].includes(localState.action) ? true : false}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+                <DetalheProgramacaoDublagem
+                  rsMaster={programacaoDublagem}
+                  setRsMaster={setProgramacaoDublagem}
+                  masterLocalState={localState}
                 />
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
-              <DetalheProgramacaoDublagem
-                rsMaster={programacaoDublagem}
-                setRsMaster={setProgramacaoDublagem}
-                masterLocalState={localState}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-              <Tooltip title={'Cancelar'}>
-                <IconButton
-                  color="secondary"
-                  sx={{ mt: 3, ml: 2 }}
-                  onClick={() => btCancelar()}
-                >
-                  <CancelRoundedIcon sx={{ fontSize: 50 }} />
-                </IconButton>
-              </Tooltip>
-              <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                <Tooltip title={'Confirmar'}>
+              </Grid>
+              <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+                <Tooltip title={'Cancelar'}>
                   <IconButton
                     color="secondary"
                     sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
+                    onClick={() => btCancelar()}
                   >
-                    <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                    <CancelRoundedIcon sx={{ fontSize: 50 }} />
                   </IconButton>
                 </Tooltip>
-              </Condicional>
+                <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
+                  <Tooltip title={'Confirmar'}>
+                    <IconButton
+                      color="secondary"
+                      sx={{ mt: 3, ml: 2 }}
+                      onClick={() => btConfirmar()}
+                    >
+                      <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Condicional>
 
-              <Condicional condicao={localState.action === 'excluindo'}>
-                <Tooltip title={'Excluir'}>
-                  <IconButton
-                    color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
-                    onClick={() => btConfirmar()}
-                  >
-                    <DeleteIcon sx={{ fontSize: 60 }} />
-                  </IconButton>
-                </Tooltip>
-              </Condicional>
-            </Grid>
-          </Condicional>
-        </Grid>
-      </Paper >
-    </Container >
+                <Condicional condicao={localState.action === 'excluindo'}>
+                  <Tooltip title={'Excluir'}>
+                    <IconButton
+                      color="secondary"
+                      sx={{ mt: 3, ml: 2 }}
+                      onClick={() => btConfirmar()}
+                    >
+                      <DeleteIcon sx={{ fontSize: 60 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Condicional>
+              </Grid>
+            </Condicional>
+          </Grid>
+        </Paper >
+      </Container >
+      <Dialog
+        open={open}
+        fullScreen={fullScreen}
+        fullWidth
+        maxWidth='md'>
+        <EtiquetasPedido
+          programacao={id}
+          setOpenMaster={setOpen}
+        />
+      </Dialog >
+    </>
   )
 
 }

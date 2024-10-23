@@ -21,6 +21,7 @@ interface PropsInterface {
   pedido?: number
   produto?: number
   qtd?: number
+  id?: number
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>;
 }
 
@@ -86,6 +87,7 @@ export default class ClsApi {
     pedido,
     produto,
     qtd,
+    id,
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
@@ -102,6 +104,7 @@ export default class ClsApi {
       pedido,
       produto,
       qtd,
+      id,
     };
 
     if (setMensagemState) {

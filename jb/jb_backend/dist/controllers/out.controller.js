@@ -59,11 +59,21 @@ var producaoDublagem_entity_1 = require("../entities/producaoDublagem.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
+    OutController.prototype.pedidosFechados = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n      SELECT \n        pd.idProgramacaoDublagem AS idProgramacaoDublagem,\n        ped.idPedido AS idPedido,\n        ped.dataPedido as dataPedido,\n        ped.statusPedido AS statusPedido,\n        pc.idPessoa AS idPessoa_cliente,\n        pv.idPessoa AS idPessoa_vendedor\n      FROM\n        programacaodublagens pd\n      INNER JOIN\n        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n        pedidos ped ON ped.idPedido = dpd.idPedido\n      INNER JOIN\n        detalhepedidos dp ON dp.idPedido = ped.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      INNER JOIN\n        pessoas pv ON pv.idPessoa = ped.idPessoa_vendedor\n      WHERE \n        ped.statusPedido = 'F' AND\n        pd.idProgramacaoDublagem = ?\n      ORDER BY\n        ped.dataPedido ASC\n;\n    ";
+                params = [id];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
+            });
+        });
+    };
     OutController.prototype.etiquetasPedidos = function (itemPesquisa) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pd.dataProgramacao,\n        p.idPedido AS pedido,\n        pc.idPessoa AS idCliente,\n        pc.nome AS cliente,\n        e.idProduto AS idProduto,\n        pros.nome AS produto,\n        c.nome AS cor,\n       \tpros.tipoProduto AS tipoProduto,\n        (dp.qtdPedida * de.qtd )AS metros\n        \n      FROM \n      programacaodublagens pd\n      INNER JOIN\n      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n      pedidos p ON p.idPedido = dpd.idPedido\n      INNER JOIN\n      detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN\n      produtos pro ON pro.idProduto = dp.idProduto\n      INNER JOIN\n      estruturas e ON e.idProduto = pro.idProduto\n      INNER JOIN\n      detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n      produtos pros ON pros.idProduto = de.idProduto\n      INNER JOIN \n      cores c ON c.idCor = de.idCor\n      WHERE\n        dp.statusItem = 3 AND\n        pd.dataProgramacao = ?\n        ;\n\n    ";
+                sql = "\n      SELECT \n        pd.dataProducao AS dataProducao,\n        ped.idPedido AS pedido,\n        pc.idPessoa AS idCliente,\n        pc.nome AS cliente,\n        pro.idProduto AS idProduto,\n        pro.nome AS produto,\n        dp.metros AS metros\n      FROM\n        producaodublagens pd\n      INNER JOIN\n        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem\n      INNER JOIN\n        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem\n      INNER JOIN\n        produtos pro ON pro.idProduto = dpd.idProduto\n      INNER JOIN\n        pedidos ped ON ped.idPedido = pd.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      WHERE \n        ped.statusPedido = 'F' AND\n        pd.dataProducao = ?\n      GROUP BY\n        dataProducao, pedido, idCliente, cliente, idProduto, produto, metros\n      ORDER BY\n        pro.nome ASC\n;\n    ";
                 params = [itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacaoDublagem_entity_1.default).query(sql, params)];
             });
@@ -228,6 +238,13 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    __decorate([
+        (0, common_1.Post)("pedidosFechados"),
+        __param(0, (0, common_1.Body)("id")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Number]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "pedidosFechados", null);
     __decorate([
         (0, common_1.Post)("etiquetasPedidos"),
         __param(0, (0, common_1.Body)("itemPesquisa")),

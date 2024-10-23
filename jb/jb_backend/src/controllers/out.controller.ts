@@ -9,6 +9,42 @@ import ProducaoDublagem from '../entities/producaoDublagem.entity'
 @Controller()
 export class OutController {
 
+  @Post("pedidosFechados")
+  async pedidosFechados(
+    @Body("id") id: number,
+  ): Promise<Array<Pedido>> {
+
+    const sql = `
+      SELECT 
+        pd.idProgramacaoDublagem AS idProgramacaoDublagem,
+        ped.idPedido AS idPedido,
+        ped.dataPedido as dataPedido,
+        ped.statusPedido AS statusPedido,
+        pc.idPessoa AS idPessoa_cliente,
+        pv.idPessoa AS idPessoa_vendedor
+      FROM
+        programacaodublagens pd
+      INNER JOIN
+        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem
+      INNER JOIN
+        pedidos ped ON ped.idPedido = dpd.idPedido
+      INNER JOIN
+        detalhepedidos dp ON dp.idPedido = ped.idPedido
+      INNER JOIN
+        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
+      INNER JOIN
+        pessoas pv ON pv.idPessoa = ped.idPessoa_vendedor
+      WHERE 
+        ped.statusPedido = 'F' AND
+        pd.idProgramacaoDublagem = ?
+      ORDER BY
+        ped.dataPedido ASC
+;
+    `
+    const params = [id]
+    return AppDataSource.getRepository(Pedido).query(sql, params)
+  }
+
   @Post("etiquetasPedidos")
   async etiquetasPedidos(
     @Body("itemPesquisa") itemPesquisa: string,
@@ -16,41 +52,33 @@ export class OutController {
 
     const sql = `
       SELECT 
-        pd.dataProgramacao,
-        p.idPedido AS pedido,
+        pd.dataProducao AS dataProducao,
+        ped.idPedido AS pedido,
         pc.idPessoa AS idCliente,
         pc.nome AS cliente,
-        e.idProduto AS idProduto,
-        pros.nome AS produto,
-        c.nome AS cor,
-       	pros.tipoProduto AS tipoProduto,
-        (dp.qtdPedida * de.qtd )AS metros
-        
-      FROM 
-      programacaodublagens pd
+        pro.idProduto AS idProduto,
+        pro.nome AS produto,
+        dp.metros AS metros
+      FROM
+        producaodublagens pd
       INNER JOIN
-      detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem
+        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem
       INNER JOIN
-      pedidos p ON p.idPedido = dpd.idPedido
+        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem
       INNER JOIN
-      detalhepedidos dp ON dp.idPedido = p.idPedido
+        produtos pro ON pro.idProduto = dpd.idProduto
       INNER JOIN
-      pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+        pedidos ped ON ped.idPedido = pd.idPedido
       INNER JOIN
-      produtos pro ON pro.idProduto = dp.idProduto
-      INNER JOIN
-      estruturas e ON e.idProduto = pro.idProduto
-      INNER JOIN
-      detalheestruturas de ON de.idEstrutura = e.idEstrutura
-      INNER JOIN
-      produtos pros ON pros.idProduto = de.idProduto
-      INNER JOIN 
-      cores c ON c.idCor = de.idCor
-      WHERE
-        dp.statusItem = 3 AND
-        pd.dataProgramacao = ?
-        ;
-
+        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
+      WHERE 
+        ped.statusPedido = 'F' AND
+        pd.dataProducao = ?
+      GROUP BY
+        dataProducao, pedido, idCliente, cliente, idProduto, produto, metros
+      ORDER BY
+        pro.nome ASC
+;
     `
     const params = [itemPesquisa]
     return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, params)

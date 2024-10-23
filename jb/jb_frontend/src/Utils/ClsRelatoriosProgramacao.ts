@@ -473,7 +473,6 @@ class ClsRelatorioProgramacao {
   }
 
   public renderRelacao = async (dt: string) => {
-    console.log('data recebida para pesquisa', dt);
     await this.BuscarDados(dt); // Aguarda a busca dos dados antes de gerar o PDF
     this.gerarPdf(dt);
   }
