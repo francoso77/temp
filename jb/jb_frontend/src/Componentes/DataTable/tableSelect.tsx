@@ -7,7 +7,7 @@ import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
-import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
+import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
 

@@ -1,17 +1,12 @@
-import { Container, Dialog, Grid, IconButton, Paper, Tooltip, useMediaQuery, useTheme } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import Condicional from '../../Componentes/Condicional/Condicional';
+import { Container, Grid, IconButton, Paper } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
-import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { DetalheProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
+import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import GerenciadorPedido from './GerenciadorPedidos';
 import ClsApi from '../../Utils/ClsApi';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import CloseIcon from '@mui/icons-material/Close'
@@ -143,7 +138,6 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
                     toolTip: "Excluir",
                   },
                 ]}
-
               />
             </Grid>
           </Grid>
