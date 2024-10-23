@@ -1,16 +1,42 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import PrintIcon from '@mui/icons-material/Print';
+import ShareIcon from '@mui/icons-material/Share';
+import { styled } from '@mui/material/styles';
+import SpeedDial, { SpeedDialProps } from '@mui/material/SpeedDial';
 
+interface ItemDetail {
+    idDetalhePedido: number,
+    Produto: string;
+    qtd: number;
+}
+
+// const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
+//     position: 'absolute',
+//     '&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft': {
+//         bottom: theme.spacing(2),
+//         right: theme.spacing(2),
+//     },
+//     '&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight': {
+//         top: theme.spacing(2),
+//         left: theme.spacing(2),
+//     },
+// }));
 
 interface EnhancedTableProps {
     numSelected: number;
@@ -21,13 +47,17 @@ interface EnhancedTableProps {
     orderBy: string | number | symbol;
 }
 
-export default function TableSelect<T>({
+export default function DataTableSelect<T>({
     dados = [],
     cabecalho = [],
+    cabecalhoDetalhe = [],
     acoes = [],
+    acoesDetalhe = [],
     onStatus = undefined,
     onSelecionarLinha = undefined,
     exibirPaginacao = true,
+    temTotal = false,
+    colunaSoma = [],
 }: DataTableInterface) {
 
     const clsFormatacao = new ClsFormatacao()
@@ -39,6 +69,18 @@ export default function TableSelect<T>({
     const [selected, setSelected] = React.useState<readonly number[]>([])
     const [order, setOrder] = useState<Order>('asc')
     const [orderBy, setOrderBy] = useState<keyof any>('nome')
+    const [somaQtd, setSomaQtd] = useState<number>(0)
+    const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+
+    // const clicou = (msg: string) => {
+    //     console.log('clicou aqui ', msg)
+    // }
+    // const actions = [
+    //     { icon: <FileCopyIcon />, name: 'Copiar', click: () => clicou('copiar') },
+    //     { icon: <SaveIcon />, name: 'Salvar', click: () => clicou('salvar') },
+    //     { icon: <PrintIcon />, name: 'Imprimir', click: () => clicou('imprimir') },
+    //     { icon: <ShareIcon />, name: 'Compartilhar', click: () => clicou('compartilhar') },
+    // ];
 
     const handleRowClick = (id: number) => {
         setOpenRows((prevOpenRows) =>
@@ -69,6 +111,8 @@ export default function TableSelect<T>({
         setOrder(isAsc ? 'desc' : 'asc')
         setOrderBy(property);
     }
+
+    const totalColunas = sumColumns(dados, colunaSoma)
 
 
     function EnhancedTableHead(props: EnhancedTableProps) {
@@ -154,14 +198,14 @@ export default function TableSelect<T>({
                         >
                             {numSelected} selecionado(s)
                         </Typography>
-                        {/* <Typography
+                        <Typography
                             sx={{ flex: '1 1 100%', textAlign: 'center', fontSize: '1.5rem' }}
                             color="inherit"
                             variant="subtitle1"
                             component="div"
                         >
                             {clsFormatacao.currency(somaQtd)} metros programados
-                        </Typography> */}
+                        </Typography>
                     </>
                 ) : (
                     <Typography
@@ -170,11 +214,11 @@ export default function TableSelect<T>({
                         id="tableTitle"
                         component="div"
                     >
-                        Pedidos Cortados
+                        Gerenciador de Pedidos
                     </Typography>
                 )}
                 {numSelected > 0 ? (
-                    <Tooltip title="Gerar Etiquetas">
+                    <Tooltip title="Em Produção">
                         <IconButton
                             onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
                         >
@@ -217,10 +261,18 @@ export default function TableSelect<T>({
         );
     }
 
+    const somaQtdSelected = (sel: readonly number[]) => {
+        let itemSomado = 0
+        sel.map((i) => {
+            itemSomado = itemSomado + calculateTotals(dados[i].details).totalQuantidade
+        })
+        setSomaQtd(itemSomado)
+    }
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             const newSelected = dados.map((_n, i) => i);
             setSelected(newSelected);
+            somaQtdSelected(newSelected)
             return;
         }
         setSelected([]);
@@ -243,11 +295,16 @@ export default function TableSelect<T>({
             );
         }
         setSelected(newSelected)
-        //somaQtdSelected(newSelected)
+        somaQtdSelected(newSelected)
     };
 
     const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDense(event.target.checked)
+    }
+
+    const calculateTotals = (details: ItemDetail[]) => {
+        const totalQuantidade = details.reduce((sum, detail) => sum + detail.qtd, 0)
+        return { totalQuantidade };
     }
 
     return (
@@ -275,6 +332,7 @@ export default function TableSelect<T>({
 
                                         const isItemSelected = selected.includes(indice);
                                         const labelId = `enhanced-table-checkbox-${indice}`;
+                                        const { totalQuantidade } = calculateTotals(dados[indice].details);
 
                                         return (
                                             <React.Fragment key={indice}>
@@ -289,6 +347,9 @@ export default function TableSelect<T>({
                                                     sx={{ cursor: 'pointer' }}
                                                 >
                                                     <StyledTableCell padding="checkbox">
+                                                        <IconButton onClick={() => handleRowClick(indice)}>
+                                                            {openRows.includes(indice) ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                                                        </IconButton>
                                                     </StyledTableCell>
                                                     <StyledTableCell padding="checkbox">
                                                         <Checkbox
@@ -348,6 +409,120 @@ export default function TableSelect<T>({
                                                         </StyledTableCell>
                                                     </Condicional>
                                                 </StyledTableRow>
+                                                <StyledTableRow sx={{ display: openRows.includes(indice) ? '#a19b9b' : 'transparent' }}>
+                                                    <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+                                                        <Collapse in={openRows.includes(indice)} timeout="auto" unmountOnExit>
+                                                            <Box sx={{ ml: 10, width: '100%', bgcolor: 'graymedium' }} >
+                                                                <Table>
+                                                                    <TableHead >
+                                                                        <StyledTableRow>
+                                                                            {cabecalhoDetalhe.map((coluna, indice) => (
+                                                                                <TableCell
+                                                                                    key={indice}
+                                                                                    sx={{ bgcolor: '#1e81b0', m: 0.5, p: 0.5, color: 'white' }}
+                                                                                    align={coluna.alinhamento ? coluna.alinhamento : 'left'}
+                                                                                    style={{ minWidth: coluna.largura }}
+                                                                                    sortDirection={orderBy === coluna.campo ? order : false}
+                                                                                >
+                                                                                    <TableSortLabel
+                                                                                        active={orderBy === coluna.campo}
+                                                                                        direction={orderBy === coluna.campo ? order : 'asc'}
+                                                                                        onClick={createSortHandler(coluna.campo)}
+                                                                                    >
+                                                                                        {coluna.cabecalho}
+                                                                                    </TableSortLabel>
+                                                                                </TableCell>
+                                                                            ))}
+                                                                            <Condicional condicao={acoesDetalhe.length > 0}>
+                                                                                <TableCell
+                                                                                    sx={{ bgcolor: '#1e81b0', m: 0.5, p: 0.5, color: 'white' }}
+                                                                                    align='center'>
+                                                                                    Ação
+                                                                                </TableCell>
+                                                                            </Condicional>
+                                                                        </StyledTableRow>
+                                                                    </TableHead>
+                                                                    <TableBody>
+                                                                        {stableSort(dados[indice].details, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                                                            .map((row, indice) => {
+
+                                                                                return (
+                                                                                    <StyledTableRow
+                                                                                        key={indice}
+                                                                                        onClick={() => onSelecionarLinha ? onSelecionarLinha(row, page * rowsPerPage + indice) : ""}
+                                                                                    >
+                                                                                        {
+                                                                                            cabecalhoDetalhe.map((coluna, indice) => {
+
+                                                                                                return (
+                                                                                                    <StyledTableCell
+                                                                                                        key={indice}
+                                                                                                        sx={{
+                                                                                                            color: (row as any)[coluna.campo] === 1 ? 'green' :
+                                                                                                                (row as any)[coluna.campo] === 2 ? 'red' :
+                                                                                                                    (row as any)[coluna.campo] === 3 ? 'orange' : 'default'
+                                                                                                        }}
+                                                                                                        align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
+                                                                                                        {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
+                                                                                                    </StyledTableCell>
+                                                                                                )
+                                                                                            })
+                                                                                        }
+                                                                                        <Condicional condicao={acoesDetalhe.length > 0}>
+                                                                                            <StyledTableCell align='center' sx={{ mx: 0, px: 0 }}
+                                                                                            >
+                                                                                                {acoesDetalhe.map((acao, index) => (
+                                                                                                    <Tooltip title={acao.toolTip} key={index}>
+                                                                                                        <span>
+                                                                                                            <IconButton
+                                                                                                                disabled={acao.onDisabled ? acao.onDisabled(row as T) : false}
+                                                                                                                onClick={() => acao.onAcionador(row as T, indice)}
+                                                                                                                sx={{ mx: 0, px: 0 }}
+                                                                                                            >
+                                                                                                                <Icon
+                                                                                                                    sx={{
+                                                                                                                        color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main,
+                                                                                                                        fontSize: '1.25rem',
+                                                                                                                        mx: 0,
+                                                                                                                        px: 0,
+                                                                                                                        [theme.breakpoints.up('md')]: {
+                                                                                                                            fontSize: '1.55rem',
+                                                                                                                        },
+                                                                                                                    }}
+                                                                                                                >
+                                                                                                                    {acao.icone}
+                                                                                                                </Icon>
+                                                                                                            </IconButton>
+                                                                                                        </span>
+                                                                                                    </Tooltip>
+                                                                                                ))}
+                                                                                            </StyledTableCell>
+                                                                                        </Condicional>
+                                                                                    </StyledTableRow>
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                        <Condicional condicao={dados[indice].details.length === 0}>
+                                                                            <StyledTableRow>
+                                                                                <StyledTableCell
+                                                                                    colSpan={cabecalho.length + 1}
+                                                                                    style={{ textAlign: "center" }}
+                                                                                >
+                                                                                    <p>Não Há registros!!!!</p>
+                                                                                </StyledTableCell>
+                                                                            </StyledTableRow>
+                                                                        </Condicional>
+                                                                        <StyledTableRow >
+                                                                            <StyledTableCell align="left"><strong>Total:</strong></StyledTableCell>
+                                                                            <StyledTableCell align='right'><strong>{clsFormatacao.currency(totalQuantidade)}</strong></StyledTableCell>
+                                                                            <StyledTableCell ></StyledTableCell>
+                                                                        </StyledTableRow>
+                                                                    </TableBody>
+                                                                </Table>
+                                                            </Box>
+                                                        </Collapse>
+                                                    </StyledTableCell>
+                                                </StyledTableRow>
                                             </ React.Fragment>
                                         );
                                     })}
@@ -360,6 +535,24 @@ export default function TableSelect<T>({
                                             <p>Não Há registros!!!!</p>
                                         </StyledTableCell>
                                     </StyledTableRow>
+                                </Condicional>
+                                <Condicional condicao={temTotal}>
+                                    <TableFooter>
+                                        <StyledTableRow>
+                                            <StyledTableCell>
+                                                TOTAL
+                                            </StyledTableCell>
+                                            {colunaSoma.map((column) => (
+                                                <StyledTableCell
+                                                    colSpan={1}
+                                                    align={'center'}
+                                                    key={column}
+                                                >
+                                                    {clsFormatacao.currency(totalColunas[column])}
+                                                </StyledTableCell>
+                                            ))}
+                                        </StyledTableRow>
+                                    </TableFooter>
                                 </Condicional>
                             </TableBody>
                         </Table>

@@ -10,7 +10,7 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import ComboBox from '../../Componentes/ComboBox';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
-import DataTableSelect from '../../Componentes/DataTable/tableSelect';
+import DataTableSelect from '../../Componentes/DataTable/tableSelectNivel';
 import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';

@@ -15,6 +15,7 @@ import GerenciadorPedido from './GerenciadorPedidos';
 import ClsApi from '../../Utils/ClsApi';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import CloseIcon from '@mui/icons-material/Close'
+import TableSelect from '../../Componentes/DataTable/tableSelect';
 
 
 
@@ -130,8 +131,8 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
                 <CloseIcon />
               </IconButton>
             </Grid>
-            <Grid item xs={12} sx={{ textAlign: 'center', mt: 3 }}>
-              <DataTable
+            <Grid item xs={12} sx={{ mt: 3 }}>
+              <TableSelect
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
