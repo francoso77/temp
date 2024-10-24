@@ -47,8 +47,10 @@ export class OutController {
 
   @Post("etiquetasPedidos")
   async etiquetasPedidos(
-    @Body("itemPesquisa") itemPesquisa: string,
-  ): Promise<Array<ProgramacaoDublagem>> {
+    @Body("pedidos") pedidos: Array<number>,
+  ): Promise<Array<ProducaoDublagem>> {
+
+    const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
 
     const sql = `
       SELECT 
@@ -72,18 +74,15 @@ export class OutController {
       INNER JOIN
         pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
       WHERE 
-        ped.statusPedido = 'F' AND
-        pd.dataProducao = ?
+        ped.idPedido IN ${ped}
       GROUP BY
-        dataProducao, pedido, idCliente, cliente, idProduto, produto, metros
-      ORDER BY
-        pro.nome ASC
-;
+        pd.dataProducao, pedido, idCliente, cliente, idProduto, produto, metros
+      order by
+        pedido, produto ASC
     `
-    const params = [itemPesquisa]
-    return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, params)
+    const params = [ped]
+    return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
   }
-
   @Post("fichasCortesPedidos")
   async fichasCortesPedidos(
     @Body("itemPesquisa") itemPesquisa: string,

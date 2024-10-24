@@ -9,7 +9,6 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface, DetalhePecaInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
 import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
@@ -331,9 +330,9 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       })
   }
 
-  useEffect(() => {
-    buscarDados()
-  }, [open])
+  // useEffect(() => {
+  //   buscarDados()
+  // }, [open])
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))

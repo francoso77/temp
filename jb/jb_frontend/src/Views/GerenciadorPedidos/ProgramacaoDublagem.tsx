@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
@@ -125,9 +125,6 @@ export default function ProgramacaoDublagem() {
   }
 
   const onEtiqueta = async (id: number) => {
-    // const { dataProgramacao } = await pesquisarID(id);
-    // const dataPesquisa = formatarData(dataProgramacao);
-    // clsRelatorioProgramacao.renderEtiqueta(dataPesquisa);
     setId(id)
     setOpen(true)
   }

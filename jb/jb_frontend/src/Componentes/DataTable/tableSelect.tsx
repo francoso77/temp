@@ -30,7 +30,6 @@ export default function TableSelect<T>({
     exibirPaginacao = true,
 }: DataTableInterface) {
 
-    const clsFormatacao = new ClsFormatacao()
     const theme = useTheme()
     const [openRows, setOpenRows] = useState<number[]>([]);
     const [page, setPage] = useState(0)

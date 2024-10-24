@@ -69,13 +69,14 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.etiquetasPedidos = function (itemPesquisa) {
+    OutController.prototype.etiquetasPedidos = function (pedidos) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, params;
+            var ped, sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pd.dataProducao AS dataProducao,\n        ped.idPedido AS pedido,\n        pc.idPessoa AS idCliente,\n        pc.nome AS cliente,\n        pro.idProduto AS idProduto,\n        pro.nome AS produto,\n        dp.metros AS metros\n      FROM\n        producaodublagens pd\n      INNER JOIN\n        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem\n      INNER JOIN\n        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem\n      INNER JOIN\n        produtos pro ON pro.idProduto = dpd.idProduto\n      INNER JOIN\n        pedidos ped ON ped.idPedido = pd.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      WHERE \n        ped.statusPedido = 'F' AND\n        pd.dataProducao = ?\n      GROUP BY\n        dataProducao, pedido, idCliente, cliente, idProduto, produto, metros\n      ORDER BY\n        pro.nome ASC\n;\n    ";
-                params = [itemPesquisa];
-                return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacaoDublagem_entity_1.default).query(sql, params)];
+                ped = '(' + pedidos.map(function (v) { return v; }).join(", ") + ')';
+                sql = "\n      SELECT \n        pd.dataProducao AS dataProducao,\n        ped.idPedido AS pedido,\n        pc.idPessoa AS idCliente,\n        pc.nome AS cliente,\n        pro.idProduto AS idProduto,\n        pro.nome AS produto,\n        dp.metros AS metros\n      FROM\n        producaodublagens pd\n      INNER JOIN\n        detalheproducaodublagens dpd ON dpd.idDublagem = pd.idDublagem\n      INNER JOIN\n        detalhepecas dp ON dp.idDetalheProducaoDublagem = dpd.idDetalheProducaoDublagem\n      INNER JOIN\n        produtos pro ON pro.idProduto = dpd.idProduto\n      INNER JOIN\n        pedidos ped ON ped.idPedido = pd.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      WHERE \n        ped.idPedido IN ".concat(ped, "\n      GROUP BY\n        pd.dataProducao, pedido, idCliente, cliente, idProduto, produto, metros\n      order by\n        pedido, produto ASC\n    ");
+                params = [ped];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(producaoDublagem_entity_1.default).query(sql, params)];
             });
         });
     };
@@ -247,9 +248,9 @@ var OutController = /** @class */ (function () {
     ], OutController.prototype, "pedidosFechados", null);
     __decorate([
         (0, common_1.Post)("etiquetasPedidos"),
-        __param(0, (0, common_1.Body)("itemPesquisa")),
+        __param(0, (0, common_1.Body)("pedidos")),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String]),
+        __metadata("design:paramtypes", [Array]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "etiquetasPedidos", null);
     __decorate([

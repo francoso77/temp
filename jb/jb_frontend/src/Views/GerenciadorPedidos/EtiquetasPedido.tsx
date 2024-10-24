@@ -11,26 +11,24 @@ import ClsApi from '../../Utils/ClsApi';
 import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import CloseIcon from '@mui/icons-material/Close'
 import TableSelect from '../../Componentes/DataTable/tableSelect';
-
-
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao';
 
 interface PropsInterface {
   programacao: number,
   setOpenMaster: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-
 export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInterface) {
 
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
+  const clsRelatorioProgramacao = new ClsRelatorioProgramacao()
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
   const [rsPessoa, setRsPessoa] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
-
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -71,8 +69,20 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
 
   ]
 
-  const onEtiqueta = (rs: DetalheProgramacaoDublagemInterface) => {
+  async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
 
+    const tmp: Array<number> = []
+    selecao.forEach((sel: any) => {
+
+      tmp.push(rsPesquisa[sel].idPedido)
+
+    })
+    onEtiqueta(tmp)
+    setSelected([])
+  }
+
+  const onEtiqueta = async (ids: number[]) => {
+    clsRelatorioProgramacao.renderEtiqueta(ids)
   }
 
   const btFechar = () => {
@@ -99,7 +109,6 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
         setRsPessoa(rsPessoas)
       })
 
-    console.log(programacao, 'programacao')
     clsApi.execute<Array<PedidoInterface>>({
       url: 'pedidosFechados',
       method: 'post',
@@ -134,10 +143,11 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
                   {
                     icone: "printTwoToneIcon",
                     onAcionador: (rs: DetalheProgramacaoDublagemInterface) =>
-                      onEtiqueta(rs),
+                      onEtiqueta([rs.idPedido]),
                     toolTip: "Excluir",
                   },
                 ]}
+                onStatus={onStatus}
               />
             </Grid>
           </Grid>

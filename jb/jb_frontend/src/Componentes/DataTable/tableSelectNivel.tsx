@@ -3,7 +3,6 @@ import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSort
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
@@ -12,13 +11,6 @@ import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
-import { styled } from '@mui/material/styles';
-import SpeedDial, { SpeedDialProps } from '@mui/material/SpeedDial';
 
 interface ItemDetail {
     idDetalhePedido: number,
@@ -70,17 +62,7 @@ export default function DataTableSelect<T>({
     const [order, setOrder] = useState<Order>('asc')
     const [orderBy, setOrderBy] = useState<keyof any>('nome')
     const [somaQtd, setSomaQtd] = useState<number>(0)
-    const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
-    // const clicou = (msg: string) => {
-    //     console.log('clicou aqui ', msg)
-    // }
-    // const actions = [
-    //     { icon: <FileCopyIcon />, name: 'Copiar', click: () => clicou('copiar') },
-    //     { icon: <SaveIcon />, name: 'Salvar', click: () => clicou('salvar') },
-    //     { icon: <PrintIcon />, name: 'Imprimir', click: () => clicou('imprimir') },
-    //     { icon: <ShareIcon />, name: 'Compartilhar', click: () => clicou('compartilhar') },
-    // ];
 
     const handleRowClick = (id: number) => {
         setOpenRows((prevOpenRows) =>
@@ -204,7 +186,7 @@ export default function DataTableSelect<T>({
                             variant="subtitle1"
                             component="div"
                         >
-                            {clsFormatacao.currency(somaQtd)} metros programados
+                            {clsFormatacao.currency(somaQtd)} metros
                         </Typography>
                     </>
                 ) : (

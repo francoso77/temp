@@ -406,30 +406,11 @@ export default function ProducaoDublagem() {
         entidade: "Pedido",
         campoOrder: ["idPedido"],
         relations: ["detalhePedidos"],
-        criterio: {
-          statusPedido: 'C'
-        },
-        camposLike: ['statusPedido'],
         select: ['idPedido', 'statusPedido']
       })
       .then((rsPedidos: Array<PedidoInterface>) => {
         setRsPedido(rsPedidos)
       })
-
-
-    // clsCrud
-    //   .pesquisar({
-    //     entidade: "Produto",
-    //     campoOrder: ['nome'],
-    //     criterio: {
-    //       tipoProduto: [7],
-    //     },
-    //     camposLike: ['tipoProduto'],
-    //   })
-    //   .then((rsProdutos: Array<ProdutoInterface>) => {
-    //     setRsProduto(rsProdutos)
-    //   })
-
   }
 
   const btPesquisarQtd = (pedido: number) => {
