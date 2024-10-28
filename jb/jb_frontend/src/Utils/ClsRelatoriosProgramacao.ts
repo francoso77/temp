@@ -4,6 +4,8 @@ import ClsFormatacao from "./ClsFormatacao";
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import ClsCrud from './ClsCrudApi';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 interface DadosPedidos {
   pedido: number;
@@ -43,55 +45,90 @@ interface DadosEtiqueta {
   produto: string;
   metros: number;
 }
+
+interface PecasTinturaria {
+  peca: string;
+  idTecido: number;
+  artigo: string;
+  peso: number;
+}
+interface DadosTinturaria {
+  dataTinturaria: string;
+  romaneio: number;
+  idCliente: number;
+  cliente: string;
+  idTinturaria: number;
+  tinturaria: string;
+  pecas: Array<PecasTinturaria>;
+}
 class ClsRelatorioProgramacao {
   public tecidos: DadosFilter[] = [];
   public forros: Dados[] = [];
   public espumas: Dados[] = [];
   public pedidos: DadosPedidos[] = [];
   public etiquetas: DadosEtiqueta[] = [];
+  public tinturaria: DadosTinturaria[] = [];
   public clsFormatacao = new ClsFormatacao();
   public clsApi = new ClsApi();
   public clsCrud = new ClsCrud();
 
-  private async BuscarDados(dt: string): Promise<void> {
+  private async BuscarDados(dt: string | Array<number>): Promise<void> {
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/; // Padrão de data no formato YYYY-MM-DD
     try {
-      const [pedidos, forros, espumas, tecidos] = await Promise.all([
+
+      const defaultDate = "0001-01-01";
+      const formattedDate = typeof dt === 'string' && datePattern.test(dt) ? dt : defaultDate;
+
+      const [pedidos, forros, espumas, tecidos, etiquetas] = await Promise.all([
         this.clsApi.execute<Array<DadosPedidos>>({
           url: 'fichasCortesPedidos',
           method: 'post',
-          itemPesquisa: dt
+          itemPesquisa: formattedDate,
         }),
         this.clsApi.execute<Array<Dados>>({
           url: 'pedidosEspumasEForrosProgramadas',
           method: 'post',
-          itemPesquisa: dt,
+          itemPesquisa: formattedDate,
           campo: 'nome',
           tipo: 'Forro',
         }),
         this.clsApi.execute<Array<Dados>>({
           url: 'pedidosEspumasEForrosProgramadas',
           method: 'post',
-          itemPesquisa: dt,
+          itemPesquisa: formattedDate,
           campo: 'nome',
           tipo: 'Espuma',
         }),
         this.clsApi.execute<Array<DadosFilter>>({
           url: 'pedidosTecidosProgramadas',
           method: 'post',
-          itemPesquisa: dt,
+          itemPesquisa: formattedDate,
           campo: 'nome',
         }),
+        this.clsApi.execute<Array<DadosEtiqueta>>({
+          url: 'etiquetasPedidos',
+          method: 'post',
+          pedidos: typeof dt === 'object' ? dt : [0],
+        })
       ]);
 
       this.pedidos = pedidos;
       this.forros = forros;
       this.espumas = espumas;
       this.tecidos = tecidos;
+      this.etiquetas = etiquetas;
+
+      // console.log('tecidos', this.tecidos);
+      // console.log('pedidos', this.pedidos);
+      // console.log('forros', this.forros);
+      // console.log('espumas', this.espumas);
+      // console.log('etiquetas', this.etiquetas);
 
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     }
   }
+
   private renderDetalhes = (row: Dados): Array<{ metros: string; produto: string; cor: string; pedido: number; cliente: string }> => {
     const detalhesFiltrados = this.tecidos.filter(tecido => tecido.idProduto === row.idProduto && tecido.cor === row.cor);
     const itensFiltrados = this.tecidos.filter(item =>
@@ -293,25 +330,84 @@ class ClsRelatorioProgramacao {
 
   }
 
+  private gerarRomaneio = () => {
+    const worksheet = XLSX.utils.json_to_sheet(this.etiquetas)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Romaneio')
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+    const file = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(file, 'Romaneio_Dublados - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.xlsx');
+  }
+
+  private gerarTintuaria = () => {
+
+    const doc = new jsPDF({
+      orientation: 'portrait',   // 'portrait' ou 'landscape'
+      unit: 'mm',                // Unidade: 'mm', 'cm', 'in', etc.
+      format: 'a4'
+    })
+
+    const startX = 3; // Margem esquerda
+    let startY = 7;   // Margem superior
+    const lineHeight = 7; // Altura de cada linha
+
+    this.tinturaria.forEach((tinturaria: DadosTinturaria) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('ROMANEIO: ' + this.clsFormatacao.notaFiscal(tinturaria.romaneio.toString()), startX, startY);
+      doc.text('CLIENTE: ' + tinturaria.cliente, startX, startY * 2);
+      doc.text('TINTURARIA: ' + tinturaria.tinturaria, startX, startY * 3);
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(12);
+      doc.text('PEÇA          PRODUTO         PESO', startX, startY * 5);
+      doc.text('__________________________________________________________', startX, startY * 5);
+      doc.setFontSize(10);
+
+      tinturaria.pecas.forEach((item: PecasTinturaria) => {
+        doc.text(item.peca, startX, startY + lineHeight * 5);
+        doc.text(item.artigo, startX + 25, startY + lineHeight * 5);
+        doc.text(item.peso.toString(), startX + 55, startY + lineHeight * 5);
+        startY += lineHeight;
+      })
+
+    })
+
+    doc.save('Romaneio_Malharia - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+
+  }
+
+  public renderTintuaria = async (romaneio: number) => {
+    await this.clsApi.execute<Array<DadosTinturaria>>({
+      url: 'romaneiosTinturaria',
+      method: 'post',
+      id: romaneio,
+    }).then((res: Array<DadosTinturaria>) => {
+      this.tinturaria = res
+    })
+
+    this.gerarTintuaria()
+  }
+
   public renderRelacao = async (dt: string) => {
-    await this.BuscarDados(dt); // Aguarda a busca dos dados antes de gerar o PDF
-    this.gerarPdf(dt);
+    await this.BuscarDados(dt)
+    this.gerarPdf(dt)
   }
 
   public renderFicha = async (dt: string) => {
-    await this.BuscarDados(dt); // Aguarda a busca dos dados antes de gerar o PDF
-    this.gerarFicha();
+    await this.BuscarDados(dt)
+    this.gerarFicha()
   }
 
   public renderEtiqueta = async (ids: Array<number>) => {
-    const etiquetas = await this.clsApi.execute<Array<DadosEtiqueta>>({
-      url: 'etiquetasPedidos',
-      method: 'post',
-      pedidos: ids
-    })
-    this.etiquetas = etiquetas
-    this.gerarEtiqueta();
+    await this.BuscarDados(ids)
+    this.gerarEtiqueta()
+  }
+
+  public renderRomaneio = async (ids: Array<number>) => {
+    await this.BuscarDados(ids)
+    this.gerarRomaneio()
   }
 }
 
-export default ClsRelatorioProgramacao;
+export default ClsRelatorioProgramacao

@@ -5,6 +5,7 @@ import ProducaoMalharia from '../entities/producaoMalharia.entity'
 import PerdaMalharia from '../entities/perdaMalharia.entity'
 import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
 import ProducaoDublagem from '../entities/producaoDublagem.entity'
+import Tinturaria from '../entities/tinturaria.entity'
 
 @Controller()
 export class OutController {
@@ -524,6 +525,52 @@ export class OutController {
       pd.qtdFilme;
       `
     return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, [itemPesquisa || null])
+  }
+
+  @Post("romaneiosTinturaria")
+  async romaneiosTinturaria(
+    @Body("id") id: number,
+  ): Promise<Array<Tinturaria>> {
+
+    const sql = `
+      SELECT 
+
+      t.idTinturaria AS romaneio,
+      t.dataTinturaria AS dataTinturaria, 
+      t.idPessoa_cliente AS idCliente,
+      pc.nome AS cliente,
+      t.idPessoa_fornecedor AS idFornecedor,
+      pf.nome AS tinturaria,
+              JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'idTinturaria', dt.idTinturaria,
+            'idMalharia', pm.idMalharia,
+            'peca', pm.peca,      
+            'artigo', p.nome,
+            'peso', ROUND(pm.peso, 2)
+          )
+        ) AS pecas
+
+      FROM
+      tinturarias t
+      INNER JOIN
+      detalhetinturarias dt ON dt.idTinturaria = t.idTinturaria
+      INNER JOIN
+      producaomalharias pm ON pm.idMalharia = dt.idMalharia
+      INNER JOIN
+      pessoas pc ON pc.idPessoa = t.idPessoa_cliente
+      INNER JOIN
+      pessoas pf ON pf.idPessoa = t.idPessoa_fornecedor
+      INNER JOIN
+      produtos p ON p.idProduto = pm.idProduto
+      WHERE
+      t.idTinturaria = ?
+      GROUP BY
+      romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria
+      ;
+      `
+    const params = [id]
+    return AppDataSource.getRepository(Tinturaria).query(sql, params)
   }
 
 }

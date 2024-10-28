@@ -1,16 +1,35 @@
 import React, { useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction, SpeedDial } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
 import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
-import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
-import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
+import styled from 'styled-components';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+// import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
+// import PrintIcon from '@mui/icons-material/Print';
+// import ShareIcon from '@mui/icons-material/Share';
 
+// const actions = [
+//     { icon: <PrintIcon />, name: 'Print', click: () => { } },
+//     { icon: <ShareIcon />, name: 'Share', click: () => { } },
+// ];
+
+const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
+    position: 'absolute',
+    '&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft': {
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+    },
+    '&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight': {
+        top: theme.spacing(2),
+        left: theme.spacing(2),
+    },
+}));
 
 interface EnhancedTableProps {
     numSelected: number;
@@ -28,6 +47,7 @@ export default function TableSelect<T>({
     onStatus = undefined,
     onSelecionarLinha = undefined,
     exibirPaginacao = true,
+    ItemSpeed = [],
 }: DataTableInterface) {
 
     const theme = useTheme()
@@ -172,45 +192,55 @@ export default function TableSelect<T>({
                         Pedidos Cortados
                     </Typography>
                 )}
-                {numSelected > 0 ? (
-                    <Tooltip title="Gerar Etiquetas">
-                        <IconButton
-                            onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
-                        >
-                            <AutorenewTwoToneIcon
-                                sx={{ fontSize: 40, color: 'green' }}
-                            />
-                        </IconButton>
-                    </Tooltip>
-                ) : (<></>
-                    // <Box sx={{ position: 'relative', mr: 10, height: 100 }}>
-                    //     <SpeedDial
-                    //         ariaLabel="Menu de opções"
-                    //         icon={<MoreVertIcon />}
-                    //         direction={'left'}
-                    //         sx={{
-                    //             position: 'absolute',
-                    //             bottom: 23,
-                    //             right: -77,
-                    //             // Aumentar o tamanho do SpeedDial
-                    //             transform: 'scale(1)',
-                    //             '& .MuiFab-primary': {
-                    //                 width: 35, // Largura personalizada
-                    //                 height: 35, // Altura personalizada
-                    //             },
-                    //         }}
-
+                {numSelected <= 0 ? (<></>
+                    // <Tooltip title="Gerar Etiquetas">
+                    //     <IconButton
+                    //         onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
                     //     >
-                    //         {actions.map((action) => (
-                    //             <SpeedDialAction
-                    //                 key={action.name}
-                    //                 icon={action.icon}
-                    //                 tooltipTitle={action.name}
-                    //                 onClick={action.click}
-                    //             />
-                    //         ))}
-                    //     </SpeedDial>
-                    // </Box>
+                    //         <AutorenewTwoToneIcon
+                    //             sx={{ fontSize: 40, color: 'green' }}
+                    //         />
+                    //     </IconButton>
+                    // </Tooltip>
+                ) : (
+                    <Box sx={{ position: 'relative', mr: 10, height: 100 }}>
+                        <SpeedDial
+                            ariaLabel="Menu de opções"
+                            icon={<MoreVertIcon />}
+                            direction={'left'}
+                            sx={{
+                                color: 'green',
+                                position: 'absolute',
+                                bottom: 23,
+                                right: -77,
+                                // Aumentar o tamanho do SpeedDial
+                                transform: 'scale(1)',
+                                '& .MuiFab-primary': {
+                                    bgcolor: theme.palette.secondary.main, // Cor de fundo do botão principal
+                                    color: 'white', // Cor do ícone
+                                    width: 35,
+                                    height: 35,
+                                    '&:hover': {
+                                        bgcolor: 'green', // Cor ao passar o mouse
+                                    },
+                                },
+                                '& .MuiSpeedDialAction-staticTooltipLabel': {
+                                    bgcolor: 'black', // Cor de fundo dos tooltips
+                                    color: 'white', // Cor do texto nos tooltips
+                                },
+                            }}
+
+                        >
+                            {ItemSpeed.map((action) => (
+                                <SpeedDialAction
+                                    key={action.name}
+                                    icon={action.icon}
+                                    tooltipTitle={action.name}
+                                    onClick={onStatus ? () => onStatus(selected, setSelected, action.tipo) : undefined}
+                                />
+                            ))}
+                        </SpeedDial>
+                    </Box>
                 )}
             </Toolbar>
         );

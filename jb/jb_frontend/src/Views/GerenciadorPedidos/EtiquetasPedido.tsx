@@ -2,7 +2,7 @@ import { Container, Grid, IconButton, Paper } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
+import { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalheProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
 import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
@@ -12,6 +12,8 @@ import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInt
 import CloseIcon from '@mui/icons-material/Close'
 import TableSelect from '../../Componentes/DataTable/tableSelect';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao';
+import ArticleTwoToneIcon from '@mui/icons-material/ArticleTwoTone';
+import SellTwoToneIcon from '@mui/icons-material/SellTwoTone';
 
 interface PropsInterface {
   programacao: number,
@@ -69,7 +71,11 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
 
   ]
 
-  async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
+  async function onStatus(
+    selecao: any,
+    setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>,
+    tipo: "etiqueta" | "romaneio"
+  ) {
 
     const tmp: Array<number> = []
     selecao.forEach((sel: any) => {
@@ -77,14 +83,27 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
       tmp.push(rsPesquisa[sel].idPedido)
 
     })
-    onEtiqueta(tmp)
+    if (tipo === "etiqueta") {
+      onEtiqueta(tmp)
+    } else {
+      onRomaneio(tmp)
+    }
     setSelected([])
   }
+
 
   const onEtiqueta = async (ids: number[]) => {
     clsRelatorioProgramacao.renderEtiqueta(ids)
   }
 
+  const onRomaneio = async (ids: number[]) => {
+    clsRelatorioProgramacao.renderRomaneio(ids)
+  }
+
+  const actions: Array<ItemSpeedDial> = [
+    { icon: <SellTwoToneIcon />, name: 'Etiqueta', tipo: "etiqueta" },
+    { icon: <ArticleTwoToneIcon />, name: 'Romaneio', tipo: "romaneio" },
+  ]
   const btFechar = () => {
     setOpenMaster(false)
   }
@@ -137,14 +156,21 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
             </Grid>
             <Grid item xs={12} sx={{ mt: 3 }}>
               <TableSelect
+                ItemSpeed={actions}
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
                   {
-                    icone: "printTwoToneIcon",
+                    icone: "sellTwoToneIcon",
                     onAcionador: (rs: DetalheProgramacaoDublagemInterface) =>
                       onEtiqueta([rs.idPedido]),
-                    toolTip: "Excluir",
+                    toolTip: "Etiqueta",
+                  },
+                  {
+                    icone: "articleTwoToneIcon",
+                    onAcionador: (rs: DetalheProgramacaoDublagemInterface) =>
+                      onRomaneio([rs.idPedido]),
+                    toolTip: "Romaneio",
                   },
                 ]}
                 onStatus={onStatus}

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
@@ -6,7 +6,6 @@ import { visuallyHidden } from '@mui/utils';
 import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
-import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
@@ -202,7 +201,7 @@ export default function DataTableSelect<T>({
                 {numSelected > 0 ? (
                     <Tooltip title="Em Produção">
                         <IconButton
-                            onClick={onStatus ? () => onStatus(selected, setSelected) : undefined}
+                            onClick={onStatus ? () => onStatus(selected, setSelected, 'etiqueta') : undefined}
                         >
                             <AutorenewTwoToneIcon
                                 sx={{ fontSize: 40, color: 'green' }}

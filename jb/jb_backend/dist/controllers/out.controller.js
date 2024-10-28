@@ -56,6 +56,7 @@ var producaoMalharia_entity_1 = require("../entities/producaoMalharia.entity");
 var perdaMalharia_entity_1 = require("../entities/perdaMalharia.entity");
 var programacaoDublagem_entity_1 = require("../entities/programacaoDublagem.entity");
 var producaoDublagem_entity_1 = require("../entities/producaoDublagem.entity");
+var tinturaria_entity_1 = require("../entities/tinturaria.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -239,6 +240,16 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    OutController.prototype.romaneiosTinturaria = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n      SELECT \n\n      t.idTinturaria AS romaneio,\n      t.dataTinturaria AS dataTinturaria, \n      t.idPessoa_cliente AS idCliente,\n      pc.nome AS cliente,\n      t.idPessoa_fornecedor AS idFornecedor,\n      pf.nome AS tinturaria,\n              JSON_ARRAYAGG(\n          JSON_OBJECT(\n            'idTinturaria', dt.idTinturaria,\n            'idMalharia', pm.idMalharia,\n            'peca', pm.peca,      \n            'artigo', p.nome,\n            'peso', ROUND(pm.peso, 2)\n          )\n        ) AS pecas\n\n      FROM\n      tinturarias t\n      INNER JOIN\n      detalhetinturarias dt ON dt.idTinturaria = t.idTinturaria\n      INNER JOIN\n      producaomalharias pm ON pm.idMalharia = dt.idMalharia\n      INNER JOIN\n      pessoas pc ON pc.idPessoa = t.idPessoa_cliente\n      INNER JOIN\n      pessoas pf ON pf.idPessoa = t.idPessoa_fornecedor\n      INNER JOIN\n      produtos p ON p.idProduto = pm.idProduto\n      WHERE\n      t.idTinturaria = ?\n      GROUP BY\n      romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria\n      ;\n      ";
+                params = [id];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(tinturaria_entity_1.default).query(sql, params)];
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)("pedidosFechados"),
         __param(0, (0, common_1.Body)("id")),
@@ -346,6 +357,13 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "programacaoPedidos", null);
+    __decorate([
+        (0, common_1.Post)("romaneiosTinturaria"),
+        __param(0, (0, common_1.Body)("id")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Number]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "romaneiosTinturaria", null);
     OutController = __decorate([
         (0, common_1.Controller)()
     ], OutController);

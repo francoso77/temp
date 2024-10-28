@@ -24,13 +24,19 @@ export interface DataTableCabecalhoInterface {
   format?: (arg: any, row: any) => string | number | undefined
 }
 
+export interface ItemSpeedDial {
+  icon: JSX.Element;
+  name: string;
+  tipo: "etiqueta" | "romaneio";
+}
+
 export interface DataTableInterface {
   dados: Array<any>
   cabecalho: Array<DataTableCabecalhoInterface>
   cabecalhoDetalhe?: Array<any>
   acoes?: Array<DataTableAcaoInterface<any>>
   acoesDetalhe?: Array<DataTableAcaoInterface<any>>
-  onStatus?: (selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) => void
+  onStatus?: (selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>, tipo: "etiqueta" | "romaneio") => void
   onSelecionarLinha?: (
     rs: { [key: string]: number | string } | Object,
     linha: number
@@ -38,6 +44,7 @@ export interface DataTableInterface {
   exibirPaginacao?: boolean
   temTotal?: boolean;
   colunaSoma?: Array<string>;
+  ItemSpeed?: Array<ItemSpeedDial>;
   // qtdColunas?: number;
 }
 

@@ -15,8 +15,10 @@ import ShowText from '../../Componentes/ShowText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsApi from '../../Utils/ClsApi';
+import ClsRelatoriosProgramacao from '../../Utils/ClsRelatoriosProgramacao';
 import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
+import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -39,6 +41,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
+  const clsRelatorios = new ClsRelatoriosProgramacao()
 
   const DadosPeca: DadosPecaInterface = {
     peca: ''
@@ -120,6 +123,9 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     })
   }
 
+  const btRomaneio = () => {
+    clsRelatorios.renderTintuaria(rsMaster.idTinturaria as number)
+  }
   const btCancelar = () => {
     setMasterLocalState({ action: actionTypes.pesquisando })
     setLocalState({ action: actionTypes.incluindo })
@@ -540,6 +546,15 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
 
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+              <Tooltip title={'Romaneio'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 3, ml: 2 }}
+                  onClick={() => btRomaneio()}
+                >
+                  <PictureAsPdfRoundedIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
               <Tooltip title={'Cancelar'}>
                 <IconButton
                   color="secondary"
