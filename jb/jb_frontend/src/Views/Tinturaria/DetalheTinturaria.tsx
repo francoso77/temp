@@ -126,6 +126,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const btRomaneio = () => {
     clsRelatorios.renderTintuaria(rsMaster.idTinturaria as number)
   }
+
   const btCancelar = () => {
     setMasterLocalState({ action: actionTypes.pesquisando })
     setLocalState({ action: actionTypes.incluindo })
@@ -546,7 +547,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
           <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
 
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
-              <Tooltip title={'Romaneio'}>
+              {/* <Tooltip title={'Romaneio'}>
                 <IconButton
                   color="secondary"
                   sx={{ mt: 3, ml: 2 }}
@@ -554,7 +555,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
                 >
                   <PictureAsPdfRoundedIcon sx={{ fontSize: 50 }} />
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
               <Tooltip title={'Cancelar'}>
                 <IconButton
                   color="secondary"

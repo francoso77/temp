@@ -22,6 +22,7 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
 import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface'
 import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface'
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao'
 
 
 
@@ -30,6 +31,7 @@ export function Tinturaria() {
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const validaCampo = new ClsValidacao()
+  const clsRelatorios = new ClsRelatorioProgramacao()
 
   const ResetDados: TinturariaInterface = {
     dataTinturaria: '',
@@ -104,6 +106,10 @@ export function Tinturaria() {
           dataTinturaria: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
         }
       })
+  }
+
+  const onRomaneio = (id: number) => {
+    clsRelatorios.renderTintuaria(id)
   }
 
   const onDetalhes = (id: string | number) => {
@@ -525,6 +531,12 @@ export function Tinturaria() {
                       onAcionador: (rs: TinturariaInterface) =>
                         onDetalhes(rs.idTinturaria as number),
                       toolTip: "Romaneio",
+                    },
+                    {
+                      icone: "picture_as_pdf_rounded_icon",
+                      onAcionador: (rs: TinturariaInterface) =>
+                        onRomaneio(rs.idTinturaria as number),
+                      toolTip: "Relação Peças",
                     },
                   ]}
                 />

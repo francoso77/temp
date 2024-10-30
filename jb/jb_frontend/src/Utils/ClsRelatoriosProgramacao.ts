@@ -7,6 +7,21 @@ import ClsCrud from './ClsCrudApi';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
+type Composicao = {
+  fio: string;
+  qtdFio: number;
+};
+
+type Peca = {
+  peca: string;
+  peso: number;
+  tear: string;
+  artigo: string;
+  tecelao: string;
+  revisador: string;
+  composisao: Composicao[];
+};
+
 interface DadosPedidos {
   pedido: number;
   idCliente?: number;
@@ -46,12 +61,17 @@ interface DadosEtiqueta {
   metros: number;
 }
 
-interface PecasTinturaria {
-  peca: string;
-  idTecido: number;
-  artigo: string;
-  peso: number;
-}
+// interface PecasTinturaria {
+//   peca: string;
+//   idTecido: number;
+//   artigo: string;
+//   peso: number;
+//   tear: string;
+//   tecelao: string;
+//   revisador: string;
+//   composicao: Array<Composicao>
+// }
+
 interface DadosTinturaria {
   dataTinturaria: string;
   romaneio: number;
@@ -59,8 +79,9 @@ interface DadosTinturaria {
   cliente: string;
   idTinturaria: number;
   tinturaria: string;
-  pecas: Array<PecasTinturaria>;
+  pecas: Array<Peca>;
 }
+
 class ClsRelatorioProgramacao {
   public tecidos: DadosFilter[] = [];
   public forros: Dados[] = [];
@@ -342,38 +363,188 @@ class ClsRelatorioProgramacao {
 
   private gerarTintuaria = () => {
 
-    const doc = new jsPDF({
-      orientation: 'portrait',   // 'portrait' ou 'landscape'
-      unit: 'mm',                // Unidade: 'mm', 'cm', 'in', etc.
-      format: 'a4'
-    })
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    const marginTop = 15;
+    let cursorY = marginTop;
+    let pesoTotalGeral = 0;
+    let qtdTotalGeral = 0;
+    let pageNumber = 1;
 
-    const startX = 3; // Margem esquerda
-    let startY = 7;   // Margem superior
-    const lineHeight = 7; // Altura de cada linha
-
-    this.tinturaria.forEach((tinturaria: DadosTinturaria) => {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text('ROMANEIO: ' + this.clsFormatacao.notaFiscal(tinturaria.romaneio.toString()), startX, startY);
-      doc.text('CLIENTE: ' + tinturaria.cliente, startX, startY * 2);
-      doc.text('TINTURARIA: ' + tinturaria.tinturaria, startX, startY * 3);
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(12);
-      doc.text('PEÇA          PRODUTO         PESO', startX, startY * 5);
-      doc.text('__________________________________________________________', startX, startY * 5);
+    // Cabeçalho do Relatório
+    const addHeader = () => {
+      doc.setFontSize(14);
+      doc.text("Romaneio de peças", pageWidth / 2, cursorY, { align: 'center' });
       doc.setFontSize(10);
+      cursorY += 10;
+      doc.text('Cliente: ' + this.tinturaria[0].cliente, 10, cursorY);
+      cursorY += 5;
+      doc.text('Tinturaria: ' + this.tinturaria[0].tinturaria, 10, cursorY);
+      cursorY += 5;
+      doc.text('Romaneio: ' + this.tinturaria[0].romaneio, 10, cursorY);
+      cursorY += 5;
+    };
 
-      tinturaria.pecas.forEach((item: PecasTinturaria) => {
-        doc.text(item.peca, startX, startY + lineHeight * 5);
-        doc.text(item.artigo, startX + 25, startY + lineHeight * 5);
-        doc.text(item.peso.toString(), startX + 55, startY + lineHeight * 5);
-        startY += lineHeight;
-      })
+    // Rodapé do Relatório
+    const addFooter = () => {
+      const dataAtual = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+      doc.setFontSize(8);
+      doc.text(dataAtual, 10, pageHeight - 10);
+      doc.text(`Página ${pageNumber}`, pageWidth - 20, pageHeight - 10);
+    };
 
-    })
+    // Função para iniciar nova página
+    const addNewPage = () => {
+      doc.addPage();
+      pageNumber += 1;
+      cursorY = marginTop;
+      addFooter();
+    };
 
-    doc.save('Romaneio_Malharia - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    addHeader();
+    addFooter();
+
+
+    // Agrupamento por Artigo
+    const artigosAgrupados = this.tinturaria[0].pecas.reduce((acc, peca) => {
+      if (!acc[peca.artigo]) acc[peca.artigo] = [];
+      acc[peca.artigo].push(peca);
+      return acc;
+    }, {} as Record<string, Peca[]>);
+
+    Object.entries(artigosAgrupados).forEach(([artigo, pecas], index) => {
+      const pesoTotalArtigo = pecas.reduce((acc, peca) => acc + peca.peso, 0);
+      const qtdTotalArtigo = pecas.length;
+      pesoTotalGeral += pesoTotalArtigo;
+      qtdTotalGeral += qtdTotalArtigo;
+
+      // Cálculo de espaço necessário para o artigo atual
+      const artigoHeight = 30 + pecas.length * 10 + pecas[0].composisao.length * 10;
+      if (cursorY + artigoHeight > pageHeight - 20) addNewPage(); // Se não houver espaço, cria nova página
+
+      // Cabeçalho do Artigo e Composição com multiplicação de `qtdFio` pelo `pesoTotalArtigo`
+      autoTable(doc, {
+        head: [[`Artigo: ${artigo}`, `Peso Total: ${pesoTotalArtigo.toFixed(2)} kg`, `Quantidade: ${qtdTotalArtigo}`]],
+        startY: cursorY,
+        headStyles: {
+          fillColor: [220, 220, 220],
+          textColor: [0, 0, 0],
+          lineWidth: 0.1,
+          lineColor: [0, 0, 0],
+          fontStyle: 'italic',
+          fontSize: 9,
+        },
+      });
+
+      cursorY = (doc as any).lastAutoTable.finalY + 1;
+
+      // Composição do Artigo (multiplicando `qtdFio` pelo peso total do artigo)
+      const composicaoArtigo = pecas[0].composisao.map((fio) => [
+        fio.fio,
+        (fio.qtdFio).toFixed(2) + '%',
+        (fio.qtdFio * pesoTotalArtigo).toFixed(2), // Multiplicação do `qtdFio` pelo `pesoTotalArtigo`
+      ]);
+      autoTable(doc, {
+        head: [['Fio', 'Qtd%', 'Qtd Total (Fio x Peso do Artigo)']],
+        body: composicaoArtigo,
+        startY: cursorY,
+        bodyStyles: {
+          fontSize: 5, // Tamanho da fonte do corpo da tabela
+          fillColor: [255, 255, 255], textColor: [0, 0, 0], lineWidth: 0.1, lineColor: [0, 0, 0]
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          lineWidth: 0.1,
+          lineColor: [0, 0, 0],
+          fontStyle: 'normal',
+          fontSize: 9,
+        },
+      });
+
+      cursorY = (doc as any).lastAutoTable.finalY + 1;
+
+      // Agrupamento por Tear
+      const tearesAgrupados = pecas.reduce((acc, peca) => {
+        if (!acc[peca.tear]) acc[peca.tear] = [];
+        acc[peca.tear].push(peca);
+        return acc;
+      }, {} as Record<string, Peca[]>);
+
+      Object.entries(tearesAgrupados).forEach(([tear, itensTear]) => {
+        const pesoTotalTear = itensTear.reduce((acc, peca) => acc + peca.peso, 0);
+        const qtdTotalTear = itensTear.length;
+
+        // Cabeçalho do Tear
+        autoTable(doc, {
+          head: [[`Tear: ${tear}`]],
+          startY: cursorY,
+          headStyles: {
+            fillColor: [255, 255, 255],
+            textColor: [0, 0, 0],
+            lineWidth: 0.1,
+            lineColor: [0, 0, 0],
+            fontStyle: 'normal',
+            fontSize: 9,
+          },
+          //headStyles: { fillColor: [52, 152, 219], textColor: [255, 255, 255] },
+        });
+
+        cursorY = (doc as any).lastAutoTable.finalY + 0.5;
+
+        // Detalhes das Peças
+        const itemData = itensTear.map((peca) => [
+          peca.peca,
+          peca.peso.toFixed(2) + ' kg',
+          peca.tecelao,
+          peca.revisador,
+        ]);
+
+        autoTable(doc, {
+          head: [['Peça', 'Peso', 'Tecelão', 'Revisor']],
+          body: itemData,
+          startY: cursorY,
+          bodyStyles: { fontSize: 7 },
+          headStyles: {
+            fillColor: [255, 255, 255],
+            textColor: [0, 0, 0],
+            lineWidth: 0.1,
+            lineColor: [0, 0, 0],
+            fontStyle: 'normal',
+            fontSize: 9,
+          },
+        });
+
+        cursorY = (doc as any).lastAutoTable.finalY + 1;
+
+      });
+
+      if (cursorY + artigoHeight > pageHeight - 20) addNewPage(); // Avança para nova página caso necessário
+
+    });
+
+    // Totalização Geral
+    if (cursorY + 10 <= pageHeight - 20) { // Verifica se há espaço na página atual
+      autoTable(doc, {
+        head: [['Peso Total Geral', 'Quantidade Total Geral']],
+        body: [[`${pesoTotalGeral.toFixed(2)} kg`, `${qtdTotalGeral}`]],
+        startY: cursorY,
+        bodyStyles: { fontSize: 8, halign: 'right' },
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: 'right', fontStyle: 'italic' },
+      });
+    } else {
+      addNewPage(); // Adiciona nova página se não houver espaço
+      autoTable(doc, {
+        head: [['Peso Total Geral', 'Quantidade Total Geral']],
+        body: [[`${pesoTotalGeral.toFixed(2)} kg`, `${qtdTotalGeral}`]],
+        startY: cursorY,
+        bodyStyles: { fontSize: 8, halign: 'right' },
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: 'right', fontStyle: 'italic' },
+      });
+    }
+
+    doc.save('Romaneio_Malharia-Romaneio-' + this.tinturaria[0].romaneio + '.pdf');
 
   }
 
@@ -386,6 +557,7 @@ class ClsRelatorioProgramacao {
       this.tinturaria = res
     })
 
+    console.log(this.tinturaria)
     this.gerarTintuaria()
   }
 

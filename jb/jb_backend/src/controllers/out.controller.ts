@@ -533,41 +533,51 @@ export class OutController {
   ): Promise<Array<Tinturaria>> {
 
     const sql = `
-      SELECT 
-
-      t.idTinturaria AS romaneio,
-      t.dataTinturaria AS dataTinturaria, 
-      t.idPessoa_cliente AS idCliente,
-      pc.nome AS cliente,
-      t.idPessoa_fornecedor AS idFornecedor,
-      pf.nome AS tinturaria,
-              JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'idTinturaria', dt.idTinturaria,
-            'idMalharia', pm.idMalharia,
-            'peca', pm.peca,      
-            'artigo', p.nome,
-            'peso', ROUND(pm.peso, 2)
-          )
+    SELECT 
+        t.idTinturaria AS romaneio,
+        t.dataTinturaria AS dataTinturaria, 
+        t.idPessoa_cliente AS idCliente,
+        pc.nome AS cliente,
+        t.idPessoa_fornecedor AS idFornecedor,
+        pf.nome AS tinturaria,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'idTinturaria', dt.idTinturaria,
+                'idMalharia', pm.idMalharia,
+                'tear', m.nome,
+                'peca', pm.peca,      
+                'artigo', p.nome,
+                'peso', ROUND(pm.peso, 2),
+                'tecelao', pt.nome,
+                'revisador', pr.nome,
+                'composisao', (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'fio', pro.nome,
+                            'qtdFio', des.qtd
+                        )
+                    )
+                    FROM detalheestruturas des
+                    INNER JOIN produtos pro ON pro.idProduto = des.idProduto
+                    WHERE des.idEstrutura = e.idEstrutura
+                )
+            )
         ) AS pecas
-
-      FROM
-      tinturarias t
-      INNER JOIN
-      detalhetinturarias dt ON dt.idTinturaria = t.idTinturaria
-      INNER JOIN
-      producaomalharias pm ON pm.idMalharia = dt.idMalharia
-      INNER JOIN
-      pessoas pc ON pc.idPessoa = t.idPessoa_cliente
-      INNER JOIN
-      pessoas pf ON pf.idPessoa = t.idPessoa_fornecedor
-      INNER JOIN
-      produtos p ON p.idProduto = pm.idProduto
-      WHERE
-      t.idTinturaria = ?
-      GROUP BY
-      romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria
-      ;
+    FROM
+        tinturarias t
+        INNER JOIN detalhetinturarias dt ON dt.idTinturaria = t.idTinturaria
+        INNER JOIN producaomalharias pm ON pm.idMalharia = dt.idMalharia
+        INNER JOIN pessoas pr ON pr.idPessoa = pm.idPessoa_revisador
+        INNER JOIN pessoas pt ON pt.idPessoa = pm.idPessoa_tecelao
+        INNER JOIN maquinas m ON m.idMaquina = pm.idMaquina
+        INNER JOIN pessoas pc ON pc.idPessoa = t.idPessoa_cliente
+        INNER JOIN pessoas pf ON pf.idPessoa = t.idPessoa_fornecedor
+        INNER JOIN produtos p ON p.idProduto = pm.idProduto
+        INNER JOIN estruturas e ON e.idProduto = p.idProduto
+    WHERE
+        t.idTinturaria = ?
+    GROUP BY
+        romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria;
       `
     const params = [id]
     return AppDataSource.getRepository(Tinturaria).query(sql, params)
