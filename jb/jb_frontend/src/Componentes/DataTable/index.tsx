@@ -45,6 +45,7 @@ export interface DataTableInterface {
   temTotal?: boolean;
   colunaSoma?: Array<string>;
   ItemSpeed?: Array<ItemSpeedDial>;
+  tituloTabela?: string;
   // qtdColunas?: number;
 }
 

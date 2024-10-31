@@ -174,6 +174,7 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
                   },
                 ]}
                 onStatus={onStatus}
+                tituloTabela='Pedidos Cortados'
               />
             </Grid>
           </Grid>

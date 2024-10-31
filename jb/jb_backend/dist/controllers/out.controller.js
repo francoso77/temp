@@ -177,12 +177,12 @@ var OutController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 novoStatusPedido = 'F';
                 novoStatusItem = 2;
-                console.log(tipoStatus);
-                console.log(pedido);
-                console.log(produto);
-                console.log(qtd);
-                console.log(novoStatusPedido);
-                console.log(novoStatusItem);
+                // console.log(tipoStatus)
+                // console.log(pedido)
+                // console.log(produto)
+                // console.log(qtd)
+                // console.log(novoStatusPedido)
+                // console.log(novoStatusItem)
                 if (tipoStatus === 'Excluir') {
                     novoStatusPedido = 'C';
                     novoStatusItem = 3;
@@ -240,12 +240,13 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.romaneiosTinturaria = function (id) {
+    OutController.prototype.romaneiosTinturaria = function (pedidos) {
         return __awaiter(this, void 0, void 0, function () {
-            var sql, params;
+            var ped, sql, params;
             return __generator(this, function (_a) {
-                sql = "\n    SELECT \n        t.idTinturaria AS romaneio,\n        t.dataTinturaria AS dataTinturaria, \n        t.idPessoa_cliente AS idCliente,\n        pc.nome AS cliente,\n        t.idPessoa_fornecedor AS idFornecedor,\n        pf.nome AS tinturaria,\n        JSON_ARRAYAGG(\n            JSON_OBJECT(\n                'idTinturaria', dt.idTinturaria,\n                'idMalharia', pm.idMalharia,\n                'tear', m.nome,\n                'peca', pm.peca,      \n                'artigo', p.nome,\n                'peso', ROUND(pm.peso, 2),\n                'tecelao', pt.nome,\n                'revisador', pr.nome,\n                'composisao', (\n                    SELECT JSON_ARRAYAGG(\n                        JSON_OBJECT(\n                            'fio', pro.nome,\n                            'qtdFio', des.qtd\n                        )\n                    )\n                    FROM detalheestruturas des\n                    INNER JOIN produtos pro ON pro.idProduto = des.idProduto\n                    WHERE des.idEstrutura = e.idEstrutura\n                )\n            )\n        ) AS pecas\n    FROM\n        tinturarias t\n        INNER JOIN detalhetinturarias dt ON dt.idTinturaria = t.idTinturaria\n        INNER JOIN producaomalharias pm ON pm.idMalharia = dt.idMalharia\n        INNER JOIN pessoas pr ON pr.idPessoa = pm.idPessoa_revisador\n        INNER JOIN pessoas pt ON pt.idPessoa = pm.idPessoa_tecelao\n        INNER JOIN maquinas m ON m.idMaquina = pm.idMaquina\n        INNER JOIN pessoas pc ON pc.idPessoa = t.idPessoa_cliente\n        INNER JOIN pessoas pf ON pf.idPessoa = t.idPessoa_fornecedor\n        INNER JOIN produtos p ON p.idProduto = pm.idProduto\n        INNER JOIN estruturas e ON e.idProduto = p.idProduto\n    WHERE\n        t.idTinturaria = ?\n    GROUP BY\n        romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria;\n      ";
-                params = [id];
+                ped = '(' + pedidos.map(function (v) { return v; }).join(", ") + ')';
+                sql = "\n    SELECT \n        t.idTinturaria AS romaneio,\n        t.dataTinturaria AS dataTinturaria, \n        t.idPessoa_cliente AS idCliente,\n        pc.nome AS cliente,\n        t.idPessoa_fornecedor AS idFornecedor,\n        pf.nome AS tinturaria,\n        JSON_ARRAYAGG(\n            JSON_OBJECT(\n                'idTinturaria', dt.idTinturaria,\n                'idMalharia', pm.idMalharia,\n                'tear', m.nome,\n                'peca', pm.peca,      \n                'artigo', p.nome,\n                'peso', ROUND(pm.peso, 2),\n                'tecelao', pt.nome,\n                'revisador', pr.nome,\n                'composisao', (\n                    SELECT JSON_ARRAYAGG(\n                        JSON_OBJECT(\n                            'fio', pro.nome,\n                            'qtdFio', des.qtd\n                        )\n                    )\n                    FROM detalheestruturas des\n                    INNER JOIN produtos pro ON pro.idProduto = des.idProduto\n                    WHERE des.idEstrutura = e.idEstrutura\n                )\n            )\n        ) AS pecas\n    FROM\n        tinturarias t\n        INNER JOIN detalhetinturarias dt ON dt.idTinturaria = t.idTinturaria\n        INNER JOIN producaomalharias pm ON pm.idMalharia = dt.idMalharia\n        INNER JOIN pessoas pr ON pr.idPessoa = pm.idPessoa_revisador\n        INNER JOIN pessoas pt ON pt.idPessoa = pm.idPessoa_tecelao\n        INNER JOIN maquinas m ON m.idMaquina = pm.idMaquina\n        INNER JOIN pessoas pc ON pc.idPessoa = t.idPessoa_cliente\n        INNER JOIN pessoas pf ON pf.idPessoa = t.idPessoa_fornecedor\n        INNER JOIN produtos p ON p.idProduto = pm.idProduto\n        INNER JOIN estruturas e ON e.idProduto = p.idProduto\n    WHERE\n        t.idTinturaria IN ".concat(ped, "\n    GROUP BY\n        romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria\n    ORDER BY\n        MIN(p.nome) ASC\n    ;\n      ");
+                params = [ped];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(tinturaria_entity_1.default).query(sql, params)];
             });
         });
@@ -359,9 +360,9 @@ var OutController = /** @class */ (function () {
     ], OutController.prototype, "programacaoPedidos", null);
     __decorate([
         (0, common_1.Post)("romaneiosTinturaria"),
-        __param(0, (0, common_1.Body)("id")),
+        __param(0, (0, common_1.Body)("pedidos")),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [Number]),
+        __metadata("design:paramtypes", [Array]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "romaneiosTinturaria", null);
     OutController = __decorate([

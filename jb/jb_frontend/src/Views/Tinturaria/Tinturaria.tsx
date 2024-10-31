@@ -10,11 +10,12 @@ import CloseIcon from '@mui/icons-material/Close'
 import AddCircleIcon from "@mui/icons-material/AddCircle"
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
+import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import Condicional from '../../Componentes/Condicional/Condicional'
-import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
+import DataTable, { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable'
 import ComboBox from '../../Componentes/ComboBox'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
@@ -23,6 +24,7 @@ import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces
 import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface'
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao'
+import TableSelect from '../../Componentes/DataTable/tableSelect'
 
 
 
@@ -79,6 +81,11 @@ export function Tinturaria() {
       format: (_v, rs: any) => rs.fornecedor.nome
     },
   ]
+
+  const actions: Array<ItemSpeedDial> = [
+    { icon: <PictureAsPdfRoundedIcon />, name: 'Relação Peças', tipo: "romaneio" },
+  ]
+
   const MensagemErro = (erro: string) => {
     setMensagemState({
       titulo: 'Erro...',
@@ -108,7 +115,24 @@ export function Tinturaria() {
       })
   }
 
-  const onRomaneio = (id: number) => {
+  async function onStatus(
+    selecao: any,
+    setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>,
+    tipo: "etiqueta" | "romaneio"
+  ) {
+
+    const tmp: Array<number> = []
+    selecao.forEach((sel: any) => {
+
+      tmp.push(rsPesquisa[sel].idTinturaria)
+
+    })
+    if (tipo === "romaneio") {
+      onRomaneio(tmp)
+    }
+    setSelected([])
+  }
+  const onRomaneio = (id: Array<number>) => {
     clsRelatorios.renderTintuaria(id)
   }
 
@@ -510,9 +534,12 @@ export function Tinturaria() {
                 </Tooltip>
               </Grid>
               <Grid item xs={12}>
-                <DataTable
+                <TableSelect
+                  ItemSpeed={actions}
                   cabecalho={cabecalhoForm}
                   dados={rsPesquisa}
+                  tituloTabela='Romaneios gerados'
+                  onStatus={onStatus}
                   acoes={[
                     {
                       icone: 'edit',
@@ -535,7 +562,7 @@ export function Tinturaria() {
                     {
                       icone: "picture_as_pdf_rounded_icon",
                       onAcionador: (rs: TinturariaInterface) =>
-                        onRomaneio(rs.idTinturaria as number),
+                        onRomaneio([rs.idTinturaria as number]),
                       toolTip: "Relação Peças",
                     },
                   ]}

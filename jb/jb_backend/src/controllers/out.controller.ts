@@ -84,6 +84,7 @@ export class OutController {
     const params = [ped]
     return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
   }
+
   @Post("fichasCortesPedidos")
   async fichasCortesPedidos(
     @Body("itemPesquisa") itemPesquisa: string,
@@ -383,12 +384,12 @@ export class OutController {
     let novoStatusPedido = 'F'
     let novoStatusItem = 2
 
-    console.log(tipoStatus)
-    console.log(pedido)
-    console.log(produto)
-    console.log(qtd)
-    console.log(novoStatusPedido)
-    console.log(novoStatusItem)
+    // console.log(tipoStatus)
+    // console.log(pedido)
+    // console.log(produto)
+    // console.log(qtd)
+    // console.log(novoStatusPedido)
+    // console.log(novoStatusItem)
 
     if (tipoStatus === 'Excluir') {
       novoStatusPedido = 'C'
@@ -529,8 +530,10 @@ export class OutController {
 
   @Post("romaneiosTinturaria")
   async romaneiosTinturaria(
-    @Body("id") id: number,
+    @Body("pedidos") pedidos: Array<number>,
   ): Promise<Array<Tinturaria>> {
+
+    const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
 
     const sql = `
     SELECT 
@@ -575,11 +578,14 @@ export class OutController {
         INNER JOIN produtos p ON p.idProduto = pm.idProduto
         INNER JOIN estruturas e ON e.idProduto = p.idProduto
     WHERE
-        t.idTinturaria = ?
+        t.idTinturaria IN ${ped}
     GROUP BY
-        romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria;
+        romaneio, dataTinturaria, idCliente, cliente, idFornecedor, tinturaria
+    ORDER BY
+        MIN(p.nome) ASC
+    ;
       `
-    const params = [id]
+    const params = [ped]
     return AppDataSource.getRepository(Tinturaria).query(sql, params)
   }
 

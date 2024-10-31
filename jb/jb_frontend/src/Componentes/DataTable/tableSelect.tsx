@@ -48,6 +48,7 @@ export default function TableSelect<T>({
     onSelecionarLinha = undefined,
     exibirPaginacao = true,
     ItemSpeed = [],
+    tituloTabela = '',
 }: DataTableInterface) {
 
     const theme = useTheme()
@@ -189,7 +190,7 @@ export default function TableSelect<T>({
                         id="tableTitle"
                         component="div"
                     >
-                        Pedidos Cortados
+                        {tituloTabela ? tituloTabela : 'Itens'}
                     </Typography>
                 )}
                 {numSelected <= 0 ? (<></>

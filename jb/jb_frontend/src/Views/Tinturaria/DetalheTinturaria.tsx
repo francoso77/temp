@@ -123,10 +123,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
     })
   }
 
-  const btRomaneio = () => {
-    clsRelatorios.renderTintuaria(rsMaster.idTinturaria as number)
-  }
-
   const btCancelar = () => {
     setMasterLocalState({ action: actionTypes.pesquisando })
     setLocalState({ action: actionTypes.incluindo })

@@ -52,6 +52,7 @@ export default function Login() {
         url = url.concat('&senha=')
         url = url.concat(usuarioState.senha)
 
+        console.log(usuarioState.usuario)
         setTimeout(() => {
 
             fetch(url).then(rs => {
