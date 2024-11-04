@@ -18,7 +18,7 @@ const VelocimetroPedidos: React.FC = () => {
     plugins: {
       title: {
         display: true,
-        text: 'Desempenho do dia',
+        text: 'Produção dos Pedidos',
         font: {
           size: 18,
         },

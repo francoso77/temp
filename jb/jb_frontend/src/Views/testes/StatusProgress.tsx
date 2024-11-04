@@ -58,3 +58,5 @@ const PedidoStatus: React.FC<PedidoStatusProps> = ({ numeroPedido, status, dataP
     </Card>
   );
 };
+
+export default PedidoStatus;

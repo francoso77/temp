@@ -14,12 +14,12 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const BarrasPedidosMensais: React.FC = () => {
   const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
     datasets: [
       {
         label: 'Pedidos',
-        data: [5, 10, 8, 15, 20, 12, 17, 10, 5, 9, 4, 6],
-        backgroundColor: '#3f51b5',
+        data: [510, 1020, 835, 1510, 290, 1299, 1070, 1250, 500, 900, 400, 600],
+        backgroundColor: '#daae5c',
       },
     ],
   };

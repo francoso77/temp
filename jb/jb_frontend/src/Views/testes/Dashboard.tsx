@@ -3,8 +3,9 @@ import { Box, Typography, Paper, Grid } from '@mui/material';
 import VelocimetroPedidos from './VelocimetroPedidos';
 import BarrasPedidosMensais from './BarrasPedidosMensais';
 import LinhasTipoProdutos from './LinhasTipoProdutos';
-import StatusPedido from './StatusPedido';
 import PedidoStatus from './StatusProgress';
+import LinhasTipoProdutos3D from './LinhasTipoProdutos3D';
+
 interface PedidoStatusProps {
   numeroPedido: string;
   status: 'aberto' | 'em produção' | 'fechado';
@@ -29,13 +30,13 @@ const Dashboard: React.FC = () => {
       </Typography>
 
       <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
+        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Paper sx={{ padding: 2, height: 300 }}> {/* Definindo altura fixa */}
             <VelocimetroPedidos />
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
+        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Paper sx={{ padding: 2, height: 300 }}> {/* Mesma altura definida aqui */}
             <BarrasPedidosMensais />
           </Paper>
         </Grid>
@@ -43,12 +44,13 @@ const Dashboard: React.FC = () => {
 
       <Paper sx={{ padding: 2, marginTop: 2 }}>
         <LinhasTipoProdutos />
+        <LinhasTipoProdutos3D />
       </Paper>
 
-      <Paper sx={{ padding: 2, marginTop: 2 }}>
+      <Paper sx={{ padding: 1, marginTop: 1 }}>
         <Grid container spacing={2}>
           {pedidos.map((pedido, index) => (
-            <Grid item key={index} xs={12} md={4}>
+            <Grid item key={index} xs={6} md={4}>
               <PedidoStatus
                 status={pedido.status}
                 numeroPedido={pedido.numeroPedido}
@@ -64,4 +66,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-

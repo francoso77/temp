@@ -15,12 +15,18 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, T
 
 const LinhasTipoProdutos: React.FC = () => {
   const data = {
-    labels: ['Tipo 1', 'Tipo 2', 'Tipo 3', 'Tipo 4'],
+    labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
     datasets: [
       {
-        label: 'Produtos',
-        data: [10, 15, 12, 20],
+        label: 'Nylon',
+        data: [12, 15, 10, 20, 18, 25, 22, 19, 30, 28, 26, 32], // dados fictícios para o exemplo
         borderColor: '#ff9800',
+        fill: false,
+      },
+      {
+        label: 'Palmilhas',
+        data: [10, 13, 12, 18, 16, 22, 20, 17, 27, 25, 24, 29], // dados fictícios para o exemplo
+        borderColor: '#4caf50',
         fill: false,
       },
     ],
@@ -41,4 +47,3 @@ const LinhasTipoProdutos: React.FC = () => {
 };
 
 export default LinhasTipoProdutos;
-
