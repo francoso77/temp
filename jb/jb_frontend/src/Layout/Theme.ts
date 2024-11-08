@@ -9,6 +9,7 @@ const enum CORES {
   azulEscuro = "#3c486b",
   vermelho = "#e74c3c",
   cinzaClaro = "#F4F4F5",
+  vermelhoNSC = '#e15244',
 }
 
 export const THEME = createTheme({
@@ -75,7 +76,8 @@ export const THEME = createTheme({
   },
   palette: {
     primary: {
-      main: CORES.azulEscuro
+      // main: CORES.azulEscuro
+      main: CORES.vermelhoNSC
     },
     secondary: {
       main: CORES.laranja

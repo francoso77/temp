@@ -152,7 +152,7 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
 
   useEffect(() => {
     BuscarDados()
-  })
+  }, [])
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -163,7 +163,10 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
         fullScreen={fullScreen}
         fullWidth
         maxWidth='md'>
-        <GerenciadorPedido detalhe={rsMaster.detalheProgramacaoDublagens} setOpenDetalhe={setOpen} />
+        <GerenciadorPedido
+          detalhe={rsMaster.detalheProgramacaoDublagens}
+          setOpenDetalhe={setOpen}
+        />
       </Dialog >
       <Paper sx={{ m: 0, p: 1 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>

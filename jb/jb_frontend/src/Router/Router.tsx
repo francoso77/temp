@@ -15,7 +15,7 @@ import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem';
 import Usuario from '../Views/Usuario/Usuario';
 import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
-import Dashboard from '../Views/testes/Dashboard';
+import Dashboard from '../Views/DashBoard/Dashboard';
 
 
 export const router = createBrowserRouter([

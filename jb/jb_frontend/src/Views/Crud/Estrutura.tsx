@@ -250,7 +250,7 @@ export default function Estrutura() {
   const btFechar = () => {
     setLayoutState({
       titulo: '',
-      tituloAnterior: 'Estruturas de Produtos',
+      tituloAnterior: 'Cadastro de Estruturas de Produtos',
       pathTitulo: '/',
       pathTituloAnterior: '/Estruturas'
     })

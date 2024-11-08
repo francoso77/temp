@@ -107,12 +107,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     buscarDados()
   }
 
-  useEffect(() => {
-    if (rsMaster) {
-      alterarStatusItem()
-    }
-  }, [rsMaster])
-
   const onCortar = (rs: DetalheProducaoDublagemInterface, indice: number) => {
 
     setIndiceEdicao(indice)
@@ -330,9 +324,15 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       })
   }
 
-  // useEffect(() => {
-  //   buscarDados()
-  // }, [open])
+  useEffect(() => {
+    buscarDados()
+  }, [open])
+
+  useEffect(() => {
+    if (rsMaster) {
+      alterarStatusItem()
+    }
+  }, [rsMaster])
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))

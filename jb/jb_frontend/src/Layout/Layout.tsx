@@ -4,13 +4,14 @@ import { GlobalContext } from '../ContextoGlobal/ContextoGlobal';
 import { Outlet } from 'react-router-dom';
 import useUsuarioState from '../ContextoGlobal/UsuarioState';
 import useLayoutState from '../ContextoGlobal/LayoutState';
-import MenuNav from './MenuNav';
-import Header from './Header';
+//import Header from './Header';
 import useMensagemState from '../ContextoGlobal/MensagemState';
 import Mensagem from './Mensagem';
 import { ROTAS_LIVRES } from './ClsRotas';
 import { useEffect, useState } from 'react';
 import Condicional from '../Componentes/Condicional/Condicional';
+import HeaderMenu from './HeaderMenu';
+import MenuFooter from './MenuFooter';
 
 function Layout() {
 
@@ -49,7 +50,8 @@ function Layout() {
           <>
             <Mensagem />
             <Condicional condicao={usuarioState.logado}>
-              <Header />
+              {/* <Header /> */}
+              < HeaderMenu />
             </Condicional>
 
             <Condicional
@@ -61,7 +63,7 @@ function Layout() {
             </Condicional>
 
             <Condicional condicao={usuarioState.logado}>
-              <MenuNav />
+              <MenuFooter />
             </Condicional>
 
             {/* <Condicional condicao={!usuarioState.logado && !rotaLivre}>

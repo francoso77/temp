@@ -92,7 +92,7 @@ const StyledFab = styled(Fab)({
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
-export default function MenuNav() {
+export default function MenuFooter() {
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
   const { mensagemState, setMensagemState } = React.useContext(GlobalContext) as GlobalContextInterface
@@ -142,7 +142,7 @@ export default function MenuNav() {
             </IconButton>
           </Tooltip>
           <StyledFab color="primary" aria-label="add">
-            <Tooltip title="Open Menu" onClick={handleOpenUserMenu} sx={{ p: 0 }} >
+            <Tooltip title="Cadastros Gerais" onClick={handleOpenUserMenu} sx={{ p: 0 }} >
               <AddIcon />
             </Tooltip>
           </StyledFab>
