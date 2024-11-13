@@ -10,15 +10,30 @@ exports.AppModule = void 0;
 var common_1 = require("@nestjs/common");
 var crud_controller_1 = require("./controllers/crud.controller");
 var out_controller_1 = require("./controllers/out.controller");
+var logger_middleware_1 = require("./auth/logger.middleware");
+var roles_guard_1 = require("./auth/roles.guard");
+var app_service_1 = require("./app.service");
+var core_1 = require("@nestjs/core");
+var global_module_1 = require("./global.module");
+var app_controller_1 = require("./app.controller");
 var loginUsuario_controller_1 = require("./controllers/loginUsuario.controller");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
+    AppModule.prototype.configure = function (consumer) {
+        consumer
+            .apply(logger_middleware_1.LoggerMiddleware)
+            .forRoutes('*');
+    };
     AppModule = __decorate([
         (0, common_1.Module)({
-            imports: [],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController],
-            providers: [],
+            imports: [global_module_1.GlobalModule],
+            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, app_controller_1.AppController, loginUsuario_controller_1.LoginUsuarioController],
+            providers: [app_service_1.AppService, {
+                    provide: core_1.APP_GUARD,
+                    useClass: roles_guard_1.RolesGuard,
+                }],
+            exports: []
         })
     ], AppModule);
     return AppModule;
