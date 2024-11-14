@@ -16,6 +16,7 @@ import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem
 import Usuario from '../Views/Usuario/Usuario';
 import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
 import Dashboard from '../Views/DashBoard/Dashboard';
+import { ConsultaEstoque } from '../Views/testes/ConsultaEstoque';
 
 
 export const router = createBrowserRouter([
@@ -84,8 +85,12 @@ export const router = createBrowserRouter([
         element: <ProducaoDublagem />,
       },
       {
-        path: "/Testes",
+        path: "/Dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/Testes",
+        element: <ConsultaEstoque />,
       },
     ]
   },

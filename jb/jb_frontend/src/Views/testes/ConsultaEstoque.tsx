@@ -5,11 +5,21 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsApi from '../../Utils/ClsApi'
 import ClsCrud from '../../Utils/ClsCrudApi'
-import { Box, Grid, IconButton, Paper } from '@mui/material'
+import { Box, Grid, IconButton, Paper, SelectChangeEvent } from '@mui/material'
 import ComboBox from '../../Componentes/ComboBox'
 import InputText from '../../Componentes/InputText'
 import CloseIcon from '@mui/icons-material/Close'
+import { TipoProdutoTypes } from '../../types/tipoProdutoypes'
+import OperatorSelect, { Operator } from '../../Componentes/OperatorSelect'
 
+const dadosInterface = {
+  idProduto: 0,
+  idCor: 0,
+  idFornecedor: 0,
+  qtd: 0,
+  idTipoProduto: 0
+
+}
 
 export const ConsultaEstoque = () => {
 
@@ -24,8 +34,13 @@ export const ConsultaEstoque = () => {
   const [rsFornecedores, setRsFornecedores] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
+  const [dados, setDados] = useState(dadosInterface)
 
+  const [operator, setOperator] = useState<Operator>('>');
 
+  const handleOperatorChange = (event: SelectChangeEvent<Operator>) => {
+    setOperator(event.target.value as Operator);
+  };
   const BuscarDados = () => {
 
     clsCrud.pesquisar({
@@ -70,7 +85,7 @@ export const ConsultaEstoque = () => {
   }
 
   useEffect(() => {
-    BuscarDados()
+    //BuscarDados()
   })
   return (
     <div>
@@ -81,36 +96,36 @@ export const ConsultaEstoque = () => {
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12} sm={2} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
               <ComboBox
                 opcoes={rsProdutos}
                 campoDescricao="nome"
                 campoID="idProduto"
-                dados={producaoMalharia}
+                dados={dados}
                 mensagemPadraoCampoEmBranco=""
                 field="idProduto"
                 label="Produtos"
                 erros={erros}
-                setState={setProducaoMalharia}
+                setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
                 tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }} >
             <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
               <ComboBox
                 opcoes={rsCores}
                 campoDescricao="nome"
                 campoID="idCor"
-                dados={producaoMalharia}
+                dados={dados}
                 mensagemPadraoCampoEmBranco=""
                 field="idCor"
                 label="Cores"
                 erros={erros}
-                setState={setProducaoMalharia}
+                setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 2)}
                 tamanhoFonte={25}
@@ -120,113 +135,68 @@ export const ConsultaEstoque = () => {
           <Grid item xs={12} sm={6} sx={{ mt: 0.5 }} >
             <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
               <ComboBox
-                opcoes={TurnoTypes}
+                opcoes={TipoProdutoTypes}
                 campoDescricao="descricao"
-                campoID="idTurno"
-                dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco="Qual o turno"
-                field="turno"
-                label="Turno"
+                campoID="idTipoProduto"
+                dados={dados}
+                mensagemPadraoCampoEmBranco=""
+                field="idTipoProduto"
+                label="Tipo Produto"
                 erros={erros}
-                setState={setProducaoMalharia}
+                setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 3)}
                 tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
                 opcoes={rsFornecedores}
                 campoDescricao="nome"
                 campoID="idPessoa"
-                dados={producaoMalharia}
+                dados={dados}
                 mensagemPadraoCampoEmBranco=""
                 field="idPessoa_fornecedor"
                 label="Fornecedor"
                 erros={erros}
-                setState={setProducaoMalharia}
+                setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 4)}
                 tamanhoFonte={25}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
-            <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-              <InputText
-                tipo='uppercase'
-                label="Quantidade"
-                dados={producaoMalharia}
-                field="qtd"
-                setState={setProducaoMalharia}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={5} sx={{ mt: 0 }}>
-            <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
-              <InputText
-                type='tel'
-                tipo="date"
-                label="Data"
-                posicaoLabel={'bottom'}
-                dados={producaoMalharia}
-                field="dataProducao"
-                setState={setProducaoMalharia}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={3} sx={{ mt: 0 }}>
-            <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
-              <InputText
-                tipo='currency'
-                scale={3}
-                label="Peso"
-                posicaoLabel={'bottom'}
-                dados={producaoMalharia}
-                field="peso"
-                setState={setProducaoMalharia}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 8)}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4} sx={{ mt: 0 }}>
-            <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
-              <InputText
-                tipo='number'
-                label="Peça"
-                posicaoLabel={'bottom'}
-                dados={producaoMalharia}
-                field="peca"
-                setState={setProducaoMalharia}
-                disabled={true}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
-            </Box>
-          </Grid>
+          <Paper sx={{ padding: 1, ml: 1.5, mt: 1.5, width: '100%' }} variant="outlined" >
+            <Grid container direction="row" spacing={2}>
+              <Grid item xs={12} md={6} sx={{ mt: 0.5 }}>
+                <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                  <OperatorSelect
+                    value={operator}
+                    onChange={handleOperatorChange}
+                    label='Operador'
+                    tamanhoFonte={25}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6} sx={{ mt: 0.5 }}>
+                <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                  <InputText
+                    tipo='uppercase'
+                    label="Quantidade"
+                    dados={dados}
+                    field="qtd"
+                    setState={setDados}
+                    erros={erros}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                    tamanhoFonte={25}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
         </Grid>
       </Paper>
     </div>
