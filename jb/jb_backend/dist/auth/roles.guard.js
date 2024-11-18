@@ -13,19 +13,17 @@ exports.RolesGuard = void 0;
 var common_1 = require("@nestjs/common");
 var core_1 = require("@nestjs/core");
 var roles_decorator_1 = require("./roles.decorator");
-var sessao_service_1 = require("./services/sessao.service");
-var contexto_service_1 = require("./services/contexto.service");
 var PERMISSOES = [
     { modulo: 'clientes', permissao: 'incluir' },
     { modulo: 'login', permissao: 'logar' },
     { modulo: 'pedidos', permissao: 'consultar' },
     { modulo: 'entradas', permissao: 'deletar' },
+    { modulo: 'estoques', permissao: 'consultar' },
+    { modulo: 'crud', permissao: 'pesquisar' },
 ];
 var RolesGuard = /** @class */ (function () {
-    function RolesGuard(reflector, contextoGlobal, sessao) {
+    function RolesGuard(reflector) {
         this.reflector = reflector;
-        this.contextoGlobal = contextoGlobal;
-        this.sessao = sessao;
         console.log('Constructor do Roles Guard....');
     }
     RolesGuard.prototype.canActivate = function (context) {
@@ -57,9 +55,7 @@ var RolesGuard = /** @class */ (function () {
     };
     RolesGuard = __decorate([
         (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
-        __metadata("design:paramtypes", [core_1.Reflector,
-            contexto_service_1.ContextoService,
-            sessao_service_1.SessaoService])
+        __metadata("design:paramtypes", [core_1.Reflector])
     ], RolesGuard);
     return RolesGuard;
 }());

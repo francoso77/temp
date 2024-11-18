@@ -12,13 +12,23 @@ import CloseIcon from '@mui/icons-material/Close'
 import { TipoProdutoTypes } from '../../types/tipoProdutoypes'
 import OperatorSelect, { Operator } from '../../Componentes/OperatorSelect'
 
-const dadosInterface = {
+interface PesquisaInterface {
+  idProduto: number
+  idPessoa_fornecedor: number
+  idCor: number
+  idTipoProduto: number
+  qtd: number
+  operador: Operator
+
+}
+
+const dadosInterface: PesquisaInterface = {
   idProduto: 0,
   idCor: 0,
-  idFornecedor: 0,
+  idPessoa_fornecedor: 0,
+  operador: ">",
   qtd: 0,
   idTipoProduto: 0
-
 }
 
 export const ConsultaEstoque = () => {
@@ -36,10 +46,8 @@ export const ConsultaEstoque = () => {
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState(dadosInterface)
 
-  const [operator, setOperator] = useState<Operator>('>');
-
   const handleOperatorChange = (event: SelectChangeEvent<Operator>) => {
-    setOperator(event.target.value as Operator);
+    setDados({ ...dados, operador: event.target.value as Operator });
   };
   const BuscarDados = () => {
 
@@ -84,9 +92,28 @@ export const ConsultaEstoque = () => {
     }
   }
 
+  const btPesquisar = () => {
+
+    const produto = dados.idProduto !== 0 ? dados.idProduto : null
+    const cor = dados.idCor !== 0 ? dados.idCor : null
+
+    clsCrud.pesquisar(
+      {
+        entidade: "Estoque",
+        criterio: {
+          idProduto: produto,
+          idCor: cor
+        }
+      }
+    )
+      .then((rs: Array<any>) => {
+        setRsPesquisa(rs)
+      })
+  }
   useEffect(() => {
-    //BuscarDados()
-  })
+    BuscarDados()
+  }, [])
+
   return (
     <div>
       <Paper variant="outlined" sx={{ padding: 0.5, m: 0.5 }}>
@@ -110,6 +137,8 @@ export const ConsultaEstoque = () => {
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
+                onSelect={btPesquisar}
+
                 tamanhoFonte={25}
               />
             </Box>
@@ -173,7 +202,7 @@ export const ConsultaEstoque = () => {
               <Grid item xs={12} md={6} sx={{ mt: 0.5 }}>
                 <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                   <OperatorSelect
-                    value={operator}
+                    value={dados.operador}
                     onChange={handleOperatorChange}
                     label='Operador'
                     tamanhoFonte={25}
@@ -199,6 +228,7 @@ export const ConsultaEstoque = () => {
           </Paper>
         </Grid>
       </Paper>
+      {JSON.stringify(dados)}
     </div>
   )
 }

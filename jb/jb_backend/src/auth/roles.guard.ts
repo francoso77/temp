@@ -10,13 +10,15 @@ const PERMISSOES: RoleInterface[] = [
   { modulo: 'login', permissao: 'logar' },
   { modulo: 'pedidos', permissao: 'consultar' },
   { modulo: 'entradas', permissao: 'deletar' },
+  { modulo: 'estoques', permissao: 'consultar' },
+  { modulo: 'crud', permissao: 'pesquisar' },
 ]
 @Injectable({ scope: Scope.REQUEST })
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly contextoGlobal: ContextoService,
-    private readonly sessao: SessaoService
+    // private readonly contextoGlobal: ContextoService,
+    // private readonly sessao: SessaoService
   ) {
     console.log('Constructor do Roles Guard....')
   }
