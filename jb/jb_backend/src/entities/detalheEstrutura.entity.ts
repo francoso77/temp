@@ -39,8 +39,8 @@ export default class DetalheEstrutura implements DetalheEstruturaInterface {
   qtd: number
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
-  createAD: Date
+  createAt: Date
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
-  updateAD: Date
+  updateAt: Date
 }

@@ -38,11 +38,11 @@ var ProgramacaoDublagem = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], ProgramacaoDublagem.prototype, "createAD", void 0);
+    ], ProgramacaoDublagem.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], ProgramacaoDublagem.prototype, "updateAD", void 0);
+    ], ProgramacaoDublagem.prototype, "updateAt", void 0);
     ProgramacaoDublagem = __decorate([
         (0, typeorm_1.Entity)({ name: 'programacaodublagens' })
     ], ProgramacaoDublagem);

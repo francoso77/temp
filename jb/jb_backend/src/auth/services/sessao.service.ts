@@ -7,6 +7,6 @@ export class SessaoService {
     console.log('Constructor do Sessao Service....')
   }
 
-  public usuarioSessao: string = 'Usuário Sessao Inicial'
+  public usuarioSessao: number = 0
 
 }

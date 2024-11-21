@@ -38,11 +38,11 @@ var DetalhePeca = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], DetalhePeca.prototype, "createAD", void 0);
+    ], DetalhePeca.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], DetalhePeca.prototype, "updateAD", void 0);
+    ], DetalhePeca.prototype, "updateAt", void 0);
     DetalhePeca = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalhepecas' })
     ], DetalhePeca);

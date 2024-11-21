@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UsuarioSessaoInterface } from '../../interfaces/sistema/usuarioInterface';
+import { Usuario } from './usuario.entity';
 
 @Entity({ name: 'usuariosessoes' })
 export class UsuarioSessao implements UsuarioSessaoInterface {
@@ -7,6 +8,8 @@ export class UsuarioSessao implements UsuarioSessaoInterface {
   @PrimaryGeneratedColumn()
   idSessao: number;
 
+  @JoinColumn({ name: 'idUsuario' })
+  @ManyToOne(() => Usuario)
   @Column()
   idUsuario: number;
 
@@ -17,9 +20,9 @@ export class UsuarioSessao implements UsuarioSessaoInterface {
   ativo: boolean;
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
-  createAD: Date;
+  createAt: Date;
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
-  updateAD: Date;
+  updateAt: Date;
 
 }

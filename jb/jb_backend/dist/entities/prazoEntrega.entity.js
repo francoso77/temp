@@ -36,11 +36,11 @@ var PrazoEntrega = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], PrazoEntrega.prototype, "createAD", void 0);
+    ], PrazoEntrega.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], PrazoEntrega.prototype, "updateAD", void 0);
+    ], PrazoEntrega.prototype, "updateAt", void 0);
     PrazoEntrega = __decorate([
         (0, typeorm_1.Entity)({ name: 'prazoentregas' })
     ], PrazoEntrega);

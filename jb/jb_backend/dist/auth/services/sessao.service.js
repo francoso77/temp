@@ -13,7 +13,7 @@ exports.SessaoService = void 0;
 var common_1 = require("@nestjs/common");
 var SessaoService = /** @class */ (function () {
     function SessaoService() {
-        this.usuarioSessao = 'Usuário Sessao Inicial';
+        this.usuarioSessao = 0;
         console.log('Constructor do Sessao Service....');
     }
     SessaoService = __decorate([

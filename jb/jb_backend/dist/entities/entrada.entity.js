@@ -48,11 +48,11 @@ var Entrada = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], Entrada.prototype, "createAD", void 0);
+    ], Entrada.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], Entrada.prototype, "updateAD", void 0);
+    ], Entrada.prototype, "updateAt", void 0);
     Entrada = __decorate([
         (0, typeorm_1.Entity)({ name: 'entradas' })
     ], Entrada);

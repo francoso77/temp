@@ -58,11 +58,11 @@ var DetalheEstrutura = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], DetalheEstrutura.prototype, "createAD", void 0);
+    ], DetalheEstrutura.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], DetalheEstrutura.prototype, "updateAD", void 0);
+    ], DetalheEstrutura.prototype, "updateAt", void 0);
     DetalheEstrutura = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalheestruturas' })
     ], DetalheEstrutura);

@@ -45,11 +45,11 @@ var ProducaoDublagem = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], ProducaoDublagem.prototype, "createAD", void 0);
+    ], ProducaoDublagem.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], ProducaoDublagem.prototype, "updateAD", void 0);
+    ], ProducaoDublagem.prototype, "updateAt", void 0);
     ProducaoDublagem = __decorate([
         (0, typeorm_1.Entity)({ name: 'producaodublagens' })
     ], ProducaoDublagem);

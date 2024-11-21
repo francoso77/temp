@@ -36,11 +36,11 @@ var UnidadeMedida = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], UnidadeMedida.prototype, "createAD", void 0);
+    ], UnidadeMedida.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], UnidadeMedida.prototype, "updateAD", void 0);
+    ], UnidadeMedida.prototype, "updateAt", void 0);
     UnidadeMedida = __decorate([
         (0, typeorm_1.Entity)({ name: 'unidademedidas' })
     ], UnidadeMedida);

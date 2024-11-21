@@ -57,11 +57,11 @@ var Programacao = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], Programacao.prototype, "createAD", void 0);
+    ], Programacao.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], Programacao.prototype, "updateAD", void 0);
+    ], Programacao.prototype, "updateAt", void 0);
     Programacao = __decorate([
         (0, typeorm_1.Entity)({ name: 'programacoes' })
     ], Programacao);

@@ -40,11 +40,11 @@ var DetalheTinturaria = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], DetalheTinturaria.prototype, "createAD", void 0);
+    ], DetalheTinturaria.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], DetalheTinturaria.prototype, "updateAD", void 0);
+    ], DetalheTinturaria.prototype, "updateAt", void 0);
     DetalheTinturaria = __decorate([
         (0, typeorm_1.Entity)({ name: 'detalhetinturarias' })
     ], DetalheTinturaria);

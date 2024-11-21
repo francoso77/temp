@@ -35,8 +35,8 @@ export default class Estoque implements EstoqueInterface {
   cor: Cor
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
-  createAD: Date
+  createAt: Date
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
-  updateAD: Date
+  updateAt: Date
 }

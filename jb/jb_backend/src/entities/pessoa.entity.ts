@@ -63,8 +63,8 @@ export default class Pessoa implements PessoaInterface {
   clienteProgramacoes: Programacao[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
-  createAD: Date
+  createAt: Date
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
-  updateAD: Date
+  updateAt: Date
 }

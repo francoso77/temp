@@ -26,6 +26,12 @@ import DetalheProgramacaoDublagem from './entities/detalheProgramacaoDublagem.en
 import { Usuario } from './entities/sistema/usuario.entity'
 import { UsuarioSessao } from './entities/sistema/usuarioSessao.entity'
 import DetalhePeca from './entities/detalhePeca.entity'
+import { Grupo } from './entities/sistema/grupo.entity'
+import { GrupoPermissao } from './entities/sistema/grupoPermissao.entity'
+import { GrupoUsuario } from './entities/sistema/grupoUsuario.entity'
+import { UsuarioPermissao } from './entities/sistema/usuarioPermissao.entity'
+import { Modulo } from './entities/sistema/modulo.entity'
+import { ModuloPermissao } from './entities/sistema/moduloPermissao.entity'
 
 
 export const AppDataSource = new DataSource({
@@ -48,10 +54,15 @@ export const AppDataSource = new DataSource({
     DetalheProgramacao,
     DetalheProgramacaoDublagem,
     DetalheTinturaria,
+    Grupo,
+    GrupoPermissao,
+    GrupoUsuario,
     Entrada,
     Estoque,
     Estrutura,
     Maquina,
+    Modulo,
+    ModuloPermissao,
     Pedido,
     Pessoa,
     PerdaMalharia,
@@ -64,6 +75,7 @@ export const AppDataSource = new DataSource({
     Tinturaria,
     UnidadeMedida,
     Usuario,
+    UsuarioPermissao,
     UsuarioSessao
   ],
   migrations: [],

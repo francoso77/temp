@@ -37,9 +37,9 @@ export default class Programacao implements ProgramacaoInterface {
   detalheProgramacoes: DetalheProgramacao[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
-  createAD: Date
+  createAt: Date
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
-  updateAD: Date
+  updateAt: Date
 
 }
