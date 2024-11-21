@@ -31,8 +31,8 @@ var RolesGuard = /** @class */ (function () {
             context.getHandler(),
             context.getClass(),
         ]);
-        var _a = context.switchToHttp().getRequest().body, nomeUsuario = _a.nomeUsuario, tempo = _a.tempo;
-        var _b = context.switchToHttp().getRequest().body, cpf = _b.cpf, senha = _b.senha;
+        //const { nomeUsuario, tempo } = context.switchToHttp().getRequest().body;
+        // const { cpf, senha } = context.switchToHttp().getRequest().body;
         // console.log("[RolesGuard] - nomeUsuario: ", nomeUsuario)
         // console.log("[RolesGuard] - tempo: ", tempo)
         // console.log("[RolesGuard] - ContextoGlobal: ", this.contextoGlobal.usuarioContexto)
@@ -40,18 +40,23 @@ var RolesGuard = /** @class */ (function () {
         // console.log("[RolesGuard] - cpf: ", cpf)
         // console.log("[RolesGuard] - senha: ", senha)
         // console.log("[RolesGuard] - requiredRoles: ", requiredRoles)
-        if (!requiredRoles) {
-            return false;
-        }
-        else {
-            var permissao = PERMISSOES.find(function (permissao) { return permissao.modulo === requiredRoles.modulo && permissao.permissao === requiredRoles.permissao; });
-            if (!permissao) {
-                throw new common_1.HttpException('Acesso negado', common_1.HttpStatus.FORBIDDEN);
-            }
-        }
-        return true;
+        // if (!requiredRoles) {
+        //   return false;
+        // } else {
+        //   let permissao = PERMISSOES.find((permissao) => permissao.modulo === requiredRoles.modulo && permissao.permissao === requiredRoles.permissao)
+        //   if (!permissao) {
+        //     throw new HttpException('Acesso negado', HttpStatus.FORBIDDEN);
+        //   }
+        // }
+        // return true
         // const { user } = context.switchToHttp().getRequest();
         // return requiredRoles.some((role) => user.roles?.includes(role));
+        if (!requiredRoles) {
+            return true;
+        }
+        var request = context.switchToHttp().getRequest();
+        console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
+        return true;
     };
     RolesGuard = __decorate([
         (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),

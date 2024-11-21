@@ -3,7 +3,7 @@ import { UsuarioSessao } from '../entities/sistema/usuarioSessao.entity'
 
 export default class ClsAutenticacaoMiddleware {
 
-  public pesquisarToken(authorization: string): Promise<number> {
+  public async pesquisarToken(authorization: string): Promise<number> {
 
     let token: string = authorization ? authorization : ''
 
@@ -11,7 +11,7 @@ export default class ClsAutenticacaoMiddleware {
 
       token = token.replace('Bearer ', '')
 
-      return AppDataSource.getRepository(UsuarioSessao)
+      return await AppDataSource.getRepository(UsuarioSessao)
         .findOne({ where: { token: token, ativo: true } })
         .then(rsUsuarioSessao => {
 
@@ -25,7 +25,7 @@ export default class ClsAutenticacaoMiddleware {
         })
 
     } else {
-      return Promise.resolve(0)
+      return await Promise.resolve(0)
     }
 
   }

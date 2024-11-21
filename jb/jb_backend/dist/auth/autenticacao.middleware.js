@@ -20,14 +20,18 @@ var AutenticacaoMiddleware = /** @class */ (function () {
     AutenticacaoMiddleware.prototype.use = function (req, res, next) {
         var _this = this;
         var clsAutenticacaoMiddleware = new autenticacao_middleware_cls_1.default();
+        console.log("[AutenticacaoMiddleware] - req.headers.authorization: ", req.headers.authorization);
         clsAutenticacaoMiddleware.pesquisarToken(req.headers.authorization).then(function (idUsuario) {
-            if (idUsuario > 0) {
-                _this.sessao.usuarioSessao = idUsuario;
-                next();
-            }
-            else {
-                res.status(401).send({ ok: false, mensagem: 'Usuário ou senha inválidos.', dados: null });
-            }
+            console.log("[AutenticacaoMiddleware] - idUsuario: ", idUsuario);
+            _this.sessao.usuarioSessao = idUsuario;
+            next();
+            // if (idUsuario) {
+            //   this.sessao.usuarioSessao = idUsuario
+            //   next()
+            // } else {
+            //   res.status(401).send({ ok: false, mensagem: 'Token invalido', dados: null })
+            //   next()
+            // }
         });
     };
     AutenticacaoMiddleware = __decorate([

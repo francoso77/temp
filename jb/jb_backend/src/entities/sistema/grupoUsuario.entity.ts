@@ -1,17 +1,19 @@
 import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { GrupoUsuarioInterface } from '../../interfaces/sistema/grupoInterface';
+import { Grupo } from './grupo.entity';
+import { Usuario } from './usuario.entity';
 
 @Entity({ name: 'gruposusuaroios' })
 export class GrupoUsuario implements GrupoUsuarioInterface {
 
   @PrimaryColumn()
   @JoinColumn({ name: 'idGrupo' })
-  @ManyToOne(() => GrupoUsuario)
+  @ManyToOne(() => Grupo)
   idGrupo: number;
 
   @PrimaryColumn()
   @JoinColumn({ name: 'idUsuario' })
-  @ManyToOne(() => GrupoUsuario)
+  @ManyToOne(() => Usuario)
   idUsuario: number;
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })

@@ -1,7 +1,6 @@
 import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { GrupoPermissaoInterface } from '../../interfaces/sistema/grupoInterface';
 import { Grupo } from './grupo.entity';
-import { Modulo } from './modulo.entity';
 import { ModuloPermissao } from './moduloPermissao.entity';
 
 @Entity({ name: 'grupospermissoes' })

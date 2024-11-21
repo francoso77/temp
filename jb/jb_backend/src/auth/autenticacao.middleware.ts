@@ -16,13 +16,22 @@ export class AutenticacaoMiddleware implements NestMiddleware {
 
     const clsAutenticacaoMiddleware = new ClsAutenticacaoMiddleware()
 
+    console.log("[AutenticacaoMiddleware] - req.headers.authorization: ", req.headers.authorization)
+
     clsAutenticacaoMiddleware.pesquisarToken(req.headers.authorization).then(idUsuario => {
-      if (idUsuario > 0) {
-        this.sessao.usuarioSessao = idUsuario
-        next()
-      } else {
-        res.status(401).send({ ok: false, mensagem: 'Usuário ou senha inválidos.', dados: null })
-      }
+
+      console.log("[AutenticacaoMiddleware] - idUsuario: ", idUsuario)
+
+      this.sessao.usuarioSessao = idUsuario
+      next()
+
+      // if (idUsuario) {
+      //   this.sessao.usuarioSessao = idUsuario
+      //   next()
+      // } else {
+      //   res.status(401).send({ ok: false, mensagem: 'Token invalido', dados: null })
+      //   next()
+      // }
     })
   }
 }

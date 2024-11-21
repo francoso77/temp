@@ -29,8 +29,8 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    const { nomeUsuario, tempo } = context.switchToHttp().getRequest().body;
-    const { cpf, senha } = context.switchToHttp().getRequest().body;
+    //const { nomeUsuario, tempo } = context.switchToHttp().getRequest().body;
+    // const { cpf, senha } = context.switchToHttp().getRequest().body;
 
     // console.log("[RolesGuard] - nomeUsuario: ", nomeUsuario)
     // console.log("[RolesGuard] - tempo: ", tempo)
@@ -40,20 +40,27 @@ export class RolesGuard implements CanActivate {
     // console.log("[RolesGuard] - senha: ", senha)
     // console.log("[RolesGuard] - requiredRoles: ", requiredRoles)
 
-    if (!requiredRoles) {
-      return false;
-    } else {
+    // if (!requiredRoles) {
+    //   return false;
+    // } else {
 
-      let permissao = PERMISSOES.find((permissao) => permissao.modulo === requiredRoles.modulo && permissao.permissao === requiredRoles.permissao)
+    //   let permissao = PERMISSOES.find((permissao) => permissao.modulo === requiredRoles.modulo && permissao.permissao === requiredRoles.permissao)
 
-      if (!permissao) {
-        throw new HttpException('Acesso negado', HttpStatus.FORBIDDEN);
-      }
-    }
+    //   if (!permissao) {
+    //     throw new HttpException('Acesso negado', HttpStatus.FORBIDDEN);
+    //   }
+    // }
 
-    return true
+    // return true
 
     // const { user } = context.switchToHttp().getRequest();
     // return requiredRoles.some((role) => user.roles?.includes(role));
+
+    if (!requiredRoles) {
+      return true;
+    }
+    const request = context.switchToHttp().getRequest();
+    console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
+    return true
   }
 }

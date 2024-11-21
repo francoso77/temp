@@ -11,12 +11,12 @@ var common_1 = require("@nestjs/common");
 var crud_controller_1 = require("./controllers/crud.controller");
 var out_controller_1 = require("./controllers/out.controller");
 var roles_guard_1 = require("./auth/roles.guard");
-var app_service_1 = require("./app.service");
 var core_1 = require("@nestjs/core");
 var global_module_1 = require("./global.module");
-var app_controller_1 = require("./app.controller");
 var loginUsuario_controller_1 = require("./controllers/loginUsuario.controller");
 var autenticacao_middleware_1 = require("./auth/autenticacao.middleware");
+var somar_controller_1 = require("./controllers/somar.controller");
+var sessao_service_1 = require("./auth/services/sessao.service");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -28,8 +28,8 @@ var AppModule = /** @class */ (function () {
     AppModule = __decorate([
         (0, common_1.Module)({
             imports: [global_module_1.GlobalModule],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, app_controller_1.AppController, loginUsuario_controller_1.LoginUsuarioController],
-            providers: [app_service_1.AppService, {
+            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController, somar_controller_1.SomarController],
+            providers: [sessao_service_1.SessaoService, {
                     provide: core_1.APP_GUARD,
                     useClass: roles_guard_1.RolesGuard,
                 }],

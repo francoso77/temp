@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default class ClsLoginUsuarioController {
   public async logar(cpf: string, senha: string): Promise<RespostaPadraoInterface<string>> {
+
     const retorno: RespostaPadraoInterface<string> = {
       ok: false,
       mensagem: 'Usuário ou senha inválidos.',
@@ -24,7 +25,6 @@ export default class ClsLoginUsuarioController {
 
     if (usuarioLogado) {
 
-      //const token = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2)
       const token: string = uuidv4()
 
       await AppDataSource.getRepository(Usuario)

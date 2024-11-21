@@ -31,6 +31,10 @@ export default class ClsApi {
     maxBodyLength: Infinity,
     headers: {
       "Content-Type": "application/json",
+      // headers: { 
+      //   'Content-Type': 'application/json', 
+      //   'Authorization': '••••••'
+      // },
     },
   };
 
@@ -139,5 +143,11 @@ export default class ClsApi {
     return ClsApi.sendRequest<T>(props);
   }
 
+  public async login(
+    cpf: string,
+    senha: string,
+    setMensagemState: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
+  ): Promise<any> {
+    return
+  }
 }
-

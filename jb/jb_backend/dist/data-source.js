@@ -29,6 +29,12 @@ var detalheProgramacaoDublagem_entity_1 = require("./entities/detalheProgramacao
 var usuario_entity_1 = require("./entities/sistema/usuario.entity");
 var usuarioSessao_entity_1 = require("./entities/sistema/usuarioSessao.entity");
 var detalhePeca_entity_1 = require("./entities/detalhePeca.entity");
+var grupo_entity_1 = require("./entities/sistema/grupo.entity");
+var grupoPermissao_entity_1 = require("./entities/sistema/grupoPermissao.entity");
+var grupoUsuario_entity_1 = require("./entities/sistema/grupoUsuario.entity");
+var usuarioPermissao_entity_1 = require("./entities/sistema/usuarioPermissao.entity");
+var modulo_entity_1 = require("./entities/sistema/modulo.entity");
+var moduloPermissao_entity_1 = require("./entities/sistema/moduloPermissao.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -49,10 +55,15 @@ exports.AppDataSource = new typeorm_1.DataSource({
         detalheProgramacao_entity_1.default,
         detalheProgramacaoDublagem_entity_1.default,
         detalheTinturaria_entity_1.default,
+        grupo_entity_1.Grupo,
+        grupoPermissao_entity_1.GrupoPermissao,
+        grupoUsuario_entity_1.GrupoUsuario,
         entrada_entity_1.default,
         estoque_entity_1.default,
         estrutura_entity_1.default,
         maquina_entity_1.default,
+        modulo_entity_1.Modulo,
+        moduloPermissao_entity_1.ModuloPermissao,
         pedido_entity_1.default,
         pessoa_entity_1.default,
         perdaMalharia_entity_1.default,
@@ -65,6 +76,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         tinturaria_entity_1.default,
         unidadeMedida_entity_1.default,
         usuario_entity_1.Usuario,
+        usuarioPermissao_entity_1.UsuarioPermissao,
         usuarioSessao_entity_1.UsuarioSessao
     ],
     migrations: [],

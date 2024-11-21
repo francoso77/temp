@@ -39,7 +39,7 @@ export default function Login() {
 
       clsCrud
         .pesquisar({
-          entidade: "User",
+          entidade: "Usuario",
           criterio: {
             cpf: "%".concat(dados.cpf).concat("%"),
           },

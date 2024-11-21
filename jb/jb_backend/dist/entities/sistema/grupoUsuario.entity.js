@@ -11,19 +11,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GrupoUsuario = void 0;
 var typeorm_1 = require("typeorm");
+var grupo_entity_1 = require("./grupo.entity");
+var usuario_entity_1 = require("./usuario.entity");
 var GrupoUsuario = /** @class */ (function () {
     function GrupoUsuario() {
     }
     __decorate([
         (0, typeorm_1.PrimaryColumn)(),
         (0, typeorm_1.JoinColumn)({ name: 'idGrupo' }),
-        (0, typeorm_1.ManyToOne)(function () { return GrupoUsuario; }),
+        (0, typeorm_1.ManyToOne)(function () { return grupo_entity_1.Grupo; }),
         __metadata("design:type", Number)
     ], GrupoUsuario.prototype, "idGrupo", void 0);
     __decorate([
         (0, typeorm_1.PrimaryColumn)(),
         (0, typeorm_1.JoinColumn)({ name: 'idUsuario' }),
-        (0, typeorm_1.ManyToOne)(function () { return GrupoUsuario; }),
+        (0, typeorm_1.ManyToOne)(function () { return usuario_entity_1.Usuario; }),
         __metadata("design:type", Number)
     ], GrupoUsuario.prototype, "idUsuario", void 0);
     __decorate([
