@@ -172,6 +172,7 @@ export default function Text({
           {label}
         </Typography>
         <OutlinedInput
+          autoComplete="new-password"
           id={field}
           value={dados[field]}
           sx={{ my: 0, py: 0, height: 40 }}
@@ -222,6 +223,7 @@ export default function Text({
             inputComponent={mask ? MaskCustom : undefined}
             type={type}
             autoFocus={autofocus}
+            autoComplete='off'
           />
 
           <Condicional condicao={typeof erros[field] !== 'undefined'}>

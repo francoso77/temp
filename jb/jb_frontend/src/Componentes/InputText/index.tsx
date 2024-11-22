@@ -355,6 +355,7 @@ export default function InputText({
           </Typography>
         </Condicional>
         <OutlinedInput
+          autoComplete='off'
           sx={{
             color: corFonte,
             fontSize: tamanhoFonte,

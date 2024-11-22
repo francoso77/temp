@@ -22,7 +22,9 @@ interface PropsInterface {
   produto?: number
   qtd?: number
   id?: number
-  setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>;
+  setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
+  cpf?: string
+  senha?: string
 }
 
 export default class ClsApi {
@@ -92,6 +94,8 @@ export default class ClsApi {
     produto,
     qtd,
     id,
+    cpf,
+    senha
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
@@ -109,6 +113,8 @@ export default class ClsApi {
       produto,
       qtd,
       id,
+      cpf,
+      senha
     };
 
     if (setMensagemState) {
@@ -143,11 +149,4 @@ export default class ClsApi {
     return ClsApi.sendRequest<T>(props);
   }
 
-  public async login(
-    cpf: string,
-    senha: string,
-    setMensagemState: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
-  ): Promise<any> {
-    return
-  }
 }

@@ -2,11 +2,10 @@ import { Button, Checkbox, FormControlLabel, Grid, Link, Paper, Typography } fro
 import { useContext, useState } from 'react';
 import ClsValidacao from '../Utils/ClsValidacao';
 import Text from '../Componentes/Text';
-import { useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../ContextoGlobal/MensagemState';
-import ClsCrud from '../Utils/ClsCrudApi';
-import { UsuarioInterface } from '../../../jb_backend/src/interfaces/sistema/usuarioInterface';
+import ClsApi from '../Utils/ClsApi';
 
 const APPLE: string = '/apple.png';
 const FACEBOOK: string = '/facebook.png';
@@ -16,8 +15,10 @@ export default function Login() {
 
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState({ cpf: '', senha: '' })
-  const clsCrud = new ClsCrud()
+  const clsApi = new ClsApi()
   const clsValidacao: ClsValidacao = new ClsValidacao()
+  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
@@ -37,27 +38,29 @@ export default function Login() {
 
     if (validarDados()) {
 
-      clsCrud
-        .pesquisar({
-          entidade: "Usuario",
-          criterio: {
-            cpf: "%".concat(dados.cpf).concat("%"),
-          },
-          camposLike: ["cpf"],
-        })
-        .then((rs: Array<UsuarioInterface>) => {
-          if (dados.cpf === rs[0].cpf && dados.senha === rs[0].senha) {
+      clsApi.execute<any>({
+        url: 'loginUsuario',
+        method: 'post',
+        cpf: dados.cpf,
+        senha: dados.senha,
+        mensagem: 'Verificando usuário e senha',
+        setMensagemState: setMensagemState
+      })
+        .then((rs) => {
+          if (rs.ok && rs.dados && rs.dados.length > 0) {
+            const [usuario, token] = rs.dados.split('.')
             contextGlobal.setUsuarioState({
-              usuario: rs[0].cpf ? rs[0].cpf : 'sem id',
-              logado: true
+              usuario: usuario,
+              logado: true,
+              token: token
             })
             contextGlobal.setLayoutState({
-              titulo: 'Etapas Realizadas',
+              titulo: 'Dashboard',
               tituloAnterior: '',
-              pathTitulo: '/EtapasRealizadas',
+              pathTitulo: '/Dashboard',
               pathTituloAnterior: ''
             })
-            navegar("/EtapasRealizadas")
+            navegar("/Testes")
           } else {
             contextGlobal.setMensagemState({
               ...contextGlobal.mensagemState,
@@ -73,105 +76,100 @@ export default function Login() {
             ...contextGlobal.mensagemState,
             exibir: true,
             tipo: MensagemTipo.Error,
-            titulo: 'Validação',
-            mensagem: 'Usário ou senha inválido!',
+            titulo: 'Erro de conexão',
+            mensagem: 'Não foi possível conectar ao servidor.',
             exibirBotao: true
           })
-          // setMensagemState({
-          //   ...mensagemState,
-          //   titulo: 'Erro de conexão',
-          //   exibir: true,
-          //   mensagem: 'Erro na conexão com banco de dados!',
-          //   tipo: MensagemTipo.Error,
-          //   exibirBotao: true,
-          // });
         })
     }
   }
 
   return (
     <>
-      <Grid
-        container
-        minHeight="100vh"
-        justifyContent="center"
-        alignContent="center"
-      >
-        <Grid item xs={12} sm={8} md={5} lg={4}>
-          <Paper sx={{ padding: 3, margin: 3 }}>
-            <Grid container>
-              <Grid item xs={12} sx={{ textAlign: "center" }}>
-                {/* <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} /> */}
-              </Grid>
-              <Grid item xs={12} sx={{ mt: 3 }}>
-                <Text
-                  autofocus
-                  label='CPF'
-                  mask="000.000.000-00"
-                  tipo='mask'
-                  field='cpf'
-                  dados={dados}
-                  setState={setDados}
-                  erros={erros}
-                />
-              </Grid>
-              <Grid item xs={12} sx={{ mt: 3 }}>
-                <Text
-                  field="senha"
-                  label="Senha"
-                  tipo='pass'
-                  dados={dados}
-                  setState={setDados}
-                  erros={erros}
-                  mapKeyPress={[{ key: 'Enter', onKey: btEntrar }]}
-                />
-              </Grid>
-              <Grid container alignItems="center" justifyContent="space-between">
-                <Grid item>
-                  <FormControlLabel control={<Checkbox />} label={
-                    <Typography variant="caption" display="block" gutterBottom>
-                      Lembre-me
-                    </Typography>
-                  } />
+      <Form method='post' action='/Login'>
+        <Grid
+          container
+          minHeight="100vh"
+          justifyContent="center"
+          alignContent="center"
+        >
+          <Grid item xs={12} sm={8} md={5} lg={4}>
+            <Paper sx={{ padding: 3, margin: 3 }}>
+              <Grid container>
+                <Grid item xs={12} sx={{ textAlign: "center" }}>
+                  {/* <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} /> */}
                 </Grid>
-                <Grid item>
-                  <FormControlLabel control={<Link href="#" />} onClick={() => navegar('/User')} label={
-                    <Typography variant="caption" display="block" gutterBottom>
-                      Cadastrar
-                    </Typography>
-                  } />
+                <Grid item xs={12} sx={{ mt: 3 }}>
+                  <Text
+                    autofocus
+                    label='CPF'
+                    mask="000.000.000-00"
+                    tipo='mask'
+                    field='cpf'
+                    dados={dados}
+                    setState={setDados}
+                    erros={erros}
+                  />
                 </Grid>
-              </Grid>
-              <Grid item xs={12} sx={{ mt: 3 }}>
-                <Button
-                  onClick={() => btEntrar()}
-                  fullWidth
-                  variant="contained"
-                >
-                  Entrar
-                </Button>
-              </Grid>
-              <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
-                <Link>Esqueci a Senha</Link>
-              </Grid>
-              <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
-                <Button
-                  startIcon={<img src={GOOGLE} alt="logotipo da Google" width="50" height="50" />}
-                >
-                </Button>
-                <Button
-                  startIcon={<img src={FACEBOOK} alt="logotipo do Facebook" width="50" height="50" />}
-                >
-                </Button>
-                <Button
-                  startIcon={<img src={APPLE} alt="logotipo da Apple" width="50" height="50" />}
-                >
-                </Button>
-              </Grid>
-            </Grid >
-          </Paper>
+                <Grid item xs={12} sx={{ mt: 3 }}>
+                  <Text
+                    field="senha"
+                    label="Senha"
+                    tipo='pass'
+                    type='password'
+                    dados={dados}
+                    setState={setDados}
+                    erros={erros}
+                    mapKeyPress={[{ key: 'Enter', onKey: btEntrar }]}
+                  />
+                </Grid>
+                <Grid container alignItems="center" justifyContent="space-between">
+                  <Grid item>
+                    <FormControlLabel control={<Checkbox />} label={
+                      <Typography variant="caption" display="block" gutterBottom>
+                        Lembre-me
+                      </Typography>
+                    } />
+                  </Grid>
+                  <Grid item>
+                    <FormControlLabel control={<Link href="#" />} onClick={() => navegar('/Usuario')} label={
+                      <Typography variant="caption" display="block" gutterBottom>
+                        Cadastrar
+                      </Typography>
+                    } />
+                  </Grid>
+                </Grid>
+                <Grid item xs={12} sx={{ mt: 3 }}>
+                  <Button
+                    onClick={() => btEntrar()}
+                    fullWidth
+                    variant="contained"
+                  >
+                    Entrar
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
+                  <Link>Esqueci a Senha</Link>
+                </Grid>
+                <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
+                  <Button
+                    startIcon={<img src={GOOGLE} alt="logotipo da Google" width="50" height="50" />}
+                  >
+                  </Button>
+                  <Button
+                    startIcon={<img src={FACEBOOK} alt="logotipo do Facebook" width="50" height="50" />}
+                  >
+                  </Button>
+                  <Button
+                    startIcon={<img src={APPLE} alt="logotipo da Apple" width="50" height="50" />}
+                  >
+                  </Button>
+                </Grid>
+              </Grid >
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Form>
     </>
   )
 }

@@ -48,27 +48,27 @@ const OperatorSelect: React.FC<OperatorSelectProps> = ({ value, onChange, textAl
         onChange={onChange}
       >
         <MenuItem sx={{ fontSize: tamanhoFonte }} value=">">
-          <img src={'img/operator/maior-que.png'} alt="Maior que" style={{ width: 24, marginRight: 8, marginTop: 3 }} />
+          <img src={'img/operator/maior-que.png'} alt="Maior que" style={{ width: tamanhoFonte, marginRight: 8, marginTop: 1 }} />
           Maior que
         </MenuItem>
         <MenuItem sx={{ fontSize: tamanhoFonte }} value="<">
-          <img src={'img/operator/menor-que.png'} alt="Menor que" style={{ width: 24, marginRight: 8, marginTop: 3 }} />
+          <img src={'img/operator/menor-que.png'} alt="Menor que" style={{ width: tamanhoFonte, marginRight: 8, marginTop: 1 }} />
           Menor que
         </MenuItem>
         <MenuItem sx={{ fontSize: tamanhoFonte }} value=">=">
-          <img src={'img/operator/e-maior-que-ou-igual-a.png'} alt="Maior ou igual" style={{ width: 24, marginRight: 8, marginTop: 3 }} />
+          <img src={'img/operator/e-maior-que-ou-igual-a.png'} alt="Maior ou igual" style={{ width: tamanhoFonte, marginRight: 8, marginTop: 1 }} />
           Maior ou igual
         </MenuItem>
         <MenuItem sx={{ fontSize: tamanhoFonte }} value="<=">
-          <img src={'img/operator/e-menor-ou-igual-a.png'} alt="Menor ou igual" style={{ width: 24, marginRight: 8, marginTop: 3 }} />
+          <img src={'img/operator/e-menor-ou-igual-a.png'} alt="Menor ou igual" style={{ width: tamanhoFonte, marginRight: 8, marginTop: 1 }} />
           Menor ou igual
         </MenuItem>
         <MenuItem sx={{ fontSize: tamanhoFonte }} value="=">
-          <img src={'img/operator/igual.png'} alt="Igual" style={{ width: 24, marginRight: 8, marginTop: 3 }} />
+          <img src={'img/operator/igual.png'} alt="Igual" style={{ width: tamanhoFonte, marginRight: 8, marginTop: 1 }} />
           Igual
         </MenuItem>
         <MenuItem sx={{ fontSize: tamanhoFonte }} value="!=">
-          <img src={'img/operator/nao-igual.png'} alt="Diferente" style={{ width: 24, marginRight: 8, marginTop: 3 }} />
+          <img src={'img/operator/nao-igual.png'} alt="Diferente" style={{ width: tamanhoFonte, marginRight: 8, marginTop: 1 }} />
           Diferente
         </MenuItem>
       </Select>

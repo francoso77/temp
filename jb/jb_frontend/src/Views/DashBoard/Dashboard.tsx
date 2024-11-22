@@ -25,9 +25,9 @@ const pedidos: Array<PedidoStatusProps> = [
 const Dashboard: React.FC = () => {
   return (
     <Box sx={{ padding: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Typography variant="h5" align="center">
+      {/* <Typography variant="h5" align="center">
         Dashboard
-      </Typography>
+      </Typography> */}
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>

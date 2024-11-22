@@ -5,12 +5,15 @@ import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInt
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsApi from '../../Utils/ClsApi'
 import ClsCrud from '../../Utils/ClsCrudApi'
-import { Box, Grid, IconButton, Paper, SelectChangeEvent } from '@mui/material'
+import { Box, Grid, IconButton, Paper, SelectChangeEvent, Tooltip } from '@mui/material'
 import ComboBox from '../../Componentes/ComboBox'
 import InputText from '../../Componentes/InputText'
 import CloseIcon from '@mui/icons-material/Close'
 import { TipoProdutoTypes } from '../../types/tipoProdutoypes'
 import OperatorSelect, { Operator } from '../../Componentes/OperatorSelect'
+import ContentPasteSearchTwoToneIcon from '@mui/icons-material/ContentPasteSearchTwoTone'
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
+import { idID } from '@mui/material/locale'
 
 interface PesquisaInterface {
   idProduto: number
@@ -33,9 +36,9 @@ const dadosInterface: PesquisaInterface = {
 
 export const ConsultaEstoque = () => {
 
-  const clsFormatacao = new ClsFormatacao()
-  const clsApi = new ClsApi()
+
   const clsCrud = new ClsCrud()
+  const clsFormatacao = new ClsFormatacao()
 
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -45,6 +48,33 @@ export const ConsultaEstoque = () => {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState(dadosInterface)
+
+  const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
+    {
+      cabecalho: 'Produto',
+      alinhamento: 'left',
+      campo: 'idProduto',
+      format: (_v, rs: any) => rsProdutos.find(v => v.idProduto === rs.idProduto)?.nome
+    },
+    {
+      cabecalho: 'Cor',
+      alinhamento: 'left',
+      campo: 'idCor',
+      format: (_v, rs: any) => rsCores.find(v => v.idCor === rs.idCor)?.nome
+    },
+    {
+      cabecalho: 'Fornecedor',
+      alinhamento: 'left',
+      campo: 'idPessoa_fornecedor',
+      format: (_v, rs: any) => rsFornecedores.find(v => v.idPessoa === rs.idPessoa_fornecedor)?.nome
+    },
+    {
+      cabecalho: 'Estoque',
+      alinhamento: 'right',
+      campo: 'qtd',
+      format: (_v, rs: any) => clsFormatacao.currency(rs.qtd)
+    },
+  ]
 
   const handleOperatorChange = (event: SelectChangeEvent<Operator>) => {
     setDados({ ...dados, operador: event.target.value as Operator });
@@ -96,20 +126,25 @@ export const ConsultaEstoque = () => {
 
     const produto = dados.idProduto !== 0 ? dados.idProduto : null
     const cor = dados.idCor !== 0 ? dados.idCor : null
+    const fornecedor = dados.idPessoa_fornecedor !== 0 ? dados.idPessoa_fornecedor : null
+    const tipo = dados.idTipoProduto !== 0 ? dados.idTipoProduto : null
 
     clsCrud.pesquisar(
       {
         entidade: "Estoque",
         criterio: {
           idProduto: produto,
-          idCor: cor
+          idCor: cor,
+          idPessoa_fornecedor: fornecedor
         }
       }
     )
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
+        console.log(rs)
       })
   }
+
   useEffect(() => {
     BuscarDados()
   }, [])
@@ -123,7 +158,7 @@ export const ConsultaEstoque = () => {
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
               <ComboBox
                 opcoes={rsProdutos}
@@ -138,12 +173,11 @@ export const ConsultaEstoque = () => {
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
                 onSelect={btPesquisar}
-
-                tamanhoFonte={25}
+                tamanhoFonte={15}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
             <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
               <ComboBox
                 opcoes={rsCores}
@@ -157,11 +191,11 @@ export const ConsultaEstoque = () => {
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 2)}
-                tamanhoFonte={25}
+                tamanhoFonte={15}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
             <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
               <ComboBox
                 opcoes={TipoProdutoTypes}
@@ -175,11 +209,11 @@ export const ConsultaEstoque = () => {
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 3)}
-                tamanhoFonte={25}
+                tamanhoFonte={15}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
                 opcoes={rsFornecedores}
@@ -193,11 +227,11 @@ export const ConsultaEstoque = () => {
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                tamanhoFonte={25}
+                tamanhoFonte={15}
               />
             </Box>
           </Grid>
-          <Paper sx={{ padding: 1, ml: 1.5, mt: 1.5, width: '100%' }} variant="outlined" >
+          <Paper sx={{ padding: 1, ml: 1.5, mt: 1.5, width: '55%' }} variant="outlined" >
             <Grid container direction="row" spacing={2}>
               <Grid item xs={12} md={6} sx={{ mt: 0.5 }}>
                 <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
@@ -205,7 +239,7 @@ export const ConsultaEstoque = () => {
                     value={dados.operador}
                     onChange={handleOperatorChange}
                     label='Operador'
-                    tamanhoFonte={25}
+                    tamanhoFonte={15}
                   />
                 </Box>
               </Grid>
@@ -220,15 +254,33 @@ export const ConsultaEstoque = () => {
                     erros={erros}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 0)}
-                    tamanhoFonte={25}
+                    tamanhoFonte={15}
                   />
                 </Box>
               </Grid>
             </Grid>
           </Paper>
+          <Grid item xs={2} md={1}>
+            <Tooltip title={'Pesquisar'}>
+              <IconButton
+                color="secondary"
+                sx={{ mt: 5, ml: 6, mb: 5 }}
+                onClick={() => btPesquisar()}
+              >
+                <ContentPasteSearchTwoToneIcon sx={{ fontSize: 60 }} />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+          <Grid item xs={12} sx={{ m: 0.5 }}>
+            <DataTable
+              cabecalho={cabecalhoForm}
+              dados={rsPesquisa}
+              acoes={[]}
+            />
+          </Grid>
         </Grid>
       </Paper>
-      {JSON.stringify(dados)}
+      {/* {JSON.stringify(dados)} */}
     </div>
   )
 }

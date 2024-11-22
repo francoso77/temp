@@ -33,6 +33,8 @@ export default function Cor() {
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<CorInterface>>([])
@@ -69,8 +71,8 @@ export default function Cor() {
         setRsPesquisa(rs)
       })
   }
-  const pesquisarID = (id: string | number): Promise<CorInterface> => {
-    return clsCrud
+  const pesquisarID = async (id: string | number): Promise<CorInterface> => {
+    return await clsCrud
       .pesquisar({
         entidade: "Cor",
         criterio: {
