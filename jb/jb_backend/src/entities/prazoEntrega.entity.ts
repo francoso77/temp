@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PrazoEntregaInterface } from '../interfaces/prazoEntregaInterface';
 import Pedido from './pedido.entity';
 
@@ -9,6 +9,7 @@ export default class PrazoEntrega implements PrazoEntregaInterface {
   idPrazoEntrega: number
 
   @Column({ length: 35 })
+  @Index()
   nome: string
 
   @Column({ length: 35 })

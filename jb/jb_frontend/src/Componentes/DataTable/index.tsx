@@ -46,7 +46,7 @@ export interface DataTableInterface {
   colunaSoma?: Array<string>;
   ItemSpeed?: Array<ItemSpeedDial>;
   tituloTabela?: string;
-  // qtdColunas?: number;
+  qtdColunas?: number;
 }
 
 export const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -74,17 +74,17 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     padding: '1px',
-    fontSize: '0.55rem',
+    fontSize: '0.65rem',
     [theme.breakpoints.up('md')]: {
       padding: '2px',
       fontSize: '0.75rem',
     },
   },
   [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
-    padding: '1px',
-    fontSize: '0.55rem',
+    padding: '4px',
+    fontSize: '0.65rem',
     [theme.breakpoints.up('md')]: {
-      padding: '2px',
+      padding: '7px',
       fontSize: '0.75rem',
     },
     position: "sticky",
@@ -191,7 +191,7 @@ export default function DataTable<T>({
   exibirPaginacao = true,
   temTotal = false,
   colunaSoma = [],
-  // qtdColunas
+  qtdColunas = 1
 }: DataTableInterface) {
 
   const clsFormatacao = new ClsFormatacao()
@@ -331,7 +331,7 @@ export default function DataTable<T>({
                 </StyledTableCell>
                 {colunaSoma.map((column) => (
                   <StyledTableCell
-                    colSpan={1}
+                    colSpan={qtdColunas}
                     align={'center'}
                     key={column}
                   >

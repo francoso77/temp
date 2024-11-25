@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PerdaMalhariaInterface } from '../interfaces/perdaMalhariaInterface';
 import Produto from './produto.entity';
 import Pessoa from './pessoa.entity';
@@ -11,9 +11,11 @@ export default class PerdaMalharia implements PerdaMalhariaInterface {
   idPerdaMalharia: number
 
   @Column({ type: "datetime" })
+  @Index()
   dataPerda: string
 
   @Column()
+  @Index()
   idMaquina: number
 
   @JoinColumn({ name: 'idMaquina' })
@@ -21,6 +23,7 @@ export default class PerdaMalharia implements PerdaMalhariaInterface {
   maquina: Maquina
 
   @Column()
+  @Index()
   idProduto: number
 
   @JoinColumn({ name: 'idProduto' })
@@ -28,6 +31,7 @@ export default class PerdaMalharia implements PerdaMalhariaInterface {
   produto: Produto
 
   @Column()
+  @Index()
   idPessoa_tecelao: number
 
   @JoinColumn({ name: 'idPessoa_tecelao' })

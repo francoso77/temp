@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, In, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { EstoqueInterface } from '../interfaces/estoqueInterface';
 import Pessoa from './pessoa.entity';
 import Produto from './produto.entity';
@@ -11,6 +11,7 @@ export default class Estoque implements EstoqueInterface {
   idEstoque: number
 
   @Column()
+  @Index()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
@@ -18,6 +19,7 @@ export default class Estoque implements EstoqueInterface {
   produto: Produto
 
   @Column()
+  @Index()
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })

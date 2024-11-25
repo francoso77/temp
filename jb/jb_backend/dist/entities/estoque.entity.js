@@ -22,6 +22,7 @@ var Estoque = /** @class */ (function () {
     ], Estoque.prototype, "idEstoque", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Estoque.prototype, "idProduto", void 0);
     __decorate([
@@ -31,6 +32,7 @@ var Estoque = /** @class */ (function () {
     ], Estoque.prototype, "produto", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Estoque.prototype, "idPessoa_fornecedor", void 0);
     __decorate([

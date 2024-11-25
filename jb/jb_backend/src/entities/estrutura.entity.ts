@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { EstruturaInterface } from '../interfaces/estruturaInterface';
 import Produto from './produto.entity';
 import DetalheEstrutura from './detalheEstrutura.entity';
@@ -21,6 +21,7 @@ export default class Estrutura implements EstruturaInterface {
   qtdBase: number
 
   @Column()
+  @Index()
   idProduto: number
 
   @JoinColumn({ name: 'idProduto' })

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common"
+import { Body, Controller, Post } from "@nestjs/common"
 import Pedido from '../entities/pedido.entity'
 import { AppDataSource } from '../data-source'
 import ProducaoMalharia from '../entities/producaoMalharia.entity'
@@ -6,9 +6,51 @@ import PerdaMalharia from '../entities/perdaMalharia.entity'
 import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
 import ProducaoDublagem from '../entities/producaoDublagem.entity'
 import Tinturaria from '../entities/tinturaria.entity'
+import Estoque from '../entities/estoque.entity'
 
 @Controller()
 export class OutController {
+
+  @Post("produtosEmEstoque")
+  async produtosEmEstoque(
+    @Body("idProduto") idProduto: number,
+    @Body("idCor") idCor: number,
+    @Body("tipoProduto") tipoProduto: number,
+    @Body("idFornecedor") idFornecedor: number,
+    @Body("operador") operador: string,
+    @Body("qtdComparar") qtdComparar: number,
+  ): Promise<Array<Estoque>> {
+
+    const sql = `
+    SELECT 
+	    e.idProduto,
+	    e.idCor,
+	    p.tipoProduto,
+	    e.idPessoa_fornecedor,
+	    ROUND(SUM(e.qtd),2) AS totalQtd
+    FROM estoques e
+    INNER JOIN produtos p ON p.idProduto = e.idProduto
+    LEFT JOIN cores c ON c.idCor = e.idCor
+    INNER JOIN pessoas pf ON pf.idPessoa = e.idPessoa_fornecedor
+    WHERE
+      (? IS NULL OR e.idProduto = ?) AND
+      (? IS NULL OR e.idCor = ?) AND
+      (? IS NULL OR p.tipoProduto = ?) AND
+      (? IS NULL OR e.idPessoa_fornecedor = ?)
+    GROUP BY
+	    e.idProduto,
+	    e.idCor,
+	    e.idPessoa_fornecedor
+    HAVING
+      (? IS NULL OR ROUND(SUM(e.qtd),2) ${operador} ?)
+    ORDER BY
+      e.idProduto ASC
+    ;
+    `
+    const params = [idProduto, idProduto, idCor, idCor, tipoProduto, tipoProduto, idFornecedor, idFornecedor, qtdComparar, qtdComparar, operador]
+    return AppDataSource.getRepository(Estoque).query(sql, params)
+  }
+
 
   @Post("pedidosFechados")
   async pedidosFechados(

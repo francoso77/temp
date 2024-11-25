@@ -23,6 +23,7 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "idPedido", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Pedido.prototype, "dataPedido", void 0);
     __decorate([
@@ -40,6 +41,7 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "prazoEntrega", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Pedido.prototype, "idPessoa_cliente", void 0);
     __decorate([
@@ -49,6 +51,7 @@ var Pedido = /** @class */ (function () {
     ], Pedido.prototype, "cliente", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Pedido.prototype, "idPessoa_vendedor", void 0);
     __decorate([

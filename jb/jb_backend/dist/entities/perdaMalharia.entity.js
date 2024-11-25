@@ -22,10 +22,12 @@ var PerdaMalharia = /** @class */ (function () {
     ], PerdaMalharia.prototype, "idPerdaMalharia", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], PerdaMalharia.prototype, "dataPerda", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], PerdaMalharia.prototype, "idMaquina", void 0);
     __decorate([
@@ -35,6 +37,7 @@ var PerdaMalharia = /** @class */ (function () {
     ], PerdaMalharia.prototype, "maquina", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], PerdaMalharia.prototype, "idProduto", void 0);
     __decorate([
@@ -44,6 +47,7 @@ var PerdaMalharia = /** @class */ (function () {
     ], PerdaMalharia.prototype, "produto", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], PerdaMalharia.prototype, "idPessoa_tecelao", void 0);
     __decorate([

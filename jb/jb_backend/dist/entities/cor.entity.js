@@ -19,6 +19,7 @@ var Cor = /** @class */ (function () {
     ], Cor.prototype, "idCor", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 35 }),
+        (0, typeorm_1.Index)({ unique: true }),
         __metadata("design:type", String)
     ], Cor.prototype, "nome", void 0);
     __decorate([

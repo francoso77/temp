@@ -310,6 +310,7 @@ export default function Produto() {
       }
     }
   }
+
   const BuscarDados = () => {
     clsCrud
       .pesquisar({

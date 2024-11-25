@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import DetalheProducaoDublagem from './detalheProducaoDublagem.entity';
 import { ProducaoDublagemInterface } from '../interfaces/producaoDublagemInterface';
 import { TipoColagemType } from '../types/tipoColagemTypes';
@@ -11,12 +11,14 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   idDublagem: number
 
   @Column({ type: "datetime" })
+  @Index()
   dataProducao: string;
 
   @Column()
   tipoColagem: TipoColagemType;
 
   @Column()
+  @Index()
   idPedido: number;
 
   @JoinColumn({ name: 'idPedido' })

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { EntradaInterface } from '../interfaces/entradaInterface';
 import DetalheEntrada from './detalheEntrada.entity';
@@ -10,15 +10,18 @@ export default class Entrada implements EntradaInterface {
   idEntrada: number
 
   @Column({ length: 11 })
+  @Index()
   notaFiscal: string
 
   @Column({ type: "datetime" })
+  @Index()
   dataEmissao: string;
 
   @Column({ nullable: true, length: 60 })
   observacao: string
 
   @Column()
+  @Index()
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })

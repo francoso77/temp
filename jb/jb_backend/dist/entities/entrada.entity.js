@@ -21,10 +21,12 @@ var Entrada = /** @class */ (function () {
     ], Entrada.prototype, "idEntrada", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 11 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Entrada.prototype, "notaFiscal", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Entrada.prototype, "dataEmissao", void 0);
     __decorate([
@@ -33,6 +35,7 @@ var Entrada = /** @class */ (function () {
     ], Entrada.prototype, "observacao", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Entrada.prototype, "idPessoa_fornecedor", void 0);
     __decorate([

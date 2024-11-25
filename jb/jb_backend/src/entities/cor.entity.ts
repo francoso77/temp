@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { CorInterface } from '../interfaces/corInteface';
 
 @Entity({ name: 'cores' })
@@ -8,6 +8,7 @@ export default class Cor implements CorInterface {
   idCor: number
 
   @Column({ length: 35 })
+  @Index({ unique: true })
   nome: string
 
   @Column()

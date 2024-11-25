@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PedidoInterface } from '../interfaces/pedidoInterface';
 import { StatusPedidoType } from '../types/statusPedidoTypes';
 import PrazoEntrega from './prazoEntrega.entity';
@@ -12,6 +12,7 @@ export default class Pedido implements PedidoInterface {
   idPedido: number
 
   @Column({ type: "datetime" })
+  @Index()
   dataPedido: string
 
   @Column({ nullable: true, length: 60 })
@@ -25,6 +26,7 @@ export default class Pedido implements PedidoInterface {
   prazoEntrega: PrazoEntrega
 
   @Column()
+  @Index()
   idPessoa_cliente: number
 
   @JoinColumn({ name: 'idPessoa_cliente' })
@@ -32,6 +34,7 @@ export default class Pedido implements PedidoInterface {
   cliente: Pessoa
 
   @Column()
+  @Index()
   idPessoa_vendedor: number
 
   @JoinColumn({ name: 'idPessoa_vendedor' })

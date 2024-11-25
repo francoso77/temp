@@ -25,6 +25,12 @@ interface PropsInterface {
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
   cpf?: string
   senha?: string
+  idProduto?: number | null
+  idCor?: number | null
+  tipoProduto?: number | null
+  idFornecedor?: number | null
+  operador?: string | null
+  qtdComparar?: number | null
 }
 
 export default class ClsApi {
@@ -95,7 +101,13 @@ export default class ClsApi {
     qtd,
     id,
     cpf,
-    senha
+    senha,
+    idProduto,
+    idCor,
+    tipoProduto,
+    idFornecedor,
+    operador,
+    qtdComparar
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
@@ -114,7 +126,13 @@ export default class ClsApi {
       qtd,
       id,
       cpf,
-      senha
+      senha,
+      idProduto,
+      idCor,
+      tipoProduto,
+      idFornecedor,
+      operador,
+      qtdComparar
     };
 
     if (setMensagemState) {

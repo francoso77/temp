@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { MaquinaInterface } from '../interfaces/maquinaInterface';
 import ProducaoMalharia from './producaoMalharia.entity';
 
@@ -9,6 +9,7 @@ export default class Maquina implements MaquinaInterface {
   idMaquina: number
 
   @Column({ length: 35 })
+  @Index()
   nome: string
 
   @Column({ length: 15 })

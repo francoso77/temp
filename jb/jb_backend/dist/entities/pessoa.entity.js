@@ -22,14 +22,17 @@ var Pessoa = /** @class */ (function () {
     ], Pessoa.prototype, "idPessoa", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 50 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Pessoa.prototype, "nome", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true, length: 25 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Pessoa.prototype, "apelido", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         (0, class_validator_1.Length)(14, 18, { message: 'O campo doc deve ter entre 14 e 18 caracteres.' }),
         __metadata("design:type", String)
     ], Pessoa.prototype, "cpf_cnpj", void 0);
@@ -67,6 +70,7 @@ var Pessoa = /** @class */ (function () {
     ], Pessoa.prototype, "whatsapp", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true, length: 255 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Pessoa.prototype, "email", void 0);
     __decorate([

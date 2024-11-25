@@ -57,9 +57,20 @@ var perdaMalharia_entity_1 = require("../entities/perdaMalharia.entity");
 var programacaoDublagem_entity_1 = require("../entities/programacaoDublagem.entity");
 var producaoDublagem_entity_1 = require("../entities/producaoDublagem.entity");
 var tinturaria_entity_1 = require("../entities/tinturaria.entity");
+var estoque_entity_1 = require("../entities/estoque.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
+    OutController.prototype.produtosEmEstoque = function (idProduto, idCor, tipoProduto, idFornecedor, operador, qtdComparar) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n    SELECT \n\t    e.idProduto,\n\t    e.idCor,\n\t    p.tipoProduto,\n\t    e.idPessoa_fornecedor,\n\t    ROUND(SUM(e.qtd),2) AS totalQtd\n    FROM estoques e\n    INNER JOIN produtos p ON p.idProduto = e.idProduto\n    LEFT JOIN cores c ON c.idCor = e.idCor\n    INNER JOIN pessoas pf ON pf.idPessoa = e.idPessoa_fornecedor\n    WHERE\n      (? IS NULL OR e.idProduto = ?) AND\n      (? IS NULL OR e.idCor = ?) AND\n      (? IS NULL OR p.tipoProduto = ?) AND\n      (? IS NULL OR e.idPessoa_fornecedor = ?)\n    GROUP BY\n\t    e.idProduto,\n\t    e.idCor,\n\t    e.idPessoa_fornecedor\n    HAVING\n      (? IS NULL OR ROUND(SUM(e.qtd),2) ".concat(operador, " ?)\n    ORDER BY\n      e.idProduto ASC\n    ;\n    ");
+                params = [idProduto, idProduto, idCor, idCor, tipoProduto, tipoProduto, idFornecedor, idFornecedor, qtdComparar, qtdComparar, operador];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(estoque_entity_1.default).query(sql, params)];
+            });
+        });
+    };
     OutController.prototype.pedidosFechados = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
@@ -251,6 +262,18 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    __decorate([
+        (0, common_1.Post)("produtosEmEstoque"),
+        __param(0, (0, common_1.Body)("idProduto")),
+        __param(1, (0, common_1.Body)("idCor")),
+        __param(2, (0, common_1.Body)("tipoProduto")),
+        __param(3, (0, common_1.Body)("idFornecedor")),
+        __param(4, (0, common_1.Body)("operador")),
+        __param(5, (0, common_1.Body)("qtdComparar")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Number, Number, Number, Number, String, Number]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "produtosEmEstoque", null);
     __decorate([
         (0, common_1.Post)("pedidosFechados"),
         __param(0, (0, common_1.Body)("id")),

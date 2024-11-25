@@ -20,6 +20,7 @@ var PrazoEntrega = /** @class */ (function () {
     ], PrazoEntrega.prototype, "idPrazoEntrega", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 35 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], PrazoEntrega.prototype, "nome", void 0);
     __decorate([

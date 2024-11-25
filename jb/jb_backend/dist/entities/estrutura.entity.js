@@ -35,6 +35,7 @@ var Estrutura = /** @class */ (function () {
     ], Estrutura.prototype, "qtdBase", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Estrutura.prototype, "idProduto", void 0);
     __decorate([

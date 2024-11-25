@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface'
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface'
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
@@ -13,7 +13,9 @@ import { TipoProdutoTypes } from '../../types/tipoProdutoypes'
 import OperatorSelect, { Operator } from '../../Componentes/OperatorSelect'
 import ContentPasteSearchTwoToneIcon from '@mui/icons-material/ContentPasteSearchTwoTone'
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
-import { idID } from '@mui/material/locale'
+import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
+import { useNavigate } from 'react-router-dom'
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 
 interface PesquisaInterface {
   idProduto: number
@@ -38,6 +40,7 @@ export const ConsultaEstoque = () => {
 
 
   const clsCrud = new ClsCrud()
+  const clsApi = new ClsApi()
   const clsFormatacao = new ClsFormatacao()
 
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -48,6 +51,7 @@ export const ConsultaEstoque = () => {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState(dadosInterface)
+  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -71,8 +75,13 @@ export const ConsultaEstoque = () => {
     {
       cabecalho: 'Estoque',
       alinhamento: 'right',
-      campo: 'qtd',
-      format: (_v, rs: any) => clsFormatacao.currency(rs.qtd)
+      campo: 'totalQtd',
+      format: (_v, rs: any) => clsFormatacao.currency(rs.totalQtd)
+    },
+    {
+      cabecalho: '',
+      alinhamento: 'left',
+      campo: ''
     },
   ]
 
@@ -106,10 +115,6 @@ export const ConsultaEstoque = () => {
       })
   }
 
-  const btFechar = () => {
-
-  }
-
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
     if (event.key === 'Enter') {
       const nextField = fieldRefs.current[index];
@@ -124,25 +129,42 @@ export const ConsultaEstoque = () => {
 
   const btPesquisar = () => {
 
-    const produto = dados.idProduto !== 0 ? dados.idProduto : null
-    const cor = dados.idCor !== 0 ? dados.idCor : null
-    const fornecedor = dados.idPessoa_fornecedor !== 0 ? dados.idPessoa_fornecedor : null
-    const tipo = dados.idTipoProduto !== 0 ? dados.idTipoProduto : null
+    const idProduto = dados.idProduto !== 0 ? dados.idProduto : null
+    const idCor = dados.idCor !== 0 ? dados.idCor : null
+    const idFornecedor = dados.idPessoa_fornecedor !== 0 ? dados.idPessoa_fornecedor : null
+    const tipoProduto = dados.idTipoProduto !== 0 ? dados.idTipoProduto : null
+    const operador = dados.operador ? dados.operador : null
+    const qtdComparar = dados.qtd !== 0 ? dados.qtd : null
 
-    clsCrud.pesquisar(
-      {
-        entidade: "Estoque",
-        criterio: {
-          idProduto: produto,
-          idCor: cor,
-          idPessoa_fornecedor: fornecedor
-        }
-      }
-    )
+
+    clsApi.execute<any>({
+      method: 'post',
+      url: 'produtosEmEstoque',
+      idProduto,
+      idCor,
+      idFornecedor,
+      tipoProduto,
+      operador,
+      qtdComparar
+    })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
-        console.log(rs)
       })
+  }
+
+  const btLimpar = () => {
+    setDados({ ...dadosInterface, qtd: 0 })
+  }
+
+  const irPara = useNavigate()
+  const btFechar = () => {
+    setLayoutState({
+      titulo: '',
+      tituloAnterior: 'Consulta Estoques de Produtos',
+      pathTitulo: '/',
+      pathTituloAnterior: '/ConsultaEstoque'
+    })
+    irPara('/')
   }
 
   useEffect(() => {
@@ -158,7 +180,7 @@ export const ConsultaEstoque = () => {
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={4} >
             <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
               <ComboBox
                 opcoes={rsProdutos}
@@ -172,12 +194,11 @@ export const ConsultaEstoque = () => {
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
-                onSelect={btPesquisar}
                 tamanhoFonte={15}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={4}  >
             <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
               <ComboBox
                 opcoes={rsCores}
@@ -195,7 +216,7 @@ export const ConsultaEstoque = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={4}  >
             <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
               <ComboBox
                 opcoes={TipoProdutoTypes}
@@ -213,7 +234,7 @@ export const ConsultaEstoque = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={4} >
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
                 opcoes={rsFornecedores}
@@ -233,7 +254,7 @@ export const ConsultaEstoque = () => {
           </Grid>
           <Paper sx={{ padding: 1, ml: 1.5, mt: 1.5, width: '55%' }} variant="outlined" >
             <Grid container direction="row" spacing={2}>
-              <Grid item xs={12} md={6} sx={{ mt: 0.5 }}>
+              <Grid item xs={12} md={6} >
                 <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                   <OperatorSelect
                     value={dados.operador}
@@ -243,7 +264,7 @@ export const ConsultaEstoque = () => {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={6} sx={{ mt: 0.5 }}>
+              <Grid item xs={12} md={6} >
                 <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                   <InputText
                     tipo='uppercase'
@@ -255,6 +276,8 @@ export const ConsultaEstoque = () => {
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 0)}
                     tamanhoFonte={15}
+                    onClickIconeEnd={() => btLimpar()}
+                    iconeEnd='close_icon'
                   />
                 </Box>
               </Grid>
@@ -276,6 +299,10 @@ export const ConsultaEstoque = () => {
               cabecalho={cabecalhoForm}
               dados={rsPesquisa}
               acoes={[]}
+              temTotal={true}
+              colunaSoma={['totalQtd']}
+              qtdColunas={6}
+
             />
           </Grid>
         </Grid>

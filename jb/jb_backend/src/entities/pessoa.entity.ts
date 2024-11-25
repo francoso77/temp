@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PessoaInterface } from '../interfaces/pessoaInterface';
 import { PessoaType } from '../types/pessoaTypes';
 import { Length } from 'class-validator';
@@ -12,12 +12,15 @@ export default class Pessoa implements PessoaInterface {
   idPessoa: number
 
   @Column({ length: 50 })
+  @Index()
   nome: string
 
   @Column({ nullable: true, length: 25 })
+  @Index()
   apelido: string
 
   @Column()
+  @Index()
   @Length(14, 18, { message: 'O campo doc deve ter entre 14 e 18 caracteres.' })
   cpf_cnpj: string
 
@@ -46,6 +49,7 @@ export default class Pessoa implements PessoaInterface {
   whatsapp: string
 
   @Column({ nullable: true, length: 255 })
+  @Index()
   email: string
 
   @Column({ nullable: true })
