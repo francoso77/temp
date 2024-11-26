@@ -15,7 +15,6 @@ export default class PerdaMalharia implements PerdaMalhariaInterface {
   dataPerda: string
 
   @Column()
-  @Index()
   idMaquina: number
 
   @JoinColumn({ name: 'idMaquina' })
@@ -23,7 +22,6 @@ export default class PerdaMalharia implements PerdaMalhariaInterface {
   maquina: Maquina
 
   @Column()
-  @Index()
   idProduto: number
 
   @JoinColumn({ name: 'idProduto' })
@@ -31,7 +29,6 @@ export default class PerdaMalharia implements PerdaMalhariaInterface {
   produto: Produto
 
   @Column()
-  @Index()
   idPessoa_tecelao: number
 
   @JoinColumn({ name: 'idPessoa_tecelao' })

@@ -11,7 +11,6 @@ export default class Estoque implements EstoqueInterface {
   idEstoque: number
 
   @Column()
-  @Index()
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
@@ -19,7 +18,6 @@ export default class Estoque implements EstoqueInterface {
   produto: Produto
 
   @Column()
-  @Index()
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })

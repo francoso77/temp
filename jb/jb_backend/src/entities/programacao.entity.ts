@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { ProgramacaoInterface } from '../interfaces/programacaoInterface';
 import Tinturaria from './tinturaria.entity';
@@ -11,9 +11,11 @@ export default class Programacao implements ProgramacaoInterface {
   idProgramacao: number
 
   @Column({ length: 11 })
+  @Index()
   notaFiscal: string
 
   @Column({ type: "datetime" })
+  @Index()
   dataProgramacao: string;
 
   @Column({ nullable: true, length: 60 })

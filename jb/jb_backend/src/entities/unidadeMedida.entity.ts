@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UnidadeMedidaInterface } from '../interfaces/unidadeMedidaInteface';
 import Produto from './produto.entity';
 
@@ -9,9 +9,11 @@ export default class UnidadeMedida implements UnidadeMedidaInterface {
   idUnidade: number
 
   @Column({ length: 2 })
+  @Index({ unique: true })
   sigla: string
 
   @Column({ length: 35 })
+  @Index({ unique: true })
   nome: string
 
   @JoinColumn({ name: 'idUnidade' })

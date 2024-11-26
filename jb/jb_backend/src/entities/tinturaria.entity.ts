@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { TinturariaInterface } from '../interfaces/tinturariaInterface';
 import DetalheTinturaria from './detalheTinturaria.entity';
@@ -10,6 +10,7 @@ export default class Tinturaria implements TinturariaInterface {
   idTinturaria: number
 
   @Column({ type: "datetime" })
+  @Index()
   dataTinturaria: string;
 
   @Column()

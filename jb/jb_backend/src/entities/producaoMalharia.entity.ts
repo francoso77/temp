@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import Pessoa from './pessoa.entity';
 import { ProducaoMalhariaInterface } from '../interfaces/producaoMalhariaInterface';
 import Maquina from './maquina.entity';
@@ -13,6 +13,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   idMalharia: number
 
   @Column()
+  @Index()
   peca: string
 
   @Column()
@@ -30,6 +31,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   produto: Produto
 
   @Column({ type: "datetime" })
+  @Index()
   dataProducao: string;
 
   @Column()
@@ -59,6 +61,7 @@ export default class ProducaoMalharia implements ProducaoMalhariaInterface {
   fechado: boolean
 
   @Column({ nullable: true, type: "datetime" })
+  @Index()
   dataFechado: string;
 
   @Column({ nullable: true })

@@ -21,7 +21,6 @@ export default class Entrada implements EntradaInterface {
   observacao: string
 
   @Column()
-  @Index()
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })

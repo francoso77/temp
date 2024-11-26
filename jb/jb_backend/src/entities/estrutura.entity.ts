@@ -21,7 +21,6 @@ export default class Estrutura implements EstruturaInterface {
   qtdBase: number
 
   @Column()
-  @Index()
   idProduto: number
 
   @JoinColumn({ name: 'idProduto' })

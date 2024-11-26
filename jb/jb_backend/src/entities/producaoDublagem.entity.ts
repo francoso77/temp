@@ -18,7 +18,6 @@ export default class ProducaoDublagem implements ProducaoDublagemInterface {
   tipoColagem: TipoColagemType;
 
   @Column()
-  @Index()
   idPedido: number;
 
   @JoinColumn({ name: 'idPedido' })

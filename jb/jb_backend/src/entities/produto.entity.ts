@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ProdutoInterface } from '../interfaces/produtoInterface';
 import UnidadeMedida from './unidadeMedida.entity';
 import { TipoProdutoType } from '../types/tipoProdutoypes';
@@ -10,6 +10,7 @@ export default class Produto implements ProdutoInterface {
   idProduto: number
 
   @Column({ length: 80 })
+  @Index({ unique: true })
   nome: string
 
   @Column()

@@ -1,6 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import DetalheProgramacaoDublagem from './detalheProgramacaoDublagem.entity';
-import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } from '../interfaces/programacaoDublagemInterface';
+import { ProgramacaoDublagemInterface } from '../interfaces/programacaoDublagemInterface';
 
 @Entity({ name: 'programacaodublagens' })
 export default class ProgramacaoDublagem implements ProgramacaoDublagemInterface {
@@ -9,6 +9,7 @@ export default class ProgramacaoDublagem implements ProgramacaoDublagemInterface
   idProgramacaoDublagem: number
 
   @Column({ type: "datetime" })
+  @Index()
   dataProgramacao: string
 
   @Column({ type: 'float', precision: 4 })

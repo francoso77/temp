@@ -46,6 +46,7 @@ export default class Pessoa implements PessoaInterface {
   telefone: string
 
   @Column({ nullable: true, length: 15 })
+  @Index()
   whatsapp: string
 
   @Column({ nullable: true, length: 255 })

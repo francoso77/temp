@@ -26,7 +26,6 @@ export default class Pedido implements PedidoInterface {
   prazoEntrega: PrazoEntrega
 
   @Column()
-  @Index()
   idPessoa_cliente: number
 
   @JoinColumn({ name: 'idPessoa_cliente' })
@@ -34,7 +33,6 @@ export default class Pedido implements PedidoInterface {
   cliente: Pessoa
 
   @Column()
-  @Index()
   idPessoa_vendedor: number
 
   @JoinColumn({ name: 'idPessoa_vendedor' })
