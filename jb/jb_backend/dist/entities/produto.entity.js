@@ -21,6 +21,7 @@ var Produto = /** @class */ (function () {
     ], Produto.prototype, "idProduto", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 80 }),
+        (0, typeorm_1.Index)({ unique: true }),
         __metadata("design:type", String)
     ], Produto.prototype, "nome", void 0);
     __decorate([

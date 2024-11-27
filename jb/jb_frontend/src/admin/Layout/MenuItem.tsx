@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { EstruturaMenuInterface } from './MenuCls'
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { GlobalContext, GlobalContextInterface } from "../ContextoGlobal/ContextoGlobal";
+import { GlobalContext, GlobalContextInterface } from "../../ContextoGlobal/ContextoGlobal";
 
 
 interface PropsInterface {

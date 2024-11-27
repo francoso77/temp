@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert';
-import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
-import Condicional from '../Componentes/Condicional/Condicional';
-import { MensagemTipo } from '../ContextoGlobal/MensagemState';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import Condicional from '../../Componentes/Condicional/Condicional';
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { Button, Dialog, Grid, Typography } from '@mui/material';

@@ -22,10 +22,12 @@ var Programacao = /** @class */ (function () {
     ], Programacao.prototype, "idProgramacao", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 11 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Programacao.prototype, "notaFiscal", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Programacao.prototype, "dataProgramacao", void 0);
     __decorate([

@@ -31,7 +31,6 @@ var ProducaoDublagem = /** @class */ (function () {
     ], ProducaoDublagem.prototype, "tipoColagem", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
-        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], ProducaoDublagem.prototype, "idPedido", void 0);
     __decorate([

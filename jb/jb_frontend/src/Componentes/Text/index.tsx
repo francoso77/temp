@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, forwardRef, useState } from 'react';
-import { OutlinedInput, Typography, InputAdornment, FormControl, FormControlLabel, Checkbox, IconButton, Icon } from '@mui/material';
+import { OutlinedInput, Typography, InputAdornment, FormControl, FormControlLabel, Checkbox, IconButton, Icon, useTheme } from '@mui/material';
 import Condicional from '../Condicional/Condicional';
 import { IMaskInput } from 'react-imask';
 import VisibilityIcon from "@mui/icons-material/Visibility"
@@ -12,6 +12,7 @@ interface mapKeyPressInterface {
 
 interface ComTextInterface {
   label: string,
+  tamanhoFonte?: number,
   disabled?: boolean,
   type?: string,
   placeholder?: string,
@@ -20,6 +21,7 @@ interface ComTextInterface {
   field: string,
   mask?: string,
   setState: React.Dispatch<React.SetStateAction<any>>
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined
   iconeEnd?: string,
   onClickIconeEnd?: () => void
   iconeStart?: string
@@ -57,10 +59,12 @@ const MaskCustom = forwardRef((props: any, ref: any) => {
 })
 export default function Text({
   label,
+  tamanhoFonte = 16,
   dados,
   field,
   mask,
   setState,
+  onKeyDown,
   disabled = false,
   type = 'text',
   placeholder = label,
@@ -75,6 +79,7 @@ export default function Text({
   maxLength
 }: ComTextInterface) {
 
+  const theme = useTheme()
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -83,10 +88,14 @@ export default function Text({
     }
   }, [autofocus, setState])
 
-  const onKey = (key: string) => {
+  const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>) => {
     if (mapKeyPress.length > 0) {
       let encontrou: boolean = false
-      for (let contador: number = 0; contador < mapKeyPress.length && !encontrou; contador++) {
+      for (
+        let contador: number = 0;
+        contador < mapKeyPress.length && !encontrou;
+        contador++
+      ) {
         if (mapKeyPress[contador].key === key) {
           encontrou = true
           mapKeyPress[contador].onKey()
@@ -137,7 +146,13 @@ export default function Text({
           <Typography
             variant='body2'
             textAlign='left'
-            sx={{ mt: 1 }}
+            sx={{
+              mt:
+                theme && theme.inputs && theme.inputs.marginTop
+                  ? theme.inputs.marginTop
+                  : 0,
+              fontSize: tamanhoFonte,
+            }}
           >
             {label}
           </Typography>
@@ -148,7 +163,7 @@ export default function Text({
             disabled={disabled}
             type={type}
             onChange={(e) => setState({ ...dados, [field]: e.target.value })}
-            onKeyDown={(ev) => onKey(ev.key)}
+            onKeyDown={onKeyDown ? onKeyDown : (ev) => onKey(ev.key, mapKeyPress)}
             autoFocus={autofocus}
             inputRef={inputRef}
             endAdornment={exibirIcone('end', iconeEnd, onClickIconeEnd)}
@@ -167,7 +182,13 @@ export default function Text({
         <Typography
           variant='body2'
           textAlign='left'
-          sx={{ mt: 1 }}
+          sx={{
+            mt:
+              theme && theme.inputs && theme.inputs.marginTop
+                ? theme.inputs.marginTop
+                : 0,
+            fontSize: tamanhoFonte,
+          }}
         >
           {label}
         </Typography>
@@ -180,7 +201,7 @@ export default function Text({
           disabled={disabled}
           type={exibirSenha}
           onChange={(e) => setState({ ...dados, [field]: e.target.value })}
-          onKeyDown={(ev) => onKey(ev.key)}
+          onKeyDown={onKeyDown ? onKeyDown : (ev) => onKey(ev.key, mapKeyPress)}
           autoFocus={autofocus}
           inputRef={inputRef}
           endAdornment={
@@ -207,7 +228,13 @@ export default function Text({
           <Typography
             variant='body2'
             textAlign='left'
-            sx={{ mt: 1 }}
+            sx={{
+              mt:
+                theme && theme.inputs && theme.inputs.marginTop
+                  ? theme.inputs.marginTop
+                  : 0,
+              fontSize: tamanhoFonte,
+            }}
           >
             {label}
           </Typography>
@@ -239,7 +266,13 @@ export default function Text({
           <Typography
             variant='body2'
             textAlign='left'
-            sx={{ mt: 1 }}
+            sx={{
+              mt:
+                theme && theme.inputs && theme.inputs.marginTop
+                  ? theme.inputs.marginTop
+                  : 0,
+              fontSize: tamanhoFonte,
+            }}
           >
             {label}
           </Typography>
@@ -250,7 +283,7 @@ export default function Text({
             disabled={disabled}
             type={type}
             onChange={(e) => setState({ ...dados, [field]: e.target.value })}
-            onKeyDown={(ev) => onKey(ev.key)}
+            onKeyDown={onKeyDown ? onKeyDown : (ev) => onKey(ev.key, mapKeyPress)}
             autoFocus={autofocus}
           />
 

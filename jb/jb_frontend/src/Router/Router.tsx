@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
-import Login from '../Login/Login';
-import Layout from '../Layout/Layout';
+import Login from '../admin/Login/Login';
+import Layout from '../admin/Layout/Layout';
 import Cor from '../Views/Crud/Cor';
 import UnidadeMedida from '../Views/Crud/UnidadeMedida';
 import Maquina from '../Views/Crud/Maquina';
@@ -93,5 +93,9 @@ export const router = createBrowserRouter([
         element: <ConsultaEstoque />,
       },
     ]
+  },
+  {
+    path: "/",
+    element: <Usuario />,
   },
 ]);

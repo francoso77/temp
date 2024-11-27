@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UsuarioInterface } from '../../interfaces/sistema/usuarioInterface';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 @Entity({ name: 'usuarios' })
 export class Usuario implements UsuarioInterface {
@@ -12,6 +13,10 @@ export class Usuario implements UsuarioInterface {
   @Column({ length: 14 })
   cpf: string
 
+  @Column({ nullable: true, length: 255 })
+  @Index({ unique: true })
+  email: string
+
   @Column({ length: 25 })
   senha: string
 
@@ -20,6 +25,9 @@ export class Usuario implements UsuarioInterface {
 
   @Column({ type: 'int', default: 0 })
   tentativasLogin: number
+
+  @Column({ type: 'int', default: 0 })
+  tipoUsuario: UsuarioType
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

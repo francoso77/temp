@@ -35,7 +35,6 @@ var Entrada = /** @class */ (function () {
     ], Entrada.prototype, "observacao", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
-        (0, typeorm_1.Index)(),
         __metadata("design:type", Number)
     ], Entrada.prototype, "idPessoa_fornecedor", void 0);
     __decorate([

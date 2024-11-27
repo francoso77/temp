@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
-import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { Typography } from '@mui/material';
 
 

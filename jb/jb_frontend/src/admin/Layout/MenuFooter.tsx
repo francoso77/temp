@@ -19,8 +19,8 @@ import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutl
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import FactoryIcon from '@mui/icons-material/Factory';
 import ColorLensTwoToneIcon from '@mui/icons-material/ColorLensTwoTone';
-import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
-import menuCrud from '../Utils/menuCrud.json';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import menuCrud from '../../Utils/menuCrud.json';
 
 // const settingsJSON = [
 //   {

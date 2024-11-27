@@ -24,6 +24,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "idMalharia", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], ProducaoMalharia.prototype, "peca", void 0);
     __decorate([
@@ -46,6 +47,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "produto", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], ProducaoMalharia.prototype, "dataProducao", void 0);
     __decorate([
@@ -84,6 +86,7 @@ var ProducaoMalharia = /** @class */ (function () {
     ], ProducaoMalharia.prototype, "fechado", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true, type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], ProducaoMalharia.prototype, "dataFechado", void 0);
     __decorate([

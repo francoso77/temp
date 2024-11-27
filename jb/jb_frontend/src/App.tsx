@@ -1,4 +1,4 @@
-import { THEME } from './Layout/Theme';
+import { THEME } from './admin/Layout/Theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 
 function App() {

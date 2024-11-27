@@ -66,6 +66,7 @@ var Pessoa = /** @class */ (function () {
     ], Pessoa.prototype, "telefone", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true, length: 15 }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Pessoa.prototype, "whatsapp", void 0);
     __decorate([

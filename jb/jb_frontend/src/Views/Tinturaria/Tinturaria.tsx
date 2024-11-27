@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 import Condicional from '../../Componentes/Condicional/Condicional'
-import DataTable, { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable'
+import { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable'
 import ComboBox from '../../Componentes/ComboBox'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
@@ -245,7 +245,7 @@ export function Tinturaria() {
         },
         camposLike: ['dataTinturaria'],
 
-        msg: 'Pesquisando notas ...',
+        msg: 'Pesquisando romaneios ...',
         setMensagemState: setMensagemState
       }
     } else {
@@ -268,7 +268,7 @@ export function Tinturaria() {
           idPessoa_cliente: idsCli,
         },
         camposLike: ['idPessoa_cliente'],
-        msg: 'Pesquisando notas ...',
+        msg: 'Pesquisando romaneios ...',
         setMensagemState: setMensagemState
       }
     }

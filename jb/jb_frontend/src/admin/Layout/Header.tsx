@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { GlobalContext, GlobalContextInterface } from '../ContextoGlobal/ContextoGlobal';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from '@mui/material';
 

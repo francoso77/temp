@@ -118,7 +118,7 @@ export function ProducaoMalharia() {
       campoOrder: ['nome'],
     })
       .then((rs: Array<PessoaInterface>) => {
-        setRsRevisador(rs)
+        setRsRevisador(rs && rs.length > 0 ? rs : [])
       })
 
     clsCrud.pesquisar({
@@ -129,7 +129,7 @@ export function ProducaoMalharia() {
       campoOrder: ['nome'],
     })
       .then((rs: Array<PessoaInterface>) => {
-        setRsTecelao(rs)
+        setRsTecelao(rs && rs.length > 0 ? rs : [])
       })
 
     clsCrud.pesquisar({
@@ -140,7 +140,7 @@ export function ProducaoMalharia() {
       campoOrder: ['nome'],
     })
       .then((rs: Array<MaquinaInterface>) => {
-        setRsMaquina(rs)
+        setRsMaquina(rs && rs.length > 0 ? rs : [])
       })
 
     clsCrud.pesquisar({
@@ -152,7 +152,7 @@ export function ProducaoMalharia() {
       campoOrder: ['nome'],
     })
       .then((rs: Array<ProdutoInterface>) => {
-        setRsProduto(rs)
+        setRsProduto(rs && rs.length > 0 ? rs : [])
       })
 
     clsCrud.consultar({
@@ -164,10 +164,13 @@ export function ProducaoMalharia() {
       select: ['CONCAT( LPAD(MONTH(dataProducao), 2, "0"), "/",YEAR(dataProducao)) AS mes']
     })
       .then((rs: Array<any>) => {
-        setRsMeses(rs)
-        setSelectedValue({ mes: rs[0].mes })
+        setRsMeses(rs || []);
+        if (rs && rs.length > 0) {
+          setSelectedValue({ mes: rs[0].mes });
+        } else {
+          setSelectedValue({ mes: '' });
+        }
       })
-
   }
 
 

@@ -21,6 +21,7 @@ var Tinturaria = /** @class */ (function () {
     ], Tinturaria.prototype, "idTinturaria", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
+        (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Tinturaria.prototype, "dataTinturaria", void 0);
     __decorate([

@@ -138,7 +138,7 @@ export default class ClsCrud {
       .then((rs) => {
         if (rs.data.ok && setMensagemState) {
           setMensagemState({
-            titulo: 'Aviso...',
+            titulo: '',
             exibir: false,
             mensagem: '',
             tipo: MensagemTipo.Info,

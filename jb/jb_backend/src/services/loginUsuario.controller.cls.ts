@@ -34,12 +34,13 @@ export default class ClsLoginUsuarioController {
         .save({
           idUsuario: usuarioLogado.idUsuario,
           token,
-          ativo: true
+          ativo: true,
+          tipoUsuario: usuarioLogado.tipoUsuario
         })
 
       retorno.ok = true
       retorno.mensagem = 'Login efetuado com sucesso.'
-      retorno.dados = usuarioLogado.nome + '.' + token
+      retorno.dados = usuarioLogado.nome + '.' + token + '.' + usuarioLogado.tipoUsuario
       return retorno
     } else {
       await AppDataSource.getRepository(Usuario)

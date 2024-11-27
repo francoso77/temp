@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Usuario = void 0;
 var typeorm_1 = require("typeorm");
+var usuarioTypes_1 = require("../../types/usuarioTypes");
 var Usuario = /** @class */ (function () {
     function Usuario() {
     }
@@ -27,6 +28,11 @@ var Usuario = /** @class */ (function () {
         __metadata("design:type", String)
     ], Usuario.prototype, "cpf", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true, length: 255 }),
+        (0, typeorm_1.Index)({ unique: true }),
+        __metadata("design:type", String)
+    ], Usuario.prototype, "email", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ length: 25 }),
         __metadata("design:type", String)
     ], Usuario.prototype, "senha", void 0);
@@ -38,6 +44,10 @@ var Usuario = /** @class */ (function () {
         (0, typeorm_1.Column)({ type: 'int', default: 0 }),
         __metadata("design:type", Number)
     ], Usuario.prototype, "tentativasLogin", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: 'int', default: 0 }),
+        __metadata("design:type", Number)
+    ], Usuario.prototype, "tipoUsuario", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)

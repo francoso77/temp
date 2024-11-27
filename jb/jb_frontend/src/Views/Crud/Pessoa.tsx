@@ -16,7 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
 import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
-import { THEME } from '../../Layout/Theme';
+import { THEME } from '../../admin/Layout/Theme';
 import DialogPessoas from '../../Componentes/Dialog/DialogPessoas';
 
 
@@ -160,6 +160,7 @@ export default function Pessoa() {
       retorno = validaCampo.naoVazio('bairro', pessoa, erros, retorno, 'Informe um bairro')
       retorno = validaCampo.naoVazio('cidade', pessoa, erros, retorno, 'Informe a cidade')
       retorno = validaCampo.eUF('uf', pessoa, erros, retorno, false)
+      retorno = validaCampo.eEmail('email', pessoa, erros, retorno)
     }
     setErros(erros)
     return retorno

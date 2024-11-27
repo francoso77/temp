@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { EstruturaMenuInterface } from '../Layout/MenuCls'
+import { EstruturaMenuInterface } from '../admin/Layout/MenuCls'
 
 export interface LayoutStateInterface {
   titulo: string

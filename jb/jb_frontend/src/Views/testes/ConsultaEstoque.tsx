@@ -168,6 +168,12 @@ export const ConsultaEstoque = () => {
   }
 
   useEffect(() => {
+    setLayoutState({
+      titulo: 'Consulta Estoques de Produtos',
+      tituloAnterior: '',
+      pathTitulo: '/ConsultaEstoque',
+      pathTituloAnterior: '/'
+    })
     BuscarDados()
   }, [])
 

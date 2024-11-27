@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Drawer, List, Toolbar } from '@mui/material';
 import { EstruturaMenuInterface } from "./MenuCls";
 import MenuItem from './MenuItem';
-import { GlobalContext, GlobalContextInterface } from "../ContextoGlobal/ContextoGlobal";
+import { GlobalContext, GlobalContextInterface } from "../../ContextoGlobal/ContextoGlobal";
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 

@@ -1,17 +1,18 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { THEME } from './Theme';
-import { GlobalContext } from '../ContextoGlobal/ContextoGlobal';
+import { GlobalContext } from '../../ContextoGlobal/ContextoGlobal';
 import { Outlet } from 'react-router-dom';
-import useUsuarioState from '../ContextoGlobal/UsuarioState';
-import useLayoutState from '../ContextoGlobal/LayoutState';
+import useUsuarioState from '../../ContextoGlobal/UsuarioState';
+import useLayoutState from '../../ContextoGlobal/LayoutState';
 //import Header from './Header';
-import useMensagemState from '../ContextoGlobal/MensagemState';
+import useMensagemState from '../../ContextoGlobal/MensagemState';
 import Mensagem from './Mensagem';
 import { ROTAS_LIVRES } from './ClsRotas';
 import { useEffect, useState } from 'react';
-import Condicional from '../Componentes/Condicional/Condicional';
+import Condicional from '../../Componentes/Condicional/Condicional';
 import HeaderMenu from './HeaderMenu';
 import MenuFooter from './MenuFooter';
+import Login from '../Login/Login';
 
 function Layout() {
 
@@ -66,9 +67,9 @@ function Layout() {
               <MenuFooter />
             </Condicional>
 
-            {/* <Condicional condicao={!usuarioState.logado && !rotaLivre}>
-              <EventosEmAberto />
-            </Condicional> */}
+            <Condicional condicao={!usuarioState.logado && !rotaLivre}>
+              <Login />
+            </Condicional>
           </>
         </GlobalContext.Provider>
       </ThemeProvider>
