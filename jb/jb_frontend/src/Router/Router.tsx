@@ -1,6 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
-import Login from '../admin/Login/Login';
-import Layout from '../admin/Layout/Layout';
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import Login from '../app/Login/Login';
+import Layout from '../app/Layout/Layout';
 import Cor from '../Views/Crud/Cor';
 import UnidadeMedida from '../Views/Crud/UnidadeMedida';
 import Maquina from '../Views/Crud/Maquina';
@@ -16,25 +16,38 @@ import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem
 import Usuario from '../Views/Usuario/Usuario';
 import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
 import Dashboard from '../Views/DashBoard/Dashboard';
-import { ConsultaEstoque } from '../Views/testes/ConsultaEstoque';
+import { ConsultaEstoque } from '../Views/Estoques/ConsultaEstoque';
+import Home from '../Home';
 
+// // Função para verificar se o usuário está autenticado
+// const isAuthenticated = () => {
+//   const token = localStorage.getItem("authToken");
+//   return Boolean(token); // Retorna `true` se existir um token, caso contrário `false`.
+// };
+
+// // Componente para proteger as rotas
+// const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+//   return isAuthenticated() ? children : <Navigate to="/Login" />;
+// };
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
+      // Rotas públicas (rotaLivre)
       {
         path: "/Login",
         element: <Login />,
       },
       {
-        path: "/Cor",
-        element: <Cor />,
-      },
-      {
         path: "/Usuario",
         element: <Usuario />,
+      },
+      // Rotas protegidas
+      {
+        path: "/Cor",
+        element: <Cor />,
       },
       {
         path: "/UnidadeMedida",
@@ -77,7 +90,7 @@ export const router = createBrowserRouter([
         element: <Tinturaria />,
       },
       {
-        path: "/ProgramacaoPedido",
+        path: "/ProgramacaoDublagem",
         element: <ProgramacaoDublagem />,
       },
       {
@@ -89,13 +102,13 @@ export const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "/Testes",
+        path: "/ConsultaEstoque",
         element: <ConsultaEstoque />,
       },
+      {
+        path: "/Testes",
+        element: <Home />,
+      },
     ]
-  },
-  {
-    path: "/",
-    element: <Usuario />,
   },
 ]);

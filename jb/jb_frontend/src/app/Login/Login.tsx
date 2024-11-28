@@ -68,12 +68,20 @@ export default function Login() {
         .then((rs) => {
           if (rs.ok && rs.dados && rs.dados.length > 0) {
             const [usuario, token, tipoUsuario] = rs.dados.split('.')
+
             contextGlobal.setUsuarioState({
               usuario: usuario,
               logado: true,
               token: token,
-              tipoUsuario: tipoUsuario
+              tipoUsuario: tipoUsuario,
+              idsMenu: tipoUsuario === '0' ? [5, 7] :
+                tipoUsuario === '5' ? [1, 5, 6, 9] :
+                  tipoUsuario === '2' ? [3, 4, 6, 9] :
+                    tipoUsuario === '3' ? [2, 6, 7, 9] :
+                      tipoUsuario === '4' ? [2, 7, 8, 9] :
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9]
             })
+
             if (rememberMe) {
               localStorage.setItem('cpf', dados.cpf)
               localStorage.setItem('senha', dados.senha)
@@ -81,16 +89,19 @@ export default function Login() {
               localStorage.removeItem('cpf')
               localStorage.removeItem('senha')
             }
-            contextGlobal.setLayoutState({
-              titulo: 'Dashboard',
-              tituloAnterior: '',
-              pathTitulo: '/Dashboard',
-              pathTituloAnterior: ''
-            })
+            // contextGlobal.setLayoutState({
+            //   titulo: 'Dashboard',
+            //   tituloAnterior: '',
+            //   pathTitulo: '/Dashboard',
+            //   pathTituloAnterior: ''
+            // })
+
+            //ir para a página inicial
+
             navegar("/Testes")
           } else {
-            contextGlobal.setMensagemState({
-              ...contextGlobal.mensagemState,
+            setMensagemState({
+              ...mensagemState,
               exibir: true,
               tipo: MensagemTipo.Error,
               titulo: 'Validação',
@@ -99,8 +110,8 @@ export default function Login() {
             })
           }
         }).catch(() => {
-          contextGlobal.setMensagemState({
-            ...contextGlobal.mensagemState,
+          setMensagemState({
+            ...mensagemState,
             exibir: true,
             tipo: MensagemTipo.Error,
             titulo: 'Erro de conexão',

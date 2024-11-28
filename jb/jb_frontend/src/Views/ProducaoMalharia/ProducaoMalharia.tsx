@@ -186,12 +186,16 @@ export function ProducaoMalharia() {
         select: ['ROUND(SUM(peso),2) AS pesoTotal', 'COUNT(peso) AS qtdTotal', 'CONCAT( LPAD(MONTH(dataProducao), 2, "0"), "/",YEAR(dataProducao)) AS mes']
       });
 
+      if (rs.length === 0) {
+        return
+      }
+
       if (selectedValue.mes === "") {
         setRsTotais({
           ...rsTotais,
-          mes: rs[0].mes,
-          pesoTotal: rs[0].pesoTotal,
-          qtdTotal: rs[0].qtdTotal
+          mes: rs[0]?.mes || '',
+          pesoTotal: rs[0]?.pesoTotal || 0,
+          qtdTotal: rs[0]?.qtdTotal || 0
         })
       } else {
 

@@ -6,6 +6,7 @@ export interface UsuarioStateInterface {
   logado: boolean
   token: string
   tipoUsuario: UsuarioType
+  idsMenu: Array<number>
 }
 
 export default function useUsuarioState() {
@@ -13,7 +14,8 @@ export default function useUsuarioState() {
     usuario: '',
     logado: false,
     token: '',
-    tipoUsuario: UsuarioType.default
+    tipoUsuario: UsuarioType.default,
+    idsMenu: [5, 7]
   })
 
   return { usuarioState, setUsuarioState }

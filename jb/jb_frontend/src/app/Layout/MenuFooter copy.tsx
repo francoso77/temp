@@ -92,7 +92,7 @@ const StyledFab = styled(Fab)({
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
-export default function MenuFooter() {
+export default function MenuFooter_copy() {
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
   const { mensagemState, setMensagemState } = React.useContext(GlobalContext) as GlobalContextInterface
@@ -141,7 +141,7 @@ export default function MenuFooter() {
               <AddShoppingCartOutlinedIcon sx={{ width: 32, height: 32 }} />
             </IconButton>
           </Tooltip>
-          <StyledFab color="primary" aria-label="add">
+          {/* <StyledFab color="primary" aria-label="add">
             <Tooltip title="Cadastros Gerais" onClick={handleOpenUserMenu} sx={{ p: 0 }} >
               <AddIcon />
             </Tooltip>
@@ -168,7 +168,7 @@ export default function MenuFooter() {
                 <Typography textAlign="center">{setting.menu}</Typography>
               </MenuItem>
             ))}
-          </Menu>
+          </Menu> */}
           <Box sx={{ flexGrow: 0.5 }} />
           <Tooltip title={'Produção Malharia'}>
             <IconButton color="primary" onClick={() => irPara('/ProducaoMalharia', 'Produção Malharia')}>

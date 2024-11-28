@@ -21,6 +21,7 @@ function Layout() {
   const { layoutState, setLayoutState } = useLayoutState()
   const { mensagemState, setMensagemState } = useMensagemState()
 
+  // Verifica se a rota atual é livre
   const chkRotaLivre = () => {
     const urlAtual: string = window.location.href
 
@@ -33,7 +34,7 @@ function Layout() {
 
   useEffect(() => {
     chkRotaLivre()
-  })
+  }, [window.location.href])
 
   return (
     <>
