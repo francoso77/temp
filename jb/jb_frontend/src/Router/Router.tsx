@@ -33,17 +33,29 @@ import Home from '../Home';
 export const router = createBrowserRouter([
   {
     path: "/",
+    element: <Navigate to="/Login" />,
+  },
+  {
+    path: "/Login",
+    element: <Login />,
+  },
+  {
+    path: "/Usuario",
+    element: <Usuario />,
+  },
+  {
+    path: "/",
     element: <Layout />,
     children: [
       // Rotas públicas (rotaLivre)
-      {
-        path: "/Login",
-        element: <Login />,
-      },
-      {
-        path: "/Usuario",
-        element: <Usuario />,
-      },
+      // {
+      //   path: "/Login",
+      //   element: <Login />,
+      // },
+      // {
+      //   path: "/Usuario",
+      //   element: <Usuario />,
+      // },
       // Rotas protegidas
       {
         path: "/Cor",

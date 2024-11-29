@@ -21,7 +21,7 @@ export class UsuarioSessao implements UsuarioSessaoInterface {
   ativo: boolean;
 
   @Column({ type: 'int', default: 0 })
-  tipoUsuario: UsuarioType
+  tipoUsuario: number
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date;

@@ -500,7 +500,7 @@ export function Tinturaria() {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ mt: 2 }}>
+      <Container maxWidth="md" sx={{ mt: 0 }}>
         <Paper variant="outlined" sx={{ padding: 1 }}>
           <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: 0.5 }}>

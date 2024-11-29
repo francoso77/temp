@@ -67,14 +67,15 @@ export default function Login() {
       })
         .then((rs) => {
           if (rs.ok && rs.dados && rs.dados.length > 0) {
-            const [usuario, token, tipoUsuario] = rs.dados.split('.')
+            const [usuario, token, tipoUsuario, idUsuario] = rs.dados.split('.')
 
             contextGlobal.setUsuarioState({
+              idUsuario: Number(idUsuario),
               usuario: usuario,
               logado: true,
               token: token,
               tipoUsuario: tipoUsuario,
-              idsMenu: tipoUsuario === '0' ? [5, 7] :
+              idsMenu: tipoUsuario === '0' ? [7] :
                 tipoUsuario === '5' ? [1, 5, 6, 9] :
                   tipoUsuario === '2' ? [3, 4, 6, 9] :
                     tipoUsuario === '3' ? [2, 6, 7, 9] :
@@ -98,7 +99,7 @@ export default function Login() {
 
             //ir para a página inicial
 
-            navegar("/Testes")
+            navegar("/")
           } else {
             setMensagemState({
               ...mensagemState,

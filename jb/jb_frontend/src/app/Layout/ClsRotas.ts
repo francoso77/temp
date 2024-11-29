@@ -1,1 +1,1 @@
-export const ROTAS_LIVRES: Array<string> = ["Login", "Usuario"]
+export const ROTAS_LIVRES: Array<string> = ["Login", "Usuario", "/Usuario"]

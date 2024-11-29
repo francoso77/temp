@@ -83,7 +83,10 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                         _a.sent();
                         retorno.ok = true;
                         retorno.mensagem = 'Login efetuado com sucesso.';
-                        retorno.dados = usuarioLogado.nome + '.' + token + '.' + usuarioLogado.tipoUsuario;
+                        retorno.dados = usuarioLogado.nome +
+                            '.' + token +
+                            '.' + usuarioLogado.tipoUsuario +
+                            '.' + usuarioLogado.idUsuario;
                         return [2 /*return*/, retorno];
                     case 5: return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario)
                             .update({ cpf: cpf }, { tentativasLogin: function () { return 'tentativasLogin + 1'; } })];

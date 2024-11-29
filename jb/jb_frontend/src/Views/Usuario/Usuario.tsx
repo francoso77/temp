@@ -98,7 +98,7 @@ export default function Usuario() {
       pathTitulo: '/',
       pathTituloAnterior: '/Usuario'
     })
-    if (usuarioState.tipoUsuario === UsuarioType.admin) {
+    if (verificarTipoUsuario() || localState.action === actionTypes.editando) {
 
       irPara('/')
     } else {
@@ -126,7 +126,7 @@ export default function Usuario() {
   }
 
   const btCancelar = () => {
-    if (usuarioState.tipoUsuario === UsuarioType.admin) {
+    if (verificarTipoUsuario()) {
 
       setErros({})
       setUsuario(ResetDados)
@@ -252,25 +252,38 @@ export default function Usuario() {
       })
   }
 
+  const verificarTipoUsuario = () => {
+    let tipoUsuario: any = usuarioState.tipoUsuario
+    const admin: number = UsuarioType.admin
+    tipoUsuario = Number(tipoUsuario)
+    return tipoUsuario === admin
+  }
+
   useEffect(() => {
-    // setLayoutState({
-    //   titulo: 'Cadastro de Usuários',
-    //   tituloAnterior: '',
-    //   pathTitulo: '/Usuario',
-    //   pathTituloAnterior: '/'
-    // })
-    if (usuarioState.tipoUsuario === UsuarioType.admin) {
-      setLocalState({ action: actionTypes.pesquisando })
-    } else {
+
+    if (!usuarioState.logado) {
       setLocalState({ action: actionTypes.incluindo })
+    } else {
+
+      if (verificarTipoUsuario()) {
+        setLocalState({ action: actionTypes.pesquisando })
+      } else {
+        if (usuarioState.logado) {
+          pesquisarID(usuarioState.idUsuario).then((rs) => {
+            setLocalState({ action: actionTypes.editando })
+            setUsuario(rs)
+          })
+        }
+      }
     }
+
   }, [])
 
   return (
     <>
       <Form method='post' action='/Usuario'>
 
-        <Container maxWidth="md" sx={{ mt: 1.5 }}>
+        <Container maxWidth="md" sx={{ mt: 2 }}>
           <Paper variant="outlined" sx={{ padding: 1.5 }}>
 
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -352,7 +365,7 @@ export default function Usuario() {
                       field="cpf"
                       erros={erros}
                       type='tel'
-                      disabled={localState.action === 'excluindo' ? true : false}
+                      disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                       min={14}
                       onKeyDown={(event: any) => btPulaCampo(event, 2)}
                       autoFocus
@@ -419,7 +432,7 @@ export default function Usuario() {
                     disabled={localState.action === 'excluindo' ? true : false}
                   />
                 </Grid> */}
-                <Condicional condicao={usuarioState.tipoUsuario === UsuarioType.admin}>
+                <Condicional condicao={verificarTipoUsuario()}>
                   <Grid item xs={12} sm={12} sx={{ mt: 1 }}>
                     <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                       <ComboBox

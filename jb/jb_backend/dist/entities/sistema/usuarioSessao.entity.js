@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsuarioSessao = void 0;
 var typeorm_1 = require("typeorm");
 var usuario_entity_1 = require("./usuario.entity");
-var usuarioTypes_1 = require("../../types/usuarioTypes");
 var UsuarioSessao = /** @class */ (function () {
     function UsuarioSessao() {
     }
