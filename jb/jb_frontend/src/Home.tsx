@@ -1,169 +1,86 @@
-import React, { useEffect, useState } from "react"
-import { AppBar, Box, Button, CardMedia, Container, Grid, Menu, MenuItem, Paper, ThemeProvider, Toolbar, Typography } from "@mui/material"
-import ClsApi from './Utils/ClsApi'
-import useUsuarioState from './ContextoGlobal/UsuarioState'
-import useMensagemState from './ContextoGlobal/MensagemState'
-import useLayoutState from './ContextoGlobal/LayoutState'
-import { GlobalContextInterface } from './ContextoGlobal/ContextoGlobal'
-import styled from 'styled-components'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { Box, Button, Typography, AppBar, Toolbar, Container, Grid } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
-
-export default function Home() {
-
-  const { usuarioState, setUsuarioState } = useUsuarioState()
-
-  const { mensagemState, setMensagemState } = useMensagemState()
-
-  const { layoutState, setLayoutState } = useLayoutState()
-
-  const [rotaLivre, setRotaLivre] = useState<boolean>(false)
-
-  const clsApi = new ClsApi()
-
-  const ContextoGlobalDefault: GlobalContextInterface = {
-    setUsuarioState: setUsuarioState,
-    usuarioState: usuarioState,
-    layoutState: layoutState,
-    setLayoutState: setLayoutState,
-    mensagemState: mensagemState,
-    setMensagemState: setMensagemState,
-  }
-
-  const Offset = styled("div")(({ theme }) => theme.mixins.toolbar)
-
-  const pesquisarEventos = () => {
-
-    // clsBackEnd.execute<Array<ProvaInterface>>({ url: 'provasEmAberto', metodo: 'get' }).then((rs) => {
-    //   setRsProvas(rs)
-    // })
-
-  }
-
-  useEffect(() => {
-    pesquisarEventos()
-  }, [])
-
-  const nav = useNavigate()
-
-  const irPara = (url: string) => {
-    nav(url)
-  }
-
+const Home: React.FC = () => {
   return (
-    <>
+    <Box>
+      {/* Barra Superior */}
+      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Indústria Têxtil Circular
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-      <Box sx={{
-        backgroundColor: '#F7BA0B',
-        position: 'absolute',
-        height: '418px',
-        width: '100%',
-        margin: 0,
-        top: 0,
-        left: 0,
-        zIndex: -1
-      }}>
-      </Box>
-
-      <AppBar position="static" sx={{ backgroundColor: '#3b4869' }}>
-
-        <Container maxWidth="xl">
-          <Toolbar disableGutters>
-
-            <img src="/img/logomarca.png" alt="Logo JB Têxtil" style={{ width: '70px' }} />
-
-            <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+      {/* Conteúdo */}
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Grid container spacing={4} alignItems="center">
+          {/* Texto de Introdução */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Bem-vindo ao Sistema de Gestão Têxtil
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'justify', mb: 2 }}>
+              A indústria têxtil circular, também conhecida como tubular, é especializada na produção de malhas
+              e tecidos de alta qualidade. Nosso sistema oferece controle total sobre o fluxo de produção, desde
+              a gestão de matérias-primas até a expedição dos produtos acabados.
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'justify', mb: 2 }}>
+              Explore nossa plataforma para gerenciar seus estoques, acompanhar pedidos e otimizar a produção.
+              Um sistema ideal para vendedores, estoquistas, operadores de produção e administradores.
+            </Typography>
+            <Box display="flex" gap={2}>
               <Button
-                key='btCadastrar'
-                sx={{ my: 2, color: 'white', display: 'block' }}
-                onClick={() => irPara('/user/CadastroUsuario')}
+                variant="contained"
+                component={Link}
+                to="/Usuario"
+                sx={{ bgcolor: '#007BFF', '&:hover': { bgcolor: '#0056b3' } }}
               >
                 Cadastrar
               </Button>
-
               <Button
-                key='btEntrar'
-                sx={{ my: 2, color: 'white', display: 'block' }}
-                onClick={() => irPara('/user/LoginApp')}
+                variant="outlined"
+                component={Link}
+                to="/Login"
+                sx={{ color: '#007BFF', borderColor: '#007BFF', '&:hover': { borderColor: '#0056b3' } }}
               >
-                Entrar
+                Login
               </Button>
             </Box>
+          </Grid>
 
-          </Toolbar>
-
-
-        </Container>
-      </AppBar>
-
-      <Grid container justifyContent='center' alignItems='center'>
-
-        <Grid item xs={12} sm={6}>
-
-          <Typography
-            component="p"
-            sx={{
-              mt: 5,
-              textAlign: 'center',
-              // display: { xs: 'flex' },
-              flexGrow: 1,
-              fontFamily: 'roboto',
-              fontSize: { xs: '24pt', md: '36pt' },
-              fontWeight: 600,
-              letterSpacing: '.1rem',
-              color: 'inherit',
-              textDecoration: 'none'
-            }}
-          >
-            BEM VINDO <br /> A <br />JB TÊXTIL
-          </Typography>
-
-          <CardMedia
-            src="https://www.youtube.com/embed/Ptbk2af68e8"
-            //src="./video/institucional.mp4"
-            component="video"
-            sx={{ width: '100%', marginTop: '15px', border: '1px solid black' }}
-
-            autoPlay
-            loop
-            controls
-            muted
-          />
-
-          <Typography
-            component="p"
-            sx={{
-              mt: 5,
-              textAlign: 'center',
-              // display: { xs: 'flex' },
-              flexGrow: 1,
-              fontFamily: 'roboto',
-              fontSize: { xs: '24pt', md: '36pt' },
-              fontWeight: 600,
-              letterSpacing: '.1rem',
-              color: 'inherit',
-              textDecoration: 'none'
-            }}
-          >
-            Próximas Provas
-          </Typography>
-
-          {/* {rsProvas.map((prova, indice) =>
-            <CardEvento
-              key={indice}
-              cidade={prova.cidade}
-              data={prova.dataHoraProva}
-              imagem="./imagens/logo.png"
-              qtdInscritos={0}
-              titulo={prova.nomeProva}
-              uf={prova.uf}
-            />
-          )} */}
-
+          {/* Imagem ou Slider */}
+          <Grid item xs={12} md={6}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+            >
+              <img
+                src="/path/to/your/image1.jpg"
+                alt="Máquina Têxtil"
+                style={{ width: '100%', borderRadius: 8 }}
+              />
+            </motion.div>
+          </Grid>
         </Grid>
 
-      </Grid>
+        {/* Vídeo (opcional) */}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Conheça nossa Indústria em Ação
+          </Typography>
+          <Box component="video" controls width="100%" sx={{ borderRadius: 4 }}>
+            <source src="/path/to/your/video.mp4" type="video/mp4" />
+            Seu navegador não suporta o vídeo.
+          </Box>
+        </Box>
+      </Container>
+    </Box>
+  );
+};
 
-    </>
-  )
-}
+export default Home;

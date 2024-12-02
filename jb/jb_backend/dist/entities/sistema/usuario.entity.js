@@ -49,6 +49,14 @@ var Usuario = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Usuario.prototype, "tipoUsuario", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], Usuario.prototype, "resetToken", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: "datetime", nullable: true }),
+        __metadata("design:type", Date)
+    ], Usuario.prototype, "resetTokenExpires", void 0);
+    __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Usuario.prototype, "createAt", void 0);

@@ -98,12 +98,9 @@ export default function Usuario() {
       pathTitulo: '/',
       pathTituloAnterior: '/Usuario'
     })
-    if (verificarTipoUsuario() || localState.action === actionTypes.editando) {
 
-      irPara('/')
-    } else {
-      irPara('/Login')
-    }
+    irPara('/')
+
   }
 
   const onEditar = (id: string | number) => {
@@ -207,7 +204,9 @@ export default function Usuario() {
 
       if (rs.ok) {
         exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok)
-        btFechar();
+        if (!verificarTipoUsuario()) {
+          btFechar();
+        }
         setLocalState({ action: actionTypes.pesquisando })
       }
     } catch (error) {
@@ -283,8 +282,8 @@ export default function Usuario() {
     <>
       <Form method='post' action='/Usuario'>
 
-        <Container maxWidth="md" sx={{ mt: 2 }}>
-          <Paper variant="outlined" sx={{ padding: 1.5 }}>
+        <Container maxWidth="md" sx={{ mt: 1.5 }}>
+          <Paper variant="outlined" sx={{ padding: 1 }}>
 
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
@@ -354,12 +353,12 @@ export default function Usuario() {
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
                   />
                 </Grid>
-                <Grid item xs={12} md={12} sx={{ mt: 1 }}>
+                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                     <InputText
                       label="CPF"
                       mask="cpf"
-                      // onChange={() => TemCPF()}
+                      onBlur={() => TemCPF()}
                       setState={setUsuario}
                       dados={usuario}
                       field="cpf"
@@ -372,7 +371,7 @@ export default function Usuario() {
                     />
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={12} sx={{ mt: 1, pl: { md: 1 } }}>
+                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
 
                     <InputText
@@ -388,7 +387,7 @@ export default function Usuario() {
                     />
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={12} sx={{ mt: 1, pl: { md: 1 } }}>
+                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
 
                     <InputText
@@ -404,7 +403,7 @@ export default function Usuario() {
                     />
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={12} sx={{ mt: 1 }}>
+                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
 
                     <Text
@@ -433,7 +432,7 @@ export default function Usuario() {
                   />
                 </Grid> */}
                 <Condicional condicao={verificarTipoUsuario()}>
-                  <Grid item xs={12} sm={12} sx={{ mt: 1 }}>
+                  <Grid item xs={12} sm={12} sx={{ mt: 0 }}>
                     <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                       <ComboBox
                         opcoes={UsuarioTypes}
@@ -451,11 +450,11 @@ export default function Usuario() {
                     </Box>
                   </Grid>
                 </Condicional>
-                <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+                <Grid item xs={12} sx={{ mt: 1, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>
                     <IconButton
                       color="secondary"
-                      sx={{ mt: 3, ml: 2 }}
+                      sx={{ mt: 1, ml: 2 }}
                       onClick={() => btCancelar()}
                     >
                       <CancelRoundedIcon sx={{ fontSize: 50 }} />
@@ -465,7 +464,7 @@ export default function Usuario() {
                     <Tooltip title={'Confirmar'}>
                       <IconButton
                         color="secondary"
-                        sx={{ mt: 3, ml: 2 }}
+                        sx={{ mt: 1, ml: 2 }}
                         onClick={() => btConfirmar()}
                       >
                         <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
@@ -477,7 +476,7 @@ export default function Usuario() {
             </Grid>
           </Paper >
         </Container >
-      </Form>
+      </Form >
     </>
   )
 }

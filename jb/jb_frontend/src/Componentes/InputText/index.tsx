@@ -63,6 +63,7 @@ interface InputTextInterface {
   onChange?: (v: any) => void
   afterChange?: (v: any) => void
   onFocus?: (v: any) => void
+  onBlur?: (v: any) => void
   textAlign?: "left" | "right" | "center"
   labelAlign?: "left" | "right" | "center"
   width?: "100%" | string
@@ -273,6 +274,7 @@ export default function InputText({
   onChange = undefined,
   afterChange = undefined,
   onFocus = undefined,
+  onBlur = undefined,
   textAlign = "left",
   labelAlign = "left",
   width = "100%",
@@ -363,7 +365,7 @@ export default function InputText({
           }}
           inputRef={inputRef}
           name={field}
-          onBlur={(e) => formatarDadosAoSair(e)}
+          onBlur={onBlur ? onBlur : (e) => formatarDadosAoSair(e)}
           autoFocus={autoFocus}
           value={valor === null ? "" : valor}
           size="small"

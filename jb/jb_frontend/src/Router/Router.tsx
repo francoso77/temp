@@ -17,46 +17,22 @@ import Usuario from '../Views/Usuario/Usuario';
 import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
 import Dashboard from '../Views/DashBoard/Dashboard';
 import { ConsultaEstoque } from '../Views/Estoques/ConsultaEstoque';
-import Home from '../Home';
-
-// // Função para verificar se o usuário está autenticado
-// const isAuthenticated = () => {
-//   const token = localStorage.getItem("authToken");
-//   return Boolean(token); // Retorna `true` se existir um token, caso contrário `false`.
-// };
-
-// // Componente para proteger as rotas
-// const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-//   return isAuthenticated() ? children : <Navigate to="/Login" />;
-// };
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/Login" />,
-  },
-  {
-    path: "/Login",
-    element: <Login />,
-  },
-  {
-    path: "/Usuario",
-    element: <Usuario />,
-  },
-  {
-    path: "/",
     element: <Layout />,
     children: [
-      // Rotas públicas (rotaLivre)
-      // {
-      //   path: "/Login",
-      //   element: <Login />,
-      // },
-      // {
-      //   path: "/Usuario",
-      //   element: <Usuario />,
-      // },
-      // Rotas protegidas
+      //Rotas públicas (rotaLivre)
+      {
+        path: "/Login",
+        element: <Login />,
+      },
+      {
+        path: "/Usuario",
+        element: <Usuario />,
+      },
+      //Rotas protegidas
       {
         path: "/Cor",
         element: <Cor />,
@@ -117,10 +93,10 @@ export const router = createBrowserRouter([
         path: "/ConsultaEstoque",
         element: <ConsultaEstoque />,
       },
-      {
-        path: "/Testes",
-        element: <Home />,
-      },
+      // {
+      //   path: "/Testes",
+      //   element: <Home />,
+      // },
     ]
   },
 ]);

@@ -29,6 +29,12 @@ export class Usuario implements UsuarioInterface {
   @Column({ type: 'int', default: 0 })
   tipoUsuario: UsuarioType
 
+  @Column({ nullable: true })
+  resetToken: string;
+
+  @Column({ type: "datetime", nullable: true })
+  resetTokenExpires: Date;
+
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date
 

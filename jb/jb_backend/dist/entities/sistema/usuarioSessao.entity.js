@@ -34,10 +34,6 @@ var UsuarioSessao = /** @class */ (function () {
         __metadata("design:type", Boolean)
     ], UsuarioSessao.prototype, "ativo", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'int', default: 0 }),
-        __metadata("design:type", Number)
-    ], UsuarioSessao.prototype, "tipoUsuario", void 0);
-    __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], UsuarioSessao.prototype, "createAt", void 0);

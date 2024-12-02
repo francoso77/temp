@@ -1,7 +1,7 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { THEME } from './Theme';
 import { GlobalContext } from '../../ContextoGlobal/ContextoGlobal';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import useUsuarioState from '../../ContextoGlobal/UsuarioState';
 import useLayoutState from '../../ContextoGlobal/LayoutState';
 import useMensagemState from '../../ContextoGlobal/MensagemState';
@@ -38,10 +38,11 @@ function Layout() {
   const { usuarioState, setUsuarioState } = useUsuarioState()
   const { layoutState, setLayoutState } = useLayoutState()
   const { mensagemState, setMensagemState } = useMensagemState()
+  const location = useLocation();
 
   // Verifica se a rota atual é livre
   const chkRotaLivre = () => {
-    const urlAtual: string = window.location.href
+    const urlAtual: string = location.pathname
 
     const indice: number = ROTAS_LIVRES.findIndex((rsRota) => {
       return urlAtual.includes(rsRota)
@@ -52,7 +53,7 @@ function Layout() {
 
   useEffect(() => {
     chkRotaLivre()
-  }, [window.location.href])
+  }, [location])
 
   return (
     <>

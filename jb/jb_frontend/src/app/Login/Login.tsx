@@ -90,16 +90,9 @@ export default function Login() {
               localStorage.removeItem('cpf')
               localStorage.removeItem('senha')
             }
-            // contextGlobal.setLayoutState({
-            //   titulo: 'Dashboard',
-            //   tituloAnterior: '',
-            //   pathTitulo: '/Dashboard',
-            //   pathTituloAnterior: ''
-            // })
-
-            //ir para a página inicial
 
             navegar("/")
+
           } else {
             setMensagemState({
               ...mensagemState,
@@ -216,92 +209,94 @@ export default function Login() {
         </Grid>
       </Form>
     </>
-
-    // <>
-    //   <Form method='post' action='/Login'>
-    //     <Grid
-    //       container
-    //       minHeight="100vh"
-    //       justifyContent="center"
-    //       alignContent="center"
-    //     >
-    //       <Grid item xs={12} sm={8} md={5} lg={4}>
-    //         <Paper sx={{ padding: 3, margin: 3 }}>
-    //           <Grid container>
-    //             <Grid item xs={12} sx={{ textAlign: "center" }}>
-    //               {/* <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} /> */}
-    //             </Grid>
-    //             <Grid item xs={12} sx={{ mt: 3 }}>
-    //               <Text
-    //                 autofocus
-    //                 label='CPF'
-    //                 mask="000.000.000-00"
-    //                 tipo='mask'
-    //                 field='cpf'
-    //                 dados={dados}
-    //                 setState={setDados}
-    //                 erros={erros}
-    //               />
-    //             </Grid>
-    //             <Grid item xs={12} sx={{ mt: 3 }}>
-    //               <Text
-    //                 field="senha"
-    //                 label="Senha"
-    //                 tipo='pass'
-    //                 type='password'
-    //                 dados={dados}
-    //                 setState={setDados}
-    //                 erros={erros}
-    //                 mapKeyPress={[{ key: 'Enter', onKey: btEntrar }]}
-    //               />
-    //             </Grid>
-    //             <Grid container alignItems="center" justifyContent="space-between">
-    //               <Grid item>
-    //                 <FormControlLabel control={<Checkbox />} label={
-    //                   <Typography variant="caption" display="block" gutterBottom>
-    //                     Lembre-me
-    //                   </Typography>
-    //                 } />
-    //               </Grid>
-    //               <Grid item>
-    //                 <FormControlLabel control={<Link href="#" />} onClick={() => navegar('/Usuario')} label={
-    //                   <Typography variant="caption" display="block" gutterBottom>
-    //                     Cadastrar
-    //                   </Typography>
-    //                 } />
-    //               </Grid>
-    //             </Grid>
-    //             <Grid item xs={12} sx={{ mt: 3 }}>
-    //               <Button
-    //                 onClick={() => btEntrar()}
-    //                 fullWidth
-    //                 variant="contained"
-    //               >
-    //                 Entrar
-    //               </Button>
-    //             </Grid>
-    //             <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
-    //               <Link>Esqueci a Senha</Link>
-    //             </Grid>
-    //             <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
-    //               <Button
-    //                 startIcon={<img src={GOOGLE} alt="logotipo da Google" width="50" height="50" />}
-    //               >
-    //               </Button>
-    //               <Button
-    //                 startIcon={<img src={FACEBOOK} alt="logotipo do Facebook" width="50" height="50" />}
-    //               >
-    //               </Button>
-    //               <Button
-    //                 startIcon={<img src={APPLE} alt="logotipo da Apple" width="50" height="50" />}
-    //               >
-    //               </Button>
-    //             </Grid>
-    //           </Grid >
-    //         </Paper>
-    //       </Grid>
-    //     </Grid>
-    //   </Form>
-    // </>
   )
 }
+
+
+
+// <>
+//   <Form method='post' action='/Login'>
+//     <Grid
+//       container
+//       minHeight="100vh"
+//       justifyContent="center"
+//       alignContent="center"
+//     >
+//       <Grid item xs={12} sm={8} md={5} lg={4}>
+//         <Paper sx={{ padding: 3, margin: 3 }}>
+//           <Grid container>
+//             <Grid item xs={12} sx={{ textAlign: "center" }}>
+//               {/* <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} /> */}
+//             </Grid>
+//             <Grid item xs={12} sx={{ mt: 3 }}>
+//               <Text
+//                 autofocus
+//                 label='CPF'
+//                 mask="000.000.000-00"
+//                 tipo='mask'
+//                 field='cpf'
+//                 dados={dados}
+//                 setState={setDados}
+//                 erros={erros}
+//               />
+//             </Grid>
+//             <Grid item xs={12} sx={{ mt: 3 }}>
+//               <Text
+//                 field="senha"
+//                 label="Senha"
+//                 tipo='pass'
+//                 type='password'
+//                 dados={dados}
+//                 setState={setDados}
+//                 erros={erros}
+//                 mapKeyPress={[{ key: 'Enter', onKey: btEntrar }]}
+//               />
+//             </Grid>
+//             <Grid container alignItems="center" justifyContent="space-between">
+//               <Grid item>
+//                 <FormControlLabel control={<Checkbox />} label={
+//                   <Typography variant="caption" display="block" gutterBottom>
+//                     Lembre-me
+//                   </Typography>
+//                 } />
+//               </Grid>
+//               <Grid item>
+//                 <FormControlLabel control={<Link href="#" />} onClick={() => navegar('/Usuario')} label={
+//                   <Typography variant="caption" display="block" gutterBottom>
+//                     Cadastrar
+//                   </Typography>
+//                 } />
+//               </Grid>
+//             </Grid>
+//             <Grid item xs={12} sx={{ mt: 3 }}>
+//               <Button
+//                 onClick={() => btEntrar()}
+//                 fullWidth
+//                 variant="contained"
+//               >
+//                 Entrar
+//               </Button>
+//             </Grid>
+//             <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
+//               <Link>Esqueci a Senha</Link>
+//             </Grid>
+//             <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
+//               <Button
+//                 startIcon={<img src={GOOGLE} alt="logotipo da Google" width="50" height="50" />}
+//               >
+//               </Button>
+//               <Button
+//                 startIcon={<img src={FACEBOOK} alt="logotipo do Facebook" width="50" height="50" />}
+//               >
+//               </Button>
+//               <Button
+//                 startIcon={<img src={APPLE} alt="logotipo da Apple" width="50" height="50" />}
+//               >
+//               </Button>
+//             </Grid>
+//           </Grid >
+//         </Paper>
+//       </Grid>
+//     </Grid>
+//   </Form>
+// </>

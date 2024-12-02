@@ -8,7 +8,9 @@ export interface UsuarioInterface {
   senha: string;
   ativo: boolean;
   tentativasLogin: number;
-  tipoUsuario: number;
+  tipoUsuario: UsuarioType;
+  resetToken: string;
+  resetTokenExpires: Date;
 }
 
 export interface UsuarioSessaoInterface {
@@ -16,7 +18,6 @@ export interface UsuarioSessaoInterface {
   idUsuario: number;
   token: string;
   ativo: boolean;
-  tipoUsuario: number;
 }
 
 export interface UsuarioPermissaoInterface {
