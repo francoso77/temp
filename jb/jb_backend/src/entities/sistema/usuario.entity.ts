@@ -32,7 +32,7 @@ export class Usuario implements UsuarioInterface {
   @Column({ nullable: true })
   resetToken: string;
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   resetTokenExpires: Date;
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })

@@ -21,11 +21,16 @@ var DetalheProgramacao = /** @class */ (function () {
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "idDetalheProgramacao", void 0);
     __decorate([
-        (0, typeorm_1.PrimaryColumn)(),
+        (0, typeorm_1.Column)(),
         __metadata("design:type", Number)
     ], DetalheProgramacao.prototype, "idProgramacao", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return programacao_entity_1.default; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idProgramacao' }),
+        (0, typeorm_1.ManyToOne)(function () { return programacao_entity_1.default; }, function (programacao) { return programacao.detalheProgramacoes; }, {
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+            orphanedRowAction: 'delete'
+        }),
         __metadata("design:type", programacao_entity_1.default)
     ], DetalheProgramacao.prototype, "programacao", void 0);
     __decorate([

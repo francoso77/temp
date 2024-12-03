@@ -23,6 +23,5 @@ export interface UsuarioSessaoInterface {
 export interface UsuarioPermissaoInterface {
   idUsuarioPermissao?: number;
   idUsuario: number;
-  //idModulo: number;
   idModuloPermissao: number;
 }

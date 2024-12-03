@@ -22,8 +22,8 @@ var MailerModule = /** @class */ (function () {
                         port: 587, // Porta para SMTP seguro
                         secure: false, // Use TLS
                         auth: {
-                            user: 'seuemail@gmail.com', // Seu email
-                            pass: 'suasenha', // Sua senha ou App Password
+                            user: 'ti@jbtextil.com', // Seu email
+                            pass: 'textiljb4009', // Sua senha ou App Password
                         },
                     },
                     defaults: {

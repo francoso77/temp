@@ -28,7 +28,9 @@ const ResetDados: UsuarioInterface = {
   nome: '',
   tentativasLogin: 0,
   tipoUsuario: UsuarioType.default,
-  email: ''
+  email: '',
+  resetToken: '',
+  resetTokenExpires: new Date()
 }
 
 export default function Usuario() {
@@ -251,11 +253,9 @@ export default function Usuario() {
       })
   }
 
-  const verificarTipoUsuario = () => {
-    let tipoUsuario: any = usuarioState.tipoUsuario
-    const admin: number = UsuarioType.admin
-    tipoUsuario = Number(tipoUsuario)
-    return tipoUsuario === admin
+  const verificarTipoUsuario = (): boolean => {
+    const tipoUsuario = Number(usuarioState.tipoUsuario)
+    return tipoUsuario === UsuarioType.admin
   }
 
   useEffect(() => {
@@ -276,7 +276,7 @@ export default function Usuario() {
       }
     }
 
-  }, [])
+  }, [usuarioState, verificarTipoUsuario, pesquisarID])
 
   return (
     <>
@@ -295,7 +295,7 @@ export default function Usuario() {
                   <CloseIcon />
                 </IconButton>
               </Grid>
-              <Condicional condicao={localState.action === 'pesquisando'}>
+              <Condicional condicao={localState.action === 'pesquisando' && !verificarTipoUsuario()}>
                 <Grid item xs={10} md={11}>
                   <InputText
                     label="Pesquisa"
@@ -349,7 +349,7 @@ export default function Usuario() {
                     dados={usuario}
                     field="ativo"
                     setState={setUsuario}
-                    disabled={localState.action === 'excluindo' ? true : false}
+                    disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
                   />
                 </Grid>
@@ -382,7 +382,7 @@ export default function Usuario() {
                       erros={erros}
                       type="text"
                       tipo='uppercase'
-                      disabled={localState.action === 'excluindo' ? true : false}
+                      disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 3)}
                     />
                   </Box>

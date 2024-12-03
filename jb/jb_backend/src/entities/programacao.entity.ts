@@ -35,7 +35,9 @@ export default class Programacao implements ProgramacaoInterface {
   @ManyToOne(() => Pessoa)
   cliente: Pessoa
 
-  @OneToMany(() => DetalheProgramacao, detalheProgramacao => detalheProgramacao.programacao)
+  @JoinColumn({ name: 'idProgramacao' })
+  @OneToMany(() => DetalheProgramacao,
+    detalheProgramacao => detalheProgramacao.programacao, { cascade: true })
   detalheProgramacoes: DetalheProgramacao[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })

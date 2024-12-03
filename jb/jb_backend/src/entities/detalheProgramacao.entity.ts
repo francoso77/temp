@@ -10,11 +10,16 @@ export default class DetalheProgramacao implements DetalheProgramacaoInterface {
   @PrimaryGeneratedColumn()
   idDetalheProgramacao: number;
 
-  @PrimaryColumn()
+  @Column()
   idProgramacao: number;
 
-  @ManyToOne(() => Programacao)
-  programacao: Programacao;
+  @JoinColumn({ name: 'idProgramacao' })
+  @ManyToOne(() => Programacao, programacao => programacao.detalheProgramacoes, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete'
+  })
+  programacao: Programacao
 
   @Column()
   idProduto: number;

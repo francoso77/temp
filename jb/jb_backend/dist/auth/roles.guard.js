@@ -13,54 +13,41 @@ exports.RolesGuard = void 0;
 var common_1 = require("@nestjs/common");
 var core_1 = require("@nestjs/core");
 var roles_decorator_1 = require("./roles.decorator");
-var PERMISSOES = [
-    { modulo: 'clientes', permissao: 'incluir' },
-    { modulo: 'login', permissao: 'logar' },
-    { modulo: 'pedidos', permissao: 'consultar' },
-    { modulo: 'entradas', permissao: 'deletar' },
-    { modulo: 'estoques', permissao: 'consultar' },
-    { modulo: 'crud', permissao: 'pesquisar' },
-];
+var sessao_service_1 = require("./services/sessao.service");
+//scope do Roles tem que ser igual ao do sessão
 var RolesGuard = /** @class */ (function () {
-    function RolesGuard(reflector) {
+    function RolesGuard(reflector, 
+    // private readonly contextoGlobal: ContextoService,
+    sessao) {
         this.reflector = reflector;
+        this.sessao = sessao;
         console.log('Constructor do Roles Guard....');
     }
+    //tranformar o canactivate em Promise
     RolesGuard.prototype.canActivate = function (context) {
         var requiredRoles = this.reflector.getAllAndOverride(roles_decorator_1.ROLES_KEY, [
             context.getHandler(),
             context.getClass(),
         ]);
-        //const { nomeUsuario, tempo } = context.switchToHttp().getRequest().body;
-        // const { cpf, senha } = context.switchToHttp().getRequest().body;
-        // console.log("[RolesGuard] - nomeUsuario: ", nomeUsuario)
-        // console.log("[RolesGuard] - tempo: ", tempo)
-        // console.log("[RolesGuard] - ContextoGlobal: ", this.contextoGlobal.usuarioContexto)
-        // console.log("[RolesGuard] - ContextoSessao: ", this.sessao.usuarioSessao)
-        // console.log("[RolesGuard] - cpf: ", cpf)
-        // console.log("[RolesGuard] - senha: ", senha)
-        // console.log("[RolesGuard] - requiredRoles: ", requiredRoles)
-        // if (!requiredRoles) {
-        //   return false;
-        // } else {
-        //   let permissao = PERMISSOES.find((permissao) => permissao.modulo === requiredRoles.modulo && permissao.permissao === requiredRoles.permissao)
-        //   if (!permissao) {
-        //     throw new HttpException('Acesso negado', HttpStatus.FORBIDDEN);
-        //   }
-        // }
-        // return true
-        // const { user } = context.switchToHttp().getRequest();
-        // return requiredRoles.some((role) => user.roles?.includes(role));
         if (!requiredRoles) {
+            // return Promise.resolve(true)
             return true;
         }
         var request = context.switchToHttp().getRequest();
+        // const clsAcesso = new ClsAcesso()
+        // return clsAcesso.checarAcesso(
+        //   this.sessao.usuarioSessao,
+        //   requiredRoles.modulo,
+        //   requiredRoles.permissao).then(checarAcesso => {
+        //     return checarAcesso
+        //   })
         console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
         return true;
     };
     RolesGuard = __decorate([
         (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
-        __metadata("design:paramtypes", [core_1.Reflector])
+        __metadata("design:paramtypes", [core_1.Reflector,
+            sessao_service_1.SessaoService])
     ], RolesGuard);
     return RolesGuard;
 }());

@@ -1,5 +1,5 @@
-import { Box, Button, Checkbox, FormControlLabel, Grid, Link, Paper, Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Box, Button, Grid, Link, Paper, Typography } from '@mui/material';
+import { useContext, useState } from 'react';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import Text from '../../Componentes/Text';
 import { Form, useNavigate } from 'react-router-dom';
@@ -8,18 +8,15 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsApi from '../../Utils/ClsApi';
 import Copyright from '../Layout/Copyright';
 
-// const APPLE: string = '/apple.png';
-// const FACEBOOK: string = '/facebook.png';
-// const GOOGLE: string = '/google.png';
-
 export default function Login() {
 
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState({ cpf: '', senha: '' })
-  const [rememberMe, setRememberMe] = useState<boolean>(false)
   const clsApi = new ClsApi()
   const clsValidacao: ClsValidacao = new ClsValidacao()
   const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
+  const navegar = useNavigate()
 
 
   const validarDados = (): boolean => {
@@ -33,27 +30,9 @@ export default function Login() {
     return retorno
   }
 
-  const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
-  const navegar = useNavigate()
 
-  useEffect(() => {
-    const tmpCpf = localStorage.getItem('cpf')
-    const tmpSenha = localStorage.getItem('senha')
-    if (tmpCpf && tmpSenha) {
-      setDados({ ...dados, cpf: tmpCpf, senha: tmpSenha })
-      setRememberMe(true)
-    }
-  })
+
   const btEntrar = () => {
-    // setMensagemState({
-    //   ...mensagemState,
-    //   titulo: 'Processando...',
-    //   mensagem: 'Login autorizado, carregando menu...',
-    //   exibir: true,
-    //   tipo: MensagemTipo.Loading,
-    //   exibirBotao: false,
-    //   cb: null
-    // })
 
     if (validarDados()) {
 
@@ -82,14 +61,6 @@ export default function Login() {
                       tipoUsuario === '4' ? [2, 7, 8, 9] :
                         [1, 2, 3, 4, 5, 6, 7, 8, 9]
             })
-
-            if (rememberMe) {
-              localStorage.setItem('cpf', dados.cpf)
-              localStorage.setItem('senha', dados.senha)
-            } else {
-              localStorage.removeItem('cpf')
-              localStorage.removeItem('senha')
-            }
 
             navegar("/")
 
@@ -176,7 +147,7 @@ export default function Login() {
                   mapKeyPress={[{ key: 'Enter', onKey: btEntrar }]}
                 />
                 <Grid container alignItems="center" justifyContent="space-between">
-                  <Grid item>
+                  {/* <Grid item>
                     <FormControlLabel control={
                       <Checkbox
                         checked={rememberMe}
@@ -187,14 +158,14 @@ export default function Login() {
                         Lembre-me
                       </Typography>
                     } />
-                  </Grid>
-                  <Grid item>
+                  </Grid> */}
+                  {/* <Grid item>
                     <FormControlLabel control={<Link href="#" />} onClick={() => navegar('/Usuario')} label={
                       <Typography variant="caption" display="block" gutterBottom>
                         Cadastrar
                       </Typography>
                     } />
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={12}>
                     <Button variant='contained' onClick={() => btEntrar()} sx={{ width: '100%', mt: 1.5 }}>Logar</Button>
                   </Grid>

@@ -1,10 +1,14 @@
+import { CorInterface } from './corInteface'
+import { ProdutoInterface } from './produtoInterface'
+
 export interface ProgramacaoInterface {
   idProgramacao?: number
   dataProgramacao: string
-  notaFiscal: string
+  notaFiscal: string | null
   idTinturaria: number
   msg: string
   idPessoa_cliente: number
+  detalheProgramacoes: DetalheProgramacaoInterface[]
 }
 
 export interface DetalheProgramacaoInterface {
@@ -16,4 +20,6 @@ export interface DetalheProgramacaoInterface {
   gm2: number
   largura: number
   qtdPeca: number
+  produto: ProdutoInterface
+  cor: CorInterface
 }

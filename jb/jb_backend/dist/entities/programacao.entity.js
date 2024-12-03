@@ -53,7 +53,8 @@ var Programacao = /** @class */ (function () {
         __metadata("design:type", pessoa_entity_1.default)
     ], Programacao.prototype, "cliente", void 0);
     __decorate([
-        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) { return detalheProgramacao.programacao; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idProgramacao' }),
+        (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) { return detalheProgramacao.programacao; }, { cascade: true }),
         __metadata("design:type", Array)
     ], Programacao.prototype, "detalheProgramacoes", void 0);
     __decorate([

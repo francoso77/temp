@@ -4,62 +4,40 @@ import { ROLES_KEY } from './roles.decorator';
 import { SessaoService } from './services/sessao.service';
 import { ContextoService } from './services/contexto.service';
 import { RoleInterface } from './roles.interface';
+import ClsAcesso from '../services/acesso.cls';
 
-const PERMISSOES: RoleInterface[] = [
-  { modulo: 'clientes', permissao: 'incluir' },
-  { modulo: 'login', permissao: 'logar' },
-  { modulo: 'pedidos', permissao: 'consultar' },
-  { modulo: 'entradas', permissao: 'deletar' },
-  { modulo: 'estoques', permissao: 'consultar' },
-  { modulo: 'crud', permissao: 'pesquisar' },
-]
+//scope do Roles tem que ser igual ao do sessão
 @Injectable({ scope: Scope.REQUEST })
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     // private readonly contextoGlobal: ContextoService,
-    // private readonly sessao: SessaoService
+    private readonly sessao: SessaoService
   ) {
     console.log('Constructor do Roles Guard....')
   }
 
+  //tranformar o canactivate em Promise
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<RoleInterface>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
-    ]);
+    ])
 
-    //const { nomeUsuario, tempo } = context.switchToHttp().getRequest().body;
-    // const { cpf, senha } = context.switchToHttp().getRequest().body;
-
-    // console.log("[RolesGuard] - nomeUsuario: ", nomeUsuario)
-    // console.log("[RolesGuard] - tempo: ", tempo)
-    // console.log("[RolesGuard] - ContextoGlobal: ", this.contextoGlobal.usuarioContexto)
-    // console.log("[RolesGuard] - ContextoSessao: ", this.sessao.usuarioSessao)
-    // console.log("[RolesGuard] - cpf: ", cpf)
-    // console.log("[RolesGuard] - senha: ", senha)
-    // console.log("[RolesGuard] - requiredRoles: ", requiredRoles)
-
-    // if (!requiredRoles) {
-    //   return false;
-    // } else {
-
-    //   let permissao = PERMISSOES.find((permissao) => permissao.modulo === requiredRoles.modulo && permissao.permissao === requiredRoles.permissao)
-
-    //   if (!permissao) {
-    //     throw new HttpException('Acesso negado', HttpStatus.FORBIDDEN);
-    //   }
-    // }
-
-    // return true
-
-    // const { user } = context.switchToHttp().getRequest();
-    // return requiredRoles.some((role) => user.roles?.includes(role));
 
     if (!requiredRoles) {
-      return true;
+      // return Promise.resolve(true)
+      return true
     }
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest()
+    // const clsAcesso = new ClsAcesso()
+
+    // return clsAcesso.checarAcesso(
+    //   this.sessao.usuarioSessao,
+    //   requiredRoles.modulo,
+    //   requiredRoles.permissao).then(checarAcesso => {
+    //     return checarAcesso
+    //   })
     console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
     return true
   }

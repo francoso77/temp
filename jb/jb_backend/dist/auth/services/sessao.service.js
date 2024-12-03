@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessaoService = void 0;
 var common_1 = require("@nestjs/common");
+//scope da sessão tem que ser igual ao do RolesGuard
 var SessaoService = /** @class */ (function () {
     function SessaoService() {
         this.usuarioSessao = 0;
