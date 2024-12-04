@@ -42,7 +42,7 @@ var Programacao = /** @class */ (function () {
         (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
         (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }),
         __metadata("design:type", tinturaria_entity_1.default)
-    ], Programacao.prototype, "tinturaria", void 0);
+    ], Programacao.prototype, "romaneio", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", Number)

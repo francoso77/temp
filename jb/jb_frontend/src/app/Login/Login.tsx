@@ -55,11 +55,11 @@ export default function Login() {
               token: token,
               tipoUsuario: tipoUsuario,
               idsMenu: tipoUsuario === '0' ? [7] :
-                tipoUsuario === '5' ? [1, 5, 6, 9] :
-                  tipoUsuario === '2' ? [3, 4, 6, 9] :
-                    tipoUsuario === '3' ? [2, 6, 7, 9] :
-                      tipoUsuario === '4' ? [2, 7, 8, 9] :
-                        [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                tipoUsuario === '5' ? [1, 5, 6, 10] :
+                  tipoUsuario === '2' ? [3, 4, 6, 10] :
+                    tipoUsuario === '3' ? [2, 6, 7, 9, 10] :
+                      tipoUsuario === '4' ? [2, 7, 8, 10] :
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             })
 
             navegar("/")

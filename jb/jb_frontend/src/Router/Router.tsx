@@ -17,6 +17,7 @@ import Usuario from '../Views/Usuario/Usuario';
 import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
 import Dashboard from '../Views/DashBoard/Dashboard';
 import { ConsultaEstoque } from '../Views/Estoques/ConsultaEstoque';
+import ProgramacaoTinturaria from '../Views/ProgramacaoTinturaria/ProgramacaoTinturaria';
 
 export const router = createBrowserRouter([
   {
@@ -92,6 +93,10 @@ export const router = createBrowserRouter([
       {
         path: "/ConsultaEstoque",
         element: <ConsultaEstoque />,
+      },
+      {
+        path: "/ProgramacaoTinturaria",
+        element: <ProgramacaoTinturaria />,
       },
       // {
       //   path: "/Testes",

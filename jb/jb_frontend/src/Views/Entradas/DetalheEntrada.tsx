@@ -141,7 +141,7 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     let erros: { [key: string]: string } = {}
 
     retorno = validaCampo.naoVazio('idProduto', detalheEntrada, erros, retorno, 'Escolha um produto')
-    retorno = validaCampo.naoVazio('qtd', detalheEntrada, erros, retorno, 'Quantudade maior que 0')
+    retorno = validaCampo.naoVazio('qtd', detalheEntrada, erros, retorno, 'Quantidade maior que 0')
     retorno = validaCampo.naoVazio('vrUnitario', detalheEntrada, erros, retorno, 'Valor maior que 0')
     setErros(erros)
     return retorno

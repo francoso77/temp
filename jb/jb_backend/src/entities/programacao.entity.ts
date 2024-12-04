@@ -26,7 +26,7 @@ export default class Programacao implements ProgramacaoInterface {
 
   @JoinColumn({ name: 'idTinturaria' })
   @ManyToOne(() => Tinturaria)
-  tinturaria: Tinturaria
+  romaneio: Tinturaria
 
   @Column()
   idPessoa_cliente: number

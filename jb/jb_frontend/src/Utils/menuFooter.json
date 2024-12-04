@@ -89,6 +89,17 @@
   },
   {
     "id": 9,
+    "tooltipTitle": "Programação Tinturaria",
+    "route": "/ProgramacaoTinturaria",
+    "icon": "FormatPaintIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 10,
     "tooltipTitle": "Cadastro de Usuários",
     "route": "/Usuario",
     "icon": "PersonOutlineTwoToneIcon",

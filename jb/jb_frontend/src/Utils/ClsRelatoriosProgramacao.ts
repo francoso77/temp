@@ -61,19 +61,18 @@ interface DadosEtiqueta {
   metros: number;
 }
 
-// interface PecasTinturaria {
-//   peca: string;
-//   idTecido: number;
-//   artigo: string;
-//   peso: number;
-//   tear: string;
-//   tecelao: string;
-//   revisador: string;
-//   composicao: Array<Composicao>
-// }
-
 interface DadosTinturaria {
   dataTinturaria: string;
+  romaneio: number;
+  idCliente: number;
+  cliente: string;
+  idTinturaria: number;
+  tinturaria: string;
+  pecas: Array<Peca>;
+}
+
+interface DadosProgramacao {
+  dataProgramacao: string;
   romaneio: number;
   idCliente: number;
   cliente: string;
@@ -89,6 +88,7 @@ class ClsRelatorioProgramacao {
   public pedidos: DadosPedidos[] = [];
   public etiquetas: DadosEtiqueta[] = [];
   public tinturaria: DadosTinturaria[] = [];
+  public programacao: DadosProgramacao[] = [];
   public clsFormatacao = new ClsFormatacao();
   public clsApi = new ClsApi();
   public clsCrud = new ClsCrud();
@@ -362,6 +362,204 @@ class ClsRelatorioProgramacao {
   }
 
   private gerarTintuaria = () => {
+
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    const marginTop = 15;
+    let cursorY = marginTop;
+    let pesoTotalGeral = 0;
+    let qtdTotalGeral = 0;
+    let pageNumber = 1;
+
+    this.tinturaria.forEach((item: DadosTinturaria, i: number) => {
+
+
+      // Cabeçalho do Relatório
+      const addHeader = () => {
+        doc.setFontSize(16);
+        doc.text("Romaneio de peças", 40, cursorY, { align: 'center' });
+        doc.setFontSize(10);
+        doc.text('Cliente: ' + item.cliente, 80, cursorY - 5);
+        doc.text('Tinturaria: ' + item.tinturaria, 80, cursorY + 5);
+        doc.text('Romaneio: ' + this.clsFormatacao.notaFiscal(item.romaneio.toString()), 160, cursorY + 5);
+        cursorY += 10;
+      };
+
+      // Rodapé do Relatório
+      const addFooter = () => {
+        const dataAtual = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+        doc.setFontSize(8);
+        doc.text(dataAtual, 10, pageHeight - 10);
+        doc.text(`Página ${pageNumber}`, pageWidth - 20, pageHeight - 10);
+      };
+
+      // Função para iniciar nova página
+      const addNewPage = () => {
+        doc.addPage();
+        pageNumber += 1;
+        cursorY = marginTop;
+        addFooter();
+      };
+
+      addHeader();
+      addFooter();
+
+
+      // Agrupamento por Artigo
+      const artigosAgrupados = item.pecas.reduce((acc, peca) => {
+        if (!acc[peca.artigo]) acc[peca.artigo] = [];
+        acc[peca.artigo].push(peca);
+        return acc;
+      }, {} as Record<string, Peca[]>);
+
+      Object.entries(artigosAgrupados).forEach(([artigo, pecas], index) => {
+        const pesoTotalArtigo = pecas.reduce((acc, peca) => acc + peca.peso, 0);
+        const qtdTotalArtigo = pecas.length;
+        pesoTotalGeral += pesoTotalArtigo;
+        qtdTotalGeral += qtdTotalArtigo;
+
+        // Cálculo de espaço necessário para o artigo atual
+        const artigoHeight = 30 + pecas.length * 10 + pecas[0].composisao.length * 10;
+        if (cursorY + artigoHeight > pageHeight - 20) addNewPage(); // Se não houver espaço, cria nova página
+
+        // Cabeçalho do Artigo e Composição com multiplicação de `qtdFio` pelo `pesoTotalArtigo`
+        autoTable(doc, {
+          head: [[`Artigo: ${artigo}`, `Peso Total: ${pesoTotalArtigo.toFixed(2)} kg`, `Quantidade: ${qtdTotalArtigo}`]],
+          startY: cursorY,
+          headStyles: {
+            fillColor: [220, 220, 220],
+            textColor: [0, 0, 0],
+            lineWidth: 0.1,
+            lineColor: [0, 0, 0],
+            fontStyle: 'italic',
+            fontSize: 9,
+          },
+        });
+
+        cursorY = (doc as any).lastAutoTable.finalY + 1;
+
+        // Composição do Artigo (multiplicando `qtdFio` pelo peso total do artigo)
+        const composicaoArtigo = pecas[0].composisao.map((fio) => [
+          fio.fio,
+          (fio.qtdFio).toFixed(2) + '%',
+          (fio.qtdFio * pesoTotalArtigo).toFixed(2), // Multiplicação do `qtdFio` pelo `pesoTotalArtigo`
+        ]);
+        autoTable(doc, {
+          head: [['Fio', 'Qtd%', 'Qtd Total (Fio x Peso do Artigo)']],
+          body: composicaoArtigo,
+          startY: cursorY,
+          bodyStyles: {
+            fontSize: 5, // Tamanho da fonte do corpo da tabela
+            fillColor: [255, 255, 255], textColor: [0, 0, 0], lineWidth: 0.1, lineColor: [0, 0, 0]
+          },
+          headStyles: {
+            fillColor: [255, 255, 255],
+            textColor: [0, 0, 0],
+            lineWidth: 0.1,
+            lineColor: [0, 0, 0],
+            fontStyle: 'normal',
+            fontSize: 9,
+          },
+        });
+
+        cursorY = (doc as any).lastAutoTable.finalY + 1;
+
+        // Agrupamento por Tear
+        const tearesAgrupados = pecas.reduce((acc, peca) => {
+          if (!acc[peca.tear]) acc[peca.tear] = [];
+          acc[peca.tear].push(peca);
+          return acc;
+        }, {} as Record<string, Peca[]>);
+
+        Object.entries(tearesAgrupados).forEach(([tear, itensTear]) => {
+          const pesoTotalTear = itensTear.reduce((acc, peca) => acc + peca.peso, 0);
+          const qtdTotalTear = itensTear.length;
+
+          // Cabeçalho do Tear
+          autoTable(doc, {
+            head: [[`Tear: ${tear}`]],
+            startY: cursorY,
+            headStyles: {
+              fillColor: [255, 255, 255],
+              textColor: [0, 0, 0],
+              lineWidth: 0.1,
+              lineColor: [0, 0, 0],
+              fontStyle: 'normal',
+              fontSize: 9,
+            },
+            //headStyles: { fillColor: [52, 152, 219], textColor: [255, 255, 255] },
+          });
+
+          cursorY = (doc as any).lastAutoTable.finalY + 0.5;
+
+          // Detalhes das Peças
+          const itemData = itensTear.map((peca) => [
+            peca.peca,
+            peca.peso.toFixed(2) + ' kg',
+            peca.tecelao,
+            peca.revisador,
+          ]);
+
+          autoTable(doc, {
+            head: [['Peça', 'Peso', 'Tecelão', 'Revisor']],
+            body: itemData,
+            startY: cursorY,
+            bodyStyles: { fontSize: 7 },
+            headStyles: {
+              fillColor: [255, 255, 255],
+              textColor: [0, 0, 0],
+              lineWidth: 0.1,
+              lineColor: [0, 0, 0],
+              fontStyle: 'normal',
+              fontSize: 9,
+            },
+          });
+
+          cursorY = (doc as any).lastAutoTable.finalY + 1;
+
+        });
+
+        //if (cursorY + artigoHeight > pageHeight - 20) addNewPage(); // Avança para nova página caso necessário
+
+      });
+
+      // Totalização Geral
+      if (cursorY + 10 <= pageHeight - 20) { // Verifica se há espaço na página atual
+
+        autoTable(doc, {
+          head: [['Peso Total Geral', 'Quantidade Total Geral']],
+          body: [[`${pesoTotalGeral.toFixed(2)} kg`, `${qtdTotalGeral}`]],
+          startY: cursorY + 5,
+          bodyStyles: { fontSize: 8, halign: 'right' },
+          headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: 'right', fontStyle: 'italic' },
+        });
+      } else {
+        addNewPage(); // Adiciona nova página se não houver espaço
+        autoTable(doc, {
+          head: [['Peso Total Geral', 'Quantidade Total Geral']],
+          body: [[`${pesoTotalGeral.toFixed(2)} kg`, `${qtdTotalGeral}`]],
+          startY: cursorY + 5,
+          bodyStyles: { fontSize: 8, halign: 'right' },
+          headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: 'right', fontStyle: 'italic' },
+        });
+      }
+
+      if (this.tinturaria.length - 1 === 0) {
+
+        doc.save('Romaneio_Malharia-Romaneio-' + item.romaneio + '.pdf');
+
+      } else {
+        addNewPage();
+        if (this.tinturaria.length - 1 === i) {
+          doc.save('Romaneio_Malharia-Geral.pdf');
+
+        }
+      }
+    })
+  }
+
+  private gerarProgramacaoTintuaria = () => {
 
     const doc = new jsPDF();
     const pageHeight = doc.internal.pageSize.height;

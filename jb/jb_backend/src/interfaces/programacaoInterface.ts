@@ -4,7 +4,7 @@ import { ProdutoInterface } from './produtoInterface'
 export interface ProgramacaoInterface {
   idProgramacao?: number
   dataProgramacao: string
-  notaFiscal: string | null
+  notaFiscal: string
   idTinturaria: number
   msg: string
   idPessoa_cliente: number
@@ -13,7 +13,7 @@ export interface ProgramacaoInterface {
 
 export interface DetalheProgramacaoInterface {
   idDetalheProgramacao?: number
-  idProgramacao: number
+  idProgramacao: number | null
   idProduto: number
   idCor: number
   peso: number

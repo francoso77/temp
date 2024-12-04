@@ -12,12 +12,13 @@ export interface UsuarioStateInterface {
 
 export default function useUsuarioState() {
   const [usuarioState, setUsuarioState] = useState<UsuarioStateInterface>({
-    idUsuario: 0,
-    usuario: '',
-    logado: false,
-    token: '',
-    tipoUsuario: UsuarioType.default,
-    idsMenu: [7]
+    idUsuario: 1,
+    usuario: 'Frank',
+    logado: true,
+    token: 'aadsfadfdfdsfdsfs',
+    tipoUsuario: UsuarioType.admin,
+    idsMenu: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    //idsMenu: [6, 10]
   })
 
   return { usuarioState, setUsuarioState }
