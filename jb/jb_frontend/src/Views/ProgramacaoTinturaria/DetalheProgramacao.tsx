@@ -17,7 +17,7 @@ import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 import { DetalheProgramacaoInterface, ProgramacaoInterface } from '../../../../jb_backend/src/interfaces/programacaoInterface';
-import { SomatorioProgramacaoInterface } from './ProgramacaoTinturaria';
+import { RomaneioInterface, SomatorioProgramacaoInterface } from './ProgramacaoTinturaria';
 
 
 interface PropsInterface {
@@ -25,10 +25,12 @@ interface PropsInterface {
   setRsMaster: React.Dispatch<React.SetStateAction<ProgramacaoInterface>>,
   masterLocalState: ActionInterface,
   setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioProgramacaoInterface>>,
+  RsRomaneio: RomaneioInterface[],
+  setRsRomaneio: React.Dispatch<React.SetStateAction<RomaneioInterface[]>>
 }
 
 
-export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio }: PropsInterface) {
+export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio, RsRomaneio, setRsRomaneio }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -144,8 +146,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
   const btIncluir = () => {
     if (
       rsMaster.dataProgramacao !== "" &&
-      rsMaster.idTinturaria !== 0 &&
-      rsMaster.idPessoa_cliente !== 0
+      rsMaster.idTinturaria !== 0
     ) {
       setIndiceEdicao(-1)
       setOpen(true)
@@ -236,6 +237,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
           ]
       })
       AtualizaSomatorio(tmpDetalhe)
+      AtualizaSaldoRomaneio(tmpDetalhe)
       setLocalState({ action: actionTypes.pesquisando })
       setDetalheProgramacao(ResetDados)
       setOpen(false)
@@ -261,6 +263,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
       setDetalheProgramacao(ResetDados)
       setOpen(false)
       AtualizaSomatorio(tmpDetalhe)
+      AtualizaSaldoRomaneio(tmpDetalhe)
 
     }
   }
@@ -278,6 +281,27 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
       setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
     }
   }
+
+  const AtualizaSaldoRomaneio = (rs: Array<DetalheProgramacaoInterface>) => {
+    if (!rs) return;
+
+    const updatedRomaneio = RsRomaneio.map((romaneio) => {
+      let saldo_programado = 0;
+
+      rs.forEach((detalhe) => {
+        if (romaneio.idProduto === detalhe.idProduto) {
+          saldo_programado += detalhe.peso;
+        }
+      });
+
+      return {
+        ...romaneio,
+        saldo_programado,
+      };
+    });
+
+    setRsRomaneio(updatedRomaneio);
+  };
 
   const BuscarDados = () => {
     clsCrud
@@ -323,7 +347,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
           }}>
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography sx={{ color: 'white' }}>
-              Item do Romaneio
+              Item da Programação
             </Typography>
           </Grid>
         </Paper>
@@ -460,42 +484,42 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
           </Paper >
         </Condicional>
       </Dialog >
-      <Paper sx={{ m: 0, p: 1 }}>
-        <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
-          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
-            <Tooltip title={'Incluir'}>
-              <IconButton
-                color="secondary"
-                sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}
-                onClick={() => btIncluir()}
-              >
-                <AddCircleIcon sx={{ fontSize: 50 }} />
-              </IconButton>
-            </Tooltip>
-          </Condicional>
-        </Grid>
-        <Grid item xs={12}>
-          <DataTable
-            cabecalho={cabecalhoForm}
-            dados={rsMaster.detalheProgramacoes}
-            acoes={['excluindo', 'editando'].includes(masterLocalState.action) ? [] :
-              [
-                {
-                  icone: "edit",
-                  onAcionador: (rs: DetalheProgramacaoInterface, indice: number) =>
-                    onEditar(rs, indice),
-                  toolTip: "Editar",
-                },
-                {
-                  icone: "delete",
-                  onAcionador: (rs: DetalheProgramacaoInterface) =>
-                    onExcluir(rs),
-                  toolTip: "Excluir",
-                },
-              ]}
-          />
-        </Grid>
-      </Paper>
+
+      <Grid item xs={12} sx={{ mt: -3, mb: 1, textAlign: 'center' }}>
+        <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
+          <Tooltip title={'Incluir'}>
+            <IconButton
+              color="secondary"
+              sx={{ mt: 0 }}
+              onClick={() => btIncluir()}
+            >
+              <AddCircleIcon sx={{ fontSize: 50 }} />
+            </IconButton>
+          </Tooltip>
+        </Condicional>
+      </Grid>
+      <Grid item xs={12}>
+        <DataTable
+          cabecalho={cabecalhoForm}
+          dados={rsMaster.detalheProgramacoes}
+          exibirPaginacao={false}
+          acoes={
+            [
+              {
+                icone: "edit",
+                onAcionador: (rs: DetalheProgramacaoInterface, indice: number) =>
+                  onEditar(rs, indice),
+                toolTip: "Editar",
+              },
+              {
+                icone: "delete",
+                onAcionador: (rs: DetalheProgramacaoInterface) =>
+                  onExcluir(rs),
+                toolTip: "Excluir",
+              },
+            ]}
+        />
+      </Grid>
     </>
   )
 }
