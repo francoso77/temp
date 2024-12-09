@@ -31,6 +31,7 @@ export interface ItemSpeedDial {
 }
 
 export interface DataTableInterface {
+  backgroundColorHead?: string
   dados: Array<any>
   cabecalho: Array<DataTableCabecalhoInterface>
   cabecalhoDetalhe?: Array<any>
@@ -49,81 +50,6 @@ export interface DataTableInterface {
   qtdColunas?: number;
 }
 
-export const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    padding: '1px',
-    fontSize: '0.55rem',
-    [theme.breakpoints.up('md')]: {
-      padding: '2px',
-      fontSize: '0.80rem',
-    },
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
-    padding: '1px',
-    fontSize: '0.55rem',
-    [theme.breakpoints.up('md')]: {
-      padding: '2px',
-      fontSize: '0.80rem',
-    },
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    position: "sticky",
-    left: 0,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    padding: '1px',
-    fontSize: '0.65rem',
-    [theme.breakpoints.up('md')]: {
-      padding: '2px',
-      fontSize: '0.75rem',
-    },
-  },
-  [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
-    padding: '4px',
-    fontSize: '0.65rem',
-    [theme.breakpoints.up('md')]: {
-      padding: '7px',
-      fontSize: '0.75rem',
-    },
-    position: "sticky",
-    left: 0,
-    backgroundColor: "#FFFF",
-  },
-  [`&.${tableCellClasses.footer}`]: {
-    padding: '1px',
-    fontSize: '0.55rem',
-    [theme.breakpoints.up('md')]: {
-      padding: '2px',
-      fontSize: '0.75rem',
-    },
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
-    padding: '1px',
-    fontSize: '0.55rem',
-    [theme.breakpoints.up('md')]: {
-      padding: '2px',
-      fontSize: '0.75rem',
-    },
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    position: "sticky",
-    left: 0,
-  },
-}))
-
-export const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: 'theme.palette.action.hover,'
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0,
-  },
-}));
 
 export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -183,6 +109,7 @@ export const sumColumns = (data: Array<any>, columns: Array<string>): Record<str
 
 
 export default function DataTable<T>({
+  backgroundColorHead,
   dados = [],
   cabecalho = [],
   acoes = [],
@@ -193,6 +120,82 @@ export default function DataTable<T>({
   colunaSoma = [],
   qtdColunas = 1
 }: DataTableInterface) {
+
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      padding: '1px',
+      fontSize: '0.55rem',
+      [theme.breakpoints.up('md')]: {
+        padding: '2px',
+        fontSize: '0.80rem',
+      },
+      backgroundColor: backgroundColorHead ? backgroundColorHead : theme.palette.primary.main,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
+      padding: '1px',
+      fontSize: '0.55rem',
+      [theme.breakpoints.up('md')]: {
+        padding: '2px',
+        fontSize: '0.80rem',
+      },
+      backgroundColor: backgroundColorHead ? backgroundColorHead : theme.palette.primary.main,
+      color: theme.palette.common.white,
+      position: "sticky",
+      left: 0,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      padding: '1px',
+      fontSize: '0.65rem',
+      [theme.breakpoints.up('md')]: {
+        padding: '2px',
+        fontSize: '0.75rem',
+      },
+    },
+    [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
+      padding: '4px',
+      fontSize: '0.65rem',
+      [theme.breakpoints.up('md')]: {
+        padding: '7px',
+        fontSize: '0.75rem',
+      },
+      position: "sticky",
+      left: 0,
+      backgroundColor: "#FFFF",
+    },
+    [`&.${tableCellClasses.footer}`]: {
+      padding: '1px',
+      fontSize: '0.55rem',
+      [theme.breakpoints.up('md')]: {
+        padding: '2px',
+        fontSize: '0.75rem',
+      },
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
+      padding: '1px',
+      fontSize: '0.55rem',
+      [theme.breakpoints.up('md')]: {
+        padding: '2px',
+        fontSize: '0.75rem',
+      },
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+      position: "sticky",
+      left: 0,
+    },
+  }))
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      backgroundColor: 'theme.palette.action.hover,'
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+      border: 0,
+    },
+  }));
 
   const clsFormatacao = new ClsFormatacao()
   const theme = useTheme()

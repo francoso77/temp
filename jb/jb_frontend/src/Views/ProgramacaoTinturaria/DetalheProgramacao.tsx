@@ -25,12 +25,12 @@ interface PropsInterface {
   setRsMaster: React.Dispatch<React.SetStateAction<ProgramacaoInterface>>,
   masterLocalState: ActionInterface,
   setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioProgramacaoInterface>>,
-  RsRomaneio: RomaneioInterface[],
+  rsRomaneio: RomaneioInterface[],
   setRsRomaneio: React.Dispatch<React.SetStateAction<RomaneioInterface[]>>
 }
 
 
-export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio, RsRomaneio, setRsRomaneio }: PropsInterface) {
+export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio, rsRomaneio, setRsRomaneio }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -125,6 +125,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
 
   const onEditar = (rs: DetalheProgramacaoInterface, indice: number) => {
 
+    editarSaldoRomaneio(rs)
     setLocalState({ action: actionTypes.editando })
     setIndiceEdicao(indice)
     setDetalheProgramacao(rs)
@@ -135,12 +136,13 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
 
     let tmpDetalhe: Array<DetalheProgramacaoInterface> = []
     rsMaster.detalheProgramacoes.forEach(det => {
-      if (det.idDetalheProgramacao !== rs.idDetalheProgramacao) {
+      if (det.idProduto !== rs.idProduto || det.idCor !== rs.idCor) {
         tmpDetalhe.push(det)
       }
     })
     setRsMaster({ ...rsMaster, detalheProgramacoes: tmpDetalhe })
-    //AtualizaSomatorio(tmpDetalhe)
+    AtualizaSomatorio(tmpDetalhe)
+    AtualizaSaldoRomaneio(tmpDetalhe)
   }
 
   const btIncluir = () => {
@@ -185,8 +187,11 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
   }
 
   const podeIncluirDetalhe = (): boolean => {
+
     const indice = rsMaster.detalheProgramacoes.findIndex(
-      (v, i) => v.idProduto === detalheProgramacao.idProduto && i !== indiceEdicao
+      (v, i) => v.idProduto === detalheProgramacao.idProduto &&
+        v.idCor === detalheProgramacao.idCor &&
+        i !== indiceEdicao
     )
 
     if (indice >= 0) {
@@ -202,9 +207,24 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
     return indice < 0;
   }
 
+  const temSaldo = (): boolean => {
+    const saldo = rsRomaneio.filter(v => v.idProduto === detalheProgramacao.idProduto)
+      .reduce((a, b) => a + b.saldo, 0)
+    if (saldo < detalheProgramacao.peso) {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Romaneio sem saldo suficiente - Saldo restante: ' + clsFormatacao.currency(saldo),
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    }
+    return saldo >= detalheProgramacao.peso
+  }
   const btConfirmaInclusao = () => {
 
-    if (validarDados() && podeIncluirDetalhe()) {
+    if (validarDados() && podeIncluirDetalhe() && temSaldo()) {
       let tmpDetalhe: Array<DetalheProgramacaoInterface> = [...rsMaster.detalheProgramacoes]
       tmpDetalhe.push({
         idProgramacao: rsMaster.idProgramacao as number,
@@ -245,8 +265,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
   }
 
   const btConfirmaAlteracao = () => {
-
-    if (validarDados() && podeIncluirDetalhe()) {
+    if (validarDados() && podeIncluirDetalhe() && temSaldo()) {
 
       let tmpDetalhe: Array<DetalheProgramacaoInterface> = [...rsMaster.detalheProgramacoes]
       tmpDetalhe[indiceEdicao] = {
@@ -283,31 +302,42 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
   }
 
   const AtualizaSaldoRomaneio = (rs: Array<DetalheProgramacaoInterface>) => {
-    if (!rs) return;
+    if (!rs) return
 
-    const updatedRomaneio = RsRomaneio.map((romaneio) => {
-      let saldo_programado = 0;
+    const updatedRomaneio = rsRomaneio.map((romaneio) => {
+      let saldo_programado_somado = 0
 
       rs.forEach((detalhe) => {
         if (romaneio.idProduto === detalhe.idProduto) {
-          saldo_programado += detalhe.peso;
+          saldo_programado_somado += detalhe.peso
         }
-      });
+      })
 
       return {
         ...romaneio,
-        saldo_programado,
-      };
-    });
+        peso_programado: saldo_programado_somado,
+        saldo: romaneio.peso_total - saldo_programado_somado
+      }
+    })
+    setRsRomaneio(updatedRomaneio)
+  }
 
-    setRsRomaneio(updatedRomaneio);
-  };
-
+  const editarSaldoRomaneio = (rs: DetalheProgramacaoInterface) => {
+    rsRomaneio.forEach((romaneio) => {
+      if (romaneio.idProduto === rs.idProduto) {
+        romaneio.saldo = romaneio.saldo + rs.peso
+      }
+    })
+    setRsRomaneio([...rsRomaneio])
+  }
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
         entidade: "Produto",
         campoOrder: ["nome"],
+        criterio: {
+          tipoProduto: TipoProdutoType.tecidoCru
+        }
       })
       .then((rsProdutos: Array<ProdutoInterface>) => {
         setRsProduto(rsProdutos)
@@ -500,6 +530,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
       </Grid>
       <Grid item xs={12}>
         <DataTable
+          backgroundColorHead='#d8961c'
           cabecalho={cabecalhoForm}
           dados={rsMaster.detalheProgramacoes}
           exibirPaginacao={false}

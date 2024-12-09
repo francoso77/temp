@@ -34,6 +34,7 @@ export interface RomaneioInterface {
   idProduto: number
   peso_total: number
   peso_programado: number
+  saldo: number
 }
 
 export default function ProgramacaoTinturaria() {
@@ -59,7 +60,8 @@ export default function ProgramacaoTinturaria() {
   const RomaneioDados: RomaneioInterface = {
     idProduto: 0,
     peso_total: 0,
-    peso_programado: 0
+    peso_programado: 0,
+    saldo: 0
   }
 
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -77,6 +79,7 @@ export default function ProgramacaoTinturaria() {
   const [rsTinturaria, setRsTinturaria] = useState<Array<TinturariaInterface>>([])
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioProgramacaoInterface>(SomatorioDados)
   const [rsRomaneio, setRsRomaneio] = useState<Array<RomaneioInterface>>([RomaneioDados])
+  const [headTableStatus, setHeadTableStatus] = useState(false)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -114,15 +117,22 @@ export default function ProgramacaoTinturaria() {
       format: (_v, rs: any) => rsProdutos.find(v => v.idProduto === rs.idProduto)?.nome
     },
     {
-      cabecalho: 'Qtd Romaneio',
+      cabecalho: 'Romaneio',
       alinhamento: 'center',
       campo: 'peso_total',
       format: (qtd) => clsFormatacao.currency(qtd)
     },
     {
-      cabecalho: 'Qtd Programada',
+      cabecalho: 'Programado',
       alinhamento: 'center',
       campo: 'peso_programado',
+      format: (qtd) => clsFormatacao.currency(qtd)
+      //format: (_v, rs: any) => rs.clientes.nome
+    },
+    {
+      cabecalho: 'Saldo',
+      alinhamento: 'center',
+      campo: 'saldo',
       format: (qtd) => clsFormatacao.currency(qtd)
       //format: (_v, rs: any) => rs.clientes.nome
     },
@@ -183,7 +193,6 @@ export default function ProgramacaoTinturaria() {
     let erros: { [key: string]: string } = {}
 
     retorno = validaCampo.eData('dataProgramacao', programacao, erros, retorno)
-    //retorno = validaCampo.naoVazio('idPessoa_cliente', programacao, erros, retorno, 'Informe um fornecedor')
     retorno = validaCampo.naoVazio('idTinturaria', programacao, erros, retorno, 'Informe o Romaneio')
 
     setErros(erros)
@@ -325,7 +334,7 @@ export default function ProgramacaoTinturaria() {
 
     if (validarDados()) {
 
-      if (localState.action === actionTypes.incluindo) {
+      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
           entidade: "Programacao",
           criterio: programacao,
@@ -371,6 +380,17 @@ export default function ProgramacaoTinturaria() {
     }
   }
 
+  const restaSaldo = () => {
+    let saldoFinal: number = 0
+    rsRomaneio.forEach((romaneio) => {
+      saldoFinal = saldoFinal + romaneio.saldo
+    })
+
+    if (saldoFinal <= 0) {
+      setHeadTableStatus(true)
+    }
+  }
+
   const BuscarItensRomaneio = async (romaneio: number) => {
     const tmpRomaneio: Array<any> = await clsCrud.consultar({
       entidade: 'ProducaoMalharia',
@@ -379,7 +399,14 @@ export default function ProgramacaoTinturaria() {
         fechado: true,
       },
       groupBy: 'idProduto',
-      select: ['idTinturaria', 'idProduto', 'SUM(peso) AS peso_total', '(SUM(peso) * 0) AS peso_programado', 'fechado'],
+      select: [
+        'idTinturaria',
+        'idProduto',
+        'SUM(peso) AS peso_total',
+        '(SUM(peso) * 0) AS peso_programado',
+        '(SUM(peso) - 0) AS saldo',
+        'fechado'
+      ],
     })
 
     if (tmpRomaneio.length > 0) {
@@ -437,11 +464,13 @@ export default function ProgramacaoTinturaria() {
             </Grid>
             <Grid item xs={12}>
               <DataTable
+                backgroundColorHead={headTableStatus ? "green" : "red"}
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
                   {
-                    icone: "find_in_page_two_tone",
+                    //icone: "find_in_page_two_tone",
+                    icone: "edit",
                     onAcionador: (rs: ProgramacaoInterface) =>
                       onEditar(rs.idProgramacao as number),
                     toolTip: "Visualizar",
@@ -526,17 +555,17 @@ export default function ProgramacaoTinturaria() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={6} sx={{ ml: -15, textAlign: 'center' }}>
+            <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
               <Typography variant="h6" >
                 Itens do Romaneio
               </Typography>
             </Grid>
-            <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
+            <Grid item xs={12} md={6} sx={{ ml: -5, textAlign: 'center' }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Itens Programados
               </Typography>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 2 }}>
+            <Grid item xs={12} md={5} sx={{ mt: 2 }}>
               <DataTable
                 cabecalho={cabecalhoRomaneio}
                 dados={rsRomaneio}
@@ -544,13 +573,13 @@ export default function ProgramacaoTinturaria() {
                 exibirPaginacao={false}
               />
             </Grid>
-            <Grid item xs={12} md={8} sx={{ mt: 1 }}>
+            <Grid item xs={12} md={7} sx={{ mt: 1 }}>
               <DetalheProgramacao
                 rsMaster={programacao}
                 setRsMaster={setProgramacao}
                 masterLocalState={localState}
                 setRsSomatorio={setRsSomatorio}
-                RsRomaneio={rsRomaneio}
+                rsRomaneio={rsRomaneio}
                 setRsRomaneio={setRsRomaneio}
               />
             </Grid>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction, SpeedDial } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction, SpeedDial, tableCellClasses, TableRow } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
@@ -7,7 +7,7 @@ import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
+import { DataTableInterface, getComparator, Order, stableSort, sumColumns } from '.';
 import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 // import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
@@ -18,6 +18,84 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 //     { icon: <PrintIcon />, name: 'Print', click: () => { } },
 //     { icon: <ShareIcon />, name: 'Share', click: () => { } },
 // ];
+
+export const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        padding: '1px',
+        fontSize: '0.55rem',
+        [theme.breakpoints.up('md')]: {
+            padding: '2px',
+            fontSize: '0.80rem',
+        },
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
+        padding: '1px',
+        fontSize: '0.55rem',
+        [theme.breakpoints.up('md')]: {
+            padding: '2px',
+            fontSize: '0.80rem',
+        },
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
+        position: "sticky",
+        left: 0,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        padding: '1px',
+        fontSize: '0.65rem',
+        [theme.breakpoints.up('md')]: {
+            padding: '2px',
+            fontSize: '0.75rem',
+        },
+    },
+    [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
+        padding: '4px',
+        fontSize: '0.65rem',
+        [theme.breakpoints.up('md')]: {
+            padding: '7px',
+            fontSize: '0.75rem',
+        },
+        position: "sticky",
+        left: 0,
+        backgroundColor: "#FFFF",
+    },
+    [`&.${tableCellClasses.footer}`]: {
+        padding: '1px',
+        fontSize: '0.55rem',
+        [theme.breakpoints.up('md')]: {
+            padding: '2px',
+            fontSize: '0.75rem',
+        },
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
+        padding: '1px',
+        fontSize: '0.55rem',
+        [theme.breakpoints.up('md')]: {
+            padding: '2px',
+            fontSize: '0.75rem',
+        },
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.common.white,
+        position: "sticky",
+        left: 0,
+    },
+}))
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+        backgroundColor: 'theme.palette.action.hover,'
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+        border: 0,
+    },
+}));
+
+
 
 const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
     position: 'absolute',

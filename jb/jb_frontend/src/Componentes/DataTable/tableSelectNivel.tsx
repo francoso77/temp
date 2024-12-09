@@ -8,8 +8,9 @@ import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import { DataTableInterface, getComparator, Order, stableSort, StyledTableCell, StyledTableRow, sumColumns } from '.';
+import { DataTableInterface, getComparator, Order, stableSort, sumColumns } from '.';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
+import { StyledTableCell, StyledTableRow } from './tableSelect';
 
 interface ItemDetail {
     idDetalhePedido: number,
