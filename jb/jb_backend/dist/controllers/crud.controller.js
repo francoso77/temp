@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CrudController = void 0;
 var common_1 = require("@nestjs/common");
 var crud_controller_cls_1 = require("../services/crud.controller.cls");
-var roles_decorator_1 = require("../auth/roles.decorator");
 var CrudController = /** @class */ (function () {
     function CrudController() {
     }
@@ -100,7 +99,6 @@ var CrudController = /** @class */ (function () {
     ], CrudController.prototype, "query", null);
     __decorate([
         (0, common_1.Post)("pesquisar"),
-        (0, roles_decorator_1.Roles)({ modulo: 'crud', permissao: 'pesquisar' }),
         __param(0, (0, common_1.Body)("entidade")),
         __param(1, (0, common_1.Body)("criterio")),
         __param(2, (0, common_1.Body)("camposLike")),

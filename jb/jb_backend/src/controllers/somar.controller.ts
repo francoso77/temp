@@ -1,5 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
+import { PermissoesTypes } from '../types/permissoesTypes';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller()
 export class SomarController {
@@ -9,6 +11,7 @@ export class SomarController {
   }
 
   @Post("somar")
+  @Roles({ modulo: PermissoesTypes.TINTURARIA.MODULO, permissao: PermissoesTypes.TINTURARIA.PERMISSOES.GERAR_PDF_ROMANEIO })
   public somar(
     @Body("numero01") numero01: number,
     @Body("numero02") numero02: number

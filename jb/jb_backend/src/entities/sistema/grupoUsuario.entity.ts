@@ -3,7 +3,7 @@ import { GrupoUsuarioInterface } from '../../interfaces/sistema/grupoInterface';
 import { Grupo } from './grupo.entity';
 import { Usuario } from './usuario.entity';
 
-@Entity({ name: 'gruposusuaroios' })
+@Entity({ name: 'gruposusuarios' })
 export class GrupoUsuario implements GrupoUsuarioInterface {
 
   @PrimaryColumn()

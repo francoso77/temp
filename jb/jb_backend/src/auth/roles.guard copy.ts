@@ -18,7 +18,7 @@ export class RolesGuard implements CanActivate {
   }
 
   //tranformar o canactivate em Promise
-  canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<RolesInterface>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -27,18 +27,18 @@ export class RolesGuard implements CanActivate {
 
     if (!requiredRoles) {
       // return Promise.resolve(true)
-      return Promise.resolve(true)
+      return true
     }
     const request = context.switchToHttp().getRequest()
-    const clsAcesso = new ClsAcesso()
+    // const clsAcesso = new ClsAcesso()
 
-    return clsAcesso.checarAcesso(
-      this.sessao.usuarioSessao,
-      requiredRoles.modulo,
-      requiredRoles.permissao).then(checarAcesso => {
-        return checarAcesso
-      })
-    // console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
-    // return true
+    // return clsAcesso.checarAcesso(
+    //   this.sessao.usuarioSessao,
+    //   requiredRoles.modulo,
+    //   requiredRoles.permissao).then(checarAcesso => {
+    //     return checarAcesso
+    //   })
+    console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
+    return true
   }
 }

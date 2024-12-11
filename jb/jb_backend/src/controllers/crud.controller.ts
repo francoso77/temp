@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Post, Put } from '@nestjs/common';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import ClsCrudController from '../services/crud.controller.cls';
-import { Roles } from '../auth/roles.decorator';
 
 
 @Controller()
@@ -53,7 +52,6 @@ export class CrudController {
   }
 
   @Post("pesquisar")
-  @Roles({ modulo: 'crud', permissao: 'pesquisar' })
   pesquisar(
     @Body("entidade") entidade: string,
     @Body("criterio") criterio: Record<string, any>,

@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SomarController = void 0;
 var common_1 = require("@nestjs/common");
+var permissoesTypes_1 = require("../types/permissoesTypes");
+var roles_decorator_1 = require("../auth/roles.decorator");
 var SomarController = /** @class */ (function () {
     function SomarController() {
         console.log('[SomarController] - Construtor');
@@ -25,6 +27,7 @@ var SomarController = /** @class */ (function () {
     };
     __decorate([
         (0, common_1.Post)("somar"),
+        (0, roles_decorator_1.Roles)({ modulo: permissoesTypes_1.PermissoesTypes.TINTURARIA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.TINTURARIA.PERMISSOES.GERAR_PDF_ROMANEIO }),
         __param(0, (0, common_1.Body)("numero01")),
         __param(1, (0, common_1.Body)("numero02")),
         __metadata("design:type", Function),

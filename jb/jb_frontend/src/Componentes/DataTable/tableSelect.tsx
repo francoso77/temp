@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction, SpeedDial, tableCellClasses, TableRow } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, Checkbox, Box, Toolbar, Typography, FormControlLabel, TableCell, SpeedDialAction, SpeedDial, TableRow, tableCellClasses } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
@@ -7,45 +7,39 @@ import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import { DataTableInterface, getComparator, Order, stableSort, sumColumns } from '.';
+import { DataTableInterface, getComparator, Order, stableSort } from '.';
 import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-// import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
-// import PrintIcon from '@mui/icons-material/Print';
-// import ShareIcon from '@mui/icons-material/Share';
+import { THEME } from '../../app/Layout/Theme';
 
-// const actions = [
-//     { icon: <PrintIcon />, name: 'Print', click: () => { } },
-//     { icon: <ShareIcon />, name: 'Share', click: () => { } },
-// ];
+export const StyledTableCell = styled(TableCell)(({ }) => ({
 
-export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         padding: '1px',
         fontSize: '0.55rem',
-        [theme.breakpoints.up('md')]: {
+        '@media (min-width:960px)': {
             padding: '2px',
             fontSize: '0.80rem',
         },
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
+        backgroundColor: THEME.palette.primary.main,
+        color: THEME.palette.common.white,
     },
     [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
         padding: '1px',
         fontSize: '0.55rem',
-        [theme.breakpoints.up('md')]: {
+        '@media (min-width:960px)': {
             padding: '2px',
             fontSize: '0.80rem',
         },
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
+        backgroundColor: THEME.palette.primary.main,
+        color: THEME.palette.common.white,
         position: "sticky",
         left: 0,
     },
     [`&.${tableCellClasses.body}`]: {
         padding: '1px',
         fontSize: '0.65rem',
-        [theme.breakpoints.up('md')]: {
+        '@media (min-width:960px)': {
             padding: '2px',
             fontSize: '0.75rem',
         },
@@ -53,7 +47,7 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
         padding: '4px',
         fontSize: '0.65rem',
-        [theme.breakpoints.up('md')]: {
+        '@media (min-width:960px)': {
             padding: '7px',
             fontSize: '0.75rem',
         },
@@ -64,30 +58,30 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.footer}`]: {
         padding: '1px',
         fontSize: '0.55rem',
-        [theme.breakpoints.up('md')]: {
+        '@media (min-width:960px)': {
             padding: '2px',
             fontSize: '0.75rem',
         },
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
+        backgroundColor: THEME.palette.primary.main,
+        color: THEME.palette.common.white,
     },
     [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
         padding: '1px',
         fontSize: '0.55rem',
-        [theme.breakpoints.up('md')]: {
+        '@media (min-width:960px)': {
             padding: '2px',
             fontSize: '0.75rem',
         },
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white,
+        backgroundColor: THEME.palette.primary.main,
+        color: THEME.palette.common.white,
         position: "sticky",
         left: 0,
     },
 }))
 
-export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+export const StyledTableRow = styled(TableRow)(({ }) => ({
     '&:nth-of-type(odd)': {
-        backgroundColor: 'theme.palette.action.hover,'
+        backgroundColor: THEME.palette.action.hover,
     },
     // hide last border
     '&:last-child td, &:last-child th': {
@@ -95,19 +89,6 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-
-
-const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
-    position: 'absolute',
-    '&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft': {
-        bottom: theme.spacing(2),
-        right: theme.spacing(2),
-    },
-    '&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight': {
-        top: theme.spacing(2),
-        left: theme.spacing(2),
-    },
-}));
 
 interface EnhancedTableProps {
     numSelected: number;

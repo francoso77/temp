@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginUsuarioController = void 0;
 var common_1 = require("@nestjs/common");
 var loginUsuario_controller_cls_1 = require("../services/loginUsuario.controller.cls");
-var roles_decorator_1 = require("../auth/roles.decorator");
 var LoginUsuarioController = /** @class */ (function () {
     function LoginUsuarioController() {
     }
@@ -24,7 +23,6 @@ var LoginUsuarioController = /** @class */ (function () {
     };
     __decorate([
         (0, common_1.Post)('loginUsuario'),
-        (0, roles_decorator_1.Roles)({ modulo: 'login', permissao: 'logar' }),
         __param(0, (0, common_1.Body)('cpf')),
         __param(1, (0, common_1.Body)('senha')),
         __metadata("design:type", Function),

@@ -37,7 +37,7 @@ var GrupoUsuario = /** @class */ (function () {
         __metadata("design:type", Date)
     ], GrupoUsuario.prototype, "updateAt", void 0);
     GrupoUsuario = __decorate([
-        (0, typeorm_1.Entity)({ name: 'gruposusuaroios' })
+        (0, typeorm_1.Entity)({ name: 'gruposusuarios' })
     ], GrupoUsuario);
     return GrupoUsuario;
 }());

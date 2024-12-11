@@ -14,7 +14,6 @@ var common_1 = require("@nestjs/common");
 var core_1 = require("@nestjs/core");
 var roles_decorator_1 = require("./roles.decorator");
 var sessao_service_1 = require("./services/sessao.service");
-var acesso_cls_1 = require("../services/acesso.cls");
 //scope do Roles tem que ser igual ao do sessão
 var RolesGuard = /** @class */ (function () {
     function RolesGuard(reflector, 
@@ -32,15 +31,18 @@ var RolesGuard = /** @class */ (function () {
         ]);
         if (!requiredRoles) {
             // return Promise.resolve(true)
-            return Promise.resolve(true);
+            return true;
         }
         var request = context.switchToHttp().getRequest();
-        var clsAcesso = new acesso_cls_1.default();
-        return clsAcesso.checarAcesso(this.sessao.usuarioSessao, requiredRoles.modulo, requiredRoles.permissao).then(function (checarAcesso) {
-            return checarAcesso;
-        });
-        // console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
-        // return true
+        // const clsAcesso = new ClsAcesso()
+        // return clsAcesso.checarAcesso(
+        //   this.sessao.usuarioSessao,
+        //   requiredRoles.modulo,
+        //   requiredRoles.permissao).then(checarAcesso => {
+        //     return checarAcesso
+        //   })
+        console.log("[RolesGuard] - Request Headers: ", request.headers.authorization);
+        return true;
     };
     RolesGuard = __decorate([
         (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),
@@ -50,4 +52,4 @@ var RolesGuard = /** @class */ (function () {
     return RolesGuard;
 }());
 exports.RolesGuard = RolesGuard;
-//# sourceMappingURL=roles.guard.js.map
+//# sourceMappingURL=roles.guard%20copy.js.map
