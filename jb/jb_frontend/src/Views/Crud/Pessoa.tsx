@@ -29,15 +29,17 @@ export default function Pessoa() {
   const [selectedValue, setSelectedValue] = useState(PessoaTypes[1].descricao);
 
   const handleClose = (value: string) => {
-    setOpen(false);
-    setSelectedValue(value);
-    PessoaTypes.map((p) => {
-      if (p.idPessoaType === value) {
-        pessoa.tipoPessoa = p.idPessoaType
-      }
-    })
+    setOpen(false)
+    setSelectedValue(value)
+
+    const pessoaType = PessoaTypes.find((p) => p.idPessoaType === value)
+    if (pessoaType) {
+      pessoa.tipoPessoa = pessoaType.idPessoaType
+    }
+
     setLocalState({ action: actionTypes.incluindo })
-  };
+  }
+
 
   const ResetDados: PessoaInterface = {
     nome: '',

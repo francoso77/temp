@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, buttonGroupClasses, TableCell, SpeedDialAction } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, TableFooter, Checkbox, Box, Toolbar, Typography, FormControlLabel, Collapse, TableCell } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
@@ -17,18 +17,6 @@ interface ItemDetail {
     Produto: string;
     qtd: number;
 }
-
-// const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
-//     position: 'absolute',
-//     '&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft': {
-//         bottom: theme.spacing(2),
-//         right: theme.spacing(2),
-//     },
-//     '&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight': {
-//         top: theme.spacing(2),
-//         left: theme.spacing(2),
-//     },
-// }));
 
 interface EnhancedTableProps {
     numSelected: number;
@@ -98,7 +86,7 @@ export default function DataTableSelect<T>({
 
 
     function EnhancedTableHead(props: EnhancedTableProps) {
-        const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+        const { onSelectAllClick, order, orderBy, numSelected, rowCount } =
             props;
 
         return (
@@ -244,21 +232,20 @@ export default function DataTableSelect<T>({
     }
 
     const somaQtdSelected = (sel: readonly number[]) => {
-        let itemSomado = 0
-        sel.map((i) => {
-            itemSomado = itemSomado + calculateTotals(dados[i].details).totalQuantidade
-        })
+        const itemSomado = sel.reduce((total, i) => total + calculateTotals(dados[i].details).totalQuantidade, 0)
         setSomaQtd(itemSomado)
     }
+
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = dados.map((_n, i) => i);
-            setSelected(newSelected);
+            const newSelected = Array.from({ length: dados.length }, (_, i) => i)
+            setSelected(newSelected)
             somaQtdSelected(newSelected)
-            return;
+            return
         }
-        setSelected([]);
-    };
+        setSelected([])
+    }
+
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
         const selectedIndex = selected.indexOf(id);

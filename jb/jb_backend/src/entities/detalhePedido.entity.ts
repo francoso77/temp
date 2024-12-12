@@ -3,15 +3,16 @@ import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
 import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
 import Pedido from './pedido.entity';
+import Cor from './cor.entity';
 
 @Entity({ name: 'detalhepedidos' })
 export default class DetalhePedido implements DetalhePedidoInterface {
 
   @PrimaryGeneratedColumn()
-  idDetalhePedido: number;
+  idDetalhePedido: number
 
   @Column()
-  idPedido: number;
+  idPedido: number
 
   @JoinColumn({ name: 'idPedido' })
   @ManyToOne(() => Pedido, pedido => pedido.detalhePedidos, {
@@ -19,14 +20,21 @@ export default class DetalhePedido implements DetalhePedidoInterface {
     onUpdate: 'CASCADE',
     orphanedRowAction: 'delete'
   })
-  pedido: Pedido;
+  pedido: Pedido
 
   @Column()
-  idProduto: number;
+  idProduto: number
 
   @JoinColumn({ name: 'idProduto' })
   @ManyToOne(() => Produto)
   produto: Produto
+
+  @Column({ nullable: true })
+  idCor: number | null
+
+  @JoinColumn({ name: 'idCor' })
+  @ManyToOne(() => Cor)
+  cor: Cor
 
   @Column({ type: 'float', precision: 4 })
   qtdPedida: number

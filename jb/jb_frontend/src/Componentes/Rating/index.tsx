@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, IconButton, Paper, Typography } from '@mui/material';
-import { styled } from '@mui/system';
-import Brightness1Icon from '@mui/icons-material/Brightness1';
+import React, { useState } from 'react';
+import { Box, IconButton, Typography } from '@mui/material';
 import StarTwoToneIcon from '@mui/icons-material/StarTwoTone';
 
 interface HoverColorIntensityRatingProps {

@@ -21,7 +21,7 @@ import { ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces
 import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import DetalheProducaoDubalgem from './DetalheProducaoDubalgem';
+import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';

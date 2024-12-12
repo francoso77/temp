@@ -1,4 +1,3 @@
-import React from 'react';
 import ClsApi from "./ClsApi";
 import ClsFormatacao from "./ClsFormatacao";
 import { jsPDF } from 'jspdf';
@@ -473,8 +472,8 @@ class ClsRelatorioProgramacao {
         }, {} as Record<string, Peca[]>);
 
         Object.entries(tearesAgrupados).forEach(([tear, itensTear]) => {
-          const pesoTotalTear = itensTear.reduce((acc, peca) => acc + peca.peso, 0);
-          const qtdTotalTear = itensTear.length;
+          // const pesoTotalTear = itensTear.reduce((acc, peca) => acc + peca.peso, 0);
+          // const qtdTotalTear = itensTear.length;
 
           // Cabeçalho do Tear
           autoTable(doc, {
@@ -671,8 +670,8 @@ class ClsRelatorioProgramacao {
         }, {} as Record<string, Peca[]>);
 
         Object.entries(tearesAgrupados).forEach(([tear, itensTear]) => {
-          const pesoTotalTear = itensTear.reduce((acc, peca) => acc + peca.peso, 0);
-          const qtdTotalTear = itensTear.length;
+          // const pesoTotalTear = itensTear.reduce((acc, peca) => acc + peca.peso, 0);
+          // const qtdTotalTear = itensTear.length;
 
           // Cabeçalho do Tear
           autoTable(doc, {

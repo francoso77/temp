@@ -13,7 +13,6 @@ import { TipoProdutoTypes } from '../../types/tipoProdutoypes'
 import OperatorSelect, { Operator } from '../../Componentes/OperatorSelect'
 import ContentPasteSearchTwoToneIcon from '@mui/icons-material/ContentPasteSearchTwoTone'
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
-import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
 
@@ -49,7 +48,6 @@ export const ConsultaEstoque = () => {
   const [rsCores, setRsCores] = useState<Array<CorInterface>>([])
   const [rsFornecedores, setRsFornecedores] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
-  const [erros, setErros] = useState({})
   const [dados, setDados] = useState(dadosInterface)
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
 
@@ -167,15 +165,19 @@ export const ConsultaEstoque = () => {
     irPara('/')
   }
 
+
   useEffect(() => {
+    const fetchData = async () => {
+      await BuscarDados();
+    };
     setLayoutState({
       titulo: 'Consulta Estoques de Produtos',
       tituloAnterior: '',
       pathTitulo: '/ConsultaEstoque',
       pathTituloAnterior: '/'
     })
-    BuscarDados()
-  }, [])
+    fetchData();
+  }, [BuscarDados])
 
   return (
     <div>
@@ -196,7 +198,6 @@ export const ConsultaEstoque = () => {
                 mensagemPadraoCampoEmBranco=""
                 field="idProduto"
                 label="Produtos"
-                erros={erros}
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 1)}
@@ -214,7 +215,6 @@ export const ConsultaEstoque = () => {
                 mensagemPadraoCampoEmBranco=""
                 field="idCor"
                 label="Cores"
-                erros={erros}
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 2)}
@@ -232,7 +232,6 @@ export const ConsultaEstoque = () => {
                 mensagemPadraoCampoEmBranco=""
                 field="idTipoProduto"
                 label="Tipo Produto"
-                erros={erros}
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event) => btPulaCampo(event, 3)}
@@ -250,7 +249,6 @@ export const ConsultaEstoque = () => {
                 mensagemPadraoCampoEmBranco=""
                 field="idPessoa_fornecedor"
                 label="Fornecedor"
-                erros={erros}
                 setState={setDados}
                 onFocus={(e) => e.target.select()}
                 onKeyDown={(event: any) => btPulaCampo(event, 4)}
@@ -278,7 +276,6 @@ export const ConsultaEstoque = () => {
                     dados={dados}
                     field="qtd"
                     setState={setDados}
-                    erros={erros}
                     onFocus={(e) => e.target.select()}
                     onKeyDown={(event: any) => btPulaCampo(event, 0)}
                     tamanhoFonte={15}

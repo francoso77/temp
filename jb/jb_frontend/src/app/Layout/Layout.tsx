@@ -10,11 +10,9 @@ import { ROTAS_LIVRES } from './ClsRotas';
 import { useEffect, useState } from 'react';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import HeaderMenu from './HeaderMenu';
-import Header from './Header';
 import MenuFooter from './MenuFooter';
 import Login from '../Login/Login';
 import styled from 'styled-components';
-import { UsuarioType } from '../../types/usuarioTypes';
 
 const VideoBackground = styled('video')({
   position: 'fixed',

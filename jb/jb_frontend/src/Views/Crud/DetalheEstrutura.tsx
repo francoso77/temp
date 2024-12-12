@@ -142,10 +142,12 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   const pegaTipo = () => {
-    let auxTipo: number | undefined = rsProduto.
-      find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
-    setTipo(auxTipo as number)
+    const auxTipo = rsProduto.find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
+    if (auxTipo !== undefined) {
+      setTipo(auxTipo);
+    }
   }
+
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
     if (event.key === 'Enter') {
@@ -246,9 +248,14 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   useEffect(() => {
-    BuscarDados()
-    pegaTipo()
-  }, [])
+    const fetchData = async () => {
+      await BuscarDados();
+      pegaTipo();
+    };
+
+    fetchData();
+  }, [BuscarDados, pegaTipo])
+
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))

@@ -105,6 +105,7 @@ export default function Pedido() {
         relations: [
           "detalhePedidos",
           "detalhePedidos.produto",
+          "detalhePedidos.cor",
         ],
         criterio: {
           idPedido: id,

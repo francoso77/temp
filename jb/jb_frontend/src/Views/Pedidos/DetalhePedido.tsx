@@ -20,6 +20,7 @@ import InputCalc from '../../Componentes/InputCalc';
 import { SomatorioPedidoInterface } from './Pedido';
 import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
 
 
 interface PropsInterface {
@@ -48,6 +49,11 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       ativo: false,
       tipoProduto: TipoProdutoType.tecidoTinto
     },
+    idCor: null,
+    cor: {
+      nome: '',
+      nivel: 0
+    },
     qtdPedida: 0,
     vrUnitario: 0,
     qtdAtendida: 0,
@@ -61,7 +67,11 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
   const [erros, setErros] = useState({});
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados);
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([]);
+  const [rsCor, setRsCor] = useState<Array<CorInterface>>([]);
+  const [tipo, setTipo] = useState<TipoProdutoType>()
+
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([]);
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -69,6 +79,12 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       alinhamento: 'left',
       campo: 'idProduto',
       format: (_v, rs: any) => rsProduto.find(x => x.idProduto === rs.idProduto)?.nome
+    },
+    {
+      cabecalho: 'Cor',
+      alinhamento: 'left',
+      campo: 'idCor',
+      format: (_v, rs: any) => rs ? rs.cor.nome : ""
     },
     {
       cabecalho: 'Qtd',
@@ -91,6 +107,12 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
     },
   ]
 
+  const pegaTipo = () => {
+    const auxTipo = rsProduto.find(produto => produto.idProduto === detalhePedido.idProduto)?.tipoProduto;
+    if (auxTipo !== undefined) {
+      setTipo(auxTipo);
+    }
+  }
   const validarDados = (): boolean => {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
@@ -208,22 +230,36 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
 
   const temEstrutura = async (id: number): Promise<boolean> => {
     try {
-      const estrutura: EstruturaInterface[] = await clsCrud.pesquisar({
-        entidade: "Estrutura",
-        criterio: { idProduto: id },
+      const produtosComEstrutura: ProdutoInterface[] = await clsCrud.pesquisar({
+        entidade: "Produto",
+        criterio: {
+          idProduto: id
+        },
+        camposLike: ['idProduto']
       })
-      if (estrutura.length === 0) {
-        setMensagemState({
-          titulo: 'Erro',
-          exibir: true,
-          mensagem: 'Produto sem Estrutura definida!',
-          tipo: MensagemTipo.Error,
-          exibirBotao: true,
-          cb: null
+
+      if (produtosComEstrutura.length === 0) {
+        const liberado = produtosComEstrutura.find(v => v.tipoProduto === 7 || v.tipoProduto === 8)?.idProduto
+        const estrutura: EstruturaInterface[] = await clsCrud.pesquisar({
+          entidade: "Estrutura",
+          criterio: { idProduto: liberado },
         })
-        return false
+        if (estrutura.length === 0) {
+          setMensagemState({
+            titulo: 'Erro',
+            exibir: true,
+            mensagem: 'Produto sem Estrutura definida!',
+            tipo: MensagemTipo.Error,
+            exibirBotao: true,
+            cb: null
+          })
+          return false
+        }
+        return estrutura.length > 0;
+      } else {
+        return true
       }
-      return estrutura.length > 0;
+
     } catch (error) {
       console.error("Erro ao buscar estrutura:", error)
       return false; // ou throw error;
@@ -236,12 +272,13 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       tmpDetalhe.push({
         idPedido: rsMaster.idPedido as number,
         idProduto: detalhePedido.idProduto,
+        idCor: detalhePedido.idCor,
         qtdPedida: detalhePedido.qtdPedida,
         qtdAtendida: 0,
         vrUnitario: detalhePedido.vrUnitario,
         statusItem: StatusPedidoItemType.aberto,
         produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
-
+        cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalhePedido.idCor)] },
       })
       setRsMaster({
         ...rsMaster, detalhePedidos:
@@ -250,12 +287,14 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
 
             {
               idPedido: rsMaster.idPedido as number,
+              idCor: detalhePedido.idCor,
               idProduto: detalhePedido.idProduto,
               qtdPedida: detalhePedido.qtdPedida,
               qtdAtendida: 0,
               vrUnitario: detalhePedido.vrUnitario,
               statusItem: StatusPedidoItemType.aberto,
               produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
+              cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalhePedido.idCor)] },
             }
           ]
       })
@@ -303,11 +342,33 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       .pesquisar({
         entidade: "Produto",
         campoOrder: ["nome"],
+        comparador: 'I',
+        criterio: {
+          tipoProduto: [
+            TipoProdutoType.cola,
+            TipoProdutoType.espuma,
+            TipoProdutoType.eva,
+            TipoProdutoType.filme,
+            TipoProdutoType.forro,
+            TipoProdutoType.nylon,
+            TipoProdutoType.palmilha,
+            TipoProdutoType.tecidoTinto
+          ]
+        },
+        camposLike: ['tipoProduto'],
       })
       .then((rsProdutos: Array<ProdutoInterface>) => {
         setRsProduto(rsProdutos)
       })
 
+    clsCrud
+      .pesquisar({
+        entidade: "Cor",
+        campoOrder: ["nome"],
+      })
+      .then((rsCores: Array<CorInterface>) => {
+        setRsCor(rsCores)
+      })
   }
 
   useEffect(() => {
@@ -340,7 +401,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
+              <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
                 <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
                   <ComboBox
                     opcoes={rsProduto}
@@ -354,10 +415,33 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
                     setState={setDetalhePedido}
                     disabled={localState.action === 'excluindo' ? true : false}
                     onFocus={(e) => e.target.select()}
+                    onSelect={pegaTipo}
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
                   />
                 </Box>
               </Grid>
+              <Condicional condicao={[2, 3, 6, 10, 11].includes(tipo as number)}>
+                <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+                  <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                    <ComboBox
+                      opcoes={rsCor}
+                      campoDescricao="nome"
+                      campoID="idCor"
+                      dados={detalhePedido}
+                      mensagemPadraoCampoEmBranco="Qual cor"
+                      field="idCor"
+                      label="Cores"
+                      erros={erros}
+                      setState={setDetalhePedido}
+                      disabled={localState.action === 'excluindo' ? true : false}
+                      onFocus={(e) => e.target.select()}
+                      onSelect={pegaTipo}
+                      onKeyDown={(event) => btPulaCampo(event, 2)}
+                    />
+                  </Box>
+                </Grid>
+              </Condicional>
+
               <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                   <InputText
@@ -392,7 +476,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
 
                 <InputCalc
                   label='Total Item'

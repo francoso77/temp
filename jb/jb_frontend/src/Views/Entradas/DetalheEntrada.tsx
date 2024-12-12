@@ -129,10 +129,12 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
     },
   ]
 
+
   const pegaTipo = () => {
-    let auxTipo: number | undefined = rsProduto.
-      find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
-    setTipo(auxTipo)
+    const auxTipo = rsProduto.find(produto => produto.idProduto === detalheEntrada.idProduto)?.tipoProduto;
+    if (auxTipo !== undefined) {
+      setTipo(auxTipo);
+    }
   }
 
   const validarDados = (): boolean => {
@@ -365,8 +367,13 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
   }
 
   useEffect(() => {
-    BuscarDados()
-  }, [])
+    const fetchData = async () => {
+      await BuscarDados();
+    };
+
+    fetchData();
+  }, [BuscarDados]);
+
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))

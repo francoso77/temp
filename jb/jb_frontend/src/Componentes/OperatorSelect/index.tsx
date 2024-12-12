@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, MenuItem, SelectChangeEvent, InputLabel, FormControl, Typography, useTheme } from '@mui/material';
+import { Select, MenuItem, SelectChangeEvent, FormControl, Typography, useTheme } from '@mui/material';
 import Condicional from '../Condicional/Condicional';
 
 

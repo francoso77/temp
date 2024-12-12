@@ -10,7 +10,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface, DetalhePecaInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
 import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';

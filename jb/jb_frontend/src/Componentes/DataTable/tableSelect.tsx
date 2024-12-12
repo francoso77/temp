@@ -13,7 +13,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { THEME } from '../../app/Layout/Theme';
 
 export const StyledTableCell = styled(TableCell)(({ }) => ({
-
     [`&.${tableCellClasses.head}`]: {
         padding: '1px',
         fontSize: '0.55rem',
@@ -79,7 +78,7 @@ export const StyledTableCell = styled(TableCell)(({ }) => ({
     },
 }))
 
-export const StyledTableRow = styled(TableRow)(({ }) => ({
+export const StyledTableRow = styled(TableRow)(() => ({
     '&:nth-of-type(odd)': {
         backgroundColor: THEME.palette.action.hover,
     },
@@ -111,7 +110,6 @@ export default function TableSelect<T>({
 }: DataTableInterface) {
 
     const theme = useTheme()
-    const [openRows, setOpenRows] = useState<number[]>([]);
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [dense, setDense] = React.useState(true)
@@ -119,11 +117,6 @@ export default function TableSelect<T>({
     const [order, setOrder] = useState<Order>('asc')
     const [orderBy, setOrderBy] = useState<keyof any>('nome')
 
-    const handleRowClick = (id: number) => {
-        setOpenRows((prevOpenRows) =>
-            prevOpenRows.includes(id) ? prevOpenRows.filter((rowId) => rowId !== id) : [...prevOpenRows, id]
-        );
-    };
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage)
     }
@@ -151,7 +144,7 @@ export default function TableSelect<T>({
 
 
     function EnhancedTableHead(props: EnhancedTableProps) {
-        const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+        const { onSelectAllClick, order, orderBy, numSelected, rowCount } =
             props;
 
         return (

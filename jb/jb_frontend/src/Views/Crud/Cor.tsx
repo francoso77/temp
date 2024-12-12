@@ -33,8 +33,6 @@ export default function Cor() {
   }
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface
-
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<CorInterface>>([])

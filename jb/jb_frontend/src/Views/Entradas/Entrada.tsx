@@ -392,8 +392,12 @@ export default function Entrada() {
   }
 
   useEffect(() => {
-    BuscarDados()
-  }, [])
+    const fetchData = async () => {
+      await BuscarDados();
+    };
+
+    fetchData();
+  }, [BuscarDados]);
 
   return (
 

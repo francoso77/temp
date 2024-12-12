@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import Login from '../app/Login/Login';
 import Layout from '../app/Layout/Layout';
 import Cor from '../Views/Crud/Cor';
@@ -14,7 +14,7 @@ import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
 import ProgramacaoDublagem from '../Views/GerenciadorPedidos/ProgramacaoDublagem';
 import Usuario from '../Views/Usuario/Usuario';
-import ProducaoDublagem from '../Views/ProducaoDublagen/ProducaoDublagem';
+import ProducaoDublagem from '../Views/ProducaoDublagem/ProducaoDublagem';
 import Dashboard from '../Views/DashBoard/Dashboard';
 import { ConsultaEstoque } from '../Views/Estoques/ConsultaEstoque';
 import ProgramacaoTinturaria from '../Views/ProgramacaoTinturaria/ProgramacaoTinturaria';

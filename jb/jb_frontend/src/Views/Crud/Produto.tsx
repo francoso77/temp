@@ -328,8 +328,13 @@ export default function Produto() {
   }
 
   useEffect(() => {
-    BuscarDados()
-  }, [])
+    const fetchData = async () => {
+      await BuscarDados();
+    };
+
+    fetchData();
+  }, [BuscarDados]);
+
 
   return (
 

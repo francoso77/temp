@@ -118,11 +118,11 @@ export default function ProgramacaoDublagem() {
     clsRelatorioProgramacao.renderRelacao(dataPesquisa);
   }
 
-  const onFicha = async (id: string | number) => {
-    const { dataProgramacao } = await pesquisarID(id);
-    const dataPesquisa = formatarData(dataProgramacao);
-    clsRelatorioProgramacao.renderFicha(dataPesquisa);
-  }
+  // const onFicha = async (id: string | number) => {
+  //   const { dataProgramacao } = await pesquisarID(id);
+  //   const dataPesquisa = formatarData(dataProgramacao);
+  //   clsRelatorioProgramacao.renderFicha(dataPesquisa);
+  // }
 
   const onEtiqueta = async (id: number) => {
     setId(id)
@@ -242,12 +242,9 @@ export default function ProgramacaoDublagem() {
         })
           .then((rs) => {
             if (rs.ok) {
-              let tmpPedidos: Array<number> = []
-              programacaoDublagem.detalheProgramacaoDublagens.map((d) => {
-                tmpPedidos.push(d.idPedido)
-              })
-              AlterarStatusPedido(tmpPedidos)
-              setLocalState({ action: actionTypes.pesquisando })
+              const tmpPedidos = programacaoDublagem.detalheProgramacaoDublagens.map(d => d.idPedido);
+              AlterarStatusPedido(tmpPedidos);
+              setLocalState({ action: actionTypes.pesquisando });
             } else {
               setMensagemState({
                 titulo: 'Erro...',

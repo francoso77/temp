@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Paper, Grid } from '@mui/material';
 import VelocimetroPedidos from './VelocimetroPedidos';
 import BarrasPedidosMensais from './BarrasPedidosMensais';
 import LinhasTipoProdutos from './LinhasTipoProdutos';

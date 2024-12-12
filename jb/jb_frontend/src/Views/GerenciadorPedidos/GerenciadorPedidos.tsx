@@ -41,6 +41,11 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       ativo: false,
       tipoProduto: TipoProdutoType.tecidoTinto
     },
+    idCor: null,
+    cor: {
+      nome: '',
+      nivel: 0
+    },
     qtdPedida: 0,
     vrUnitario: 0,
     qtdAtendida: 0,

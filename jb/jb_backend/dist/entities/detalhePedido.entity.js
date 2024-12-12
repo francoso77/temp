@@ -13,6 +13,7 @@ var typeorm_1 = require("typeorm");
 var produto_entity_1 = require("./produto.entity");
 var statusPedidoItemTypes_1 = require("../types/statusPedidoItemTypes");
 var pedido_entity_1 = require("./pedido.entity");
+var cor_entity_1 = require("./cor.entity");
 var DetalhePedido = /** @class */ (function () {
     function DetalhePedido() {
     }
@@ -42,6 +43,15 @@ var DetalhePedido = /** @class */ (function () {
         (0, typeorm_1.ManyToOne)(function () { return produto_entity_1.default; }),
         __metadata("design:type", produto_entity_1.default)
     ], DetalhePedido.prototype, "produto", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", Number)
+    ], DetalhePedido.prototype, "idCor", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idCor' }),
+        (0, typeorm_1.ManyToOne)(function () { return cor_entity_1.default; }),
+        __metadata("design:type", cor_entity_1.default)
+    ], DetalhePedido.prototype, "cor", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
