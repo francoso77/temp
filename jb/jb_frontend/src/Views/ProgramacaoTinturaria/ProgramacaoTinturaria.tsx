@@ -35,6 +35,7 @@ export interface RomaneioInterface {
   peso_total: number
   peso_programado: number
   saldo: number
+  qtd_peca: number
 }
 
 export default function ProgramacaoTinturaria() {
@@ -61,7 +62,8 @@ export default function ProgramacaoTinturaria() {
     idProduto: 0,
     peso_total: 0,
     peso_programado: 0,
-    saldo: 0
+    saldo: 0,
+    qtd_peca: 0
   }
 
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -77,6 +79,7 @@ export default function ProgramacaoTinturaria() {
   const [rsProdutos, setRsProdutos] = useState<Array<ProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsTinturaria, setRsTinturaria] = useState<Array<TinturariaInterface>>([])
+  const [rsSomatorioTinturaria, setRsSomatorioTinturaria] = useState<SomatorioProgramacaoInterface>(SomatorioDados)
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioProgramacaoInterface>(SomatorioDados)
   const [rsRomaneio, setRsRomaneio] = useState<Array<RomaneioInterface>>([RomaneioDados])
   const [headTableStatus, setHeadTableStatus] = useState(false)
@@ -115,6 +118,13 @@ export default function ProgramacaoTinturaria() {
       alinhamento: 'left',
       campo: 'idProduto',
       format: (_v, rs: any) => rsProdutos.find(v => v.idProduto === rs.idProduto)?.nome
+    },
+    {
+      cabecalho: 'Peças',
+      alinhamento: 'center',
+      campo: 'qtd_peca',
+      format: (qtd) => clsFormatacao.currency(Number(qtd))
+      //format: (_v, rs: any) => rs.clientes.nome
     },
     {
       cabecalho: 'Romaneio',
@@ -313,7 +323,7 @@ export default function ProgramacaoTinturaria() {
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
-        setRsPesquisa(rs);
+        setRsPesquisa(rs)
       });
   }
 
@@ -328,6 +338,19 @@ export default function ProgramacaoTinturaria() {
         total = total + detalhe.peso
       })
       setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
+    }
+  }
+  const AtualizaSomatorioTinturaria = (rs: Array<RomaneioInterface>) => {
+
+    let totalQtd: number = 0
+    let total: number = 0
+
+    if (rs) {
+      rs.forEach((detalhe) => {
+        totalQtd = totalQtd + Number(detalhe.qtd_peca)
+        total = total + detalhe.peso_total
+      })
+      setRsSomatorioTinturaria({ total: total.toString(), totalQtd: totalQtd.toString() })
     }
   }
   const btConfirmar = () => {
@@ -405,12 +428,14 @@ export default function ProgramacaoTinturaria() {
         'SUM(peso) AS peso_total',
         '(SUM(peso) * 0) AS peso_programado',
         '(SUM(peso) - 0) AS saldo',
+        '(COUNT(idProduto)) AS qtd_peca',
         'fechado'
       ],
     })
 
     if (tmpRomaneio.length > 0) {
       setRsRomaneio(tmpRomaneio)
+      AtualizaSomatorioTinturaria(tmpRomaneio)
     }
   }
   const irPara = useNavigate()
@@ -583,7 +608,35 @@ export default function ProgramacaoTinturaria() {
                 setRsRomaneio={setRsRomaneio}
               />
             </Grid>
-            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={6} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                tipo='currency'
+                scale={2}
+                label="Qtd"
+                labelAlign='center'
+                dados={rsSomatorioTinturaria}
+                field="totalQtd"
+                setState={setRsSomatorioTinturaria}
+                disabled={true}
+                textAlign='center'
+                tamanhoFonte={30}
+              />
+            </Grid>
+            <Grid item xs={6} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <InputText
+                tipo='currency'
+                scale={2}
+                label="Total"
+                labelAlign='center'
+                dados={rsSomatorioTinturaria}
+                field="total"
+                setState={setRsSomatorioTinturaria}
+                disabled={true}
+                textAlign='center'
+                tamanhoFonte={30}
+              />
+            </Grid>
+            <Grid item xs={6} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 tipo='currency'
                 scale={2}
@@ -597,7 +650,7 @@ export default function ProgramacaoTinturaria() {
                 tamanhoFonte={30}
               />
             </Grid>
-            <Grid item xs={6} md={6} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={6} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 tipo='currency'
                 scale={2}
