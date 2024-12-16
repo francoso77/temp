@@ -58,6 +58,7 @@ var programacaoDublagem_entity_1 = require("../entities/programacaoDublagem.enti
 var producaoDublagem_entity_1 = require("../entities/producaoDublagem.entity");
 var tinturaria_entity_1 = require("../entities/tinturaria.entity");
 var estoque_entity_1 = require("../entities/estoque.entity");
+var programacao_entity_1 = require("../entities/programacao.entity");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -68,6 +69,16 @@ var OutController = /** @class */ (function () {
                 sql = "\n    SELECT \n\t    e.idProduto,\n\t    e.idCor,\n\t    p.tipoProduto,\n\t    e.idPessoa_fornecedor,\n\t    ROUND(SUM(e.qtd),2) AS totalQtd\n    FROM estoques e\n    INNER JOIN produtos p ON p.idProduto = e.idProduto\n    LEFT JOIN cores c ON c.idCor = e.idCor\n    INNER JOIN pessoas pf ON pf.idPessoa = e.idPessoa_fornecedor\n    WHERE\n      (? IS NULL OR e.idProduto = ?) AND\n      (? IS NULL OR e.idCor = ?) AND\n      (? IS NULL OR p.tipoProduto = ?) AND\n      (? IS NULL OR e.idPessoa_fornecedor = ?)\n    GROUP BY\n\t    e.idProduto,\n\t    e.idCor,\n\t    e.idPessoa_fornecedor\n    HAVING\n      (? IS NULL OR ROUND(SUM(e.qtd),2) ".concat(operador, " ?)\n    ORDER BY\n      e.idProduto ASC\n    ;\n    ");
                 params = [idProduto, idProduto, idCor, idCor, tipoProduto, tipoProduto, idFornecedor, idFornecedor, qtdComparar, qtdComparar, operador];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(estoque_entity_1.default).query(sql, params)];
+            });
+        });
+    };
+    OutController.prototype.programacaoTinturaria = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var sql, params;
+            return __generator(this, function (_a) {
+                sql = "\n      SELECT \n          prg.idProgramacao,\n          prg.notaFiscal,\n          prg.dataProgramacao,\n          prg.msg,\n          tin.idTinturaria AS romaneio,\n          pc.nome AS cliente,\n          pf.nome AS tinturaria,\n          JSON_ARRAYAGG(\n              JSON_OBJECT(\n                  'produto', pro.nome,\n                  'cor', c.nome,\n                  'peso', ROUND(det.peso, 2),\n                  'largura', ROUND(det.largura,2),\n                  'gm2', ROUND(det.gm2,2 ),\n                  'qtdPecas', ROUND(det.qtdPeca,0)\n              )\n          ) AS pecas\n      FROM \n          programacoes prg\n      INNER JOIN \n          tinturarias tin ON tin.idTinturaria = prg.idTinturaria\n      INNER JOIN \n          pessoas pc ON pc.idPessoa = prg.idPessoa_cliente\n      INNER JOIN \n          pessoas pf ON pf.idPessoa = tin.idPessoa_fornecedor\n      INNER JOIN \n          detalheprogramacoes det ON det.idProgramacao = prg.idProgramacao\n      INNER JOIN \n          produtos pro ON pro.idProduto = det.idProduto\n      INNER JOIN \n          cores c ON c.idCor = det.idCor\n      WHERE \n          prg.idProgramacao = ?\n      GROUP BY \n          prg.idProgramacao, prg.notaFiscal, prg.dataProgramacao, prg.msg, tin.idTinturaria\n      ORDER BY \n          MIN(pro.nome) ASC;\n    ";
+                params = [id];
+                return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacao_entity_1.default).query(sql, params)];
             });
         });
     };
@@ -274,6 +285,13 @@ var OutController = /** @class */ (function () {
         __metadata("design:paramtypes", [Number, Number, Number, Number, String, Number]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "produtosEmEstoque", null);
+    __decorate([
+        (0, common_1.Post)("programacaoTinturaria"),
+        __param(0, (0, common_1.Body)("id")),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Number]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "programacaoTinturaria", null);
     __decorate([
         (0, common_1.Post)("pedidosFechados"),
         __param(0, (0, common_1.Body)("id")),

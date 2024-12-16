@@ -183,7 +183,7 @@ export const ConsultaEstoque = () => {
     <div>
       <Paper variant="outlined" sx={{ padding: 0.5, m: 0.25 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: 0, mr: -5, mb: -5 }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>

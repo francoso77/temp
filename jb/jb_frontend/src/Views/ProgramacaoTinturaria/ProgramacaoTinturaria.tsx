@@ -163,7 +163,7 @@ export default function ProgramacaoTinturaria() {
           idProgramacao: id,
         },
       });
-    let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataProgramacao);
+    let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataProgramacao)
     return {
       ...rs[0],
       dataProgramacao: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
@@ -325,6 +325,11 @@ export default function ProgramacaoTinturaria() {
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       });
+
+    if (Number(rsSomatorio.total) === Number(rsSomatorioTinturaria.total) &&
+      Number(rsSomatorio.totalQtd) === Number(rsSomatorioTinturaria.totalQtd)) {
+      setHeadTableStatus(!headTableStatus)
+    }
   }
 
   const AtualizaSomatorio = (rs: ProgramacaoInterface) => {
@@ -403,17 +408,6 @@ export default function ProgramacaoTinturaria() {
     }
   }
 
-  const restaSaldo = () => {
-    let saldoFinal: number = 0
-    rsRomaneio.forEach((romaneio) => {
-      saldoFinal = saldoFinal + romaneio.saldo
-    })
-
-    if (saldoFinal <= 0) {
-      setHeadTableStatus(true)
-    }
-  }
-
   const BuscarItensRomaneio = async (romaneio: number) => {
     const tmpRomaneio: Array<any> = await clsCrud.consultar({
       entidade: 'ProducaoMalharia',
@@ -489,7 +483,6 @@ export default function ProgramacaoTinturaria() {
             </Grid>
             <Grid item xs={12}>
               <DataTable
-                backgroundColorHead={headTableStatus ? "green" : "red"}
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
                 acoes={[
@@ -592,6 +585,7 @@ export default function ProgramacaoTinturaria() {
             </Grid>
             <Grid item xs={12} md={5} sx={{ mt: 2 }}>
               <DataTable
+                backgroundColorHead={!headTableStatus ? "red" : "green"}
                 cabecalho={cabecalhoRomaneio}
                 dados={rsRomaneio}
                 acoes={[]}
@@ -606,6 +600,9 @@ export default function ProgramacaoTinturaria() {
                 setRsSomatorio={setRsSomatorio}
                 rsRomaneio={rsRomaneio}
                 setRsRomaneio={setRsRomaneio}
+                setHeadTableStatus={setHeadTableStatus}
+                headTableStatus={headTableStatus}
+                rsSomatorioTinturaria={rsSomatorioTinturaria}
               />
             </Grid>
             <Grid item xs={6} md={2} sx={{ mt: 2, pl: { md: 1 } }}>

@@ -21,6 +21,14 @@ type Peca = {
   composisao: Composicao[];
 };
 
+type PecaProgramacaoTnturaria = {
+  produto: string;
+  cor: string;
+  peso: number;
+  largura: number;
+  gm2: number;
+  qtdPecas: number;
+};
 interface DadosPedidos {
   pedido: number;
   idCliente?: number;
@@ -80,6 +88,18 @@ interface DadosProgramacao {
   pecas: Array<Peca>;
 }
 
+
+interface DadosProgramacaoTinturaria {
+  idProgramacao: number;
+  dataProgramacao: string;
+  notafiscal: string;
+  msg: string;
+  romaneio: number;
+  cliente: string;
+  tinturaria: string;
+  pecas: Array<PecaProgramacaoTnturaria>;
+}
+
 class ClsRelatorioProgramacao {
   public tecidos: DadosFilter[] = [];
   public forros: Dados[] = [];
@@ -87,6 +107,7 @@ class ClsRelatorioProgramacao {
   public pedidos: DadosPedidos[] = [];
   public etiquetas: DadosEtiqueta[] = [];
   public tinturaria: DadosTinturaria[] = [];
+  public programacaoTinturaria: DadosProgramacaoTinturaria[] = [];
   public programacao: DadosProgramacao[] = [];
   public clsFormatacao = new ClsFormatacao();
   public clsApi = new ClsApi();
@@ -575,7 +596,7 @@ class ClsRelatorioProgramacao {
       // Cabeçalho do Relatório
       const addHeader = () => {
         doc.setFontSize(16);
-        doc.text("Romaneio de peças", 40, cursorY, { align: 'center' });
+        doc.text("Programação de Tingimento", 40, cursorY, { align: 'center' });
         doc.setFontSize(10);
         doc.text('Cliente: ' + item.cliente, 80, cursorY - 5);
         doc.text('Tinturaria: ' + item.tinturaria, 80, cursorY + 5);
@@ -754,6 +775,18 @@ class ClsRelatorioProgramacao {
         }
       }
     })
+  }
+
+  public renderProgramacaoTinturaria = async (id: number) => {
+    await this.clsApi.execute<Array<DadosProgramacaoTinturaria>>({
+      url: 'programacaoTinturaria',
+      method: 'post',
+      id: id,
+    }).then((res: Array<DadosProgramacaoTinturaria>) => {
+      this.programacaoTinturaria = res
+    })
+
+    this.gerarProgramacaoTintuaria()
   }
 
   public renderTintuaria = async (ids: Array<number>) => {

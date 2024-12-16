@@ -7,6 +7,7 @@ import ProgramacaoDublagem from '../entities/programacaoDublagem.entity'
 import ProducaoDublagem from '../entities/producaoDublagem.entity'
 import Tinturaria from '../entities/tinturaria.entity'
 import Estoque from '../entities/estoque.entity'
+import Programacao from '../entities/programacao.entity'
 
 @Controller()
 export class OutController {
@@ -49,6 +50,55 @@ export class OutController {
     `
     const params = [idProduto, idProduto, idCor, idCor, tipoProduto, tipoProduto, idFornecedor, idFornecedor, qtdComparar, qtdComparar, operador]
     return AppDataSource.getRepository(Estoque).query(sql, params)
+  }
+
+  @Post("programacaoTinturaria")
+  async programacaoTinturaria(
+    @Body("id") id: number,
+  ): Promise<Array<Programacao>> {
+
+    const sql = `
+      SELECT 
+          prg.idProgramacao,
+          prg.notaFiscal,
+          prg.dataProgramacao,
+          prg.msg,
+          tin.idTinturaria AS romaneio,
+          pc.nome AS cliente,
+          pf.nome AS tinturaria,
+          JSON_ARRAYAGG(
+              JSON_OBJECT(
+                  'produto', pro.nome,
+                  'cor', c.nome,
+                  'peso', ROUND(det.peso, 2),
+                  'largura', ROUND(det.largura,2),
+                  'gm2', ROUND(det.gm2,2 ),
+                  'qtdPecas', ROUND(det.qtdPeca,0)
+              )
+          ) AS pecas
+      FROM 
+          programacoes prg
+      INNER JOIN 
+          tinturarias tin ON tin.idTinturaria = prg.idTinturaria
+      INNER JOIN 
+          pessoas pc ON pc.idPessoa = prg.idPessoa_cliente
+      INNER JOIN 
+          pessoas pf ON pf.idPessoa = tin.idPessoa_fornecedor
+      INNER JOIN 
+          detalheprogramacoes det ON det.idProgramacao = prg.idProgramacao
+      INNER JOIN 
+          produtos pro ON pro.idProduto = det.idProduto
+      INNER JOIN 
+          cores c ON c.idCor = det.idCor
+      WHERE 
+          prg.idProgramacao = ?
+      GROUP BY 
+          prg.idProgramacao, prg.notaFiscal, prg.dataProgramacao, prg.msg, tin.idTinturaria
+      ORDER BY 
+          MIN(pro.nome) ASC;
+    `
+    const params = [id]
+    return AppDataSource.getRepository(Programacao).query(sql, params)
   }
 
 

@@ -26,11 +26,23 @@ interface PropsInterface {
   masterLocalState: ActionInterface,
   setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioProgramacaoInterface>>,
   rsRomaneio: RomaneioInterface[],
-  setRsRomaneio: React.Dispatch<React.SetStateAction<RomaneioInterface[]>>
+  setRsRomaneio: React.Dispatch<React.SetStateAction<RomaneioInterface[]>>,
+  setHeadTableStatus: React.Dispatch<React.SetStateAction<boolean>>,
+  headTableStatus: boolean,
+  rsSomatorioTinturaria: SomatorioProgramacaoInterface
 }
 
 
-export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalState, setRsSomatorio, rsRomaneio, setRsRomaneio }: PropsInterface) {
+export default function DetalheProgramacao({
+  rsMaster,
+  setRsMaster,
+  masterLocalState,
+  setRsSomatorio,
+  rsRomaneio,
+  setRsRomaneio,
+  setHeadTableStatus,
+  headTableStatus,
+  rsSomatorioTinturaria }: PropsInterface) {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -130,6 +142,8 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
     setIndiceEdicao(indice)
     setDetalheProgramacao(rs)
     setOpen(true)
+    setHeadTableStatus(false)
+
   }
 
   const onExcluir = (rs: DetalheProgramacaoInterface) => {
@@ -143,6 +157,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
     setRsMaster({ ...rsMaster, detalheProgramacoes: tmpDetalhe })
     AtualizaSomatorio(tmpDetalhe)
     AtualizaSaldoRomaneio(tmpDetalhe)
+    setHeadTableStatus(false)
   }
 
   const btIncluir = () => {
@@ -283,7 +298,6 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
       setOpen(false)
       AtualizaSomatorio(tmpDetalhe)
       AtualizaSaldoRomaneio(tmpDetalhe)
-
     }
   }
 
@@ -297,6 +311,14 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
         totalQtd = totalQtd + detalhe.qtdPeca
         total = total + detalhe.peso
       })
+
+      //Testa a cor da tabela de acordo com a quantidade de peças e peso
+
+      if (total === Number(rsSomatorioTinturaria.total) &&
+        totalQtd === Number(rsSomatorioTinturaria.totalQtd)) {
+        setHeadTableStatus(!headTableStatus)
+      }
+
       setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
     }
   }
@@ -330,6 +352,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
     })
     setRsRomaneio([...rsRomaneio])
   }
+
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
@@ -532,7 +555,7 @@ export default function DetalheProgramacao({ rsMaster, setRsMaster, masterLocalS
         <DataTable
           backgroundColorHead='#d8961c'
           cabecalho={cabecalhoForm}
-          dados={rsMaster.detalheProgramacoes}
+          dados={rsMaster.detalheProgramacoes.sort((a: DetalheProgramacaoInterface, b: DetalheProgramacaoInterface) => a.produto.nome.localeCompare(b.produto.nome))}
           exibirPaginacao={false}
           acoes={
             [
