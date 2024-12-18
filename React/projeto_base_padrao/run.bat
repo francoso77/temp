@@ -1,7 +1,7 @@
 @echo off
 cls
 
-cd C:\temp\React\base
+cd C:\temp\React\projeto_base_padrao
 
 start cmd /k npm run start
 

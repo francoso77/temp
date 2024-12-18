@@ -1,7 +1,7 @@
 import { AppDataSource } from '../data-source'
+import { GrupoPermissao } from '../entities/sistema/grupoPermissao.entity'
 import { Modulo } from '../entities/sistema/modulo.entity'
 import { ModuloPermissao } from '../entities/sistema/moduloPermissao.entity'
-import { UsuarioPermissao } from '../entities/sistema/usuarioPermissao.entity'
 
 const SQL_PERMISSAO: string = `
     SELECT grpe.idModuloPermissao FROM gruposusuarios AS grus
@@ -19,9 +19,8 @@ export default class ClsAcesso {
     if (idUsuario && idUsuario > 0) {
 
       const idModuloPermissao = await this.pesquisarIdModuloPermissao(modulo, permissao)
-      const usuariosPermissoes = await this.pesquisarUsuariosPermissoes(idUsuario, idModuloPermissao)
       const rsPermissao = await AppDataSource.query(SQL_PERMISSAO, [idUsuario, idModuloPermissao, idUsuario, idModuloPermissao])
-      if (rsPermissao && rsPermissao.length > 0 && usuariosPermissoes > 0) {
+      if (rsPermissao && rsPermissao.length > 0 ) {
         return true
       } else {
         return false
@@ -39,8 +38,18 @@ export default class ClsAcesso {
     if (rsModuloPermissao && rsModuloPermissao.idModuloPermissao) {
       return rsModuloPermissao.idModuloPermissao
     } else {
-      return AppDataSource.getRepository(ModuloPermissao).save({ idModulo: idModulo, permissao: permissao }).then(rsModuloPermissao_1 => {
-        return rsModuloPermissao_1.idModuloPermissao
+      return AppDataSource.getRepository(ModuloPermissao).save({ idModulo: idModulo, permissao: permissao }).then(moduloPermissao => {
+        
+        if (process.env.ID_GRUPO_ADMINISTRADOR) {
+          return AppDataSource.getRepository(GrupoPermissao).save({ 
+            idGrupo: parseInt(process.env.ID_GRUPO_ADMINISTRADOR), 
+            idModuloPermissao: moduloPermissao.idModuloPermissao
+          }).then(() => {
+            return moduloPermissao.idModuloPermissao
+          })
+        } else {
+          return moduloPermissao.idModuloPermissao
+        }
       })
     }
   }
@@ -50,19 +59,8 @@ export default class ClsAcesso {
     if (rsModulo && rsModulo.idModulo) {
       return rsModulo.idModulo
     } else {
-      return AppDataSource.getRepository(Modulo).save({ modulo: modulo }).then(rsModulo_1 => {
-        return rsModulo_1.idModulo
-      })
-    }
-  }
-
-  private async pesquisarUsuariosPermissoes(idUsuario: number, idModuloPermissao: number): Promise<number> {
-    const rsUsuariosPermissoes = await AppDataSource.getRepository(UsuarioPermissao).findOne({ where: { idModuloPermissao: idModuloPermissao, idUsuario: idUsuario } })
-    if (rsUsuariosPermissoes && rsUsuariosPermissoes.idModuloPermissao) {
-      return rsUsuariosPermissoes.idUsuarioPermissao
-    } else {
-      return AppDataSource.getRepository(UsuarioPermissao).save({ idModuloPermissao: idModuloPermissao, idUsuario: idUsuario }).then(temUsuarioPermissao => {
-        return temUsuarioPermissao.idUsuarioPermissao
+      return AppDataSource.getRepository(Modulo).save({ modulo: modulo }).then(modulo => {
+        return modulo.idModulo
       })
     }
   }

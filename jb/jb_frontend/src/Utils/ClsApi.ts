@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig } from "axios";
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState';
 import { URL_BACKEND } from './Servidor';
 import { GraficoType } from '../types/graficoTypes';
+import { GlobalContext, GlobalContextInterface } from "../ContextoGlobal/ContextoGlobal";
+import { useContext } from "react";
 
 interface PropsInterface {
   method: 'get' | 'post' | 'put' | 'delete'
@@ -31,9 +33,16 @@ interface PropsInterface {
   idFornecedor?: number | null
   operador?: string | null
   qtdComparar?: number | null
+  token?: string
 }
 
 export default class ClsApi {
+
+  // constructor(
+  //   private readonly UsuarioState: UsuarioStateInterface
+  // ){
+  //   console.log('token', this.UsuarioState.token)
+  // }
 
   private static defaultConfig: AxiosRequestConfig = {
     maxBodyLength: Infinity,
@@ -107,7 +116,8 @@ export default class ClsApi {
     tipoProduto,
     idFornecedor,
     operador,
-    qtdComparar
+    qtdComparar,
+    token
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
@@ -132,7 +142,8 @@ export default class ClsApi {
       tipoProduto,
       idFornecedor,
       operador,
-      qtdComparar
+      qtdComparar,
+      token
     };
 
     if (setMensagemState) {
@@ -147,6 +158,13 @@ export default class ClsApi {
     }
 
     try {
+     
+      if (token) {
+        ClsApi.defaultConfig.headers = {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        }
+      }
       const response = await axios[method]<T>(
         `${URL_BACKEND}/${url}`,
         requestData,

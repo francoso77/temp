@@ -15,11 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginUsuarioController = void 0;
 var common_1 = require("@nestjs/common");
 var loginUsuario_controller_cls_1 = require("../services/loginUsuario.controller.cls");
+var sessao_service_1 = require("../auth/services/sessao.service");
 var LoginUsuarioController = /** @class */ (function () {
-    function LoginUsuarioController() {
+    function LoginUsuarioController(
+    // Atribuindo a sessão com o usuário logado,
+    sessao) {
+        this.sessao = sessao;
+        //console.log('Controller de Login e Permissões do Usuário....')
     }
+    //verifica o cpf e senha no login
     LoginUsuarioController.prototype.loginUsuario = function (cpf, senha) {
         return new loginUsuario_controller_cls_1.default().logar(cpf, senha);
+    };
+    //verfica quais as permissoes do usuario logado
+    LoginUsuarioController.prototype.permissoesUsuario = function () {
+        if (this.sessao.usuarioSessao) {
+            return new loginUsuario_controller_cls_1.default().permissoesUsuario(this.sessao.usuarioSessao);
+        }
+        else {
+            return Promise.reject(null);
+        }
     };
     __decorate([
         (0, common_1.Post)('loginUsuario'),
@@ -29,8 +44,15 @@ var LoginUsuarioController = /** @class */ (function () {
         __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
     ], LoginUsuarioController.prototype, "loginUsuario", null);
+    __decorate([
+        (0, common_1.Post)('permissoesUsuario'),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", []),
+        __metadata("design:returntype", Promise)
+    ], LoginUsuarioController.prototype, "permissoesUsuario", null);
     LoginUsuarioController = __decorate([
-        (0, common_1.Controller)()
+        (0, common_1.Controller)(),
+        __metadata("design:paramtypes", [sessao_service_1.SessaoService])
     ], LoginUsuarioController);
     return LoginUsuarioController;
 }());

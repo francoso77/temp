@@ -37,38 +37,35 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var data_source_1 = require("../data-source");
+var grupoPermissao_entity_1 = require("../entities/sistema/grupoPermissao.entity");
 var modulo_entity_1 = require("../entities/sistema/modulo.entity");
 var moduloPermissao_entity_1 = require("../entities/sistema/moduloPermissao.entity");
-var usuarioPermissao_entity_1 = require("../entities/sistema/usuarioPermissao.entity");
 var SQL_PERMISSAO = "\n    SELECT grpe.idModuloPermissao FROM gruposusuarios AS grus\n    INNER JOIN grupospermissoes AS grpe\n    ON grus.idGrupo = grpe.idGrupo\n    WHERE grus.idUsuario = ? AND grpe.idModuloPermissao = ?\n    UNION ALL\n    SELECT uspe.idModuloPermissao FROM usuariospermissoes AS uspe\n    WHERE uspe.idUsuario = ? AND uspe.idModuloPermissao = ?;\n";
 var ClsAcesso = /** @class */ (function () {
     function ClsAcesso() {
     }
     ClsAcesso.prototype.checarAcesso = function (idUsuario, modulo, permissao) {
         return __awaiter(this, void 0, void 0, function () {
-            var idModuloPermissao, usuariosPermissoes, rsPermissao;
+            var idModuloPermissao, rsPermissao;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!(idUsuario && idUsuario > 0)) return [3 /*break*/, 4];
+                        if (!(idUsuario && idUsuario > 0)) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.pesquisarIdModuloPermissao(modulo, permissao)];
                     case 1:
                         idModuloPermissao = _a.sent();
-                        return [4 /*yield*/, this.pesquisarUsuariosPermissoes(idUsuario, idModuloPermissao)];
-                    case 2:
-                        usuariosPermissoes = _a.sent();
                         return [4 /*yield*/, data_source_1.AppDataSource.query(SQL_PERMISSAO, [idUsuario, idModuloPermissao, idUsuario, idModuloPermissao])];
-                    case 3:
+                    case 2:
                         rsPermissao = _a.sent();
-                        if (rsPermissao && rsPermissao.length > 0 && usuariosPermissoes > 0) {
+                        if (rsPermissao && rsPermissao.length > 0) {
                             return [2 /*return*/, true];
                         }
                         else {
                             return [2 /*return*/, false];
                         }
-                        return [3 /*break*/, 5];
-                    case 4: return [2 /*return*/, Promise.resolve(false)];
-                    case 5: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 3: return [2 /*return*/, Promise.resolve(false)];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -88,8 +85,18 @@ var ClsAcesso = /** @class */ (function () {
                             return [2 /*return*/, rsModuloPermissao.idModuloPermissao];
                         }
                         else {
-                            return [2 /*return*/, data_source_1.AppDataSource.getRepository(moduloPermissao_entity_1.ModuloPermissao).save({ idModulo: idModulo, permissao: permissao }).then(function (rsModuloPermissao_1) {
-                                    return rsModuloPermissao_1.idModuloPermissao;
+                            return [2 /*return*/, data_source_1.AppDataSource.getRepository(moduloPermissao_entity_1.ModuloPermissao).save({ idModulo: idModulo, permissao: permissao }).then(function (moduloPermissao) {
+                                    if (process.env.ID_GRUPO_ADMINISTRADOR) {
+                                        return data_source_1.AppDataSource.getRepository(grupoPermissao_entity_1.GrupoPermissao).save({
+                                            idGrupo: parseInt(process.env.ID_GRUPO_ADMINISTRADOR),
+                                            idModuloPermissao: moduloPermissao.idModuloPermissao
+                                        }).then(function () {
+                                            return moduloPermissao.idModuloPermissao;
+                                        });
+                                    }
+                                    else {
+                                        return moduloPermissao.idModuloPermissao;
+                                    }
                                 })];
                         }
                         return [2 /*return*/];
@@ -109,29 +116,8 @@ var ClsAcesso = /** @class */ (function () {
                             return [2 /*return*/, rsModulo.idModulo];
                         }
                         else {
-                            return [2 /*return*/, data_source_1.AppDataSource.getRepository(modulo_entity_1.Modulo).save({ modulo: modulo }).then(function (rsModulo_1) {
-                                    return rsModulo_1.idModulo;
-                                })];
-                        }
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    ClsAcesso.prototype.pesquisarUsuariosPermissoes = function (idUsuario, idModuloPermissao) {
-        return __awaiter(this, void 0, void 0, function () {
-            var rsUsuariosPermissoes;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuarioPermissao_entity_1.UsuarioPermissao).findOne({ where: { idModuloPermissao: idModuloPermissao, idUsuario: idUsuario } })];
-                    case 1:
-                        rsUsuariosPermissoes = _a.sent();
-                        if (rsUsuariosPermissoes && rsUsuariosPermissoes.idModuloPermissao) {
-                            return [2 /*return*/, rsUsuariosPermissoes.idUsuarioPermissao];
-                        }
-                        else {
-                            return [2 /*return*/, data_source_1.AppDataSource.getRepository(usuarioPermissao_entity_1.UsuarioPermissao).save({ idModuloPermissao: idModuloPermissao, idUsuario: idUsuario }).then(function (temUsuarioPermissao) {
-                                    return temUsuarioPermissao.idUsuarioPermissao;
+                            return [2 /*return*/, data_source_1.AppDataSource.getRepository(modulo_entity_1.Modulo).save({ modulo: modulo }).then(function (modulo) {
+                                    return modulo.idModulo;
                                 })];
                         }
                         return [2 /*return*/];

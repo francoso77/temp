@@ -12,10 +12,10 @@ export default function Login() {
 
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState({ cpf: '', senha: '' })
-  const clsApi = new ClsApi()
   const clsValidacao: ClsValidacao = new ClsValidacao()
   const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
+  const clsApi = new ClsApi()
   const navegar = useNavigate()
 
 
@@ -62,7 +62,30 @@ export default function Login() {
                         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             })
 
-            navegar("/")
+            console.log('usuario', idUsuario)
+            
+            clsApi.execute<any>({
+              url: 'permissoesUsuario',
+              token: token,
+              method: 'post',
+              mensagem: 'Buscando permissões do usuário...',
+              setMensagemState: setMensagemState
+            }).then((rsPermissoes) => {
+              console.log('permissoes', rsPermissoes)
+              navegar("/")
+
+            }).catch(() => {
+              setMensagemState({
+                ...mensagemState,
+                exibir: true,
+                tipo: MensagemTipo.Error,
+                titulo: 'Erro de conexão',
+                mensagem: 'Não foi possível conectar ao servidor.',
+                exibirBotao: true
+              })
+              navegar("/login")
+            })
+
 
           } else {
             setMensagemState({

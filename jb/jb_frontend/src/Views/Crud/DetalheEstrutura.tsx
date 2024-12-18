@@ -248,13 +248,9 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      await BuscarDados();
-      pegaTipo();
-    };
-
-    fetchData();
-  }, [BuscarDados, pegaTipo])
+    BuscarDados()
+    pegaTipo()
+  }, [])
 
 
   const theme = useTheme()

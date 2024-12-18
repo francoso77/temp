@@ -3,6 +3,32 @@ import { Usuario } from '../entities/sistema/usuario.entity';
 import { UsuarioSessao } from '../entities/sistema/usuarioSessao.entity';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { PermissoesTypeInterface, PermissoesTypes } from '../types/permissoesTypes';
+
+
+interface rsSqlPermissaoPorUsuario {
+  modulo: string
+  permissao: string
+}
+
+const SQL_PERMISSAO_POR_USUARIO = `
+    SELECT m.modulo, mp.permissao FROM modulospermissoes AS mp 
+
+    INNER JOIN modulos AS m
+    ON mp.idModulo = m.idModulo
+
+    INNER JOIN 
+    (
+    SELECT grpe.idModuloPermissao FROM gruposusuarios AS grus
+    INNER JOIN grupospermissoes AS grpe
+    ON grus.idGrupo = grpe.idGrupo
+    WHERE grus.idUsuario = ?
+    UNION ALL
+    SELECT uspe.idModuloPermissao FROM usuariospermissoes AS uspe
+    WHERE uspe.idUsuario = ?
+    ) AS permissoes
+    ON mp.idModuloPermissao = permissoes.idModuloPermissao
+`
 
 export default class ClsLoginUsuarioController {
   public async logar(cpf: string, senha: string): Promise<RespostaPadraoInterface<string>> {
@@ -71,4 +97,32 @@ export default class ClsLoginUsuarioController {
     }
   }
 
+  public async permissoesUsuario(idUsuario: number): Promise<PermissoesTypeInterface> {
+
+    return AppDataSource.query<Array<rsSqlPermissaoPorUsuario>>(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then((rsPermissoes) => {
+
+      let retorno = JSON.parse(JSON.stringify(PermissoesTypes))
+
+      Object.keys(PermissoesTypes).forEach((keyModulo) => {
+
+        const modulo = PermissoesTypes[keyModulo].MODULO;
+
+        Object.keys(PermissoesTypes[keyModulo].PERMISSOES).forEach((keyPermissao) => {
+
+          const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
+
+          console.log(modulo, permissao);
+
+          if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
+            retorno[keyModulo].PERMISSOES[keyPermissao] = ''
+          }
+
+        })
+
+      })
+
+      return retorno
+    })
+
+  }
 }

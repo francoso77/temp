@@ -40,6 +40,8 @@ var data_source_1 = require("../data-source");
 var usuario_entity_1 = require("../entities/sistema/usuario.entity");
 var usuarioSessao_entity_1 = require("../entities/sistema/usuarioSessao.entity");
 var uuid_1 = require("uuid");
+var permissoesTypes_1 = require("../types/permissoesTypes");
+var SQL_PERMISSAO_POR_USUARIO = "\n    SELECT m.modulo, mp.permissao FROM modulospermissoes AS mp \n\n    INNER JOIN modulos AS m\n    ON mp.idModulo = m.idModulo\n\n    INNER JOIN \n    (\n    SELECT grpe.idModuloPermissao FROM gruposusuarios AS grus\n    INNER JOIN grupospermissoes AS grpe\n    ON grus.idGrupo = grpe.idGrupo\n    WHERE grus.idUsuario = ?\n    UNION ALL\n    SELECT uspe.idModuloPermissao FROM usuariospermissoes AS uspe\n    WHERE uspe.idUsuario = ?\n    ) AS permissoes\n    ON mp.idModuloPermissao = permissoes.idModuloPermissao\n";
 var ClsLoginUsuarioController = /** @class */ (function () {
     function ClsLoginUsuarioController() {
     }
@@ -116,6 +118,26 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                         return [2 /*return*/, true];
                     case 3: return [2 /*return*/, false];
                 }
+            });
+        });
+    };
+    ClsLoginUsuarioController.prototype.permissoesUsuario = function (idUsuario) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, data_source_1.AppDataSource.query(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then(function (rsPermissoes) {
+                        var retorno = JSON.parse(JSON.stringify(permissoesTypes_1.PermissoesTypes));
+                        Object.keys(permissoesTypes_1.PermissoesTypes).forEach(function (keyModulo) {
+                            var modulo = permissoesTypes_1.PermissoesTypes[keyModulo].MODULO;
+                            Object.keys(permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES).forEach(function (keyPermissao) {
+                                var permissao = permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
+                                console.log(modulo, permissao);
+                                if (rsPermissoes.findIndex(function (rs) { return rs.modulo === modulo && rs.permissao === permissao; }) < 0) {
+                                    retorno[keyModulo].PERMISSOES[keyPermissao] = '';
+                                }
+                            });
+                        });
+                        return retorno;
+                    })];
             });
         });
     };
