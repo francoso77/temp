@@ -20,11 +20,9 @@ import ClsApi from '../../Utils/ClsApi';
 import { ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
 import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
 import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
-import { TipoProdutoType } from '../../types/tipoProdutoypes';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
@@ -94,8 +92,7 @@ export default function ProducaoDublagem() {
     total: '',
   }
 
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -380,7 +377,7 @@ export default function ProducaoDublagem() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Produção Dublagem',
       pathTitulo: '/',

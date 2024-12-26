@@ -76,8 +76,7 @@ export function ProducaoMalharia() {
   const [openGraficos, setOpenGraficos] = useState(false)
   const [openPerdas, setOpenPerdas] = useState(false)
   const [erros, setErros] = useState({})
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [producaoMalharia, setProducaoMalharia] = useState<ProducaoMalhariaInterface>(ResetDados)
   const [rsDadosPeca, setRsDadosPeca] = useState<DadosPecaInterface>(ResetDadosPeca)
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
@@ -357,7 +356,7 @@ export function ProducaoMalharia() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Produção Malharia',
       pathTitulo: '/',

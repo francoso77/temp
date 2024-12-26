@@ -15,6 +15,7 @@ import { UsuarioType } from '../../types/usuarioTypes';
 
 
 
+
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 export default function HeaderMenu() {
@@ -42,7 +43,7 @@ export default function HeaderMenu() {
       navegar(layoutState.pathTituloAnterior)
       let _titulo: string = layoutState.titulo
       let _pathTitulo: string = layoutState.pathTitulo
-      setLayoutState({
+      setLayoutState({...layoutState,
         titulo: layoutState.tituloAnterior,
         pathTitulo: layoutState.pathTituloAnterior,
         tituloAnterior: _titulo,
@@ -63,7 +64,7 @@ export default function HeaderMenu() {
 
   React.useEffect(() => {
     verificarTipoUsuario()
-  }, [usuarioState])
+  }, [])
 
   return (
     <>

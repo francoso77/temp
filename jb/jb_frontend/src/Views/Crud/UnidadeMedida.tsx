@@ -31,9 +31,8 @@ export default function UnidadeMedida() {
     nome: string
   }
 
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<UnidadeMedidaInterface>>([])
   const [erros, setErros] = useState({})
   const [unidadeMedida, setUnidadeMedida] = useState<UnidadeMedidaInterface>(ResetDados)
@@ -194,7 +193,7 @@ export default function UnidadeMedida() {
   const irPara = useNavigate()
 
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Unidades Medida',
       pathTitulo: '/',

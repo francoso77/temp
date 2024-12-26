@@ -40,8 +40,7 @@ export default function Produto() {
     nome: string
   }
 
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<ProdutoInterface>>([])
   const [erros, setErros] = useState({})
@@ -290,7 +289,7 @@ export default function Produto() {
   // }
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState, 
       titulo: '',
       tituloAnterior: 'Cadastro de Produtos',
       pathTitulo: '/',
@@ -328,12 +327,8 @@ export default function Produto() {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      await BuscarDados();
-    };
-
-    fetchData();
-  }, [BuscarDados]);
+    BuscarDados()
+  }, []);
 
 
   return (

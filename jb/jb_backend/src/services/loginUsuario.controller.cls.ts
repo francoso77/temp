@@ -4,6 +4,7 @@ import { UsuarioSessao } from '../entities/sistema/usuarioSessao.entity';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { PermissoesTypeInterface, PermissoesTypes } from '../types/permissoesTypes';
+import { PermissoesInterface } from '../interfaces/sistema/SistemaModuloPermissaoInterfaces';
 
 
 interface rsSqlPermissaoPorUsuario {
@@ -101,6 +102,8 @@ export default class ClsLoginUsuarioController {
 
     return AppDataSource.query<Array<rsSqlPermissaoPorUsuario>>(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then((rsPermissoes) => {
 
+      console.log(rsPermissoes)
+      
       let retorno = JSON.parse(JSON.stringify(PermissoesTypes))
 
       Object.keys(PermissoesTypes).forEach((keyModulo) => {
@@ -111,16 +114,14 @@ export default class ClsLoginUsuarioController {
 
           const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
 
-          console.log(modulo, permissao);
+          //console.log(modulo, permissao);
 
           if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
             retorno[keyModulo].PERMISSOES[keyPermissao] = ''
           }
 
         })
-
       })
-
       return retorno
     })
 

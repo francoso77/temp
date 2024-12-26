@@ -22,7 +22,7 @@ export default function MenuFooter() {
 
   const navigate = useNavigate()
   const irPara = (url: string, titulo: string) => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       tituloAnterior: layoutState.titulo,
       pathTituloAnterior: layoutState.pathTitulo,
       titulo: titulo,

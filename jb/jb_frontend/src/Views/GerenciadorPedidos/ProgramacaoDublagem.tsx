@@ -45,7 +45,7 @@ export default function ProgramacaoDublagem() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [programacaoDublagem, setProgramacaoDublagem] = useState<ProgramacaoDublagemInterface>(resetDados)
-  const { setMensagemState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -158,7 +158,7 @@ export default function ProgramacaoDublagem() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Programação Dublagem',
       pathTitulo: '/',

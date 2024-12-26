@@ -46,8 +46,7 @@ export function Tinturaria() {
   }
 
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState, layoutState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [tinturaria, setTinturaria] = useState<TinturariaInterface>(ResetDados)
   const [erros, setErros] = useState({})
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
@@ -199,18 +198,15 @@ export function Tinturaria() {
       })
   }
 
-  const IrPara = useNavigate();
+  const irPara = useNavigate();
   const btFechar = () => {
-    setLayoutState(prevState => {
-      const newState = {
-        titulo: '',
-        tituloAnterior: 'Tinturaria',
-        pathTitulo: '/',
-        pathTituloAnterior: '/Tinturaria'
-      };
-      IrPara(newState.pathTitulo)
-      return newState
+    setLayoutState({...layoutState, 
+      titulo: '',
+      tituloAnterior: 'Tinturaria',
+      pathTitulo: '/',
+      pathTituloAnterior: '/Tinturaria'
     })
+    irPara('/')
   }
 
 

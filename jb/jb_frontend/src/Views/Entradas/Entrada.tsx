@@ -48,8 +48,7 @@ export default function Entrada() {
     total: '',
     totalQtd: ''
   }
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -365,7 +364,7 @@ export default function Entrada() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Entradas de produtos',
       pathTitulo: '/',
@@ -392,12 +391,8 @@ export default function Entrada() {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      await BuscarDados();
-    };
-
-    fetchData();
-  }, [BuscarDados]);
+    BuscarDados()
+  }, [])
 
   return (
 

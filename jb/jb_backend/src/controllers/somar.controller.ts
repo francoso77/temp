@@ -11,7 +11,7 @@ export class SomarController {
   }
 
   @Post("somar")
-  @Roles({ modulo: PermissoesTypes.TINTURARIA.MODULO, permissao: PermissoesTypes.TINTURARIA.PERMISSOES.GERAR_PDF_ROMANEIO })
+  @Roles({ modulo: PermissoesTypes.PRODUTO.MODULO, permissao: PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO })
   public somar(
     @Body("numero01") numero01: number,
     @Body("numero02") numero02: number

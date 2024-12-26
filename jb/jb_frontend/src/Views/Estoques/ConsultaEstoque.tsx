@@ -49,7 +49,7 @@ export const ConsultaEstoque = () => {
   const [rsFornecedores, setRsFornecedores] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [dados, setDados] = useState(dadosInterface)
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -156,7 +156,7 @@ export const ConsultaEstoque = () => {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Consulta Estoques de Produtos',
       pathTitulo: '/',
@@ -167,21 +167,18 @@ export const ConsultaEstoque = () => {
 
 
   useEffect(() => {
-    const fetchData = async () => {
-      await BuscarDados();
-    };
-    setLayoutState({
+      BuscarDados()
+      setLayoutState({...layoutState,
       titulo: 'Consulta Estoques de Produtos',
       tituloAnterior: '',
       pathTitulo: '/ConsultaEstoque',
       pathTituloAnterior: '/'
     })
-    fetchData();
-  }, [BuscarDados])
+  }, [])
 
   return (
     <div>
-      <Paper variant="outlined" sx={{ padding: 0.5, m: 0.25 }}>
+      <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: -5 }}>
             <IconButton onClick={() => btFechar()}>

@@ -7,13 +7,15 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsApi from '../../Utils/ClsApi';
 import Copyright from '../Layout/Copyright';
+import { PermissoesTypeInterface } from '../../types/permissoesTypes';
+import MenuCls from '../Layout/ClsMenu';
 
 export default function Login() {
 
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState({ cpf: '', senha: '' })
   const clsValidacao: ClsValidacao = new ClsValidacao()
-  const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
   const clsApi = new ClsApi()
   const navegar = useNavigate()
@@ -48,6 +50,8 @@ export default function Login() {
           if (rs.ok && rs.dados && rs.dados.length > 0) {
             const [usuario, token, tipoUsuario, idUsuario] = rs.dados.split('.')
 
+            
+
             contextGlobal.setUsuarioState({
               idUsuario: Number(idUsuario),
               usuario: usuario,
@@ -62,7 +66,9 @@ export default function Login() {
                         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             })
 
-            console.log('usuario', idUsuario)
+
+
+            //console.log('usuario', idUsuario)
             
             clsApi.execute<any>({
               url: 'permissoesUsuario',
@@ -70,8 +76,14 @@ export default function Login() {
               method: 'post',
               mensagem: 'Buscando permissões do usuário...',
               setMensagemState: setMensagemState
-            }).then((rsPermissoes) => {
+            }).then((rsPermissoes: PermissoesTypeInterface) => {
               console.log('permissoes', rsPermissoes)
+
+              const clsMenu = new MenuCls()
+
+              setLayoutState( { ...layoutState, opcoesMenu: clsMenu.Menu } )
+  
+              console.log('Menu',clsMenu.Menu)
               navegar("/")
 
             }).catch(() => {

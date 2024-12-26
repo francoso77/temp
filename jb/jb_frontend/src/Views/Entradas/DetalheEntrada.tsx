@@ -367,12 +367,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      await BuscarDados();
-    };
-
-    fetchData();
-  }, [BuscarDados]);
+    BuscarDados()
+  }, [])
 
 
   const theme = useTheme()

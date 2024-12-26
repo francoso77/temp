@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { EstruturaMenuInterface } from '../app/Layout/MenuCls'
+import { MenuOpcoesInterface } from "../app/Layout/ClsMenu"
 
 export interface LayoutStateInterface {
   titulo: string
@@ -7,7 +7,7 @@ export interface LayoutStateInterface {
   pathTitulo: string
   pathTituloAnterior: string
   exibirMenu?: boolean
-  opcoesMenu?: EstruturaMenuInterface[]
+  opcoesMenu?: MenuOpcoesInterface[]
 }
 
 export default function useLayoutState() {

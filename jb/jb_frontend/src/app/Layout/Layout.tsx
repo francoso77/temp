@@ -13,6 +13,7 @@ import HeaderMenu from './HeaderMenu';
 import MenuFooter from './MenuFooter';
 import Login from '../Login/Login';
 import styled from 'styled-components';
+import Menu from './Menu';
 
 const VideoBackground = styled('video')({
   position: 'fixed',
@@ -24,10 +25,10 @@ const VideoBackground = styled('video')({
   zIndex: -1,
 
   // Adiciona responsividade para dispositivos menores
-  '@media (max-width: 768px)': {
-    objectFit: 'contain', // Ajusta a escala para evitar cortes no vídeo
-    height: 'auto', // Permite que o vídeo mantenha proporções corretas
-  },
+  //'@media (max-width: 768px)': {
+  //  objectFit: 'contain', // Ajusta a escala para evitar cortes no vídeo
+  //  height: 'auto', // Permite que o vídeo mantenha proporções corretas
+  //},
 })
 
 function Layout() {
@@ -77,6 +78,7 @@ function Layout() {
             />
             <Condicional condicao={usuarioState.logado}>
               < HeaderMenu />
+              <Menu />
             </Condicional>
 
             <Condicional condicao={(!usuarioState.logado && rotaLivre) || usuarioState.logado}>

@@ -1,14 +1,14 @@
 import { Collapse, Divider, Icon, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { EstruturaMenuInterface } from './MenuCls'
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { GlobalContext, GlobalContextInterface } from "../../ContextoGlobal/ContextoGlobal";
+import { MenuOpcoesInterface } from './ClsMenu';
 
 
 interface PropsInterface {
-  menu: EstruturaMenuInterface,
+  menu: MenuOpcoesInterface,
   deslocamento: number
 }
 
@@ -25,14 +25,14 @@ export default function MenuItem({ menu, deslocamento }: PropsInterface) {
     setOpenSubMenu(!openSubMenu)
   }
 
-  const irPara = (url: string) => {
+  const irPara = (url: string, titulo: string) => {
     navigate(url)
-    setLayoutState({ ...layoutState, exibirMenu: false })
+    setLayoutState({ ...layoutState, exibirMenu: false, titulo: titulo })
   }
 
   if (menu.filhos.length === 0) {
     return (
-      <ListItemButton onClick={() => irPara(menu.path)}>
+      <ListItemButton onClick={() => irPara(menu.path, menu.descricao)}>
         <ListItemIcon>
           <Icon sx={{ textAlign: 'center', marginLeft: deslocamento }}>{menu.icon}</Icon>
         </ListItemIcon>

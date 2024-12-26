@@ -125,12 +125,13 @@ var ClsLoginUsuarioController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, data_source_1.AppDataSource.query(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then(function (rsPermissoes) {
+                        console.log(rsPermissoes);
                         var retorno = JSON.parse(JSON.stringify(permissoesTypes_1.PermissoesTypes));
                         Object.keys(permissoesTypes_1.PermissoesTypes).forEach(function (keyModulo) {
                             var modulo = permissoesTypes_1.PermissoesTypes[keyModulo].MODULO;
                             Object.keys(permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES).forEach(function (keyPermissao) {
                                 var permissao = permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
-                                console.log(modulo, permissao);
+                                //console.log(modulo, permissao);
                                 if (rsPermissoes.findIndex(function (rs) { return rs.modulo === modulo && rs.permissao === permissao; }) < 0) {
                                     retorno[keyModulo].PERMISSOES[keyPermissao] = '';
                                 }

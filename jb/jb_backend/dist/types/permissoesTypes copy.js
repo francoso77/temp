@@ -115,4 +115,4 @@ exports.PermissoesTypes = {
         }
     }
 };
-//# sourceMappingURL=permissoesTypes.js.map
+//# sourceMappingURL=permissoesTypes%20copy.js.map

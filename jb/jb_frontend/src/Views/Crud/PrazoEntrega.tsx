@@ -31,9 +31,8 @@ export default function PrazoEntrega() {
     nome: string
   }
 
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const { setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<PrazoEntregaInterface>>([])
   const [erros, setErros] = useState({})
   const [prazoEntrega, setPrazoEntrega] = useState<PrazoEntregaInterface>(ResetDados)
@@ -195,7 +194,7 @@ export default function PrazoEntrega() {
   const irPara = useNavigate()
 
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Prazo de Entrega',
       pathTitulo: '/',

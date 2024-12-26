@@ -42,7 +42,7 @@ export default function Usuario() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
-  const { mensagemState, setMensagemState, usuarioState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, usuarioState, setLayoutState,layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [usuario, setUsuario] = useState<UsuarioInterface>(ResetDados)
@@ -94,7 +94,7 @@ export default function Usuario() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
+    setLayoutState({...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Usuários',
       pathTitulo: '/',
