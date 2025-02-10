@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import ClsLoginUsuarioController from '../services/loginUsuario.controller.cls';
-import { PermissoesTypeInterface } from '../types/permissoesTypes';
 import { SessaoService } from '../auth/services/sessao.service';
+import { LoginInterface } from '../interfaces/loginIterface';
 
 @Controller()
 export class LoginUsuarioController {
@@ -17,20 +17,20 @@ export class LoginUsuarioController {
   public loginUsuario(
     @Body('cpf') cpf: string,
     @Body('senha') senha: string,
-  ): Promise<RespostaPadraoInterface<string>> {
+  ): Promise<RespostaPadraoInterface<LoginInterface>> {
 
     return new ClsLoginUsuarioController().logar(cpf, senha);
   }
 
-  //verfica quais as permissoes do usuario logado
-  @Post('permissoesUsuario')
-  public permissoesUsuario(): Promise<PermissoesTypeInterface> {
-    if(this.sessao.usuarioSessao){
-      
-      return new ClsLoginUsuarioController().permissoesUsuario(this.sessao.usuarioSessao)
+  // //verfica quais as permissoes do usuario logado
+  // @Post('permissoesUsuario')
+  // public permissoesUsuario(): Promise<PermissoesTypeInterface> {
+  //   if(this.sessao.usuarioSessao){
 
-    } else{
-      return Promise.reject(null)
-    }
-  }
+  //     return new ClsLoginUsuarioController().permissoesUsuario(this.sessao.usuarioSessao)
+
+  //   } else{
+  //     return Promise.reject(null)
+  //   }
+  // }
 }

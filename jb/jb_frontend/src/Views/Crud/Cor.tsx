@@ -32,7 +32,7 @@ export default function Cor() {
     nome: string
   }
 
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<CorInterface>>([])
   const [erros, setErros] = useState({})
@@ -145,7 +145,8 @@ export default function Cor() {
                 criterio: cor,
                 localState: localState,
                 cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
+                setMensagemState: setMensagemState,
+                token: usuarioState.token
               })
                 .then((rs) => {
                   if (rs.ok) {
@@ -193,7 +194,8 @@ export default function Cor() {
   const irPara = useNavigate()
 
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Cores',
       pathTitulo: '/',

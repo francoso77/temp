@@ -27,15 +27,6 @@ var LoginUsuarioController = /** @class */ (function () {
     LoginUsuarioController.prototype.loginUsuario = function (cpf, senha) {
         return new loginUsuario_controller_cls_1.default().logar(cpf, senha);
     };
-    //verfica quais as permissoes do usuario logado
-    LoginUsuarioController.prototype.permissoesUsuario = function () {
-        if (this.sessao.usuarioSessao) {
-            return new loginUsuario_controller_cls_1.default().permissoesUsuario(this.sessao.usuarioSessao);
-        }
-        else {
-            return Promise.reject(null);
-        }
-    };
     __decorate([
         (0, common_1.Post)('loginUsuario'),
         __param(0, (0, common_1.Body)('cpf')),
@@ -44,12 +35,6 @@ var LoginUsuarioController = /** @class */ (function () {
         __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
     ], LoginUsuarioController.prototype, "loginUsuario", null);
-    __decorate([
-        (0, common_1.Post)('permissoesUsuario'),
-        __metadata("design:type", Function),
-        __metadata("design:paramtypes", []),
-        __metadata("design:returntype", Promise)
-    ], LoginUsuarioController.prototype, "permissoesUsuario", null);
     LoginUsuarioController = __decorate([
         (0, common_1.Controller)(),
         __metadata("design:paramtypes", [sessao_service_1.SessaoService])

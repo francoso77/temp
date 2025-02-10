@@ -12,6 +12,7 @@ export interface PropsInterface extends PadraoPesquisaInterface {
   msg?: string,
   cb?: null | ((res: boolean) => void),
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>,
+  token?: string
 }
 
 interface cepInterface {
@@ -164,7 +165,8 @@ export default class ClsCrud {
     criterio,
     localState,
     cb,
-    setMensagemState
+    setMensagemState,
+    token = '',
   }: PropsInterface): Promise<RespostaPadraoInterface<any>> {
     const dados: PadraoPesquisaInterface = {
       entidade: entidade,
@@ -175,6 +177,7 @@ export default class ClsCrud {
       maxBodyLength: Infinity,
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
     }
     if (setMensagemState) {

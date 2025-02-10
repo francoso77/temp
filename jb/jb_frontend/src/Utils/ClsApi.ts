@@ -2,13 +2,12 @@ import axios, { AxiosRequestConfig } from "axios";
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState';
 import { URL_BACKEND } from './Servidor';
 import { GraficoType } from '../types/graficoTypes';
-import { GlobalContext, GlobalContextInterface } from "../ContextoGlobal/ContextoGlobal";
-import { useContext } from "react";
+
 
 interface PropsInterface {
   method: 'get' | 'post' | 'put' | 'delete'
   url: string
-  dados?: Record<string, any>
+  dados?: Record<any, any>
   mensagem?: string
   itemPesquisa?: string
   campo?: 'data' | 'nome'
@@ -48,10 +47,6 @@ export default class ClsApi {
     maxBodyLength: Infinity,
     headers: {
       "Content-Type": "application/json",
-      // headers: { 
-      //   'Content-Type': 'application/json', 
-      //   'Authorization': '••••••'
-      // },
     },
   };
 
@@ -117,7 +112,7 @@ export default class ClsApi {
     idFornecedor,
     operador,
     qtdComparar,
-    token
+    token = ''
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
@@ -158,7 +153,7 @@ export default class ClsApi {
     }
 
     try {
-     
+
       if (token) {
         ClsApi.defaultConfig.headers = {
           "Content-Type": "application/json",

@@ -41,106 +41,200 @@ var usuario_entity_1 = require("../entities/sistema/usuario.entity");
 var usuarioSessao_entity_1 = require("../entities/sistema/usuarioSessao.entity");
 var uuid_1 = require("uuid");
 var permissoesTypes_1 = require("../types/permissoesTypes");
+var usuarioTypes_1 = require("../types/usuarioTypes");
+var typeorm_1 = require("typeorm");
 var SQL_PERMISSAO_POR_USUARIO = "\n    SELECT m.modulo, mp.permissao FROM modulospermissoes AS mp \n\n    INNER JOIN modulos AS m\n    ON mp.idModulo = m.idModulo\n\n    INNER JOIN \n    (\n    SELECT grpe.idModuloPermissao FROM gruposusuarios AS grus\n    INNER JOIN grupospermissoes AS grpe\n    ON grus.idGrupo = grpe.idGrupo\n    WHERE grus.idUsuario = ?\n    UNION ALL\n    SELECT uspe.idModuloPermissao FROM usuariospermissoes AS uspe\n    WHERE uspe.idUsuario = ?\n    ) AS permissoes\n    ON mp.idModuloPermissao = permissoes.idModuloPermissao\n";
 var ClsLoginUsuarioController = /** @class */ (function () {
     function ClsLoginUsuarioController() {
     }
     ClsLoginUsuarioController.prototype.logar = function (cpf, senha) {
         return __awaiter(this, void 0, void 0, function () {
-            var retorno, fechouSessoes, usuarioLogado, token;
+            var retorno;
+            var _this = this;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        retorno = {
-                            ok: false,
-                            mensagem: 'Usuário ou senha inválidos.',
-                            dados: null
-                        };
-                        return [4 /*yield*/, this.fecharSessoesEmAberto(cpf)];
-                    case 1:
-                        fechouSessoes = _a.sent();
-                        if (!fechouSessoes) {
-                            return [2 /*return*/, retorno];
+                retorno = {
+                    ok: false,
+                    mensagem: 'Usuário ou senha inválidos.',
+                    dados: {
+                        idUsuario: 0,
+                        nomeUsuario: '',
+                        tipoUsuario: usuarioTypes_1.UsuarioType.default,
+                        token: '',
+                        permissoes: permissoesTypes_1.PermissoesTypes
+                    }
+                };
+                return [2 /*return*/, this.fecharSessoesEmAberto(cpf).then(function (rsUsuarioExistente) {
+                        if (rsUsuarioExistente) {
+                            return data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario).findOne({ where: { cpf: cpf, senha: senha, tentativasLogin: (0, typeorm_1.LessThan)(4) } }).then(function (rsUsuarioLogado) {
+                                if (rsUsuarioLogado) {
+                                    var token_1 = (0, uuid_1.v4)();
+                                    return data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario).update({ idUsuario: rsUsuarioLogado.idUsuario }, { tentativasLogin: 0 }).then(function () {
+                                        return data_source_1.AppDataSource.getRepository(usuarioSessao_entity_1.UsuarioSessao).save({
+                                            idUsuario: rsUsuarioLogado.idUsuario,
+                                            ativo: true,
+                                            token: token_1
+                                        }).then(function () {
+                                            console.log('token gerado no login: ', token_1);
+                                            return _this.permissoesUsuario(rsUsuarioLogado.idUsuario).then(function (rsPermissoes) {
+                                                return {
+                                                    ok: true,
+                                                    mensagem: 'Login efetuado com sucesso.',
+                                                    dados: {
+                                                        idUsuario: rsUsuarioLogado.idUsuario,
+                                                        nomeUsuario: rsUsuarioLogado.nome,
+                                                        tipoUsuario: rsUsuarioLogado.tipoUsuario,
+                                                        token: token_1,
+                                                        permissoes: rsPermissoes
+                                                    }
+                                                };
+                                            });
+                                        });
+                                    });
+                                }
+                                else {
+                                    return data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario).update({ cpf: cpf }, { tentativasLogin: function () { return "tentativasLogin + 1"; } }).then(function () {
+                                        return retorno;
+                                    });
+                                }
+                            });
                         }
-                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario)
-                                .createQueryBuilder('usuario')
-                                .where('usuario.cpf = :cpf AND usuario.senha = :senha AND usuario.tentativasLogin < 4', { cpf: cpf, senha: senha })
-                                .getOne()];
-                    case 2:
-                        usuarioLogado = _a.sent();
-                        if (!usuarioLogado) return [3 /*break*/, 5];
-                        token = (0, uuid_1.v4)();
-                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario)
-                                .update({ idUsuario: usuarioLogado.idUsuario }, { tentativasLogin: 0 })];
-                    case 3:
-                        _a.sent();
-                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuarioSessao_entity_1.UsuarioSessao)
-                                .save({
-                                idUsuario: usuarioLogado.idUsuario,
-                                token: token,
-                                ativo: true,
-                                tipoUsuario: usuarioLogado.tipoUsuario
-                            })];
-                    case 4:
-                        _a.sent();
-                        retorno.ok = true;
-                        retorno.mensagem = 'Login efetuado com sucesso.';
-                        retorno.dados = usuarioLogado.nome +
-                            '.' + token +
-                            '.' + usuarioLogado.tipoUsuario +
-                            '.' + usuarioLogado.idUsuario;
-                        return [2 /*return*/, retorno];
-                    case 5: return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario)
-                            .update({ cpf: cpf }, { tentativasLogin: function () { return 'tentativasLogin + 1'; } })];
-                    case 6:
-                        _a.sent();
-                        return [2 /*return*/, retorno];
-                }
+                        else {
+                            return retorno;
+                        }
+                    })];
             });
         });
     };
     ClsLoginUsuarioController.prototype.fecharSessoesEmAberto = function (cpf) {
-        return __awaiter(this, void 0, void 0, function () {
-            var usuarioExistente;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario)
-                            .createQueryBuilder("usuario")
-                            .where("usuario.cpf = :cpf", { cpf: cpf })
-                            .getOne()];
-                    case 1:
-                        usuarioExistente = _a.sent();
-                        if (!usuarioExistente) return [3 /*break*/, 3];
-                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(usuarioSessao_entity_1.UsuarioSessao)
-                                .update({ idUsuario: usuarioExistente.idUsuario }, { ativo: false })];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/, true];
-                    case 3: return [2 /*return*/, false];
-                }
-            });
+        return data_source_1.AppDataSource.getRepository(usuario_entity_1.Usuario).findOne({ where: { cpf: cpf } }).then(function (rsUsuarioExistente) {
+            if (rsUsuarioExistente) {
+                return data_source_1.AppDataSource.getRepository(usuarioSessao_entity_1.UsuarioSessao).update({ idUsuario: rsUsuarioExistente.idUsuario }, { ativo: false }).then(function () {
+                    return true;
+                });
+            }
+            else {
+                return false;
+            }
         });
     };
     ClsLoginUsuarioController.prototype.permissoesUsuario = function (idUsuario) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, data_source_1.AppDataSource.query(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then(function (rsPermissoes) {
-                        console.log(rsPermissoes);
-                        var retorno = JSON.parse(JSON.stringify(permissoesTypes_1.PermissoesTypes));
-                        Object.keys(permissoesTypes_1.PermissoesTypes).forEach(function (keyModulo) {
-                            var modulo = permissoesTypes_1.PermissoesTypes[keyModulo].MODULO;
-                            Object.keys(permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES).forEach(function (keyPermissao) {
-                                var permissao = permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
-                                //console.log(modulo, permissao);
-                                if (rsPermissoes.findIndex(function (rs) { return rs.modulo === modulo && rs.permissao === permissao; }) < 0) {
-                                    retorno[keyModulo].PERMISSOES[keyPermissao] = '';
-                                }
-                            });
-                        });
-                        return retorno;
-                    })];
+        return data_source_1.AppDataSource.query(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then(function (rsPermissoes) {
+            var retorno = JSON.parse(JSON.stringify(permissoesTypes_1.PermissoesTypes));
+            Object.keys(permissoesTypes_1.PermissoesTypes).forEach(function (keyModulo) {
+                var modulo = permissoesTypes_1.PermissoesTypes[keyModulo].MODULO;
+                Object.keys(permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES).forEach(function (keyPermissao) {
+                    var permissao = permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
+                    //console.log(modulo, permissao);
+                    if (rsPermissoes.findIndex(function (rs) { return rs.modulo === modulo && rs.permissao === permissao; }) < 0) {
+                        retorno[keyModulo].PERMISSOES[keyPermissao] = '';
+                    }
+                });
             });
+            return retorno;
         });
+        /**
+        const fechouSessoes = await this.fecharSessoesEmAberto(cpf)
+        if (!fechouSessoes) {
+          return retorno
+        }
+    
+        const usuarioLogado = await AppDataSource.getRepository(Usuario)
+          .createQueryBuilder('usuario')
+          .where('usuario.cpf = :cpf AND usuario.senha = :senha AND usuario.tentativasLogin < 4', { cpf, senha })
+          .getOne()
+    
+        if (usuarioLogado) {
+    
+          console.log("usuario logado", usuarioLogado)
+          const token: string = uuidv4()
+    
+          await AppDataSource.getRepository(Usuario)
+            .update({ idUsuario: usuarioLogado.idUsuario }, { tentativasLogin: 0 })
+    
+          await AppDataSource.getRepository(UsuarioSessao)
+            .save({
+              idUsuario: usuarioLogado.idUsuario,
+              token,
+              ativo: true,
+              tipoUsuario: usuarioLogado.tipoUsuario
+            }).then(async () => {
+    
+              const rsPermissoes = await this.permissoesUsuario(usuarioLogado.idUsuario);
+              return {
+                ok: true,
+                mensagem: 'Login efetuado com sucesso.',
+                dados: {
+                  idUsuario: usuarioLogado.idUsuario,
+                  nomeUsuario: usuarioLogado.nome,
+                  tipoUsuario: usuarioLogado.tipoUsuario,
+                  token: token,
+                  permissoes: rsPermissoes
+                }
+              };
+            })
+          // retorno.ok = true
+          // retorno.mensagem = 'Login efetuado com sucesso.'
+          // retorno.dados = usuarioLogado.nome +
+          //   '.' + token +
+          //   '.' + usuarioLogado.tipoUsuario +
+          //   '.' + usuarioLogado.idUsuario
+          // return retorno
+        } else {
+          await AppDataSource.getRepository(Usuario)
+            .update({ cpf }, { tentativasLogin: () => 'tentativasLogin + 1' })
+          return retorno
+        }
+      }
+    
+      
+      private async fecharSessoesEmAberto(cpf: string): Promise<boolean> {
+        const usuarioExistente = await AppDataSource.getRepository(Usuario)
+          .createQueryBuilder("usuario")
+          .where("usuario.cpf = :cpf", { cpf })
+          .getOne()
+    
+        if (usuarioExistente) {
+          await AppDataSource.getRepository(UsuarioSessao)
+            .update(
+              { idUsuario: usuarioExistente.idUsuario },
+              { ativo: false }
+            )
+    
+          return true
+        } else {
+    
+          return false
+        }
+      }
+    
+      public async permissoesUsuario(idUsuario: number): Promise<PermissoesTypeInterface> {
+    
+        return AppDataSource.query<Array<rsSqlPermissaoPorUsuario>>(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then((rsPermissoes) => {
+    
+          console.log(rsPermissoes)
+    
+          let retorno = JSON.parse(JSON.stringify(PermissoesTypes))
+    
+          Object.keys(PermissoesTypes).forEach((keyModulo) => {
+    
+            const modulo = PermissoesTypes[keyModulo].MODULO;
+    
+            Object.keys(PermissoesTypes[keyModulo].PERMISSOES).forEach((keyPermissao) => {
+    
+              const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
+    
+              //console.log(modulo, permissao);
+    
+              if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
+                retorno[keyModulo].PERMISSOES[keyPermissao] = ''
+              }
+    
+            })
+          })
+          return retorno
+        })
+    
+        */
     };
     return ClsLoginUsuarioController;
 }());

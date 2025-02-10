@@ -37,7 +37,7 @@ export default function Estrutura() {
     nome: string
   }
 
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<SqlEstruturaInterface>>([])
   const [erros, setErros] = useState({})
@@ -176,7 +176,8 @@ export default function Estrutura() {
                 criterio: estrutura,
                 localState: localState,
                 cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
+                setMensagemState: setMensagemState,
+                token: usuarioState.token
               })
                 .then((rs) => {
                   if (rs.ok) {
@@ -247,7 +248,8 @@ export default function Estrutura() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Estruturas de Produtos',
       pathTitulo: '/',

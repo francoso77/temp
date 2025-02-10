@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Post, Put } from '@nestjs/common';
 import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 import ClsCrudController from '../services/crud.controller.cls';
+import { Roles } from '../auth/roles.decorator';
+import { PermissoesTypes } from '../types/permissoesTypes';
 
 
 @Controller()
@@ -25,6 +27,15 @@ export class CrudController {
   }
 
   @Post("incluir")
+  @Roles(
+    { modulo: PermissoesTypes.COR.MODULO, permissao: PermissoesTypes.COR.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.UNIDADE_MEDIDA.MODULO, permissao: PermissoesTypes.UNIDADE_MEDIDA.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.ESTRUTURA.MODULO, permissao: PermissoesTypes.ESTRUTURA.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.MAQUINA.MODULO, permissao: PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.PESSOA.MODULO, permissao: PermissoesTypes.PESSOA.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.PRAZO.MODULO, permissao: PermissoesTypes.PRAZO.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.PRODUTO.MODULO, permissao: PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO },
+  )
   incluir(
     @Body("criterio") criterio: Record<string, any>,
     @Body("entidade") entidade: string

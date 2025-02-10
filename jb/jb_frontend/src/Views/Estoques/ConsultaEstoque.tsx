@@ -156,7 +156,8 @@ export const ConsultaEstoque = () => {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Consulta Estoques de Produtos',
       pathTitulo: '/',
@@ -167,8 +168,9 @@ export const ConsultaEstoque = () => {
 
 
   useEffect(() => {
-      BuscarDados()
-      setLayoutState({...layoutState,
+    BuscarDados()
+    setLayoutState({
+      ...layoutState,
       titulo: 'Consulta Estoques de Produtos',
       tituloAnterior: '',
       pathTitulo: '/ConsultaEstoque',
@@ -180,7 +182,7 @@ export const ConsultaEstoque = () => {
     <div>
       <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: -5 }}>
+          <Grid item xs={12} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>

@@ -7,13 +7,15 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsApi from '../../Utils/ClsApi';
 import Copyright from '../Layout/Copyright';
-import { PermissoesTypeInterface } from '../../types/permissoesTypes';
 import MenuCls from '../Layout/ClsMenu';
+import { RespostaPadraoInterface } from '../../../../jb_backend/src/interfaces/respostaPadrao.interface';
+import { LoginInterface } from '../../../../jb_backend/src/interfaces/loginIterface';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 export default function Login() {
 
   const [erros, setErros] = useState({})
-  const [dados, setDados] = useState({ cpf: '', senha: '' })
+  const [dados, setDados] = useState({ cpf: '007.323.026-09', senha: 'teste123' })
   const clsValidacao: ClsValidacao = new ClsValidacao()
   const { mensagemState, setMensagemState, layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
@@ -38,7 +40,8 @@ export default function Login() {
 
     if (validarDados()) {
 
-      clsApi.execute<any>({
+
+      clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
         url: 'loginUsuario',
         method: 'post',
         cpf: dados.cpf,
@@ -47,56 +50,30 @@ export default function Login() {
         setMensagemState: setMensagemState
       })
         .then((rs) => {
-          if (rs.ok && rs.dados && rs.dados.length > 0) {
-            const [usuario, token, tipoUsuario, idUsuario] = rs.dados.split('.')
-
-            
+          if (rs.ok && rs.dados) {
 
             contextGlobal.setUsuarioState({
-              idUsuario: Number(idUsuario),
-              usuario: usuario,
+              idUsuario: rs.dados.idUsuario,
+              usuario: rs.dados.nomeUsuario,
               logado: true,
-              token: token,
-              tipoUsuario: tipoUsuario,
-              idsMenu: tipoUsuario === '0' ? [7] :
-                tipoUsuario === '5' ? [1, 5, 6, 10] :
-                  tipoUsuario === '2' ? [3, 4, 6, 10] :
-                    tipoUsuario === '3' ? [2, 6, 7, 9, 10] :
-                      tipoUsuario === '4' ? [2, 7, 8, 10] :
+              token: rs.dados.token,
+              tipoUsuario: rs.dados.tipoUsuario,
+              idsMenu: rs.dados.tipoUsuario === UsuarioType.default ? [7] :
+                rs.dados.tipoUsuario === UsuarioType.vendedor ? [1, 5, 6, 10] :
+                  rs.dados.tipoUsuario === UsuarioType.estoquistaMalharia ? [3, 4, 6, 10] :
+                    rs.dados.tipoUsuario === UsuarioType.estoquistaDublagem ? [2, 6, 7, 9, 10] :
+                      rs.dados.tipoUsuario === UsuarioType.producaoDublagem ? [2, 7, 8, 10] :
                         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             })
 
+            console.log('permissoes', rs.dados.permissoes)
 
+            const clsMenu = new MenuCls()
 
-            //console.log('usuario', idUsuario)
-            
-            clsApi.execute<any>({
-              url: 'permissoesUsuario',
-              token: token,
-              method: 'post',
-              mensagem: 'Buscando permissões do usuário...',
-              setMensagemState: setMensagemState
-            }).then((rsPermissoes: PermissoesTypeInterface) => {
-              console.log('permissoes', rsPermissoes)
+            setLayoutState({ ...layoutState, opcoesMenu: clsMenu.Menu })
 
-              const clsMenu = new MenuCls()
-
-              setLayoutState( { ...layoutState, opcoesMenu: clsMenu.Menu } )
-  
-              console.log('Menu',clsMenu.Menu)
-              navegar("/")
-
-            }).catch(() => {
-              setMensagemState({
-                ...mensagemState,
-                exibir: true,
-                tipo: MensagemTipo.Error,
-                titulo: 'Erro de conexão',
-                mensagem: 'Não foi possível conectar ao servidor.',
-                exibirBotao: true
-              })
-              navegar("/login")
-            })
+            console.log('Menu', clsMenu.Menu)
+            navegar("/")
 
 
           } else {
@@ -109,6 +86,7 @@ export default function Login() {
               exibirBotao: true
             })
           }
+
         }).catch(() => {
           setMensagemState({
             ...mensagemState,
@@ -118,8 +96,62 @@ export default function Login() {
             mensagem: 'Não foi possível conectar ao servidor.',
             exibirBotao: true
           })
+          navegar("/login")
         })
     }
+
+    //console.log('usuario', idUsuario)
+
+    // clsApi.execute<any>({
+    //   url: 'permissoesUsuario',
+    //   token: token,
+    //   method: 'post',
+    //   mensagem: 'Buscando permissões do usuário...',
+    //   setMensagemState: setMensagemState
+    // }).then((rsPermissoes: PermissoesTypeInterface) => {
+    //   console.log('permissoes', rsPermissoes)
+
+    //   const clsMenu = new MenuCls()
+
+    //   setLayoutState({ ...layoutState, opcoesMenu: clsMenu.Menu })
+
+    //   console.log('Menu', clsMenu.Menu)
+    //   navegar("/")
+
+    //   }).catch(() => {
+    //     setMensagemState({
+    //       ...mensagemState,
+    //       exibir: true,
+    //       tipo: MensagemTipo.Error,
+    //       titulo: 'Erro de conexão',
+    //       mensagem: 'Não foi possível conectar ao servidor.',
+    //       exibirBotao: true
+    //     })
+    //     navegar("/login")
+    //   })
+
+
+    // } else {
+    //   setMensagemState({
+    //     ...mensagemState,
+    //     exibir: true,
+    //     tipo: MensagemTipo.Error,
+    //     titulo: 'Validação',
+    //     mensagem: 'Usário ou senha inválido!',
+    //     exibirBotao: true
+    //   })
+    // }
+    //     }).catch(() => {
+    //       setMensagemState({
+    //         ...mensagemState,
+    //         exibir: true,
+    //         tipo: MensagemTipo.Error,
+    //         titulo: 'Erro de conexão',
+    //         mensagem: 'Não foi possível conectar ao servidor.',
+    //         exibirBotao: true
+    //       })
+    //     })
+    // }
   }
 
   return (

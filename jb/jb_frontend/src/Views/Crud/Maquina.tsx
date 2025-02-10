@@ -45,7 +45,7 @@ export default function Maquina() {
     nome: string
   }
 
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<MaquinaInterface>>([])
   const [erros, setErros] = useState({})
@@ -191,7 +191,8 @@ export default function Maquina() {
                 criterio: maquina,
                 localState: localState,
                 cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
+                setMensagemState: setMensagemState,
+                token: usuarioState.token
               })
                 .then((rs) => {
                   if (rs.ok) {
@@ -271,7 +272,8 @@ export default function Maquina() {
   }
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Máquinas',
       pathTitulo: '/',

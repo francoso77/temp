@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CrudController = void 0;
 var common_1 = require("@nestjs/common");
 var crud_controller_cls_1 = require("../services/crud.controller.cls");
+var roles_decorator_1 = require("../auth/roles.decorator");
+var permissoesTypes_1 = require("../types/permissoesTypes");
 var CrudController = /** @class */ (function () {
     function CrudController() {
     }
@@ -75,6 +77,7 @@ var CrudController = /** @class */ (function () {
     ], CrudController.prototype, "incluirComDetalhe", null);
     __decorate([
         (0, common_1.Post)("incluir"),
+        (0, roles_decorator_1.Roles)({ modulo: permissoesTypes_1.PermissoesTypes.COR.MODULO, permissao: permissoesTypes_1.PermissoesTypes.COR.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.UNIDADE_MEDIDA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.UNIDADE_MEDIDA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.ESTRUTURA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.ESTRUTURA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.MAQUINA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PESSOA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PESSOA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRAZO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRAZO.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRODUTO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO }),
         __param(0, (0, common_1.Body)("criterio")),
         __param(1, (0, common_1.Body)("entidade")),
         __metadata("design:type", Function),
