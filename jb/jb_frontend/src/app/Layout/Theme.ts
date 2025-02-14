@@ -76,8 +76,8 @@ export const THEME = createTheme({
   },
   palette: {
     primary: {
-      // main: CORES.azulEscuro
-      main: CORES.vermelhoNSC
+      main: CORES.azulEscuro
+      //main: CORES.vermelhoNSC
     },
     secondary: {
       main: CORES.laranja

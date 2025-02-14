@@ -356,7 +356,8 @@ export function ProducaoMalharia() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Produção Malharia',
       pathTitulo: '/',
@@ -380,14 +381,14 @@ export function ProducaoMalharia() {
 
   return (
     <>
-      <Paper variant="outlined" sx={{ padding: 0.5, m: 0.25 }}>
+      <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right', mt: 0, mr: -5, mb: -5 }}>
+          <Grid item xs={12} sx={{ textAlign: 'right' }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12} sm={2} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={2} >
             <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
               <ComboBox
                 inputRef={firstFieldRef}
@@ -407,7 +408,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={4}  >
             <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
               <ComboBox
                 opcoes={rsProduto}
@@ -425,7 +426,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ mt: 0.5 }} >
+          <Grid item xs={12} sm={6}  >
             <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
               <ComboBox
                 opcoes={TurnoTypes}
@@ -443,7 +444,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={4} >
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
                 opcoes={rsRevisador}
@@ -461,7 +462,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={4} >
             <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
               <ComboBox
                 opcoes={rsTecelao}
@@ -479,7 +480,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} md={4} >
             <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
               <InputText
                 tipo='uppercase'
@@ -494,7 +495,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={5} sx={{ mt: 0 }}>
+          <Grid item xs={12} md={5} >
             <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
               <InputText
                 type='tel'
@@ -514,7 +515,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={3} sx={{ mt: 0 }}>
+          <Grid item xs={12} md={3} >
             <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
               <InputText
                 tipo='currency'
@@ -534,7 +535,7 @@ export function ProducaoMalharia() {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={4} sx={{ mt: 0 }}>
+          <Grid item xs={12} md={4} >
             <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
               <InputText
                 tipo='number'
@@ -562,9 +563,9 @@ export function ProducaoMalharia() {
         </Grid>
       </Paper>
       <Condicional condicao={isDesktop}>
-        <Paper variant="outlined" sx={{ p: 0.5, m: 1, bgcolor: 'greenyellow', mt: 0.5 }}>
+        <Paper variant="outlined" sx={{ p: 0.5, m: 1, bgcolor: 'greenyellow' }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Grid item xs={12} sm={4} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} sm={4} >
               <ComboBox
                 opcoes={rsMeses}
                 campoDescricao="mes"
@@ -581,7 +582,7 @@ export function ProducaoMalharia() {
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} md={4} >
               <InputCalc
                 tipo='currency'
                 scale={2}
@@ -596,7 +597,7 @@ export function ProducaoMalharia() {
                 corFundo={'#cbdce9'}
               />
             </Grid>
-            <Grid item xs={12} md={4} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} md={4} >
               <InputCalc
                 tipo='number'
                 label="Qtd Total"
@@ -614,7 +615,7 @@ export function ProducaoMalharia() {
         </Paper>
       </Condicional>
 
-      <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+      <Grid item xs={12} sx={{ textAlign: 'right' }}>
 
         <Tooltip title={'Perdas'}>
           <IconButton
@@ -622,7 +623,7 @@ export function ProducaoMalharia() {
             sx={{ mt: 0, mr: 5 }}
             onClick={() => btPerdas()}
           >
-            <ContentCutTwoToneIcon sx={{ fontSize: 70 }} />
+            <ContentCutTwoToneIcon sx={{ fontSize: 55 }} />
           </IconButton>
         </Tooltip>
 
@@ -632,7 +633,7 @@ export function ProducaoMalharia() {
             sx={{ mt: 0, mr: 5 }}
             onClick={() => btGraficos()}
           >
-            <LeaderboardTwoToneIcon sx={{ fontSize: 70 }} />
+            <LeaderboardTwoToneIcon sx={{ fontSize: 55 }} />
           </IconButton>
         </Tooltip>
 
@@ -642,7 +643,7 @@ export function ProducaoMalharia() {
             sx={{ mt: 0, mr: 5 }}
             onClick={() => btConfirmar()}
           >
-            <CheckCircleRoundedIcon sx={{ fontSize: 70 }} />
+            <CheckCircleRoundedIcon sx={{ fontSize: 55 }} />
           </IconButton>
         </Tooltip>
       </Grid>

@@ -132,7 +132,7 @@ export default class ClsLoginUsuarioController {
 
           const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
 
-          //console.log(modulo, permissao);
+          console.log(modulo, permissao);
 
           if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
             retorno[keyModulo].PERMISSOES[keyPermissao] = ''
@@ -141,7 +141,8 @@ export default class ClsLoginUsuarioController {
         })
 
       })
-
+      console.log('permissoes encontradas pela pesquisa', rsPermissoes)
+      console.log('retorno obtido do teste', retorno)
       return retorno
     })
 

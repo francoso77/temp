@@ -124,12 +124,14 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                 var modulo = permissoesTypes_1.PermissoesTypes[keyModulo].MODULO;
                 Object.keys(permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES).forEach(function (keyPermissao) {
                     var permissao = permissoesTypes_1.PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
-                    //console.log(modulo, permissao);
+                    console.log(modulo, permissao);
                     if (rsPermissoes.findIndex(function (rs) { return rs.modulo === modulo && rs.permissao === permissao; }) < 0) {
                         retorno[keyModulo].PERMISSOES[keyPermissao] = '';
                     }
                 });
             });
+            console.log('permissoes encontradas pela pesquisa', rsPermissoes);
+            console.log('retorno obtido do teste', retorno);
             return retorno;
         });
         /**

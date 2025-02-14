@@ -7,10 +7,12 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsApi from '../../Utils/ClsApi';
 import Copyright from '../Layout/Copyright';
-import MenuCls from '../Layout/ClsMenu';
+import MenuCls, { MenuOpcoesInterface } from '../Layout/ClsMenu';
 import { RespostaPadraoInterface } from '../../../../jb_backend/src/interfaces/respostaPadrao.interface';
 import { LoginInterface } from '../../../../jb_backend/src/interfaces/loginIterface';
 import { UsuarioType } from '../../types/usuarioTypes';
+import { PermissoesTypes } from "../../types/permissoesTypes"
+
 
 export default function Login() {
 
@@ -19,9 +21,9 @@ export default function Login() {
   const clsValidacao: ClsValidacao = new ClsValidacao()
   const { mensagemState, setMensagemState, layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
+  const { usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const clsApi = new ClsApi()
   const navegar = useNavigate()
-
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
@@ -54,7 +56,7 @@ export default function Login() {
 
             contextGlobal.setUsuarioState({
               idUsuario: rs.dados.idUsuario,
-              usuario: rs.dados.nomeUsuario,
+              nomeUsuario: rs.dados.nomeUsuario,
               logado: true,
               token: rs.dados.token,
               tipoUsuario: rs.dados.tipoUsuario,
@@ -63,16 +65,114 @@ export default function Login() {
                   rs.dados.tipoUsuario === UsuarioType.estoquistaMalharia ? [3, 4, 6, 10] :
                     rs.dados.tipoUsuario === UsuarioType.estoquistaDublagem ? [2, 6, 7, 9, 10] :
                       rs.dados.tipoUsuario === UsuarioType.producaoDublagem ? [2, 7, 8, 10] :
-                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+              permissoes: rs.dados.permissoes
             })
 
-            console.log('permissoes', rs.dados.permissoes)
+            const MENU: Array<MenuOpcoesInterface> = [
+              {
+                id: '1',
+                parentId: null,
+                descricao: 'Cadastros',
+                path: '',
+                icon: 'app_registration_outlined',
+                permitido: Object.entries(rs.dados.permissoes).some(([key, value]) => value.PERMISSOES.MANUTENCAO),
+                filhos: []
+              },
+              {
+                id: '2',
+                parentId: '1',
+                descricao: 'Cores',
+                path: '/Cor',
+                icon: 'color_lens',
+                filhos: [],
+                permitido: rs.dados.permissoes.COR.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '3',
+                parentId: '1',
+                descricao: 'Estrutura de Produtos',
+                path: '/Estrutura',
+                icon: 'auto_awesome_motion_outlined',
+                filhos: [],
+                permitido: rs.dados.permissoes.ESTRUTURA.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '4',
+                parentId: '1',
+                descricao: 'Máquinas Teares',
+                path: '/Maquina',
+                icon: 'miscellaneous_services',
+                filhos: [],
+                permitido: rs.dados.permissoes.MAQUINA.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '5',
+                parentId: '1',
+                descricao: 'Pessoas',
+                path: '/Pessoa',
+                icon: 'groups_rounded',
+                filhos: [],
+                permitido: rs.dados.permissoes.PESSOA.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '6',
+                parentId: '1',
+                descricao: 'Prazo de Entrega',
+                path: '/PrazoEntrega',
+                icon: 'calendar_month_rounded',
+                filhos: [],
+                permitido: rs.dados.permissoes.PRAZO.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '7',
+                parentId: '1',
+                descricao: 'Produtos',
+                path: '/Produto',
+                icon: 'category_rounded',
+                filhos: [],
+                permitido: rs.dados.permissoes.PRODUTO.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '8',
+                parentId: '1',
+                descricao: 'Unidades de Medidas',
+                path: '/UnidadeMedida',
+                icon: 'square_foot',
+                filhos: [],
+                permitido: rs.dados.permissoes.UNIDADE_MEDIDA.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '9',
+                parentId: null,
+                descricao: 'Sistema',
+                path: '',
+                icon: 'settings_outlined',
+                permitido: true,
+                filhos: []
+              },
+              {
+                id: '10',
+                parentId: '9',
+                descricao: 'Grupos de Usuários',
+                path: '/GruposUsuarios',
+                icon: 'people_alt_outlined',
+                filhos: [],
+                permitido: true,
+              },
+              {
+                id: '11',
+                parentId: '9',
+                descricao: 'Usuários',
+                path: '/Usuarios',
+                icon: 'person_outline_outlined',
+                filhos: [],
+                permitido: true,
+              }
+            ]
 
-            const clsMenu = new MenuCls()
-
+            const clsMenu = new MenuCls(MENU)
             setLayoutState({ ...layoutState, opcoesMenu: clsMenu.Menu })
-
-            console.log('Menu', clsMenu.Menu)
             navegar("/")
 
 

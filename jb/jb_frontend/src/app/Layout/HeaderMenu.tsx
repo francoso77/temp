@@ -43,7 +43,8 @@ export default function HeaderMenu() {
       navegar(layoutState.pathTituloAnterior)
       let _titulo: string = layoutState.titulo
       let _pathTitulo: string = layoutState.pathTitulo
-      setLayoutState({...layoutState,
+      setLayoutState({
+        ...layoutState,
         titulo: layoutState.tituloAnterior,
         pathTitulo: layoutState.pathTituloAnterior,
         tituloAnterior: _titulo,
@@ -57,9 +58,10 @@ export default function HeaderMenu() {
 
   const verificarTipoUsuario = () => {
     let tipoUsuario: any = usuarioState.tipoUsuario
+    const estoquista: number = UsuarioType.estoquistaMalharia
     const admin: number = UsuarioType.admin
     tipoUsuario = Number(tipoUsuario)
-    return tipoUsuario === admin
+    return tipoUsuario === admin || tipoUsuario === estoquista
   }
 
   React.useEffect(() => {

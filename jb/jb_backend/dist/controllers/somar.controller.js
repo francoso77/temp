@@ -27,7 +27,7 @@ var SomarController = /** @class */ (function () {
     };
     __decorate([
         (0, common_1.Post)("somar"),
-        (0, roles_decorator_1.Roles)({ modulo: permissoesTypes_1.PermissoesTypes.PRODUTO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO }),
+        (0, roles_decorator_1.Roles)({ modulo: permissoesTypes_1.PermissoesTypes.COR.MODULO, permissao: permissoesTypes_1.PermissoesTypes.COR.PERMISSOES.MANUTENCAO }),
         __param(0, (0, common_1.Body)("numero01")),
         __param(1, (0, common_1.Body)("numero02")),
         __metadata("design:type", Function),
