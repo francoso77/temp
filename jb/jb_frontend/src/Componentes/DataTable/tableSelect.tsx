@@ -11,6 +11,7 @@ import { DataTableInterface, getComparator, Order, stableSort } from '.';
 import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { THEME } from '../../app/Layout/Theme';
+import ClsFormatacao from '../../Utils/ClsFormatacao';
 
 export const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -107,6 +108,7 @@ export default function TableSelect<T>({
     exibirPaginacao = true,
     ItemSpeed = [],
     tituloTabela = '',
+    temTotal = false,
 }: DataTableInterface) {
 
     const theme = useTheme()
@@ -116,6 +118,8 @@ export default function TableSelect<T>({
     const [selected, setSelected] = React.useState<readonly number[]>([])
     const [order, setOrder] = useState<Order>('asc')
     const [orderBy, setOrderBy] = useState<keyof any>('nome')
+    const [somaQtd, setSomaQtd] = useState<number>(0)
+    const clsFormatacao = new ClsFormatacao()
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage)
@@ -226,14 +230,14 @@ export default function TableSelect<T>({
                         >
                             {numSelected} selecionado(s)
                         </Typography>
-                        {/* <Typography
+                        <Typography
                             sx={{ flex: '1 1 100%', textAlign: 'center', fontSize: '1.5rem' }}
                             color="inherit"
                             variant="subtitle1"
                             component="div"
                         >
-                            {clsFormatacao.currency(somaQtd)} metros programados
-                        </Typography> */}
+                            {temTotal ? 'Total de itens:  '.concat(clsFormatacao.currency(somaQtd)).concat(' kgs') : ''}
+                        </Typography>
                     </>
                 ) : (
                     <Typography
@@ -299,10 +303,16 @@ export default function TableSelect<T>({
         );
     }
 
+    const somaQtdSelected = (sel: readonly number[]) => {
+        const itemSomado = sel.reduce((sum, i) => sum + dados[i].peso, 0)
+        setSomaQtd(itemSomado)
+    }
+
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
             const newSelected = dados.map((_n, i) => i);
             setSelected(newSelected);
+            somaQtdSelected(newSelected);
             return;
         }
         setSelected([]);
@@ -325,7 +335,7 @@ export default function TableSelect<T>({
             );
         }
         setSelected(newSelected)
-        //somaQtdSelected(newSelected)
+        somaQtdSelected(newSelected)
     };
 
     const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {

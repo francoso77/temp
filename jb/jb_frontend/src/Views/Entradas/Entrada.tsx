@@ -48,7 +48,7 @@ export default function Entrada() {
     total: '',
     totalQtd: ''
   }
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -201,6 +201,7 @@ export default function Entrada() {
           clsCrud.incluir({
             entidade: "Estoque",
             criterio: tmpEstoque,
+            token: usuarioState.token,
           })
             .then((rs) => {
               if (rs.ok) {
@@ -247,6 +248,7 @@ export default function Entrada() {
         clsCrud.incluir({
           entidade: "Entrada",
           criterio: entrada,
+          token: usuarioState.token,
           cb: () => btPesquisar(),
         })
           .then((rs) => {
@@ -270,6 +272,7 @@ export default function Entrada() {
           criterio: {
             idEntrada: entrada.idEntrada
           },
+          token: usuarioState.token,
           cb: () => btPesquisar(),
         })
           .then((rs) => {
@@ -364,7 +367,8 @@ export default function Entrada() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Entradas de produtos',
       pathTitulo: '/',

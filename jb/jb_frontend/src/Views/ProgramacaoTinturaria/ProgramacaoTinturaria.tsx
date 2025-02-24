@@ -70,7 +70,7 @@ export default function ProgramacaoTinturaria() {
   const clsCrud: ClsCrud = new ClsCrud()
   const clsFormatacao: ClsFormatacao = new ClsFormatacao()
 
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -366,6 +366,7 @@ export default function ProgramacaoTinturaria() {
         clsCrud.incluir({
           entidade: "Programacao",
           criterio: programacao,
+          token: usuarioState.token,
           cb: () => btPesquisar(),
         })
           .then((rs) => {
@@ -388,6 +389,7 @@ export default function ProgramacaoTinturaria() {
           criterio: {
             idProgramacao: programacao.idProgramacao
           },
+          token: usuarioState.token,
           cb: () => btPesquisar(),
         })
           .then((rs) => {
@@ -434,7 +436,8 @@ export default function ProgramacaoTinturaria() {
   }
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Programação de Tinturaria',
       pathTitulo: '/',

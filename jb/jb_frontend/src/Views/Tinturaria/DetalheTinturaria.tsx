@@ -18,7 +18,8 @@ import ClsApi from '../../Utils/ClsApi';
 import ClsRelatoriosProgramacao from '../../Utils/ClsRelatoriosProgramacao';
 import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
-import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded';
+import FactCheckTwoToneIcon from '@mui/icons-material/FactCheckTwoTone';
+import TabelaPecas from './TabelaPecas';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -48,11 +49,16 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   }
 
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.editando })
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [dados, setDados] = useState<Array<DetalheTinturariaInterface>>([])
   const [rsPecasSomadas, setRsPecasSomadas] = useState<Array<PecasSomadasInterface>>([])
   const [rsPessoas, setRsPessoas] = useState<Array<PessoaInterface>>([])
   const [PesquisaPeca, setPesquisaPeca] = useState<DadosPecaInterface>(DadosPeca)
+  const [openPecas, setOpenPecas] = useState<boolean>(false)
+  const [rsPecas, setRsPecas] = useState<Array<string>>([])
+  const [rsListaPecas, setRsListaPecas] = useState<Array<string>>([])
+  //const [pecaAux, setPecaAux] = useState<string>('')
+  let auxPeca: string = ''
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -104,12 +110,22 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
             tmpDetalhe.push(det)
           }
         })
+
         setDados(tmpDetalhe)
+
+        const removerItem = rsDetalhe.malharia.peca
+
+        const tmpRsPecas = rsPecas.filter(peca => peca !== removerItem)
+
+        setRsPecas(tmpRsPecas)
+
+
         clsCrud.excluir({
           entidade: "DetalheTinturaria",
           criterio: {
             idMalharia: rsDetalhe.idMalharia
-          }
+          },
+          token: usuarioState.token,
         })
           .then((rs) => {
             if (!rs.ok) {
@@ -130,7 +146,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
 
   const podeIncluirDetalhe = (): boolean => {
     const indice = dados.findIndex(
-      (v) => v.malharia.peca === PesquisaPeca.peca
+      (v) => v.malharia.peca === auxPeca
     )
 
     if (indice >= 0) {
@@ -206,6 +222,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         const rsEstoque = await clsCrud.incluir({
           entidade: 'Estoque',
           criterio: estoque,
+          token: usuarioState.token,
         })
         if (!rsEstoque.ok) {
           MensagemErro('Estoque não foi atualizado')
@@ -233,6 +250,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       criterio: dados,
       localState: localState,
       setMensagemState: setMensagemState,
+      token: usuarioState.token,
     }).then((rs) => {
       if (!rs.ok) {
         MensagemErro('Erro no cadastro')
@@ -245,6 +263,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
             clsCrud.incluir({
               entidade: 'ProducaoMalharia',
               criterio: rs,
+              token: usuarioState.token,
             })
           }
         })
@@ -254,26 +273,29 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
 
   const SomaPeca = async (rs: ProducaoMalhariaInterface) => {
 
+    let tmpDetalhe: Array<DetalheTinturariaInterface> = []
+
     const podeMovimentarEstoque = await MovimentaEstoque(rs, true)
 
     if (podeIncluirDetalhe() && podeMovimentarEstoque) {
 
-      let tmpDetalhe: Array<DetalheTinturariaInterface> = []
       tmpDetalhe.push({
         idTinturaria: rsMaster.idTinturaria as number,
         idMalharia: rs.idMalharia as number,
         malharia: rs,
 
       })
-      setDados([...dados,
-      {
-        idTinturaria: rsMaster.idTinturaria as number,
-        idMalharia: rs.idMalharia as number,
-        malharia: rs,
-      }
-      ])
+
+      setDados((prevDados) => {
+        if (!prevDados.some(item => item.idMalharia === rs.idMalharia)) {
+          return [...prevDados, ...tmpDetalhe];
+        }
+        return prevDados;
+      });
 
       AtualizaGradeProdutos(rs, 'Incluir')
+      AtualizaListaDePecas()
+
     }
   }
 
@@ -286,23 +308,28 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
         select: ["ROUND(SUM(peso),2) AS total_peca", "nome AS produto_nome"]
       });
 
-      setRsPecasSomadas((prevRsPecasSomadas) => {
-        const tmpProducao = [...prevRsPecasSomadas] // Cria uma cópia do estado anterior
-        const produtoAtual = rs[0]
-        const produtoExistente = tmpProducao.find((p) => p.produto_nome === produtoAtual.produto_nome)
+      if (!rs || rs.length === 0) return;
 
-        if (produtoExistente) {
+      setRsPecasSomadas((prevRsPecasSomadas) => {
+        // Criar um novo array sem modificar referências
+        let tmpProducao = prevRsPecasSomadas.map((item) => ({ ...item }));
+
+        const produtoAtual = rs[0];
+        const index = tmpProducao.findIndex((p) => p.produto_nome === produtoAtual.produto_nome);
+
+        if (index !== -1) {
+          // Produto já existe, atualiza valores
           if (tipo === 'Incluir') {
-            produtoExistente.total_peca = produtoExistente.total_peca + produtoAtual.total_peca
-            produtoExistente.qtd_peca = produtoExistente.qtd_peca + 1
+            tmpProducao[index].total_peca += produtoAtual.total_peca;
+            tmpProducao[index].qtd_peca += 1;
           } else {
-            produtoExistente.total_peca = produtoExistente.total_peca - produtoAtual.total_peca
-            produtoExistente.qtd_peca = produtoExistente.qtd_peca - 1
+            tmpProducao[index].total_peca -= produtoAtual.total_peca;
+            tmpProducao[index].qtd_peca -= 1;
           }
 
           // Remove o produto se o total for zero
-          if (produtoExistente.total_peca === 0) {
-            return tmpProducao.filter((item) => item.produto_nome !== produtoAtual.produto_nome)
+          if (tmpProducao[index].total_peca === 0) {
+            tmpProducao.splice(index, 1);
           }
         } else if (tipo === 'Incluir') {
           // Adiciona novo produto apenas no caso de inclusão
@@ -310,15 +337,15 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
             produto_nome: produtoAtual.produto_nome,
             total_peca: produtoAtual.total_peca,
             qtd_peca: 1,
-          })
+          });
         }
 
-        return tmpProducao
-      })
+        return tmpProducao;
+      });
     } catch (error) {
-      console.error("Erro ao atualizar a grade de produtos:", error)
+      console.error("Erro ao atualizar a grade de produtos:", error);
     }
-  }
+  };
 
   const LimpaPecas = async () => {
     const tinturaria = rsMaster.idTinturaria as number
@@ -371,11 +398,12 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   }
 
 
-  const btPesquisaPeca = () => {
+  const btPesquisaPeca = async (peca: string = PesquisaPeca.peca) => {
+    auxPeca = peca
     clsCrud.pesquisar({
       entidade: "ProducaoMalharia",
       criterio: {
-        peca: PesquisaPeca.peca,
+        peca: peca,
         fechado: false
       },
       camposLike: ['peca', 'fechado'],
@@ -459,10 +487,53 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
       })
   }
 
+  const btSelecionarPecas = () => {
+    setOpenPecas(!openPecas)
+  }
+
+
+  const AtualizaListaDePecas = () => {
+    let tmpPecas = rsPecas
+
+    if (PesquisaPeca.peca !== "") {
+      tmpPecas.push(PesquisaPeca.peca)
+      setRsPecas(tmpPecas)
+
+    } else if (tmpPecas.length > 0) {
+
+      rsListaPecas.forEach(peca => {
+        if (!tmpPecas.includes(peca)) {
+          tmpPecas.push(peca)
+        }
+      })
+      setRsPecas(tmpPecas)
+    } else {
+      setRsPecas(rsListaPecas)
+    }
+    setRsListaPecas([])
+  }
+
+
+  const AtualizaGrade = () => {
+
+    if (rsListaPecas.length > 0) {
+
+      for (const item of rsListaPecas) {
+        btPesquisaPeca(item)
+      }
+    }
+  }
+
   useEffect(() => {
     BuscarDados()
     AtualizaSoma()
   }, [])
+
+  useEffect(() => {
+    if (rsListaPecas.length > 0) {
+      AtualizaGrade()
+    }
+  }, [rsListaPecas])
 
   return (
     <>
@@ -497,10 +568,10 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
                   Informe a peça
                 </Typography>
               </Grid>
-              <Grid item xs={8} md={4} sx={{ mb: 1.5 }}>
+              <Grid item xs={8} md={4} sx={{ display: 'flex', justifyContent: 'center', mb: 1.5 }}>
                 <InputText
                   label=""
-                  tipo="text"
+                  tipo="uppercase"
                   dados={PesquisaPeca}
                   field="peca"
                   setState={setPesquisaPeca}
@@ -509,6 +580,15 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
                   mapKeyPress={[{ key: 'Enter', onKey: btPesquisaPeca }]}
                   autoFocus
                 />
+                <Tooltip title={'Selecionar peças'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 2, ml: 2 }}
+                    onClick={() => btSelecionarPecas()}
+                  >
+                    <FactCheckTwoToneIcon sx={{ fontSize: 40 }} />
+                  </IconButton>
+                </Tooltip>
               </Grid>
             </Grid>
           </Condicional>
@@ -573,6 +653,18 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
             </Grid>
           </Condicional>
         </Grid>
+        <Condicional condicao={openPecas}>
+          <Grid item xs={12}>
+            <TabelaPecas
+              openPecas={openPecas}
+              setOpenPecas={setOpenPecas}
+              rsPecas={rsPecas}
+              setRsPecas={setRsPecas}
+              rsListaPecas={rsListaPecas}
+              setRsListaPecas={setRsListaPecas}
+            />
+          </Grid>
+        </Condicional>
       </Paper >
     </>
   )

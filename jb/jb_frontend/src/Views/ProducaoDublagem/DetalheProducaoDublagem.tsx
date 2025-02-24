@@ -56,7 +56,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false)
   const [openMetros, setOpenMetros] = useState(false)
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({})
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [detalheProducaoDublagem, setDetalheProducaoDublagem] = useState<DetalheProducaoDublagemInterface>(ResetDados)
@@ -260,6 +260,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
         const rsPed = await clsCrud.incluir({
           entidade: "DetalhePedido",
           criterio: tmpDetalhe,
+          token: usuarioState.token,
         })
         if (!rsPed.ok) {
           setMensagemState({

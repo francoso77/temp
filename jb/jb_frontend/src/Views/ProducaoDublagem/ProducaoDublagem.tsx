@@ -92,7 +92,7 @@ export default function ProducaoDublagem() {
     total: '',
   }
 
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -253,6 +253,7 @@ export default function ProducaoDublagem() {
         await clsCrud.incluir({
           entidade: "Pedido",
           criterio: tmpPedido,
+          token: usuarioState.token,
         })
       }
     } catch (error) {
@@ -285,6 +286,7 @@ export default function ProducaoDublagem() {
         await clsCrud.incluir({
           entidade: "Pedido",
           criterio: tmpPedido,
+          token: usuarioState.token,
         })
       }
     } catch (error) {
@@ -299,6 +301,7 @@ export default function ProducaoDublagem() {
           entidade: "ProducaoDublagem",
           criterio: producaoDublagem,
           localState: localState,
+          token: usuarioState.token,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })
@@ -322,6 +325,7 @@ export default function ProducaoDublagem() {
           criterio: {
             idDublagem: producaoDublagem.idDublagem
           },
+          token: usuarioState.token,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })
@@ -377,7 +381,8 @@ export default function ProducaoDublagem() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Produção Dublagem',
       pathTitulo: '/',

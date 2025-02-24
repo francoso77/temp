@@ -76,7 +76,7 @@ export function ProducaoMalharia() {
   const [openGraficos, setOpenGraficos] = useState(false)
   const [openPerdas, setOpenPerdas] = useState(false)
   const [erros, setErros] = useState({})
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [producaoMalharia, setProducaoMalharia] = useState<ProducaoMalhariaInterface>(ResetDados)
   const [rsDadosPeca, setRsDadosPeca] = useState<DadosPecaInterface>(ResetDadosPeca)
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
@@ -296,6 +296,7 @@ export function ProducaoMalharia() {
             .incluir({
               entidade: "ProducaoMalharia",
               criterio: producaoMalharia,
+              token: usuarioState.token
             }).then((rs) => {
               if (rs.ok) {
                 setMensagemState({

@@ -54,7 +54,7 @@ export default function Pedido() {
     totalQtd: ''
   }
 
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -181,6 +181,7 @@ export default function Pedido() {
           entidade: "Pedido",
           criterio: pedido,
           localState: localState,
+          token: usuarioState.token,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })
@@ -204,6 +205,7 @@ export default function Pedido() {
           criterio: {
             idPedido: pedido.idPedido
           },
+          token: usuarioState.token,
           cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })
@@ -247,7 +249,8 @@ export default function Pedido() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Pedidos',
       pathTitulo: '/',

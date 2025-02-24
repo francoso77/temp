@@ -46,7 +46,7 @@ export function Tinturaria() {
   }
 
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const { setLayoutState, layoutState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState, layoutState, setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [tinturaria, setTinturaria] = useState<TinturariaInterface>(ResetDados)
   const [erros, setErros] = useState({})
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
@@ -200,7 +200,8 @@ export function Tinturaria() {
 
   const irPara = useNavigate();
   const btFechar = () => {
-    setLayoutState({...layoutState, 
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Tinturaria',
       pathTitulo: '/',
@@ -395,6 +396,7 @@ export function Tinturaria() {
         const rs = await clsCrud.incluir({
           entidade: 'ProducaoMalharia',
           criterio: tmpProducao,
+          token: usuarioState.token,
         });
 
         if (!rs.ok) {
@@ -430,6 +432,7 @@ export function Tinturaria() {
             entidade: 'Tinturaria',
             criterio: tinturaria,
             localState: localState,
+            token: usuarioState.token,
             cb: () => btPesquisar(),
             setMensagemState: setMensagemState
           })
@@ -454,7 +457,8 @@ export function Tinturaria() {
             clsCrud
               .excluir({
                 entidade: "DetalheTinturaria",
-                criterio: { idTinturaria: tinturaria.idTinturaria }
+                criterio: { idTinturaria: tinturaria.idTinturaria },
+                token: usuarioState.token,
               }).then((rs) => {
                 if (!rs.ok) {
                   console.log('Não foi possível excluir os detalhes da tinturaria')
