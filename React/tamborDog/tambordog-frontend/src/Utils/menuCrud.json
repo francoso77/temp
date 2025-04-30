@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "menu": "Atletas",
+    "icon": "person_outline_outlined",
+    "path": "/Atleta",
+    "titulo": "Cadastro de Atletas"
+  },
+  {
+    "id": 2,
+    "menu": "Raças",
+    "icon": "pets",
+    "path": "/Raca",
+    "titulo": "Cadastro de Raças"
+  },
+  {
+    "id": 3,
+    "menu": "Categorias",
+    "icon": "military_tech",
+    "path": "/Categoria",
+    "titulo": "Cadastro de Categorias"
+  },
+  {
+    "id": 4,
+    "menu": "Campeonatos",
+    "icon": "emoji_events",
+    "path": "/Campeonato",
+    "titulo": "Cadastro de Campeonatos"
+  },
+  {
+    "id": 5,
+    "menu": "Provas",
+    "icon": "sports_score",
+    "path": "/Prova",
+    "titulo": "Cadastro de Provas"
+  }
+]
