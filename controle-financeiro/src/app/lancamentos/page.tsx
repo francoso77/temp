@@ -1,9 +1,6 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import {
-  buscarLancamentos,
-  salvarLancamento,
-  excluirLancamento
-} from '../services/lancamentosService';
 import {
   Container,
   Button,
@@ -17,6 +14,7 @@ import {
 import { supabase } from '@/lib/supabaseClient';
 import LaunchForm from '@/components/LaunchForm';
 import { Lancamento } from '@/types/Lancamento';
+import { buscarLancamentos, excluirLancamento, salvarLancamento } from '@/services/lancamentosService';
 
 interface LancamentoFormData {
   descricao: string;
@@ -91,7 +89,7 @@ export default function Lancamentos() {
               <TableCell>{new Date(l.data).toLocaleDateString()}</TableCell>
               <TableCell>
                 <Button onClick={() => setEditing(l)}>Editar</Button>
-                <Button color="error" onClick={() => void handleExcluir(l.id? l.id: 'none')}>Excluir</Button>
+                <Button color="error" onClick={() => void handleExcluir(l.id ? l.id : 'none')}>Excluir</Button>
               </TableCell>
             </TableRow>
           ))}

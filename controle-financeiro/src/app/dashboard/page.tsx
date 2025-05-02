@@ -1,16 +1,20 @@
-/* eslint-disable */
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useRouter } from 'next/navigation'; // ✅ Corrigido para o App Router
+import {
+  PieChart, Pie, Cell,
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer
+} from 'recharts';
 import { Container, Typography } from '@mui/material';
 import { supabase } from '@/lib/supabaseClient';
 import { calcularSaldo } from '@/utils/calcularSaldo';
 import { buscarLancamentos } from '@/services/lancamentosService';
 
 export default function Dashboard() {
-  const [lancamentos, setLancamentos] = useState([]) as any;
-  const router = useRouter();
+  const [lancamentos, setLancamentos] = useState<any[]>([]);
   const [saldo, setSaldo] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,8 +30,9 @@ export default function Dashboard() {
   const categorias = Array.from(new Set(lancamentos.map((l: any) => l.categoria)));
   const dadosPizza = categorias.map(cat => ({
     name: cat,
-    value: lancamentos.filter((l: any) => l.categoria === cat && l.tipo === 'saída')
-      .reduce((acc: any, l: any) => acc + parseFloat(l.valor), 0)
+    value: lancamentos
+      .filter((l: any) => l.categoria === cat && l.tipo === 'saída')
+      .reduce((acc: number, l: any) => acc + parseFloat(l.valor), 0)
   }));
 
   const dadosLinha = lancamentos.reduce((acc: any, l: any) => {
@@ -36,11 +41,12 @@ export default function Dashboard() {
     if (l.tipo === 'saída') acc[mes] += parseFloat(l.valor);
     return acc;
   }, {});
+
   const dadosGraficoLinha = Object.entries(dadosLinha).map(([mes, valor]) => ({ mes, valor }));
 
   return (
     <Container>
-      <Typography variant="h5">Saldo Atual: R$ {saldo.toFixed(2)}</Typography>
+      <Typography variant="h5" gutterBottom>Saldo Atual: R$ {saldo.toFixed(2)}</Typography>
 
       <Typography variant="h6">Gastos por Categoria</Typography>
       <ResponsiveContainer width="100%" height={300}>
