@@ -1,0 +1,32 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { PlusCircle, Bell } from "lucide-react"
+import { UserDropdown } from "@/components/user-dropdown"
+import { ThemeToggle } from "@/components/theme-toggle"
+
+interface DashboardHeaderProps {
+  onAddTransaction: () => void
+}
+
+export function DashboardHeader({ onAddTransaction }: DashboardHeaderProps) {
+  return (
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
+      <div className="flex h-16 items-center px-4 md:px-6">
+        <h1 className="text-xl font-semibold">Dashboard Financeiro</h1>
+        <div className="ml-auto flex items-center gap-4">
+          <Button onClick={onAddTransaction} size="sm" className="h-9">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Nova Transação
+          </Button>
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Bell className="h-5 w-5" />
+            <span className="sr-only">Notificações</span>
+          </Button>
+          <UserDropdown />
+        </div>
+      </div>
+    </header>
+  )
+}
