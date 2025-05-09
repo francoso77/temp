@@ -9,37 +9,57 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { DollarSign, Lock, User } from "lucide-react"
+import { DollarSign, Lock, Mail, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export function LoginPage() {
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
   const { toast } = useToast()
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     setIsLoading(true)
 
-    // Simular verificação de login
-    setTimeout(() => {
-      if (username === "admin" && password === "admin") {
-        toast({
-          title: "Login realizado com sucesso",
-          description: "Bem-vindo ao FinanceControl!",
-        })
-        router.push("/dashboard")
-      } else {
-        toast({
-          title: "Erro de autenticação",
-          description: "Usuário ou senha incorretos. Use admin/admin para entrar.",
-          variant: "destructive",
-        })
-        setIsLoading(false)
-      }
-    }, 1000)
+    // Verificar se os campos estão preenchidos
+    if (!email || !password) {
+      setError("Por favor, preencha todos os campos")
+      setIsLoading(false)
+      return
+    }
+
+    // Verificar se é o login padrão (admin/admin)
+    if (email === "admin" && password === "admin") {
+      toast({
+        title: "Login realizado com sucesso",
+        description: "Bem-vindo ao FinanceControl!",
+      })
+      router.push("/dashboard")
+      return
+    }
+
+    // Verificar se o usuário existe no localStorage
+    const users = JSON.parse(localStorage.getItem("financeUsers") || "[]")
+    const user = users.find((u: any) => u.email === email && u.password === password)
+
+    if (user) {
+      // Salvar usuário atual no localStorage
+      localStorage.setItem("currentUser", JSON.stringify(user))
+
+      toast({
+        title: "Login realizado com sucesso",
+        description: `Bem-vindo de volta, ${user.name}!`,
+      })
+      router.push("/dashboard")
+    } else {
+      setError("Email ou senha incorretos")
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -58,18 +78,19 @@ export function LoginPage() {
             <CardDescription className="text-center">Entre com suas credenciais para acessar o sistema</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {error && <div className="p-3 rounded-md bg-destructive/15 text-destructive text-sm">{error}</div>}
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Usuário</Label>
+                  <Label htmlFor="email">Email ou Usuário</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="username"
-                      placeholder="Digite seu usuário"
+                      id="email"
+                      placeholder="Digite seu email ou usuário"
                       className="pl-10"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -81,13 +102,27 @@ export function LoginPage() {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="Digite sua senha"
-                      className="pl-10"
+                      className="pl-10 pr-10"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-10 w-10"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="sr-only">{showPassword ? "Esconder senha" : "Mostrar senha"}</span>
+                    </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">Senha padrão: admin</p>
                 </div>
@@ -97,8 +132,14 @@ export function LoginPage() {
               </div>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <div className="text-center text-sm text-muted-foreground mt-2">
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm text-muted-foreground">
+              Não tem uma conta?{" "}
+              <Link href="/cadastro" className="underline underline-offset-4 hover:text-primary">
+                Criar conta
+              </Link>
+            </div>
+            <div className="text-center text-sm text-muted-foreground">
               <Link href="/welcome" className="underline underline-offset-4 hover:text-primary">
                 Voltar para a página inicial
               </Link>

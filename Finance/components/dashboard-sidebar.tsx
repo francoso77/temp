@@ -2,27 +2,46 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Filter, Home, PieChart, Settings, CreditCard, Wallet, Building2, Tags } from "lucide-react"
+import { Filter, Home, PieChart, Settings, CreditCard, Wallet, Building2, Tags, BanknoteIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DateRangePicker } from "@/components/date-range-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { mockCategories } from "@/lib/data"
+import { mockCategories, getDefaultAccount, type Account } from "@/lib/data"
 import type { DateRange } from "react-day-picker"
+import { AccountSelector } from "@/components/account-selector"
+import { useState } from "react"
 
 interface DashboardSidebarProps {
   filters: {
     dateRange: DateRange
     category: string
     type: string
+    accountId?: string
   }
   setFilters: (filters: any) => void
+  selectedAccount?: Account
+  onAccountChange?: (account: Account) => void
 }
 
-export function DashboardSidebar({ filters, setFilters }: DashboardSidebarProps) {
+export function DashboardSidebar({
+  filters,
+  setFilters,
+  selectedAccount: propSelectedAccount,
+  onAccountChange: propOnAccountChange,
+}: DashboardSidebarProps) {
   const pathname = usePathname()
+  const [selectedAccount, setSelectedAccount] = useState<Account>(propSelectedAccount || getDefaultAccount())
 
   const handleDateRangeChange = (range: DateRange) => {
     setFilters({ ...filters, dateRange: range })
+  }
+
+  const handleAccountChange = (account: Account) => {
+    setSelectedAccount(account)
+    setFilters({ ...filters, accountId: account.id })
+    if (propOnAccountChange) {
+      propOnAccountChange(account)
+    }
   }
 
   return (
@@ -35,7 +54,11 @@ export function DashboardSidebar({ filters, setFilters }: DashboardSidebarProps)
       </div>
       <div className="px-4 py-6">
         <nav className="grid gap-4">
-          <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="justify-start" asChild>
+          <Button
+            variant={pathname === "/" || pathname === "/dashboard" ? "default" : "ghost"}
+            className="justify-start"
+            asChild
+          >
             <Link href="/dashboard">
               <Home className="mr-2 h-4 w-4" />
               Dashboard
@@ -45,6 +68,12 @@ export function DashboardSidebar({ filters, setFilters }: DashboardSidebarProps)
             <Link href="/transacoes">
               <CreditCard className="mr-2 h-4 w-4" />
               Transações
+            </Link>
+          </Button>
+          <Button variant={pathname === "/contas" ? "default" : "ghost"} className="justify-start" asChild>
+            <Link href="/contas">
+              <BanknoteIcon className="mr-2 h-4 w-4" />
+              Contas
             </Link>
           </Button>
           <Button variant={pathname === "/relatorios" ? "default" : "ghost"} className="justify-start" asChild>
@@ -79,6 +108,14 @@ export function DashboardSidebar({ filters, setFilters }: DashboardSidebarProps)
           Filtros
         </h3>
         <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Conta</label>
+            <AccountSelector
+              selectedAccount={propSelectedAccount || selectedAccount}
+              onAccountChange={handleAccountChange}
+              className="w-full"
+            />
+          </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Período</label>
             <DateRangePicker dateRange={filters.dateRange} onDateRangeChange={handleDateRangeChange} />

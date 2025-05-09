@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { SortableTable } from "@/components/sortable-table"
+import { PaginatedTable } from "@/components/paginated-table"
 import type { Category, Company, Transaction } from "@/lib/data"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -14,6 +14,7 @@ interface TransactionsTableProps {
   companies: Company[]
   onEditTransaction?: (transaction: Transaction) => void
   onDeleteTransaction?: (transaction: Transaction) => void
+  pageSize?: number
 }
 
 export function TransactionsTable({
@@ -22,12 +23,8 @@ export function TransactionsTable({
   companies,
   onEditTransaction,
   onDeleteTransaction,
+  pageSize = 10,
 }: TransactionsTableProps) {
-  // Get the 10 most recent transactions
-  const recentTransactions = [...transactions]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 10)
-
   const getCategoryName = (categoryId: string) => {
     const category = categories.find((c) => c.id === categoryId)
     return category ? category.name : "Sem categoria"
@@ -127,6 +124,12 @@ export function TransactionsTable({
   ]
 
   return (
-    <SortableTable data={recentTransactions} columns={columns} defaultSortColumn="date" defaultSortDirection="desc" />
+    <PaginatedTable
+      data={transactions}
+      columns={columns}
+      defaultSortColumn="date"
+      defaultSortDirection="desc"
+      pageSize={pageSize}
+    />
   )
 }

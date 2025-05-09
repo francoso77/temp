@@ -18,6 +18,9 @@ export function WelcomePage() {
             <Button asChild variant="outline" className="mr-2">
               <Link href="/login">Entrar</Link>
             </Button>
+            <Button asChild>
+              <Link href="/cadastro">Cadastrar</Link>
+            </Button>
           </div>
         </div>
       </header>
@@ -30,7 +33,7 @@ export function WelcomePage() {
             despesas e investimentos em um só lugar.
           </p>
           <Button asChild size="lg" className="text-lg px-8">
-            <Link href="/login">
+            <Link href="/cadastro">
               Começar agora
               <ChevronRight className="ml-2 h-5 w-5" />
             </Link>
@@ -93,7 +96,7 @@ export function WelcomePage() {
             Experimente o FinanceControl hoje mesmo e transforme a maneira como você gerencia suas finanças.
           </p>
           <Button asChild size="lg">
-            <Link href="/login">Criar uma conta gratuita</Link>
+            <Link href="/cadastro">Criar uma conta gratuita</Link>
           </Button>
         </div>
       </main>

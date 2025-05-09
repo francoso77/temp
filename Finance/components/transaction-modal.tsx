@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { type Transaction, mockCategories, mockCompanies } from "@/lib/data"
+import { type Transaction, mockCategories, mockCompanies, type Account, mockAccounts } from "@/lib/data"
 import { v4 as uuidv4 } from "uuid"
 
 interface TransactionModalProps {
@@ -16,15 +16,23 @@ interface TransactionModalProps {
   onClose: () => void
   onAddTransaction: (transaction: Transaction) => void
   editTransaction?: Transaction | null
+  selectedAccount?: Account
 }
 
-export function TransactionModal({ isOpen, onClose, onAddTransaction, editTransaction }: TransactionModalProps) {
+export function TransactionModal({
+  isOpen,
+  onClose,
+  onAddTransaction,
+  editTransaction,
+  selectedAccount,
+}: TransactionModalProps) {
   const [formData, setFormData] = useState({
     description: "",
     amount: "",
     type: "expense",
     categoryId: "",
     companyId: "",
+    accountId: selectedAccount?.id || mockAccounts[0].id,
     date: new Date().toISOString().split("T")[0],
   })
 
@@ -39,6 +47,7 @@ export function TransactionModal({ isOpen, onClose, onAddTransaction, editTransa
           type: editTransaction.type,
           categoryId: editTransaction.categoryId,
           companyId: editTransaction.companyId,
+          accountId: editTransaction.accountId,
           date: new Date(editTransaction.date).toISOString().split("T")[0],
         })
       } else {
@@ -49,11 +58,12 @@ export function TransactionModal({ isOpen, onClose, onAddTransaction, editTransa
           type: "expense",
           categoryId: "",
           companyId: "",
+          accountId: selectedAccount?.id || mockAccounts[0].id,
           date: new Date().toISOString().split("T")[0],
         })
       }
     }
-  }, [isOpen, editTransaction])
+  }, [isOpen, editTransaction, selectedAccount])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,6 +75,7 @@ export function TransactionModal({ isOpen, onClose, onAddTransaction, editTransa
       type: formData.type as "income" | "expense",
       categoryId: formData.categoryId,
       companyId: formData.companyId,
+      accountId: formData.accountId,
       date: new Date(formData.date).toISOString(),
     }
 
@@ -119,6 +130,24 @@ export function TransactionModal({ isOpen, onClose, onAddTransaction, editTransa
                 <SelectContent>
                   <SelectItem value="income">Receita</SelectItem>
                   <SelectItem value="expense">Despesa</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="account">Conta</Label>
+              <Select
+                value={formData.accountId}
+                onValueChange={(value) => setFormData((prev) => ({ ...prev, accountId: value }))}
+              >
+                <SelectTrigger id="account">
+                  <SelectValue placeholder="Selecione a conta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockAccounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

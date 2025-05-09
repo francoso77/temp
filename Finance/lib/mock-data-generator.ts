@@ -90,6 +90,7 @@ export function generateMockTransactions(count = 200): Transaction[] {
         type,
         categoryId,
         companyId,
+        accountId: "acc1", // Valor padrão, será substituído depois
         date: transactionDate.toISOString(),
       })
     }
@@ -128,6 +129,7 @@ export function generateMockTransactions(count = 200): Transaction[] {
         type,
         categoryId,
         companyId,
+        accountId: "acc1", // Valor padrão, será substituído depois
         date: dayDate.toISOString(),
       })
     }

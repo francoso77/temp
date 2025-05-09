@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { User, LogOut, UserCircle, Settings } from "lucide-react"
@@ -13,12 +14,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+interface UserInfo {
+  name: string
+  email: string
+}
+
 export function UserDropdown() {
   const router = useRouter()
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+
+  useEffect(() => {
+    // Carregar informações do usuário do localStorage
+    const currentUser = localStorage.getItem("currentUser")
+    if (currentUser) {
+      try {
+        const userData = JSON.parse(currentUser)
+        setUserInfo({
+          name: userData.name || "Usuário",
+          email: userData.email || "usuario@exemplo.com",
+        })
+      } catch (error) {
+        console.error("Erro ao carregar dados do usuário:", error)
+      }
+    }
+  }, [])
 
   const handleLogout = () => {
-    // Aqui você implementaria a lógica de logout
-    // Por exemplo, limpar tokens, cookies, etc.
+    // Remover usuário atual do localStorage
+    localStorage.removeItem("currentUser")
+
     console.log("Usuário deslogado")
     router.push("/login") // Redireciona para a página de login
   }
@@ -32,7 +56,12 @@ export function UserDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          <div className="flex flex-col">
+            <span>{userInfo?.name || "Usuário"}</span>
+            <span className="text-xs text-muted-foreground">{userInfo?.email || "usuario@exemplo.com"}</span>
+          </div>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/perfil" className="flex w-full cursor-pointer items-center">

@@ -4,7 +4,14 @@ import { useState } from "react"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { TransactionModal } from "@/components/transaction-modal"
-import { type Transaction, mockTransactions, mockCategories, mockCompanies } from "@/lib/data"
+import {
+  type Transaction,
+  mockTransactions,
+  mockCategories,
+  mockCompanies,
+  type Account,
+  getDefaultAccount,
+} from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TransactionsTable } from "@/components/transactions-table"
 import { Button } from "@/components/ui/button"
@@ -26,10 +33,12 @@ export function TransacoesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions)
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedAccount, setSelectedAccount] = useState<Account>(getDefaultAccount())
   const [filters, setFilters] = useState({
     dateRange: { from: undefined, to: undefined },
     category: "all",
     type: "all",
+    accountId: selectedAccount.id,
   })
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null)
@@ -78,7 +87,17 @@ export function TransacoesPage() {
     setIsDeleteDialogOpen(false)
   }
 
+  const handleAccountChange = (account: Account) => {
+    setSelectedAccount(account)
+    setFilters({ ...filters, accountId: account.id })
+  }
+
   const filteredTransactions = transactions.filter((transaction) => {
+    // Filter by account
+    if (filters.accountId && transaction.accountId !== filters.accountId) {
+      return false
+    }
+
     // Search filter
     if (searchTerm && !transaction.description.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false
@@ -110,13 +129,20 @@ export function TransacoesPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      <DashboardSidebar filters={filters} setFilters={setFilters} />
+      <DashboardSidebar
+        filters={filters}
+        setFilters={setFilters}
+        selectedAccount={selectedAccount}
+        onAccountChange={handleAccountChange}
+      />
       <div className="flex flex-col flex-1 overflow-hidden">
         <DashboardHeader
           onAddTransaction={() => {
             setTransactionToEdit(null)
             setIsModalOpen(true)
           }}
+          selectedAccount={selectedAccount}
+          onAccountChange={handleAccountChange}
         />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
@@ -154,6 +180,7 @@ export function TransacoesPage() {
                 companies={mockCompanies}
                 onEditTransaction={handleEditTransaction}
                 onDeleteTransaction={handleDeleteTransaction}
+                pageSize={10}
               />
             </CardContent>
           </Card>
@@ -167,6 +194,7 @@ export function TransacoesPage() {
         }}
         onAddTransaction={handleAddTransaction}
         editTransaction={transactionToEdit}
+        selectedAccount={selectedAccount}
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

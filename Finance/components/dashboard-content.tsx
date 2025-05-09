@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { type Transaction, mockCategories, mockCompanies } from "@/lib/data"
+import { type Transaction, mockCategories, mockCompanies, type Account } from "@/lib/data"
 import { TransactionsTable } from "@/components/transactions-table"
 import { BarChart, DollarSign, TrendingDown, TrendingUp } from "lucide-react"
 import { CategoryPieChart } from "@/components/category-pie-chart"
@@ -23,9 +23,10 @@ import { useToast } from "@/hooks/use-toast"
 interface DashboardContentProps {
   transactions: Transaction[]
   onUpdateTransactions: (transactions: Transaction[]) => void
+  selectedAccount: Account
 }
 
-export function DashboardContent({ transactions, onUpdateTransactions }: DashboardContentProps) {
+export function DashboardContent({ transactions, onUpdateTransactions, selectedAccount }: DashboardContentProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null)
@@ -35,7 +36,7 @@ export function DashboardContent({ transactions, onUpdateTransactions }: Dashboa
   // Calculate financial metrics
   const totalIncome = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + t.amount, 0)
   const totalExpenses = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + t.amount, 0)
-  const currentBalance = totalIncome - totalExpenses
+  const currentBalance = selectedAccount.initialBalance + totalIncome - totalExpenses
 
   const handleAddTransaction = (transaction: Transaction) => {
     if (transactionToEdit) {
@@ -90,7 +91,9 @@ export function DashboardContent({ transactions, onUpdateTransactions }: Dashboa
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(currentBalance)}
+              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: selectedAccount.currency }).format(
+                currentBalance,
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Atualizado em tempo real</p>
           </CardContent>
@@ -102,7 +105,9 @@ export function DashboardContent({ transactions, onUpdateTransactions }: Dashboa
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalIncome)}
+              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: selectedAccount.currency }).format(
+                totalIncome,
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Total de receitas no período</p>
           </CardContent>
@@ -114,7 +119,9 @@ export function DashboardContent({ transactions, onUpdateTransactions }: Dashboa
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalExpenses)}
+              {new Intl.NumberFormat("pt-BR", { style: "currency", currency: selectedAccount.currency }).format(
+                totalExpenses,
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Total de despesas no período</p>
           </CardContent>
@@ -160,6 +167,7 @@ export function DashboardContent({ transactions, onUpdateTransactions }: Dashboa
               companies={mockCompanies}
               onEditTransaction={handleEditTransaction}
               onDeleteTransaction={handleDeleteTransaction}
+              pageSize={5}
             />
           </CardContent>
         </Card>
@@ -173,6 +181,7 @@ export function DashboardContent({ transactions, onUpdateTransactions }: Dashboa
         }}
         onAddTransaction={handleAddTransaction}
         editTransaction={transactionToEdit}
+        selectedAccount={selectedAccount}
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
