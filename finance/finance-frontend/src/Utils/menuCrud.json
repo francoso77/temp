@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "menu": "Cores",
+    "icon": "color_lens",
+    "path": "/Cor",
+    "titulo": "Cadastro de Cores"
+  },
+  {
+    "id": 2,
+    "menu": "Estruturas de Produtos",
+    "icon": "auto_awesome_motion_outlined",
+    "path": "/Estrutura",
+    "titulo": "Cadastro de Estruturas de Produtos"
+  },
+  {
+    "id": 3,
+    "menu": "Pessoas",
+    "icon": "groups_rounded",
+    "path": "/Pessoa",
+    "titulo": "Cadastro de Pessoas"
+  },
+  {
+    "id": 4,
+    "menu": "Prazos de Entrega",
+    "icon": "calendar_month_rounded",
+    "path": "/PrazoEntrega",
+    "titulo": "Cadastro de Prazos"
+  },
+  {
+    "id": 5,
+    "menu": "Máquinas",
+    "icon": "miscellaneous_services",
+    "path": "/Maquina",
+    "titulo": "Cadastro de Máquinas"
+  },
+  {
+    "id": 6,
+    "menu": "Produtos",
+    "icon": "category_rounded",
+    "path": "/Produto",
+    "titulo": "Cadastro de Produtos"
+  },
+  {
+    "id": 7,
+    "menu": "Unidades de Medida",
+    "icon": "square_foot",
+    "path": "/UnidadeMedida",
+    "titulo": "Cadastro de Unidades de Medida"
+  }
+]

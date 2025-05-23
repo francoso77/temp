@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "tooltipTitle": "Pedidos",
+    "route": "/Pedido",
+    "icon": "NoteAltOutlinedIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 2,
+    "tooltipTitle": "Entrada de Produtos",
+    "route": "/Entrada",
+    "icon": "AddShoppingCartOutlinedIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 3,
+    "tooltipTitle": "Produção Malharia",
+    "route": "/ProducaoMalharia",
+    "icon": "FactoryIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 4,
+    "tooltipTitle": "Tinturaria",
+    "route": "/Tinturaria",
+    "icon": "ColorLensTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 5,
+    "tooltipTitle": "Dashboard",
+    "route": "/Dashboard",
+    "icon": "DashboardTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 6,
+    "tooltipTitle": "Consulta Estoques de Produtos",
+    "route": "/ConsultaEstoque",
+    "icon": "InventoryTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 7,
+    "tooltipTitle": "Gestão de Pedidos",
+    "route": "/ProgramacaoDublagem",
+    "icon": "FactCheckTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 8,
+    "tooltipTitle": "Produção Dublagem",
+    "route": "/ProducaoDublagem",
+    "icon": "ContentCutTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 9,
+    "tooltipTitle": "Programação Tinturaria",
+    "route": "/ProgramacaoTinturaria",
+    "icon": "FormatPaintIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  },
+  {
+    "id": 10,
+    "tooltipTitle": "Cadastro de Usuários",
+    "route": "/Usuario",
+    "icon": "PersonOutlineTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 32,
+      "height": 32
+    }
+  }
+]
