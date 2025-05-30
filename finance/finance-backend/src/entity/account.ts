@@ -11,13 +11,10 @@ export default class Account implements AccountInterface {
   name: string;
 
   @Column()
-  type: 'checking' | 'savings' | 'investment' | 'credit' | 'cash' | 'other'
+  type: 'corrente' | 'poupanca' | 'investmento' | 'credito' | 'dinheiro' | 'outros'
 
-  @Column({ type: 'float', precision: 3 })
+  @Column({ type: 'float', precision: 2 })
   initialBalance: number;
-
-  @Column()
-  currency: string;
 
   @Column()
   color: string;

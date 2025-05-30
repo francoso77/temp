@@ -71,34 +71,33 @@ export function Welcome() {
         </Box>
       </Container>
 
-
-      <Container sx={{ py: 2, px: 1, mt: 3, alignItems: 'center' }} >
-        <Box sx={{ display: 'flex' }}>
-          <Typography variant="h1" sx={{ ml: 15, mr: 15, fontSize: 50, fontWeight: 'bold', textAlign: 'center' }}>
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={12}>
+          <Typography variant="h5" sx={{ fontSize: 35, fontWeight: 'bold', textAlign: 'center' }}>
             Gerencie suas finanças com simplicidade e eficiência
           </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="body1" sx={{ mt: 2, ml: 15, mr: 15, fontSize: 20, textAlign: 'center' }}>
+        </Grid>
+        <Grid item xs={12} sm={12}>
+          <Typography variant="body1" sx={{ fontSize: 20, textAlign: 'center' }}>
             FinanceControl é uma plataforma completa para controle financeiro pessoal e empresarial. Acompanhe receitas, despesas e investimentos em um só lugar.
           </Typography>
-
-        </Box >
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 5 }}>
-
+        </Grid>
+        <Grid item xs={12} sm={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <CustomButton
             bgColor="#8280d8"
             textColor="black"
             href="/registrar"
             icon={<ArrowForwardIosIcon />}
             iconPosition='end'
-            sx={{ mr: { xs: 0, sm: 1 }, mt: { xs: 1, sm: 0 }, fontSize: 20 }}
+            sx={{ fontSize: 20 }}
 
           >
             Começar agora
           </CustomButton>
-        </Box>
+        </Grid>
+      </Grid>
 
+      <Container sx={{ py: 2, px: 1, mt: 3, alignItems: 'center' }} >
         <Grid
           container
           spacing={3}
@@ -152,12 +151,12 @@ export function Welcome() {
       </Container >
       <Container sx={{ py: 2, px: 1, mt: 3, alignItems: 'center', bgcolor: '#1b1a29' }} >
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="h5" sx={{ ml: 15, mr: 15, fontSize: 50, fontWeight: 'bold', textAlign: 'center' }}>
+          <Typography variant="h5" sx={{ fontSize: 35, fontWeight: 'bold', textAlign: 'center' }}>
             Pronto para começar?
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Typography variant="body1" sx={{ mt: 2, ml: 15, mr: 15, fontSize: 20, textAlign: 'center' }}>
+          <Typography variant="body1" sx={{ fontSize: 20, textAlign: 'center' }}>
             Experimente o FinanceControl hoje mesmo e transforme a maneira como você gerencia suas finanças.          </Typography>
 
         </Box >

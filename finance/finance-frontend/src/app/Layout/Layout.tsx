@@ -37,6 +37,8 @@ function Layout() {
     chkRotaLivre()
   }, [location])
 
+  const mostrarModal = location.pathname === '/transacoes/nova'
+
   return (
     <>
       <ThemeProvider theme={THEME}>
@@ -75,9 +77,9 @@ function Layout() {
               <Outlet />
             </Condicional>
 
-            {/* <Condicional condicao={usuarioState.logado}>
+            <Condicional condicao={usuarioState.logado}>
               <MenuFooter />
-            </Condicional> */}
+            </Condicional>
 
             <Condicional condicao={!usuarioState.logado && !rotaLivre}>
               <Welcome />

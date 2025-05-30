@@ -11,15 +11,15 @@ export interface IconButtonProps {
 export default function ButtonMenuFooter({
   tooltipTitle,
   icon,
-  iconSize = { width: 32, height: 32 },
+  iconSize = { width: 45, height: 45 },
   color = 'primary',
   onClick
 }: IconButtonProps) {
   return (
     <>
-      <Box sx={{ flexGrow: 0.5 }} />
-      <Tooltip title={tooltipTitle}>
-        <IconButton color={color} onClick={onClick}>
+      <Box sx={{ flexGrow: 1 }} />
+      <Tooltip title={tooltipTitle} sx={{ mt: 1 }}>
+        <IconButton color={color} onClick={onClick} >
           <Box sx={{ ...iconSize }}>
             {icon}
           </Box>

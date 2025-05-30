@@ -17,7 +17,6 @@ export default function MenuFooter() {
     setMensagemState,
     layoutState,
     setLayoutState,
-    usuarioState
   } = React.useContext(GlobalContext) as GlobalContextInterface
 
   const navigate = useNavigate()
@@ -39,10 +38,38 @@ export default function MenuFooter() {
   return (
     <>
       <Offset />
-      <AppBar onLoad={fecharLoading} position="fixed" color='default' sx={{ top: 'auto', bottom: 0 }}>
+      {/* <Paper
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          left: { xs: "25%", md: "30%", lg: "40%" },
+          transform: "translateX(-50%)",
+          borderRadius: "2rem",
+          boxShadow: 6,
+          zIndex: 1300,
+        }}
+        elevation={3}
+      > */}
+      <AppBar
+        onLoad={fecharLoading}
+        position="fixed"
+        sx={{
+          top: 'auto',
+          bottom: 8,
+          backgroundColor: "#3a3a3a", // fundo claro
+          color: "#000000",           // texto/ícone escuro
+          borderRadius: "2rem 2rem 2rem 2rem ",
+          left: { xs: "50%" },
+          transform: "translateX(-50%)",
+          width: { xs: "90%", sm: "80%", md: "60%" },
+          boxShadow: 6,
+          zIndex: 1300,
+        }}
+        color="default"
+      >
         <Toolbar>
-          {/* {menuFooter
-            .filter((data) => usuarioState.idsMenu.includes(data.id))
+          {menuFooter
+            //.filter((data) => usuarioState.idsMenu.includes(data.id))
             .map((menu, index) => (
               <ButtonMenuFooter
                 key={index}
@@ -51,9 +78,10 @@ export default function MenuFooter() {
                 iconSize={menu.iconSize}
                 color={menu.color as 'inherit' | 'primary' | 'secondary' | 'default'}
                 onClick={() => irPara(menu.route, menu.tooltipTitle)}
-              />))} */}
+              />))}
         </Toolbar>
       </AppBar>
+      {/* </Paper> */}
     </>
   );
 }

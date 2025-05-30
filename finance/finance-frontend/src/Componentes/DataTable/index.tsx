@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon, TableFooter } from '@mui/material'
+import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, TableFooter, Chip, SvgIconProps } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
@@ -11,7 +11,7 @@ export type Order = 'asc' | 'desc';
 export interface DataTableAcaoInterface<T> {
   toolTip: string
   onAcionador: (arg: T, index: number) => void
-  icone: string
+  icone: React.ElementType<SvgIconProps>
   corIcone?: string
   onDisabled?: (arg: T) => boolean
 }
@@ -22,6 +22,11 @@ export interface DataTableCabecalhoInterface {
   alinhamento?: 'left' | 'right' | 'center'
   largura?: number
   format?: (arg: any, row: any) => string | number | undefined
+  render?: (arg: any, row: any) => React.ReactNode
+
+  // 👇 Novas props opcionais para suporte ao Chip
+  chipColor?: (valor: any, row?: any) => 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
+  chipLabel?: (valor: any, row?: any) => string // caso queira customizar o texto do chip
 }
 
 export interface ItemSpeedDial {
@@ -31,7 +36,9 @@ export interface ItemSpeedDial {
 }
 
 export interface DataTableInterface {
-  backgroundColorHead?: string
+  backgroundColor?: string
+  borderColor?: string
+  borderSize?: number
   dados: Array<any>
   cabecalho: Array<DataTableCabecalhoInterface>
   cabecalhoDetalhe?: Array<any>
@@ -109,7 +116,7 @@ export const sumColumns = (data: Array<any>, columns: Array<string>): Record<str
 
 
 export default function DataTable<T>({
-  backgroundColorHead,
+  backgroundColor,
   dados = [],
   cabecalho = [],
   acoes = [],
@@ -118,7 +125,10 @@ export default function DataTable<T>({
   exibirPaginacao = true,
   temTotal = false,
   colunaSoma = [],
-  qtdColunas = 1
+  qtdColunas = 1,
+  tituloTabela = "Dados",
+  borderColor = '#3a3a3a',
+  borderSize = 1
 }: DataTableInterface) {
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -128,21 +138,25 @@ export default function DataTable<T>({
       [theme.breakpoints.up('md')]: {
         padding: '2px',
         fontSize: '0.80rem',
+
       },
-      backgroundColor: backgroundColorHead ? backgroundColorHead : theme.palette.primary.main,
+      backgroundColor: '#3a3a3a',
       color: theme.palette.common.white,
+
     },
     [`&.${tableCellClasses.head}:nth-of-type(1)`]: {
       padding: '1px',
       fontSize: '0.55rem',
+
       [theme.breakpoints.up('md')]: {
         padding: '2px',
         fontSize: '0.80rem',
       },
-      backgroundColor: backgroundColorHead ? backgroundColorHead : theme.palette.primary.main,
+      backgroundColor: '#3a3a3a',
       color: theme.palette.common.white,
       position: "sticky",
       left: 0,
+
     },
     [`&.${tableCellClasses.body}`]: {
       padding: '1px',
@@ -150,9 +164,14 @@ export default function DataTable<T>({
       [theme.breakpoints.up('md')]: {
         padding: '2px',
         fontSize: '0.75rem',
+        border: borderSize + 'px solid ' + borderColor,
+
       },
-      backgroundColor: backgroundColorHead ? backgroundColorHead : theme.palette.primary.main,
+      backgroundColor: backgroundColor ? backgroundColor : theme.palette.primary.main,
       color: theme.palette.common.white,
+      border: borderSize + 'px solid ' + borderColor,
+
+
     },
     [`&.${tableCellClasses.body}:nth-of-type(1)`]: {
       padding: '4px',
@@ -160,11 +179,16 @@ export default function DataTable<T>({
       [theme.breakpoints.up('md')]: {
         padding: '7px',
         fontSize: '0.75rem',
+        border: borderSize + 'px solid ' + borderColor,
+
       },
       position: "sticky",
       left: 0,
-      backgroundColor: backgroundColorHead ? backgroundColorHead : theme.palette.primary.main,
+      backgroundColor: backgroundColor ? backgroundColor : theme.palette.primary.main,
       color: theme.palette.common.white,
+      border: borderSize + 'px solid ' + borderColor,
+
+
     },
     [`&.${tableCellClasses.footer}`]: {
       padding: '1px',
@@ -172,9 +196,13 @@ export default function DataTable<T>({
       [theme.breakpoints.up('md')]: {
         padding: '2px',
         fontSize: '0.75rem',
+        border: borderSize + 'px solid ' + borderColor,
+
       },
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: '#3a3a3a',
       color: theme.palette.common.white,
+      border: borderSize + 'px solid ' + borderColor,
+
     },
     [`&.${tableCellClasses.footer}:nth-of-type(1)`]: {
       padding: '1px',
@@ -182,21 +210,30 @@ export default function DataTable<T>({
       [theme.breakpoints.up('md')]: {
         padding: '2px',
         fontSize: '0.75rem',
+        border: borderSize + 'px solid ' + borderColor,
+
       },
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: '#3a3a3a',
       color: theme.palette.common.white,
       position: "sticky",
       left: 0,
+      border: borderSize + 'px solid ' + borderColor,
+
     },
+
+
   }))
 
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor: backgroundColor ? backgroundColor : theme.palette.primary.main,
+      border: borderSize + 'px solid ' + borderColor,
+
+
     },
     // hide last border
     '&:last-child td, &:last-child th': {
-      border: 0,
+      border: borderSize + 'px solid ' + borderColor,
     },
   }));
 
@@ -206,6 +243,7 @@ export default function DataTable<T>({
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof any>('nome')
+
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -230,15 +268,29 @@ export default function DataTable<T>({
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property);
+
   }
 
   const totalColunas = sumColumns(dados, colunaSoma)
 
+  const chipStyle = (valor: string) => {
+    switch (valor) {
+      case 'Receita':
+        return { backgroundColor: '#2e7d32', color: '#fff' }; // verde escuro
+      case 'Despesa':
+        return { backgroundColor: '#d32f2f', color: '#fff' }; // vermelho
+      case 'sttus':
+        return { backgroundColor: '#616161', color: '#fff' }; // cinza
+      default:
+        return { backgroundColor: '#616161', color: '#fff' }; // cinza
+    }
+  }
+
   return (
     <>
       <TableContainer component={Paper}>
-        <Table >
-          <TableHead >
+        <Table>
+          <TableHead sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.common.white }}>
             <StyledTableRow >
               {cabecalho.map((coluna, indice) => (
                 <StyledTableCell
@@ -259,7 +311,7 @@ export default function DataTable<T>({
               ))}
               <Condicional condicao={acoes.length > 0}>
                 <StyledTableCell align='center'>
-                  Opções
+                  Ações
                 </StyledTableCell>
               </Condicional>
             </StyledTableRow>
@@ -278,9 +330,33 @@ export default function DataTable<T>({
                         return (
                           <StyledTableCell
                             key={indice}
-                            align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
-                            {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
+                            align={coluna.alinhamento ?? 'left'}
+                          >
+                            {
+                              coluna.render
+                                ? coluna.render((row as any)[coluna.campo], row)
+                                : coluna.chipColor
+                                  ? (
+                                    <Chip
+                                      variant="outlined"
+                                      label={coluna.chipLabel
+                                        ? coluna.chipLabel((row as any)[coluna.campo], row)
+                                        : (row as any)[coluna.campo]
+                                      }
+                                      color={coluna.chipColor((row as any)[coluna.campo], row)}
+                                      size="small"
+                                      sx={{
+                                        fontWeight: 'bold',
+                                        ...chipStyle((row as any)[coluna.campo])
+                                      }}
+                                    />
+                                  )
+                                  : coluna.format
+                                    ? coluna.format((row as any)[coluna.campo], row)
+                                    : (row as any)[coluna.campo]
+                            }
                           </StyledTableCell>
+
                         )
                       })
                     }
@@ -295,7 +371,16 @@ export default function DataTable<T>({
                                 onClick={() => acao.onAcionador(row as T, indice)}
                                 sx={{ mx: 0, px: 0 }}
                               >
-                                <Icon
+                                <acao.icone
+                                  sx={{
+                                    color: acao.corIcone ?? theme.palette.secondary.main,
+                                    fontSize: '1.25rem',
+                                    [theme.breakpoints.up('md')]: {
+                                      fontSize: '1.55rem',
+                                    },
+                                  }}
+                                />
+                                {/* <Icon
                                   sx={{
                                     color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main,
                                     fontSize: '1.25rem',
@@ -307,7 +392,8 @@ export default function DataTable<T>({
                                   }}
                                 >
                                   {acao.icone}
-                                </Icon>
+                                </Icon> */}
+
                               </IconButton>
                             </span>
                           </Tooltip>
@@ -362,6 +448,18 @@ export default function DataTable<T>({
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           sx={{
+            backgroundColor: '#3a3a3a',
+            color: '#fff',
+            borderLeft: borderSize + 'px solid ' + borderColor,
+            borderRight: borderSize + 'px solid ' + borderColor,
+            borderBottom: borderSize + 'px solid ' + borderColor,
+            borderRadius: '4px',
+            '& .MuiTablePagination-selectIcon': {
+              color: '#fff', // Cor desejada para a seta
+            },
+            '& .MuiTablePagination-actions svg': {
+              color: '#ffffff', // Altere para a cor desejada
+            },
             '& .MuiTablePagination-toolbar': {
               padding: theme.spacing(1),
               [theme.breakpoints.down('sm')]: {
@@ -398,7 +496,6 @@ export default function DataTable<T>({
                 fontSize: '1rem',
               },
             },
-
           }}
         />
       </Condicional>

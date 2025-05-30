@@ -45,8 +45,6 @@ export default function Login() {
 
     if (validarDados()) {
 
-      console.log('btEntrar', dados)
-
       clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
         url: 'loginUsuario',
         method: 'post',
@@ -130,7 +128,7 @@ export default function Login() {
                 id: '7',
                 parentId: null,
                 descricao: 'Categorias',
-                path: '/Produto',
+                path: '/categorias',
                 icon: 'category_rounded',
                 filhos: [],
                 //permitido: rs.dados.permissoes.PRODUTO.PERMISSOES.MANUTENCAO.length > 0,
@@ -266,13 +264,13 @@ export default function Login() {
           container
           justifyContent='center'
           alignItems='center'
-          height='100vh'
+          height='90vh'
 
         >
           <Grid item xs={10} sm={8} md={6} lg={4}>
             <Paper sx={{ bgcolor: '#050416' }}>
               <Box
-                sx={{ backgroundColor: 'primary.main', padding: 2, bgcolor: '#050416' }}
+                sx={{ backgroundColor: 'primary.main', bgcolor: '#050416' }}
                 textAlign='center'
 
               >

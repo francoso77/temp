@@ -1,9 +1,8 @@
 export interface AccountInterface {
   id?: string
   name: string
-  type: 'checking' | 'savings' | 'investment' | 'credit' | 'cash' | 'other'
+  type: 'corrente' | 'poupanca' | 'investmento' | 'credito' | 'dinheiro' | 'outros'
   initialBalance: number
-  currency: string
   color: string
   isDefault?: boolean
 }

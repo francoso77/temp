@@ -1,29 +1,27 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { Select, Tooltip, Typography } from '@mui/material';
+import { Tooltip, Typography, useMediaQuery } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import CustomButton from '../../Componentes/Button';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import InputSelect from '../../Componentes/Select';
-import CircleIcon from '@mui/icons-material/Circle';
-import { ColorItem, ColorSelectList } from '../../Componentes/ColorSelect';
-
-
-
-
+import { ColorSelectList } from '../../Componentes/ColorSelect';
+import Condicional from '../../Componentes/Condicional/Condicional';
+import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 export default function HeaderMenu() {
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const {
     layoutState,
@@ -61,13 +59,13 @@ export default function HeaderMenu() {
     }
   }
 
-  const [items, setItems] = React.useState<ColorItem[]>([
-    { id: 1, name: 'Conta Corrente', color: '#ff0000' },
-    { id: 2, name: 'Caixa', color: '#00ff00' },
-    { id: 3, name: 'Conta Investimento', color: '#0000ff' },
-  ]);
+  // const [items] = React.useState<ColorItem[]>([
+  //   { id: 1, name: 'Conta Corrente', color: '#ff0000' },
+  //   { id: 2, name: 'Caixa', color: '#00ff00' },
+  //   { id: 3, name: 'Conta Investimento', color: '#0000ff' },
+  // ]);
 
-  const handleItemChange = (selected: ColorItem | null) => {
+  const handleItemChange = (selected: AccountInterface | null) => {
     console.log('Selecionado:', selected);
   };
 
@@ -75,7 +73,7 @@ export default function HeaderMenu() {
     <>
       <AppBar sx={{ bgcolor: '#010108' }} onLoad={fecharLoading}>
         <Toolbar sx={{ mb: 2, borderBottom: '0.5px solid #3a3a3a', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
-          {/* <Tooltip title='Menu'>
+          <Tooltip title='Menu'>
             <IconButton
               color='primary'
               aria-label="open drawer"
@@ -83,22 +81,27 @@ export default function HeaderMenu() {
               edge="start"
               sx={{ mr: 2 }}
             >
-              <MenuIcon sx={{ width: 32, height: 32 }} />
+              <CurrencyExchangeIcon sx={{ width: isMobile ? 25 : 32, height: isMobile ? 25 : 32, color: "#8280d8" }} />
             </IconButton>
-          </Tooltip> */}
-          <Box>
+          </Tooltip>
+          {/* <Box>
             <CurrencyExchangeIcon sx={{ fontSize: 35, color: "#8280d8" }} />
-          </Box>
-          <Typography variant="h6" gutterBottom sx={{ m: '20px', color: ' #fff', textAlign: 'left' }}>
-            FinanceControl
-          </Typography>
-          <Box >
+          </Box> */}
+          <Condicional condicao={!isMobile}>
             <Typography variant="h6" gutterBottom sx={{ m: '20px', color: ' #fff', textAlign: 'left' }}>
-              {layoutState.titulo}
+              FinanceControl
             </Typography>
-          </Box>
+            <Box >
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ m: '20px', color: ' #fff', textAlign: 'left' }}>
+                {layoutState.titulo}
+              </Typography>
+            </Box>
+          </Condicional>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ mr: 1 }}>
+          {/* <Box sx={{ mr: 1 }}>
             <ColorSelectList
               valorPadrao={items[0].id as number}
               label="Contas"
@@ -107,17 +110,27 @@ export default function HeaderMenu() {
               menuBgColor='#010108'
               corIcon='#fff'
               corTexto='#fff'
+              minWidth={isMobile ? 100 : 220}
+              maxHeight={isMobile ? 20 : 35}
+              fontSize={isMobile ? 10 : 16}
+              width={isMobile ? 10 : 16}
+              height={isMobile ? 10 : 16}
 
             />
-          </Box>
+          </Box> */}
           <Box>
             <CustomButton
-              onClick={() => navegar('/')}
+              onClick={() => navegar('/transacoes/nova')}
               bgColor='#1976d2'
               textColor='black'
               iconPosition='start'
               icon={<MonetizationOnIcon />}
-              sx={{ mr: '10px' }}
+              sx={{
+                fontSize: isMobile ? '0.6rem' : '0.875rem',
+                py: isMobile ? 0 : 0.75,
+                px: isMobile ? 1 : 1
+              }}
+
             >
               Nova Transação
             </CustomButton>
@@ -139,48 +152,6 @@ export default function HeaderMenu() {
         </Toolbar>
       </AppBar>
       <Offset />
-
-      {/* <Condicional condicao={!verificarTipoUsuario()}>
-        <Box sx={{ flexGrow: 1 }}>
-          <AppBar onLoad={fecharLoading} color='primary' >
-            <Toolbar>
-              <Tooltip title='Voltar'>
-                <IconButton
-                  size="large"
-                  edge="start"
-                  color="inherit"
-                  aria-label="open drawer"
-                  sx={{ mr: 2 }}
-                  onClick={() => handleClick(true)}
-                >
-                  <ChevronLeftIcon />
-                </IconButton>
-              </Tooltip>
-              <Box sx={{ flexGrow: 1 }} />
-              <Box >
-                <Typography variant="body1" gutterBottom sx={{ margin: '20px' }}>
-                  {layoutState.titulo}
-                </Typography>
-              </Box>
-              <Box sx={{ flexGrow: 1 }} />
-              <Box sx={{ marginRight: -2 }}>
-                <Tooltip title='Sair'>
-                  <IconButton
-                    size="large"
-                    edge="end"
-                    color="inherit"
-                    sx={{ mr: 1 }}
-                    onClick={() => handleClick(false)}
-                  >
-                    <LogoutIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </Toolbar>
-          </AppBar>
-          <Offset />
-        </Box>
-      </Condicional> */}
     </>
   );
 }

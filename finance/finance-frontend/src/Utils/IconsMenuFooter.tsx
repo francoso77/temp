@@ -8,6 +8,12 @@ import FactCheckTwoToneIcon from '@mui/icons-material/FactCheckTwoTone';
 import InventoryTwoToneIcon from '@mui/icons-material/InventoryTwoTone';
 import PersonOutlineTwoToneIcon from '@mui/icons-material/PersonOutlineTwoTone';
 import FormatPaintIcon from '@mui/icons-material/FormatPaint';
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import CategoryIcon from "@mui/icons-material/Category";
+import BusinessIcon from "@mui/icons-material/Business";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import PrintIcon from '@mui/icons-material/Print';
 
 export const iconMap: { [key: string]: React.ReactNode } = {
   FactoryIcon: <FactoryIcon />,
@@ -19,5 +25,11 @@ export const iconMap: { [key: string]: React.ReactNode } = {
   FactCheckTwoToneIcon: <FactCheckTwoToneIcon />,
   InventoryTwoToneIcon: <InventoryTwoToneIcon />,
   PersonOutlineTwoToneIcon: <PersonOutlineTwoToneIcon />,
-  FormatPaintIcon: <FormatPaintIcon />
+  FormatPaintIcon: <FormatPaintIcon />,
+  AccountBalanceIcon: <AccountBalanceIcon />,
+  SyncAltIcon: <SyncAltIcon />,
+  CategoryIcon: <CategoryIcon />,
+  BusinessIcon: <BusinessIcon />,
+  BarChartIcon: <BarChartIcon />,
+  PrintIcon: <PrintIcon />
 }

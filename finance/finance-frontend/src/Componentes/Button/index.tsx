@@ -38,12 +38,13 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       startIcon={iconPosition === 'start' ? icon : undefined}
       endIcon={iconPosition === 'end' ? icon : undefined}
       sx={{
+        zIndex: 1,
         backgroundColor: bgColor,
         color: textColor,
         textTransform: 'none',
         '&:hover': {
           backgroundColor: bgColor,
-          opacity: 0.9,
+          opacity: 0.5,
         },
         ...sx,
       }}

@@ -4,23 +4,10 @@ import Condicional from '../../Componentes/Condicional/Condicional';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { Button, Dialog, Grid, Typography } from '@mui/material';
+import { Dialog, Grid, Typography } from '@mui/material';
 import { useContext } from 'react';
 import TitleBar from '../../Componentes/BarraDeTitulo';
 import CustomButton from '../../Componentes/Button';
-
-// const style = {
-//   position: 'absolute' as 'absolute',
-//   top: '50%',
-//   left: '50%',
-//   transform: 'translate(-50%, -50%)',
-//   width: 400,
-//   bgcolor: 'background.paper',
-//   border: '2px solid #000',
-//   boxShadow: 24,
-//   p: 4,
-//   display: 'flex'
-// };
 
 export default function Mensagem() {
   const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
@@ -34,9 +21,6 @@ export default function Mensagem() {
 
   const fecharJanela = () => {
     setMensagemState({ ...mensagemState, exibir: false })
-    if (mensagemState.cb) {
-      mensagemState.cb(true)
-    }
   }
   const exibirBotao = (): boolean =>
     (typeof mensagemState.exibirBotao === 'boolean' && mensagemState.exibirBotao)
@@ -46,34 +30,51 @@ export default function Mensagem() {
     (typeof mensagemState.exibirBotao === 'string' && mensagemState.exibirBotao.length > 0) ? mensagemState.exibirBotao
       : (typeof mensagemState.exibirBotao === 'boolean' && mensagemState.exibirBotao) ? 'Fechar' : ''
 
+  const darkStyles = {
+    backgroundColor: '#121212',
+    color: '#ffffff',
+  };
+
   const MontaMensagem = () =>
 
-    <Grid container justifyContent='center' alignItems='center' sx={{ margin: 'auto' }}>
-      <Grid item xs={12} sx={{ padding: 2, border: 'none', borderWidth: '2px', borderColor: 'green', textAlign: 'left' }}>
-        <Box>
-          <Condicional condicao={mensagemState.titulo.length > 0}>
-            <TitleBar title={mensagemState.titulo} />
-            {/* <Typography variant="h6" sx={{ fontWeight: 'bolder' }}>
-              {mensagemState.titulo}
-            </Typography> */}
-          </Condicional>
-        </Box>
+    <Grid container justifyContent='center' alignItems='center' sx={{ ...darkStyles, border: '1px solid #333' }}>
+      <Grid item xs={12} sx={{ textAlign: 'left' }}> <Box>
+        <Condicional condicao={mensagemState.titulo.length > 0}>
+          <TitleBar
+            title={mensagemState.titulo}
+            textColor='#ffffff'
+            backgroundColor='#121212'
+            fontSize='1.5rem'
+          />
+          <Box sx={{ borderBottom: '1px solid #333' }} />
+        </Condicional>
+      </Box>
       </Grid>
-      <Grid item xs={12} sx={{ padding: 2, border: 'none', borderWidth: '2px', borderColor: 'green', textAlign: 'center' }}>
+      <Grid item xs={12} sx={{ padding: 1, textAlign: 'center' }}>
         <Condicional condicao={mensagemState.tipo === MensagemTipo.Loading}>
           <CircularProgress />
         </Condicional>
         <Condicional condicao={mensagemState.tipo === MensagemTipo.Warning && mensagemState.mensagem.length > 0}>
-          <Alert severity={'warning'}> {mensagemState.mensagem}</Alert>
+          <Alert severity={'warning'} sx={{ bgcolor: '#121212', }}>
+            <Typography sx={{ fontSize: '1.2rem' }}>{mensagemState.mensagem}</Typography>
+          </Alert>
         </Condicional>
         <Condicional condicao={mensagemState.tipo === MensagemTipo.Error && mensagemState.mensagem.length > 0}>
-          <Alert severity={'error'}> {mensagemState.mensagem}</Alert>
+          <Alert severity={'error'} sx={{ bgcolor: '#121212' }}>
+            <Typography sx={{ fontSize: '1.2rem' }}>{mensagemState.mensagem}</Typography>
+          </Alert>
         </Condicional>
         <Condicional condicao={mensagemState.tipo === MensagemTipo.Info && mensagemState.mensagem.length > 0}>
-          <Alert severity={'info'}> {mensagemState.mensagem}</Alert>
+          <Alert severity={'info'} sx={{ bgcolor: '#121212' }}>
+            <Typography sx={{ fontSize: '1.2rem' }}>{mensagemState.mensagem}</Typography>
+
+          </Alert>
         </Condicional>
         <Condicional condicao={mensagemState.tipo === MensagemTipo.Ok && mensagemState.mensagem.length > 0}>
-          <Alert severity={'success'} > {mensagemState.mensagem}</Alert>
+          <Alert severity={'success'} sx={{ bgcolor: '#121212' }}>
+            <Typography sx={{ fontSize: '1.2rem' }}>{mensagemState.mensagem}</Typography>
+
+          </Alert>
         </Condicional>
       </Grid>
       <Condicional condicao={exibirBotao()}>
@@ -81,49 +82,28 @@ export default function Mensagem() {
           <Box>
             <Condicional condicao={mensagemState.exibirBotao !== 'SN'}>
               <CustomButton
-                bgColor='#1976d2'
+                bgColor='#333'
                 textColor='#ffffff'
                 onClick={() => fecharJanela()}
                 sx={{ margin: 2, color: 'white' }}>
                 {textoBotao()}
               </CustomButton>
-              {/* <Button
-                variant='contained'
-                color='primary'
-                onClick={() => fecharJanela()}
-                sx={{ margin: 2, color: 'white' }}>
-                {textoBotao()}
-              </Button> */}
             </Condicional>
             <Condicional condicao={mensagemState.exibirBotao === 'SN'}>
               <CustomButton
                 bgColor='#1976d2'
-                textColor='#ffffff'
+                textColor='#000'
                 onClick={() => btResposta(true)}
-                sx={{ margin: 2, color: 'white' }}>
+                sx={{ color: 'white' }}>
                 Sim
               </CustomButton>
-              {/* <Button
-                variant='contained'
-                color='primary'
-                onClick={() => btResposta(true)}
-                sx={{ margin: 2, color: 'white' }}>
-                Sim
-              </Button> */}
               <CustomButton
-                bgColor='#1976d2'
-                textColor='#ffffff'
+                bgColor='#10355a'
+                textColor='#000'
                 onClick={() => btResposta(false)}
-                sx={{ margin: 2, color: 'white' }}>
+                sx={{ ml: 1, color: 'white' }}>
                 Não
               </CustomButton>
-              {/* <Button
-                variant='contained'
-                color='primary'
-                onClick={() => btResposta(false)}
-                sx={{ margin: 2, color: 'white' }}>
-                Não
-              </Button> */}
             </Condicional>
           </Box>
         </Grid>
@@ -134,6 +114,11 @@ export default function Mensagem() {
     <Dialog
       fullWidth
       open={mensagemState.exibir}
+      PaperProps={{
+        sx: {
+          ...darkStyles,
+        }
+      }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >

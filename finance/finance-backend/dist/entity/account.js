@@ -26,13 +26,9 @@ var Account = /** @class */ (function () {
         __metadata("design:type", String)
     ], Account.prototype, "type", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 3 }),
+        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
         __metadata("design:type", Number)
     ], Account.prototype, "initialBalance", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Account.prototype, "currency", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)

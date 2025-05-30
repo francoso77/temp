@@ -77,7 +77,7 @@ export const THEME = createTheme({
     MuiIconButton: {
       defaultProps: {
         color: 'secondary',
-        style: { height: '35px', width: '35px' }
+        style: { height: '45px', width: '45px' }
       },
       styleOverrides: {
         root: {

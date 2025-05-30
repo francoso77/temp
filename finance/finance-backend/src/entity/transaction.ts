@@ -2,10 +2,12 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, Primary
 import { TransactionInterface } from '../interfaces/transaction';
 import Category from './category';
 import Account from './account';
+import Company from './company';
 
 @Index(['date', 'description'])
 @Entity({ name: 'transactions' })
 export default class Transaction implements TransactionInterface {
+
   @PrimaryColumn({ generated: 'uuid' })
   id: string;
 
@@ -16,7 +18,10 @@ export default class Transaction implements TransactionInterface {
   amount: number;
 
   @Column()
-  type: 'income' | 'expense';
+  type: 'Receita' | 'Despesa';
+
+  @Column()
+  setor: 'Dublagem' | 'Malharia';
 
   @Column()
   categoryId: string;
@@ -31,6 +36,13 @@ export default class Transaction implements TransactionInterface {
   @JoinColumn({ name: 'accountId' })
   @ManyToOne(() => Account)
   account: Account
+
+  @Column()
+  companyId: string;
+
+  @JoinColumn({ name: 'companyId' })
+  @ManyToOne(() => Company)
+  company: Company
 
   @Column({ type: "datetime" })
   date: string

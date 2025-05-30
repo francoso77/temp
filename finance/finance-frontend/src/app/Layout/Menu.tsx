@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useContext } from "react";
 import { styled } from '@mui/material/styles';
-import { Box, Button, Drawer, List, Toolbar, Typography } from '@mui/material';
-import MenuItem from './MenuItem';
+import { Box, Button, Drawer, Toolbar, Typography } from '@mui/material';
 import { GlobalContext, GlobalContextInterface } from "../../ContextoGlobal/ContextoGlobal";
-import { MenuOpcoesInterface } from "./ClsMenu";
-import { ColorItem, ColorSelectList } from '../../Componentes/ColorSelect';
+import { ColorSelectList } from '../../Componentes/ColorSelect';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ComboBox from '../../Componentes/ComboBox';
 import DateRangeSelectorModal from '../../Componentes/DateRangeSelector';
+import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
+import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
+import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
+import ClsCrud from '../../Utils/ClsCrudApi';
+import { TipoTransactionTypes } from '../../types/tipoTransactionTypes';
+import { SetorTypes } from '../../types/setorTypes';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
-const drawerWidth = 260
+const drawerWidth = 270;
 
-
-interface CategoriaInterface {
-    id: number;
-    name: string;
+export interface DadosPesquisa {
+    dataInicio: '',
+    dataFim: '',
+    categoria: '',
+    empresa: '',
+    setor: '',
+    tipo: '',
 }
 
 export default function Menu() {
@@ -25,6 +32,12 @@ export default function Menu() {
     const [modalOpen, setModalOpen] = useState(false);
     const [dataInicio, setDataInicio] = useState<string>('');
     const [dataFim, setDataFim] = useState<string>('');
+    const [dadosPesquisa, setDadosPesquisa] = useState<Array<DadosPesquisa>>([])
+
+    const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
+    //const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
+    const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
+    const clsCrud = new ClsCrud()
 
     const handleAbrirModal = () => {
         setModalOpen(true);
@@ -37,34 +50,57 @@ export default function Menu() {
     const handleConfirmarDatas = (inicio: string, fim: string) => {
         setDataInicio(inicio);
         setDataFim(fim);
+        //setDadosPesquisa([...dadosPesquisa, { dataInicio: dataInicio, dataFim: fim }])
     };
 
     const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
-    const [items, setItems] = useState<ColorItem[]>([
-        { id: 1, name: 'Conta Corrente', color: '#ff0000' },
-        { id: 2, name: 'Caixa', color: '#00ff00' },
-        { id: 3, name: 'Conta Investimento', color: '#0000ff' },
-    ]);
-
-    const [categorias, setCategorias] = useState<CategoriaInterface[]>([
-        { id: 1, name: 'Vendas' },
-        { id: 2, name: 'Serviços' },
-        { id: 3, name: 'Salários' },
-    ]);
-
-    const [tipos, setTipos] = useState<CategoriaInterface[]>([
-        { id: 2, name: 'Despesas' },
-        { id: 3, name: 'Receitas' },
-    ])
+    // const [items] = useState<ColorItem[]>([
+    //     { id: 1, name: 'Conta Corrente', color: '#ff0000' },
+    //     { id: 2, name: 'Caixa', color: '#00ff00' },
+    //     { id: 3, name: 'Conta Investimento', color: '#0000ff' },
+    // ]);
 
 
-    const [setores, setSetores] = useState<CategoriaInterface[]>([
-        { id: 2, name: 'Dublagem' },
-        { id: 3, name: 'Malharia' },
-    ])
-    const handleItemChange = (selected: ColorItem | null) => {
+    const handleItemChange = (selected: AccountInterface | null) => {
         console.log('Selecionado:', selected);
     };
+
+    const xuxu = (selected: CategoryInterface | null) => {
+        console.log('Selecionado:', selected);
+    };
+    const BuscarDados = () => {
+        clsCrud
+            .pesquisar({
+                entidade: "Account",
+                campoOrder: ['name'],
+            })
+            .then((rs: Array<AccountInterface>) => {
+                setRsContas(rs)
+            })
+
+        clsCrud
+            .pesquisar({
+                entidade: "Category",
+                campoOrder: ['name'],
+            })
+            .then((rs: Array<CategoryInterface>) => {
+                setRsCategorias(rs)
+            })
+
+        clsCrud
+            .pesquisar({
+                entidade: "Account",
+                campoOrder: ['name'],
+            })
+            .then((rs: Array<AccountInterface>) => {
+                setRsContas(rs)
+            })
+
+    }
+
+    useEffect(() => {
+        BuscarDados()
+    }, []);
 
     return (
         <>
@@ -82,43 +118,31 @@ export default function Menu() {
                     }, zIndex: (theme) => theme.zIndex.appBar - 1
                 }}
                 anchor='left'
-                open={true}
-            //onClose={() => { setLayoutState({ ...layoutState, exibirMenu: false }) }}
+                open={layoutState.exibirMenu}
+                onClose={() => { setLayoutState({ ...layoutState, exibirMenu: false }) }}
             >
                 <Toolbar />
-                <Box sx={{ overflow: 'auto' }}>
-                    <List
-                        sx={{ width: '100%', maxWidth: 200, }}
-                        component="nav"
-                        aria-labelledby="nested-list-subheader"
-                    >
-                        {layoutState.opcoesMenu?.map((menu: MenuOpcoesInterface, indice: number) =>
-                            <MenuItem key={indice} menu={menu} deslocamento={0} />
-                        )}
-                    </List>
-                    {/* <Offset /> */}
-                </Box>
-                <Box sx={{ mb: 2, borderTop: '0.5px solid #3a3a3a', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'left' }} >
+                <Box sx={{ mt: 1, mb: 2, borderTop: '0.5px solid #3a3a3a', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'left' }} >
                     <FilterAltIcon sx={{ color: '#fff', mt: 1 }} />
                     <Typography variant="body2" sx={{ color: '#fff', fontSize: 16, mt: 1 }}>
                         Filtros
                     </Typography>
                 </Box>
-                <Box >
+                <Box sx={{ ml: 1 }}>
                     <Typography variant="body2" sx={{ color: '#fff', fontSize: 16, mt: 1, ml: 1 }}>
                         Conta
                     </Typography>
                     <ColorSelectList
-                        valorPadrao={items[0].id as number}
+                        //valorPadrao={rsContas[0].id as string}
                         label="Contas"
-                        items={items}
+                        items={rsContas}
                         onChange={handleItemChange}
                         menuBgColor='#010108'
                         corIcon='#fff'
                         corTexto='#fff'
                     />
                 </Box>
-                <Box >
+                <Box sx={{ ml: 1 }} >
                     <Typography variant="body2" sx={{ color: '#fff', fontSize: 16, mt: 1, ml: 1 }}>
                         Período
                     </Typography>
@@ -132,7 +156,7 @@ export default function Menu() {
                             color: '#fff',
                             border: '1px solid #3a3a3a',
                             fontSize: '16px',
-                            minWidth: '95%',
+                            minWidth: '85%',
                             m: 0,
                             p: 0.5
                         }}
@@ -146,7 +170,7 @@ export default function Menu() {
                             backgroundColor: '#030313',
                             color: '#fff',
                             border: '1px solid #3a3a3a',
-                            maxWidth: '95%',
+                            maxWidth: '85%',
                             justifyItems: 'center'
                         }}>
                         <Typography variant="subtitle1" >Período Selecionado:</Typography>
@@ -159,49 +183,55 @@ export default function Menu() {
                     />
 
                 </Box>
-                <Box >
+                <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
                     <ComboBox
                         label='Categoria'
                         corFundo='#010108'
-                        opcoes={categorias}
-                        onChange={(e) => console.log(e)}
-                        field='name'
-                        setState={() => { }}
-                        dados={{}}
+                        corFonte={"#fff"}
+                        opcoes={rsCategorias}
+                        field='categoria'
+                        setState={setDadosPesquisa}
+                        dados={dadosPesquisa}
                         campoID='id'
                         campoDescricao='name'
                         mensagemPadraoCampoEmBranco='Escolha uma categoria'
+                        onChange={xuxu}
                     />
                 </Box>
-                <Box sx={{ mt: 5 }}>
+                <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
                     <ComboBox
                         label='Tipo'
                         corFundo='#010108'
-                        opcoes={tipos}
-                        onChange={(e) => console.log(e)}
-                        field='name'
-                        setState={() => { }}
-                        dados={{}}
-                        campoID='id'
-                        campoDescricao='name'
+                        corFonte={"#fff"}
+                        opcoes={TipoTransactionTypes}
+                        field='tipo'
+                        setState={setDadosPesquisa}
+                        dados={dadosPesquisa}
+                        campoID='idTipoTransactionType'
+                        campoDescricao='descricao'
                         mensagemPadraoCampoEmBranco='Escolha um tipo'
+                        onChange={handleItemChange}
+
                     />
                 </Box>
-                <Box sx={{ mt: 5 }}>
+                <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
                     <ComboBox
                         label='Setor'
                         corFundo='#010108'
-                        opcoes={setores}
-                        onChange={(e) => console.log(e)}
-                        field='name'
-                        setState={() => { }}
-                        dados={{}}
-                        campoID='id'
-                        campoDescricao='name'
-                        mensagemPadraoCampoEmBranco='Escolha um setor'
+                        corFonte={"#fff"}
+                        opcoes={SetorTypes}
+                        field='setor'
+                        setState={setDadosPesquisa}
+                        dados={dadosPesquisa}
+                        campoID='idSetorType'
+                        campoDescricao='descricao'
+                        mensagemPadraoCampoEmBranco='Escolha o setor'
+                        onChange={handleItemChange}
+
                     />
                 </Box>
-            </Drawer>
+                <Offset />
+            </Drawer >
         </>
     )
 }

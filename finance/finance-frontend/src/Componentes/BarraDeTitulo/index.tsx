@@ -8,6 +8,7 @@ interface TitleBarProps {
   onClose?: () => void;
   backgroundColor?: string;
   textColor?: string;
+  fontSize?: string;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -15,7 +16,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   highlightIndex = 0,
   onClose,
   backgroundColor = '#1976d2', // cor padrão (azul primário do MUI)
-  textColor = '#fff'
+  textColor = '#fff',
+  fontSize = '1rem'
 }) => {
   const renderTitle = () => {
     return (
@@ -27,7 +29,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
             sx={{
               fontWeight: highlightIndex === index ? 'bold' : 'normal',
               color: textColor,
-              fontSize: '1.25rem'
+              fontSize: fontSize
             }}
           >
             {char}
@@ -44,9 +46,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor,
-        padding: '8px 16px',
         width: '100%',
-        borderRadius: '4px 4px 0 0'
+        borderRadius: '4px 4px 0 0',
+        padding: '8px 16px'
       }}
     >
       <Box>{renderTitle()}</Box>

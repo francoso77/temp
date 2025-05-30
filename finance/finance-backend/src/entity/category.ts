@@ -11,7 +11,7 @@ export default class Category implements CategoryInterface {
   name: string;
 
   @Column()
-  type: 'income' | 'expense' | 'both';
+  type: 'Receita' | 'Despesa';
 
   @Column()
   color: string;

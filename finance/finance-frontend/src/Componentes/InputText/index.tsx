@@ -193,7 +193,7 @@ const CurrencyMaskCustom = forwardRef((props: any, ref: any) => {
       {...other}
       mask={Number}
       scale={scale ? scale : 2}
-      // signed={true}
+      signed={true}
       padFractionalZeros={true}
       normalizeZeros={true}
       onAccept={(value: any) =>
@@ -246,7 +246,7 @@ const converterEmAnoMesDia = (valor: string): string => {
 export default function InputText({
   posicaoLabel = 'top',
   corFundo = '',
-  corFonte = '',
+  corFonte = '#fff',
   tamanhoFonte = 16,
   inputRef,
   label,
@@ -306,7 +306,12 @@ export default function InputText({
     return (
       <>
         <FormControlLabel
-          sx={{ width: width }}
+          sx={{
+            width: width,
+            '& .MuiFormControlLabel-label': {
+              color: corFonte, // ou use 'primary.main', 'secondary.main', '#ff0000', etc.
+            },
+          }}
           label={label}
           labelPlacement={labelPlacement}
           control={
@@ -363,7 +368,21 @@ export default function InputText({
           sx={{
             color: corFonte,
             fontSize: tamanhoFonte,
-            backgroundColor: corFundo,
+            // backgroundColor: corFundo,
+            // border: '0.5px solid  #3a3a3a',
+            // '&.Mui-disabled': {
+            //   //color: '#aa1e1e', // Cor da fonte
+            //   backgroundColor: '#c99999', // (opcional) Cor de fundo para desabilitado
+            //   border: '0.5px solid  #3a3a3a',
+
+            // },
+            '& .MuiOutlinedInput-notchedOutline': {
+              color: '#ccc', // Cor da borda
+              borderColor: '#ccc', // (opcional) Cor da borda
+              border: '0.5px solid  #3a3a3a',
+
+            },
+
           }}
           inputRef={inputRef}
           name={field}

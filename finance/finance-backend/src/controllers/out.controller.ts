@@ -1,9 +1,26 @@
 import { Body, Controller, Post } from "@nestjs/common"
 import { AppDataSource } from '../data-source'
+import Account from '../entity/account'
 
 
 @Controller()
 export class OutController {
+
+
+  @Post("alterarPadrao")
+  async alterarPadrao(): Promise<{ success: boolean; affected?: number; error?: any }> {
+    try {
+      const result = await AppDataSource
+        .getRepository(Account)
+        .update({ isDefault: true }, { isDefault: false });
+
+      return { success: true, affected: result.affected };
+    } catch (error) {
+      return { success: false, error };
+    }
+  }
+
+
 
   //   @Post("produtosEmEstoque")
   //   async produtosEmEstoque(

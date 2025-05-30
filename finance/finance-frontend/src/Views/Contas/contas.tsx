@@ -1,0 +1,299 @@
+import { Grid, Typography } from '@mui/material';
+import React, { useContext, useState } from 'react';
+import CustomButton from '../../Componentes/Button';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
+import InputText from '../../Componentes/InputText';
+import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
+import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
+import ClsCrud from '../../Utils/ClsCrudApi';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import { AccountCard } from '../../Componentes/AccountCard';
+import Condicional from '../../Componentes/Condicional/Condicional';
+import { ContasFicha } from './contasFicha';
+
+
+interface PesquisaInterface {
+  name: string
+}
+
+export const ResetAccount: AccountInterface = {
+  name: '',
+  type: 'corrente',
+  initialBalance: 0,
+  color: '#b1a1a1',
+  isDefault: false
+}
+
+export function Contas() {
+
+  const [open, setOpen] = useState(false);
+
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const [contas, setContas] = React.useState<AccountInterface>(ResetAccount);
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
+  const [rsPesquisa, setRsPesquisa] = useState<Array<AccountInterface>>([])
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
+  const clsCrud = new ClsCrud()
+
+  const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
+    {
+      cabecalho: 'Cor',
+      alinhamento: 'center',
+      campo: 'color',
+      render: (valor: string) => (
+        <div
+          style={{
+            backgroundColor: valor,
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            border: '1px solid #ccc',
+            margin: '0 auto'
+
+          }}
+          title={valor}
+        />
+      )
+    },
+    {
+      cabecalho: 'Conta',
+      alinhamento: 'center',
+      campo: 'name',
+      //format: (arg: string) => arg.toUpperCase()
+    },
+    {
+      campo: 'type',
+      cabecalho: 'Tipo',
+      alinhamento: 'center',
+    },
+    {
+      campo: 'initialBalance',
+      cabecalho: 'Saldo Inicial',
+      alinhamento: 'center',
+      format: (arg: number) => arg.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
+    },
+    {
+      campo: 'isDefault',
+      cabecalho: 'Status',
+      alinhamento: 'center',
+      format: (arg: boolean) => arg ? 'Padrão' : ''
+    }
+
+
+  ]
+
+  const onEditar = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setContas(rs)
+      setLocalState({ action: actionTypes.editando })
+      setOpen(true)
+    })
+  }
+  const onExcluir = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setContas(rs)
+      setLocalState({ action: actionTypes.pesquisando })
+      setMensagemState({
+        titulo: 'Exclusão',
+        exibir: true,
+        mensagem: 'Deseja realmente excluir a conta ' + rs.name + '?',
+        tipo: 'warning',
+        exibirBotao: 'SN',
+        cb: (resposta) => {
+          if (resposta) {
+            clsCrud.excluir({
+              entidade: "Account",
+              criterio: { id: id },
+              setMensagemState: setMensagemState,
+              token: usuarioState.token,
+              msg: 'Excluindo conta ...',
+            }).then((rs) => {
+              if (rs.ok) {
+                btPesquisar()
+              }
+            })
+          }
+        }
+      })
+    })
+  }
+
+  const pesquisarID = async (id: string | number): Promise<AccountInterface> => {
+    return await clsCrud
+      .pesquisar({
+        entidade: "Account",
+        criterio: {
+          id: id,
+        },
+      })
+      .then((rs: Array<AccountInterface>) => {
+        return rs[0]
+      })
+  }
+  const btPesquisar = () => {
+    clsCrud
+      .pesquisar({
+        entidade: "Account",
+        criterio: {
+          name: "%".concat(pesquisa.name).concat("%"),
+        },
+        camposLike: ["name"],
+        select: ["id", "name", "type", "initialBalance", "color", "isDefault"],
+        msg: 'Pesquisando contas ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<AccountInterface>) => {
+        setRsPesquisa(rs)
+      })
+  }
+
+  const handleOpen = () => {
+    setContas(ResetAccount)
+    setLocalState({ action: actionTypes.incluindo })
+    setOpen(true);
+  }
+
+  return (
+    <>
+      <Grid container sx={{ p: 2 }}>
+        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+          <AccountCard
+            nome="Minha Conta Corrente"
+            tipo="corrente"
+            saldoInicial={1200}
+            saldoAtual={2500}
+            isPadrao
+            corTopo="#4fc3f7"
+            corFundo="rgba(255, 255, 255, 0.05)"
+            corFonte="#fff"
+            corBorda=" #3a3a3a"
+            onEdit={() => console.log('Editar')}
+            onDelete={() => console.log('Excluir')}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+          <AccountCard
+            nome="Minha Poupança"
+            tipo="poupanca"
+            saldoInicial={1200}
+            saldoAtual={2500}
+            corTopo="#4ff779"
+            corFundo="rgba(255, 255, 255, 0.05)"
+            corFonte="#fff"
+            corBorda=" #3a3a3a"
+            onEdit={() => console.log('Editar')}
+            onDelete={() => console.log('Excluir')}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+          <AccountCard
+            nome="Meus Invenstimentos"
+            tipo="investimento"
+            saldoInicial={1200}
+            saldoAtual={2500}
+            corTopo="#902ec9"
+            corFundo="rgba(255, 255, 255, 0.05)"
+            corFonte="#fff"
+            corBorda=" #3a3a3a"
+            onEdit={() => console.log('Editar')}
+            onDelete={() => console.log('Excluir')}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+          <AccountCard
+            nome="Meu Caixa"
+            tipo="dinheiro"
+            saldoInicial={1200}
+            saldoAtual={2500}
+            corTopo="#1928af"
+            corFundo="rgba(255, 255, 255, 0.05)"
+            corFonte="#fff"
+            corBorda=" #3a3a3a"
+            onEdit={() => console.log('Editar')}
+            onDelete={() => console.log('Excluir')}
+          />
+        </Grid>
+        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+          <AccountCard
+            nome="Meu Cartão de Crédito"
+            tipo="credito"
+            saldoInicial={1200}
+            saldoAtual={2500}
+            corTopo="#d1741d"
+            corFundo="rgba(255, 255, 255, 0.05)"
+            corFonte="#fff"
+            corBorda=" #3a3a3a"
+            onEdit={() => console.log('Editar')}
+            onDelete={() => console.log('Excluir')}
+          />
+        </Grid>
+      </Grid>
+      <Grid container sx={{ mt: 2 }}>
+        <Grid item xs={12}>
+          <Typography variant="h5" sx={{ m: 2, textAlign: 'left' }}>Lista de Contas</Typography>
+        </Grid>
+        <Grid item xs={6} sx={{ ml: 2 }}>
+          <InputText
+            label=""
+            placeholder="Buscar contas..."
+            tipo="uppercase"
+            dados={pesquisa}
+            field="name"
+            setState={setPesquisa}
+            iconeStart='searchicon'
+            onClickIconeStart={() => { btPesquisar() }}
+            mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
+            autoFocus
+            width={'100%'}
+
+          />
+        </Grid>
+        <Grid item xs={5}>
+          <CustomButton
+            onClick={() => { handleOpen() }}
+            bgColor='#1976d2'
+            textColor='#000'
+            iconPosition='start'
+            icon={<i className="material-icons">add</i>}
+            sx={{ mt: 2, ml: 1, textAlign: 'right' }}
+          >
+            Nova Conta
+          </CustomButton>
+        </Grid>
+        <Grid item xs={12} sx={{ m: 2 }}>
+          <DataTable
+            backgroundColor='#050516'
+            cabecalho={cabecalhoForm}
+            dados={rsPesquisa}
+            acoes={[
+              {
+                icone: EditOutlinedIcon,
+                corIcone: '#fff',
+                onAcionador: (rs: AccountInterface) =>
+                  onEditar(rs.id as string),
+                toolTip: "Editar",
+              },
+              {
+                icone: DeleteTwoToneIcon,
+                corIcone: '#fff',
+                onAcionador: (rs: AccountInterface) =>
+                  onExcluir(rs.id as string),
+                toolTip: "Excluir",
+              },
+            ]} />
+        </Grid>
+      </Grid>
+      <Condicional condicao={localState.action !== actionTypes.pesquisando}>
+        <ContasFicha
+          open={open}
+          setOpen={setOpen}
+          btPesquisar={btPesquisar}
+          conta={localState.action !== actionTypes.incluindo ? contas : undefined}
+          localState={localState}
+        />
+      </Condicional>
+    </>
+  );
+}

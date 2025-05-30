@@ -3,12 +3,16 @@ import { Box, Typography, Input } from '@mui/material';
 
 interface ColorPickerProps {
   label?: string;
-  dados: { [key: string]: string | number | readonly string[] | undefined | any };
+  dados: {
+    [key: string]: string | number | readonly string[] | undefined | any
+  };
   setState?: React.Dispatch<React.SetStateAction<any>>;
   field: string;
+  corFonte?: string;
+  disabled?: boolean
 }
 
-const ColorPicker: React.FC<ColorPickerProps> = ({ label = 'Cor', dados, setState, field }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({ label = 'Cor', dados, setState, field, corFonte = '#fff', disabled = false }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = event.target.value;
     if (setState) {
@@ -20,15 +24,16 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label = 'Cor', dados, setStat
   };
 
   return (
-    <Box display="flex" alignItems="center" gap={2}>
-      <Typography>{label}</Typography>
+    <Box display="flex" alignItems="center" gap={2} sx={{ mt: 2 }}>
+      <Typography sx={{ color: corFonte, ml: 1 }}>{label}</Typography>
       <Input
         type="color"
-        value={dados[field] || '#000000'}
+        value={dados[field] || '#b46d6d'}
         onChange={handleChange}
-        sx={{ width: 50, padding: 0, minWidth: 0 }}
+        sx={{ width: 50, padding: 0, minWidth: 0, }}
+        disabled={disabled}
       />
-      <Typography>{dados[field]}</Typography>
+      <Typography sx={{ color: corFonte }}>{dados[field]}</Typography>
     </Box>
   );
 };

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var category_1 = require("./category");
 var account_1 = require("./account");
+var company_1 = require("./company");
 var Transaction = /** @class */ (function () {
     function Transaction() {
     }
@@ -34,6 +35,10 @@ var Transaction = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
+    ], Transaction.prototype, "setor", void 0);
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
     ], Transaction.prototype, "categoryId", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'categoryId' }),
@@ -49,6 +54,15 @@ var Transaction = /** @class */ (function () {
         (0, typeorm_1.ManyToOne)(function () { return account_1.default; }),
         __metadata("design:type", account_1.default)
     ], Transaction.prototype, "account", void 0);
+    __decorate([
+        (0, typeorm_1.Column)(),
+        __metadata("design:type", String)
+    ], Transaction.prototype, "companyId", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'companyId' }),
+        (0, typeorm_1.ManyToOne)(function () { return company_1.default; }),
+        __metadata("design:type", company_1.default)
+    ], Transaction.prototype, "company", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: "datetime" }),
         __metadata("design:type", String)

@@ -1,112 +1,68 @@
 [
   {
     "id": 1,
-    "tooltipTitle": "Pedidos",
-    "route": "/Pedido",
-    "icon": "NoteAltOutlinedIcon",
+    "tooltipTitle": "Dashboard",
+    "route": "/dashboard",
+    "icon": "DashboardTwoToneIcon",
     "color": "primary",
     "iconSize": {
-      "width": 32,
-      "height": 32
+      "width": 35,
+      "height": 35
     }
   },
   {
     "id": 2,
-    "tooltipTitle": "Entrada de Produtos",
-    "route": "/Entrada",
-    "icon": "AddShoppingCartOutlinedIcon",
+    "tooltipTitle": "Contas",
+    "route": "/contas",
+    "icon": "AccountBalanceIcon",
     "color": "primary",
     "iconSize": {
-      "width": 32,
-      "height": 32
+      "width": 35,
+      "height": 35
     }
   },
   {
     "id": 3,
-    "tooltipTitle": "Produção Malharia",
-    "route": "/ProducaoMalharia",
-    "icon": "FactoryIcon",
+    "tooltipTitle": "Transações",
+    "route": "/transacoes",
+    "icon": "SyncAltIcon",
     "color": "primary",
     "iconSize": {
-      "width": 32,
-      "height": 32
+      "width": 35,
+      "height": 35
     }
   },
   {
     "id": 4,
-    "tooltipTitle": "Tinturaria",
-    "route": "/Tinturaria",
-    "icon": "ColorLensTwoToneIcon",
+    "tooltipTitle": "Categorias",
+    "route": "/categorias",
+    "icon": "CategoryIcon",
     "color": "primary",
     "iconSize": {
-      "width": 32,
-      "height": 32
+      "width": 35,
+      "height": 35
     }
   },
   {
     "id": 5,
-    "tooltipTitle": "Dashboard",
-    "route": "/Dashboard",
-    "icon": "DashboardTwoToneIcon",
+    "tooltipTitle": "Empresas",
+    "route": "/empresas",
+    "icon": "FactoryIcon",
     "color": "primary",
     "iconSize": {
-      "width": 32,
-      "height": 32
+      "width": 35,
+      "height": 35
     }
   },
   {
     "id": 6,
-    "tooltipTitle": "Consulta Estoques de Produtos",
-    "route": "/ConsultaEstoque",
-    "icon": "InventoryTwoToneIcon",
+    "tooltipTitle": "Relatórios",
+    "route": "/relatorios",
+    "icon": "PrintIcon",
     "color": "primary",
     "iconSize": {
-      "width": 32,
-      "height": 32
-    }
-  },
-  {
-    "id": 7,
-    "tooltipTitle": "Gestão de Pedidos",
-    "route": "/ProgramacaoDublagem",
-    "icon": "FactCheckTwoToneIcon",
-    "color": "primary",
-    "iconSize": {
-      "width": 32,
-      "height": 32
-    }
-  },
-  {
-    "id": 8,
-    "tooltipTitle": "Produção Dublagem",
-    "route": "/ProducaoDublagem",
-    "icon": "ContentCutTwoToneIcon",
-    "color": "primary",
-    "iconSize": {
-      "width": 32,
-      "height": 32
-    }
-  },
-  {
-    "id": 9,
-    "tooltipTitle": "Programação Tinturaria",
-    "route": "/ProgramacaoTinturaria",
-    "icon": "FormatPaintIcon",
-    "color": "primary",
-    "iconSize": {
-      "width": 32,
-      "height": 32
-    }
-  },
-  {
-    "id": 10,
-    "tooltipTitle": "Cadastro de Usuários",
-    "route": "/Usuario",
-    "icon": "PersonOutlineTwoToneIcon",
-    "color": "primary",
-    "iconSize": {
-      "width": 32,
-      "height": 32
+      "width": 35,
+      "height": 35
     }
   }
 ]

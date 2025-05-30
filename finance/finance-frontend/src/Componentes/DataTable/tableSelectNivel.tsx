@@ -358,7 +358,7 @@ export default function DataTableSelect<T>({
                                                                             onClick={selected.length === 0 ? () => acao.onAcionador(row as T, indice) : () => { }}
                                                                             sx={{ mx: 0, px: 0 }}
                                                                         >
-                                                                            <Icon
+                                                                            {/* <Icon
                                                                                 sx={{
                                                                                     color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main,
                                                                                     fontSize: '1.25rem',
@@ -370,7 +370,16 @@ export default function DataTableSelect<T>({
                                                                                 }}
                                                                             >
                                                                                 {acao.icone}
-                                                                            </Icon>
+                                                                            </Icon> */}
+                                                                            <acao.icone
+                                                                                sx={{
+                                                                                    color: acao.corIcone ?? theme.palette.secondary.main,
+                                                                                    fontSize: '1.25rem',
+                                                                                    [theme.breakpoints.up('md')]: {
+                                                                                        fontSize: '1.55rem',
+                                                                                    },
+                                                                                }}
+                                                                            />
                                                                         </IconButton>
                                                                     </span>
                                                                 </Tooltip>
@@ -448,7 +457,7 @@ export default function DataTableSelect<T>({
                                                                                                                 onClick={() => acao.onAcionador(row as T, indice)}
                                                                                                                 sx={{ mx: 0, px: 0 }}
                                                                                                             >
-                                                                                                                <Icon
+                                                                                                                {/* <Icon
                                                                                                                     sx={{
                                                                                                                         color: acao.corIcone ? acao.corIcone : theme.palette.secondary.main,
                                                                                                                         fontSize: '1.25rem',
@@ -460,7 +469,16 @@ export default function DataTableSelect<T>({
                                                                                                                     }}
                                                                                                                 >
                                                                                                                     {acao.icone}
-                                                                                                                </Icon>
+                                                                                                                </Icon> */}
+                                                                                                                <acao.icone
+                                                                                                                    sx={{
+                                                                                                                        color: acao.corIcone ?? theme.palette.secondary.main,
+                                                                                                                        fontSize: '1.25rem',
+                                                                                                                        [theme.breakpoints.up('md')]: {
+                                                                                                                            fontSize: '1.55rem',
+                                                                                                                        },
+                                                                                                                    }}
+                                                                                                                />
                                                                                                             </IconButton>
                                                                                                         </span>
                                                                                                     </Tooltip>

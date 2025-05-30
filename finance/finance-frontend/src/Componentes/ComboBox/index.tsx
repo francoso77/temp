@@ -64,12 +64,15 @@ interface ComboBoxInterface<T> {
   inputRef?: React.Ref<unknown> | undefined
   //Definição de uma cor para o fundo do componente
   corFundo?: string
+  corFonte?: string
   textAlign?: "left" | "right" | "center"
   labelAlign?: "left" | "right" | "center"
   //definições de borda
   boderRadius?: string
   borderWidth?: string
   borderColor?: string
+  //minWidth?: number,
+  // maxHeight?: number,
 }
 
 const onKey = (key: string, mapKeyPress: Array<mapKeyPressInterface>, pesquisa: string) => {
@@ -113,12 +116,15 @@ export default function ComboBox<T>(
     onFocus = undefined,
     tamanhoFonte = 16,
     onBlur,
-    corFundo = '',
+    corFundo = "#010108",
+    corFonte = '#fff',
     textAlign = 'left',
     labelAlign = 'left',
     boderRadius = '1',
     borderColor = '#3a3a3a',
-    borderWidth = '1'
+    borderWidth = '1',
+    //minWidth = 300,
+    // maxHeight = 35,
   }: ComboBoxInterface<T>) {
 
 
@@ -147,10 +153,10 @@ export default function ComboBox<T>(
     <>
       <Autocomplete
         sx={{
-
           fontSize: tamanhoFonte,
-          minWidth: 200,
-          maxHeight: 35,
+          color: corFonte,
+          // minWidth: minWidth,
+          // maxHeight: maxHeight,
           borderRadius: boderRadius,
           bgcolor: corFundo,
 
@@ -249,24 +255,25 @@ export default function ComboBox<T>(
             },
           },
         }}
+
         renderInput=
         {
           (params) => (
 
-            <FormControl >
+            <FormControl sx={{ width: "100%" }} >
               <Condicional condicao={typeof label === 'string' && label.length > 0}>
                 <Typography
                   variant='body2'
                   textAlign={labelAlign}
                   sx={{
-                    minWidth: 222,
-                    maxHeight: 35,
-                    mt:
-                      theme && theme.inputs && theme.inputs.marginTop
-                        ? theme.inputs.marginTop
-                        : 0,
+                    //minWidth: minWidth,
+                    // maxHeight: maxHeight,
+                    // mt:
+                    //   theme && theme.inputs && theme.inputs.marginTop
+                    //     ? theme.inputs.marginTop
+                    //     : 0,
                     fontSize: tamanhoFonte,
-                    ml: 1
+                    ml: 0,
                   }}
                 >
                   {label}
@@ -276,6 +283,7 @@ export default function ComboBox<T>(
               <TextField
                 {...params}
                 sx={{
+                  width: '100%',
                   '& .MuiOutlinedInput-root': {
                     borderRadius: boderRadius,
                     '& fieldset': {
@@ -293,7 +301,20 @@ export default function ComboBox<T>(
                   '& .MuiInputBase-input': {
                     fontSize: tamanhoFonte,
                     textAlign: textAlign,
-                  }
+                  },
+                  '& .MuiInputBase-root.Mui-disabled': {
+                    backgroundColor: '#c99999',
+                    color: 'red', // Cor da fonte
+                  },
+                  '& .MuiInputBase-input.Mui-disabled': {
+                    color: 'red', // Cor do input em si
+                  },
+                  '& .MuiFormLabel-root.Mui-disabled': {
+                    color: 'red', // Cor do label
+                  },
+                  '& .MuiAutocomplete-endAdornment svg': {
+                    color: corFonte, // ou qualquer outra cor (hex, rgb, theme.palette)
+                  },
                 }}
                 size='small'
                 placeholder={placeholder}

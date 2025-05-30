@@ -16,6 +16,8 @@ import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTa
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TermoDeUsoModal from './TermoDeUsoModal';
 import TitleBar from '../../Componentes/BarraDeTitulo';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 
 
 export default function Registrar() {
@@ -40,7 +42,7 @@ export default function Registrar() {
     resetToken: '',
     resetTokenExpires: new Date(),
     termsAccepted: false,
-    termsAcceptedAt: new Date
+    termsAcceptedAt: new Date()
   }
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
@@ -321,13 +323,13 @@ export default function Registrar() {
                     dados={rsPesquisa}
                     acoes={[
                       {
-                        icone: 'edit',
+                        icone: EditOutlinedIcon,
                         onAcionador: (rs: UserInterface) =>
                           onEditar(rs.id as string),
                         toolTip: "Editar",
                       },
                       {
-                        icone: "delete",
+                        icone: DeleteTwoToneIcon,
                         onAcionador: (rs: UserInterface) =>
                           onExcluir(rs.id as string),
                         toolTip: "Excluir",
