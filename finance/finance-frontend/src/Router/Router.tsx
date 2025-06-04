@@ -10,6 +10,7 @@ import { Contas } from '../Views/Contas/contas';
 import { Empresas } from '../Views/Empresas/empresas';
 import { Transacoes } from '../Views/Transacoes/transacoes';
 import PaginaTransacoes from '../Views/Transacoes/transacoesPage';
+import Dashboard from '../Views/Dashboard/Dashboard';
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ export const router = createBrowserRouter([
         path: "/transacoes/nova",
         element: <PaginaTransacoes />,
       },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      }
       // {
       //   path: "/Testes",
       //   element: <Home />,

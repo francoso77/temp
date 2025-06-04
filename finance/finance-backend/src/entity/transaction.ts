@@ -28,7 +28,7 @@ export default class Transaction implements TransactionInterface {
 
   @JoinColumn({ name: 'categoryId' })
   @ManyToOne(() => Category)
-  categoria: Category
+  category: Category
 
   @Column()
   accountId: string;

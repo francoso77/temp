@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Box,
   Typography,
@@ -11,11 +11,13 @@ import {
 import { Circle } from '@mui/icons-material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 
 interface ColorSelectListProps {
   label: string;
   items: AccountInterface[];
   onChange?: (selected: AccountInterface | null) => void;
+  onClick?: () => void;
 
   // Novas props para estilização
   sx?: SelectProps['sx'];
@@ -36,6 +38,7 @@ export const ColorSelectList: React.FC<ColorSelectListProps> = ({
   label,
   items,
   onChange,
+  onClick,
   sx,
   borderColor = '#3a3a3a',
   borderWidth = '1',
@@ -49,22 +52,27 @@ export const ColorSelectList: React.FC<ColorSelectListProps> = ({
   width = 16,
   height = 16
 }) => {
-  const [selectedId, setSelectedId] = useState<string | number | ''>(valorPadrao);
-
-  const handleChange = (event: SelectChangeEvent) => {
-    const id = event.target.value;
-    setSelectedId(id);
-    const selected = items.find(item => item.id === id);
-    onChange?.(selected || null);
-  };
+  const [selectedId, setSelectedId] = useState<string>(String(valorPadrao ?? ''));
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
   return (
     <Box >
       <Stack direction="row" spacing={1} alignItems="center">
         <Select
-          value={selectedId as string}
+          //value={layoutState.contaPadrao ?? selectedId}
+          value={
+            items.some(item => String(item.id) === (layoutState.contaPadrao ?? selectedId))
+              ? (layoutState.contaPadrao ?? selectedId)
+              : ''
+          }
           placeholder={label}
-          onChange={handleChange}
+          onChange={(e) => {
+            const id = e.target.value;
+            setSelectedId(id);
+            const selectedItem = items.find(i => String(i.id) === id);
+            onChange?.(selectedItem ?? null);
+          }}
+          onClick={onClick}
           IconComponent={() => (<SwapVertIcon sx={{ color: corIcon, fontSize: fontSize, mr: 1 }} />)}
           sx={{
             minWidth: minWidth,
@@ -94,7 +102,7 @@ export const ColorSelectList: React.FC<ColorSelectListProps> = ({
           }}
         >
           {items.map(item => (
-            <MenuItem key={item.id} value={item.id}>
+            <MenuItem key={item.id} value={String(item.id)}>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ py: 1, mr: -2 }}>
                 <Circle sx={{ width: width, height: height, color: item.color }} />
                 <Typography sx={{ fontSize: fontSize }}>{item.name}</Typography>

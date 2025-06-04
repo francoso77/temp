@@ -1,5 +1,5 @@
 import { Grid, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
@@ -26,14 +26,18 @@ export const ResetAccount: AccountInterface = {
   isDefault: false
 }
 
+interface SomatorioInterface extends AccountInterface {
+  saldoAtual: number
+}
+
 export function Contas() {
 
   const [open, setOpen] = useState(false);
 
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
-  const [contas, setContas] = React.useState<AccountInterface>(ResetAccount);
+  const [contas, setContas] = React.useState<AccountInterface>(ResetAccount)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<AccountInterface>>([])
+  const [rsPesquisa, setRsPesquisa] = useState<Array<SomatorioInterface>>([])
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const clsCrud = new ClsCrud()
 
@@ -61,7 +65,6 @@ export function Contas() {
       cabecalho: 'Conta',
       alinhamento: 'center',
       campo: 'name',
-      //format: (arg: string) => arg.toUpperCase()
     },
     {
       campo: 'type',
@@ -71,6 +74,12 @@ export function Contas() {
     {
       campo: 'initialBalance',
       cabecalho: 'Saldo Inicial',
+      alinhamento: 'center',
+      format: (arg: number) => arg.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
+    },
+    {
+      campo: 'saldoAtual',
+      cabecalho: 'Saldo Atual',
       alinhamento: 'center',
       format: (arg: number) => arg.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
     },
@@ -132,22 +141,33 @@ export function Contas() {
         return rs[0]
       })
   }
-  const btPesquisar = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "Account",
-        criterio: {
-          name: "%".concat(pesquisa.name).concat("%"),
-        },
-        camposLike: ["name"],
-        select: ["id", "name", "type", "initialBalance", "color", "isDefault"],
-        msg: 'Pesquisando contas ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<AccountInterface>) => {
-        setRsPesquisa(rs)
-      })
+  const btPesquisar = async () => {
+    const rs = await clsCrud.pesquisar({
+      entidade: "Account",
+      criterio: {
+        name: "%".concat(pesquisa.name).concat("%"),
+      },
+      camposLike: ["name"],
+      select: ["id", "name", "type", "initialBalance", "color", "isDefault"],
+      msg: 'Pesquisando contas ...',
+      setMensagemState: setMensagemState,
+    });
+
+    if (rs) {
+      const contasComSaldo = await Promise.all(
+        rs.map(async (conta) => {
+          const saldo = await ApuraSaldo(conta.id as string);
+          return {
+            ...conta,
+            saldoAtual: conta.initialBalance + saldo,
+          };
+        })
+      );
+
+      setRsPesquisa(contasComSaldo);
+    }
   }
+
 
   const handleOpen = () => {
     setContas(ResetAccount)
@@ -155,81 +175,58 @@ export function Contas() {
     setOpen(true);
   }
 
+  const ApuraSaldo = async (id: string): Promise<number> => {
+    const rs = await clsCrud.pesquisar({
+      entidade: "Transaction",
+      criterio: {
+        accountId: id,
+      },
+    });
+
+    let receitas = 0;
+    let despesas = 0;
+
+    rs?.forEach((item) => {
+      if (item.type === 'Receita') {
+        receitas += item.amount;
+      } else {
+        despesas += item.amount;
+      }
+    });
+
+    return receitas - despesas;
+  };
+
+  useEffect(() => {
+    btPesquisar()
+  }, [])
+
   return (
     <>
-      <Grid container sx={{ p: 2 }}>
-        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
-          <AccountCard
-            nome="Minha Conta Corrente"
-            tipo="corrente"
-            saldoInicial={1200}
-            saldoAtual={2500}
-            isPadrao
-            corTopo="#4fc3f7"
-            corFundo="rgba(255, 255, 255, 0.05)"
-            corFonte="#fff"
-            corBorda=" #3a3a3a"
-            onEdit={() => console.log('Editar')}
-            onDelete={() => console.log('Excluir')}
-          />
+      <Condicional condicao={rsPesquisa.length > 0}>
+        <Grid container sx={{ p: 2 }}>
+
+          {rsPesquisa.map((conta) => {
+            return (
+              <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+                <AccountCard
+                  nome={conta.name}
+                  tipo={conta.type}
+                  saldoInicial={conta.initialBalance}
+                  saldoAtual={conta.saldoAtual}
+                  isPadrao={conta.isDefault}
+                  corTopo={conta.color}
+                  corFundo="rgba(255, 255, 255, 0.05)"
+                  corFonte="#fff"
+                  corBorda=" #3a3a3a"
+                  onEdit={() => onEditar(conta.id as string)}
+                  onDelete={() => onExcluir(conta.id as string)}
+                />
+              </Grid>
+            )
+          })}
         </Grid>
-        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
-          <AccountCard
-            nome="Minha Poupança"
-            tipo="poupanca"
-            saldoInicial={1200}
-            saldoAtual={2500}
-            corTopo="#4ff779"
-            corFundo="rgba(255, 255, 255, 0.05)"
-            corFonte="#fff"
-            corBorda=" #3a3a3a"
-            onEdit={() => console.log('Editar')}
-            onDelete={() => console.log('Excluir')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
-          <AccountCard
-            nome="Meus Invenstimentos"
-            tipo="investimento"
-            saldoInicial={1200}
-            saldoAtual={2500}
-            corTopo="#902ec9"
-            corFundo="rgba(255, 255, 255, 0.05)"
-            corFonte="#fff"
-            corBorda=" #3a3a3a"
-            onEdit={() => console.log('Editar')}
-            onDelete={() => console.log('Excluir')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
-          <AccountCard
-            nome="Meu Caixa"
-            tipo="dinheiro"
-            saldoInicial={1200}
-            saldoAtual={2500}
-            corTopo="#1928af"
-            corFundo="rgba(255, 255, 255, 0.05)"
-            corFonte="#fff"
-            corBorda=" #3a3a3a"
-            onEdit={() => console.log('Editar')}
-            onDelete={() => console.log('Excluir')}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
-          <AccountCard
-            nome="Meu Cartão de Crédito"
-            tipo="credito"
-            saldoInicial={1200}
-            saldoAtual={2500}
-            corTopo="#d1741d"
-            corFundo="rgba(255, 255, 255, 0.05)"
-            corFonte="#fff"
-            corBorda=" #3a3a3a"
-            onEdit={() => console.log('Editar')}
-            onDelete={() => console.log('Excluir')}
-          />
-        </Grid>
-      </Grid>
+      </Condicional>
       <Grid container sx={{ mt: 2 }}>
         <Grid item xs={12}>
           <Typography variant="h5" sx={{ m: 2, textAlign: 'left' }}>Lista de Contas</Typography>

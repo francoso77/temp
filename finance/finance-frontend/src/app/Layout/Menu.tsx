@@ -8,35 +8,35 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ComboBox from '../../Componentes/ComboBox';
 import DateRangeSelectorModal from '../../Componentes/DateRangeSelector';
 import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
-import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { TipoTransactionTypes } from '../../types/tipoTransactionTypes';
-import { SetorTypes } from '../../types/setorTypes';
+import { TipoTransactionType, TipoTransactionTypes } from '../../types/tipoTransactionTypes';
+import { SetorType, SetorTypes } from '../../types/setorTypes';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 const drawerWidth = 270;
 
 export interface DadosPesquisa {
-    dataInicio: '',
-    dataFim: '',
-    categoria: '',
-    empresa: '',
-    setor: '',
-    tipo: '',
+    dataInicio: string;
+    dataFim: string;
+    categoria: string;
+    conta: string;
+    setor: string;
+    tipo: string
 }
 
 export default function Menu() {
 
+    const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+    const dadosIniciais: DadosPesquisa = { dataInicio: '', dataFim: '', categoria: '', conta: layoutState.contaPadrao ?? '', setor: '', tipo: '' }
     const [modalOpen, setModalOpen] = useState(false);
     const [dataInicio, setDataInicio] = useState<string>('');
     const [dataFim, setDataFim] = useState<string>('');
-    const [dadosPesquisa, setDadosPesquisa] = useState<Array<DadosPesquisa>>([])
-
+    const [dadosPesquisa, setDadosPesquisa] = useState<DadosPesquisa>(dadosIniciais)
     const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
-    //const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
     const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
+    const [contaPadrao, setContaPadrao] = useState<string | null>(null)
     const clsCrud = new ClsCrud()
 
     const handleAbrirModal = () => {
@@ -47,27 +47,42 @@ export default function Menu() {
         setModalOpen(false);
     };
 
+    const updateLayoutState = <K extends keyof typeof layoutState>(
+        key: K,
+        value: (typeof layoutState)[K]
+    ) => {
+        setLayoutState(prev => ({ ...prev, [key]: value }));
+    };
+
     const handleConfirmarDatas = (inicio: string, fim: string) => {
         setDataInicio(inicio);
         setDataFim(fim);
-        //setDadosPesquisa([...dadosPesquisa, { dataInicio: dataInicio, dataFim: fim }])
+        updateLayoutState("dataInicio", inicio);
+        updateLayoutState("dataFim", fim);
+        setDadosPesquisa({ ...dadosPesquisa, dataInicio: inicio ?? "", dataFim: fim ?? "" })
     };
 
-    const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
-    // const [items] = useState<ColorItem[]>([
-    //     { id: 1, name: 'Conta Corrente', color: '#ff0000' },
-    //     { id: 2, name: 'Caixa', color: '#00ff00' },
-    //     { id: 3, name: 'Conta Investimento', color: '#0000ff' },
-    // ]);
-
-
-    const handleItemChange = (selected: AccountInterface | null) => {
-        console.log('Selecionado:', selected);
+    const handleItemChangeAccount = (selected: AccountInterface | null) => {
+        updateLayoutState("contaPadrao", selected?.id ?? null);
+        setContaPadrao(selected?.id ?? null);
+        setDadosPesquisa({ ...dadosPesquisa, conta: selected?.id ?? "" })
     };
 
-    const xuxu = (selected: CategoryInterface | null) => {
-        console.log('Selecionado:', selected);
+    const handleItemChangeCategory = (selected: CategoryInterface | null) => {
+        updateLayoutState("categoryId", selected?.id ?? null);
+        setDadosPesquisa({ ...dadosPesquisa, categoria: selected?.id ?? "" })
     };
+
+    const handleItemChangeSetor = (selected: "Dublagem" | "Malharia" | null) => {
+        updateLayoutState("setor", selected);
+        setDadosPesquisa({ ...dadosPesquisa, setor: selected ?? "" })
+    };
+
+    const handleItemChangeTipo = (selected: "Receita" | "Despesa" | null) => {
+        updateLayoutState("type", selected);
+        setDadosPesquisa({ ...dadosPesquisa, tipo: selected ?? "" })
+    };
+
     const BuscarDados = () => {
         clsCrud
             .pesquisar({
@@ -96,11 +111,25 @@ export default function Menu() {
                 setRsContas(rs)
             })
 
+        clsCrud
+            .pesquisar({
+                entidade: "Account",
+                criterio: { isDefault: true },
+                select: ['id'],
+            })
+            .then((rs: any) => {
+                setContaPadrao(rs[0].id as string || String(rs[0].id))
+            })
+
     }
 
     useEffect(() => {
         BuscarDados()
     }, []);
+
+    useEffect(() => {
+        console.log(layoutState)
+    }, [dadosPesquisa]);
 
     return (
         <>
@@ -133,10 +162,9 @@ export default function Menu() {
                         Conta
                     </Typography>
                     <ColorSelectList
-                        //valorPadrao={rsContas[0].id as string}
                         label="Contas"
                         items={rsContas}
-                        onChange={handleItemChange}
+                        onChange={handleItemChangeAccount}
                         menuBgColor='#010108'
                         corIcon='#fff'
                         corTexto='#fff'
@@ -195,7 +223,8 @@ export default function Menu() {
                         campoID='id'
                         campoDescricao='name'
                         mensagemPadraoCampoEmBranco='Escolha uma categoria'
-                        onChange={xuxu}
+                        onChange={handleItemChangeCategory}
+                        valorPadraoCampoEmBranco={SetorType.Malharia}
                     />
                 </Box>
                 <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
@@ -210,8 +239,8 @@ export default function Menu() {
                         campoID='idTipoTransactionType'
                         campoDescricao='descricao'
                         mensagemPadraoCampoEmBranco='Escolha um tipo'
-                        onChange={handleItemChange}
-
+                        onChange={handleItemChangeTipo}
+                        valorPadraoCampoEmBranco={TipoTransactionType.Receita}
                     />
                 </Box>
                 <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
@@ -226,8 +255,8 @@ export default function Menu() {
                         campoID='idSetorType'
                         campoDescricao='descricao'
                         mensagemPadraoCampoEmBranco='Escolha o setor'
-                        onChange={handleItemChange}
-
+                        onChange={handleItemChangeSetor}
+                        valorPadraoCampoEmBranco={SetorType.Malharia}
                     />
                 </Box>
                 <Offset />

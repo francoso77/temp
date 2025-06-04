@@ -15,12 +15,8 @@ import ClsApi from '../../Utils/ClsApi';
 import { CurrencyTextField } from '../../Componentes/InputCurrency';
 import { CustomCheckbox } from '../../Componentes/CustomCheckbox';
 import { ResetAccount } from './contas';
+import { AccountTypes } from '../../types/accountTypes';
 
-
-interface tiposInterface {
-  id: string;
-  name: string;
-}
 
 interface PropsInterface {
   open: boolean,
@@ -39,15 +35,6 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
   const [dados, setDados] = useState<AccountInterface>(ResetAccount);
   const validaCampo: ClsValidacao = new ClsValidacao()
 
-
-  const [tipos] = useState<tiposInterface[]>([
-    { id: 'corrente', name: 'Conta Corrente' },
-    { id: 'poupanca', name: 'Conta Poupança' },
-    { id: 'investimento', name: 'Conta Investimento' },
-    { id: 'credito', name: 'Cartão de Credito' },
-    { id: 'dinheiro', name: 'Caixa' },
-    { id: 'outros', name: 'Outros' },
-  ])
 
   const handleClose = () => {
     btPesquisar && btPesquisar()
@@ -132,7 +119,6 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
   };
 
 
-
   useEffect(() => {
     if (conta) {
       setDados(conta)
@@ -171,12 +157,12 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
                 label='Tipo'
                 corFundo='#050516'
                 corFonte={"#fff"}
-                opcoes={tipos}
+                opcoes={AccountTypes}
                 field='type'
                 setState={setDados}
                 dados={dados}
-                campoID='id'
-                campoDescricao='name'
+                campoID='idAccountType'
+                campoDescricao='descricao'
                 mensagemPadraoCampoEmBranco='Escolha um Tipo'
               />
             </Grid>

@@ -15,17 +15,10 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
-type AccountType =
-  | 'corrente'
-  | 'poupanca'
-  | 'investimento'
-  | 'credito'
-  | 'dinheiro'
-  | 'outros';
 
 interface AccountCardProps {
   nome: string;
-  tipo: AccountType;
+  tipo: string;
   saldoInicial: number;
   saldoAtual: number;
   isPadrao?: boolean;
@@ -37,7 +30,7 @@ interface AccountCardProps {
   onDelete?: () => void;
 }
 
-const getIcon = (tipo: AccountType) => {
+const getIcon = (tipo: string) => {
   switch (tipo) {
     case 'corrente':
       return <AccountBalanceIcon />;

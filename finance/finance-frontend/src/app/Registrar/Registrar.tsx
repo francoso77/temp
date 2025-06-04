@@ -94,9 +94,7 @@ export default function Registrar() {
     setLayoutState({
       ...layoutState,
       titulo: '',
-      tituloAnterior: 'Cadastro de Usuários',
       pathTitulo: '/',
-      pathTituloAnterior: '/user'
     })
 
     irPara('/')

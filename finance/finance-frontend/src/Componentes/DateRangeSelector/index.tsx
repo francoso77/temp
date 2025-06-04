@@ -17,7 +17,8 @@ import {
   startOfMonth,
   endOfMonth,
   startOfYear,
-  endOfYear
+  endOfYear,
+  parse
 } from 'date-fns';
 import CustomButton from '../Button';
 
@@ -83,12 +84,11 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
   };
 
   const handleConfirm = () => {
-    const dataInicio = new Date(startDate);
-    const dataFim = new Date(endDate);
+    const dataInicio = parse(startDate, 'yyyy-MM-dd', new Date()); // new Date(startDate);
+    const dataFim = parse(endDate, 'yyyy-MM-dd', new Date()); // new Date(endDate);
     onConfirm(formatOutputDate(dataInicio), formatOutputDate(dataFim));
     onClose();
   };
-
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ bgcolor: '#010108', color: '#fff', textAlign: 'center', border: '1px solid #3a3a3a' }}>Selecionar Intervalo de Datas</DialogTitle>

@@ -30,7 +30,8 @@ interface ComTextInterface {
   mapKeyPress?: Array<mapKeyPressInterface>
   tipo?: 'text' | 'checkbox' | 'mask' | 'valor' | 'pass',
   autofocus?: boolean,
-  maxLength?: number
+  maxLength?: number,
+  autocomplete?: string
 }
 
 const MASK_DEFINITIONS = {
@@ -78,7 +79,8 @@ export default function Text({
   tipo = 'text',
   erros = {},
   autofocus = false,
-  maxLength
+  maxLength,
+  autocomplete
 }: ComTextInterface) {
 
   const theme = useTheme()
@@ -160,6 +162,7 @@ export default function Text({
             {label}
           </Typography>
           <OutlinedInput
+            autoComplete={autocomplete}
             value={dados[field]}
             sx={{ my: 0, py: 0, height: 40 }}
             placeholder={placeholder}

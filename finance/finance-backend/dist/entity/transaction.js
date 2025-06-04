@@ -44,7 +44,7 @@ var Transaction = /** @class */ (function () {
         (0, typeorm_1.JoinColumn)({ name: 'categoryId' }),
         (0, typeorm_1.ManyToOne)(function () { return category_1.default; }),
         __metadata("design:type", category_1.default)
-    ], Transaction.prototype, "categoria", void 0);
+    ], Transaction.prototype, "category", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)

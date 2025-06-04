@@ -23,8 +23,6 @@ export default function MenuFooter() {
   const irPara = (url: string, titulo: string) => {
     setLayoutState({
       ...layoutState,
-      tituloAnterior: layoutState.titulo,
-      pathTituloAnterior: layoutState.pathTitulo,
       titulo: titulo,
       pathTitulo: url
     })

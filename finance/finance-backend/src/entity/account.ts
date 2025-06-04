@@ -11,7 +11,7 @@ export default class Account implements AccountInterface {
   name: string;
 
   @Column()
-  type: 'corrente' | 'poupanca' | 'investmento' | 'credito' | 'dinheiro' | 'outros'
+  type: 'corrente' | 'poupanca' | 'investimento' | 'credito' | 'dinheiro' | 'outros'
 
   @Column({ type: 'float', precision: 2 })
   initialBalance: number;

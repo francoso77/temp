@@ -6,5 +6,6 @@ export const ROTAS_LIVRES: Array<string> = [
   "categorias",
   "contas",
   "empresas",
-  "transacoes"
+  "transacoes",
+  "dashboard",
 ];

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,23 +14,21 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { ColorSelectList } from '../../Componentes/ColorSelect';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
+import ClsCrud from '../../Utils/ClsCrudApi';
 
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 export default function HeaderMenu() {
 
+  const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
+  const clsCrud = new ClsCrud()
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const {
-    layoutState,
-    setLayoutState,
-    mensagemState,
-    setMensagemState,
-    usuarioState,
-    setUsuarioState
-  } = React.useContext(GlobalContext) as GlobalContextInterface
+  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const navegar = useNavigate()
 
   const toggleDrawer = () => {
@@ -39,35 +37,31 @@ export default function HeaderMenu() {
 
   const fecharLoading = () => {
     setMensagemState({ ...mensagemState, exibir: false })
+    setLayoutState({ ...layoutState, exibirMenu: false })
   }
 
-  const handleClick = (tipo: boolean) => {
-    if (tipo) {
-      navegar(layoutState.pathTituloAnterior)
-      let _titulo: string = layoutState.titulo
-      let _pathTitulo: string = layoutState.pathTitulo
-      setLayoutState({
-        ...layoutState,
-        titulo: layoutState.tituloAnterior,
-        pathTitulo: layoutState.pathTituloAnterior,
-        tituloAnterior: _titulo,
-        pathTituloAnterior: _pathTitulo
+  const handleClick = () => {
+
+    setUsuarioState({ ...usuarioState, logado: false })
+    navegar('/')
+  }
+
+  useEffect(() => {
+    clsCrud
+      .pesquisar({
+        entidade: "Account",
+        campoOrder: ['name'],
       })
-    } else {
-      setUsuarioState({ ...usuarioState, logado: false })
-      navegar('/')
-    }
-  }
-
-  // const [items] = React.useState<ColorItem[]>([
-  //   { id: 1, name: 'Conta Corrente', color: '#ff0000' },
-  //   { id: 2, name: 'Caixa', color: '#00ff00' },
-  //   { id: 3, name: 'Conta Investimento', color: '#0000ff' },
-  // ]);
+      .then((rs: Array<AccountInterface>) => {
+        setRsContas(rs)
+      })
+  }, []);
 
   const handleItemChange = (selected: AccountInterface | null) => {
-    console.log('Selecionado:', selected);
+    setLayoutState({ ...layoutState, contaPadrao: selected?.id });
   };
+
+
 
   return (
     <>
@@ -84,9 +78,6 @@ export default function HeaderMenu() {
               <CurrencyExchangeIcon sx={{ width: isMobile ? 25 : 32, height: isMobile ? 25 : 32, color: "#8280d8" }} />
             </IconButton>
           </Tooltip>
-          {/* <Box>
-            <CurrencyExchangeIcon sx={{ fontSize: 35, color: "#8280d8" }} />
-          </Box> */}
           <Condicional condicao={!isMobile}>
             <Typography variant="h6" gutterBottom sx={{ m: '20px', color: ' #fff', textAlign: 'left' }}>
               FinanceControl
@@ -101,13 +92,13 @@ export default function HeaderMenu() {
             </Box>
           </Condicional>
           <Box sx={{ flexGrow: 1 }} />
-          {/* <Box sx={{ mr: 1 }}>
+          <Box sx={{ mr: 1 }}>
+
             <ColorSelectList
-              valorPadrao={items[0].id as number}
               label="Contas"
-              items={items}
+              items={rsContas}
               onChange={handleItemChange}
-              menuBgColor='#010108'
+              menuBgColor='#212121'
               corIcon='#fff'
               corTexto='#fff'
               minWidth={isMobile ? 100 : 220}
@@ -115,9 +106,8 @@ export default function HeaderMenu() {
               fontSize={isMobile ? 10 : 16}
               width={isMobile ? 10 : 16}
               height={isMobile ? 10 : 16}
-
             />
-          </Box> */}
+          </Box>
           <Box>
             <CustomButton
               onClick={() => navegar('/transacoes/nova')}
@@ -143,7 +133,7 @@ export default function HeaderMenu() {
                 edge="end"
                 color="primary"
                 sx={{ mr: 1 }}
-                onClick={() => handleClick(false)}
+                onClick={handleClick}
               >
                 <LogoutIcon />
               </IconButton>

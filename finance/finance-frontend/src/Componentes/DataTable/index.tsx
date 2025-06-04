@@ -279,7 +279,7 @@ export default function DataTable<T>({
         return { backgroundColor: '#2e7d32', color: '#fff' }; // verde escuro
       case 'Despesa':
         return { backgroundColor: '#d32f2f', color: '#fff' }; // vermelho
-      case 'sttus':
+      case 'status':
         return { backgroundColor: '#616161', color: '#fff' }; // cinza
       default:
         return { backgroundColor: '#616161', color: '#fff' }; // cinza

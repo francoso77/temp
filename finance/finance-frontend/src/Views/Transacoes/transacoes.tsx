@@ -54,39 +54,20 @@ export function Transacoes() {
     },
     {
       cabecalho: 'Setor',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'setor',
     },
     {
       cabecalho: 'Empresa',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'companyId',
       format: (_v, rs: any) => rs.company.name
     },
     {
       cabecalho: 'Categoria',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'categoryId',
       format: (_v, rs: any) => rs.category.name
-    },
-    {
-      cabecalho: 'Cor',
-      alinhamento: 'center',
-      campo: 'color',
-      render: (valor: string) => (
-        <div
-          style={{
-            backgroundColor: valor,
-            width: 16,
-            height: 16,
-            borderRadius: '50%',
-            border: '1px solid #ccc',
-            margin: '0 auto'
-
-          }}
-          title={valor}
-        />
-      )
     },
     {
       campo: 'type',
@@ -100,13 +81,33 @@ export function Transacoes() {
         }
       },
     },
+    // {
+    //   cabecalho: 'Valor',
+    //   campo: 'amount',
+    //   alinhamento: 'center',
+    //   format: (arg: number) => arg.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
+    // },
     {
-      cabecalho: 'Valor',
       campo: 'amount',
-      alinhamento: 'center',
-      //format: (arg: number) => arg.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
-      format: (amount) => clsFormatacao.currency(amount)
-    },
+      cabecalho: 'Valor',
+      alinhamento: 'right',
+      render: (valor: number, row: any) => {
+        const isReceita = row.type === 'Receita'
+        return (
+          <span
+            style={{
+              color: isReceita ? '#4caf50' : '#f44336',
+              fontWeight: 'bold',
+            }}
+          >
+            {new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(valor)}
+          </span>
+        )
+      }
+    }
   ]
 
   const onEditar = (id: string | number) => {
@@ -154,13 +155,19 @@ export function Transacoes() {
         },
       })
       .then((rs: Array<TransactionInterface>) => {
-        return rs[0]
+        let dt: string = clsFormatacao.dataISOtoUser(rs[0].date)
+        return {
+          ...rs[0],
+          date: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+        }
       })
   }
   const btPesquisar = () => {
     clsCrud
       .pesquisar({
         entidade: "Transaction",
+        relations: ['company', 'category'],
+        token: usuarioState.token,
         criterio: {
           description: "%".concat(pesquisa.description).concat("%"),
         },
