@@ -20,9 +20,9 @@ var AutenticacaoMiddleware = /** @class */ (function () {
     AutenticacaoMiddleware.prototype.use = function (req, res, next) {
         var _this = this;
         var clsAutenticacaoMiddleware = new autenticacao_middleware_cls_1.default();
-        console.log("[AutenticacaoMiddleware] - req.headers.authorization: ", req.headers.authorization);
+        //console.log("[AutenticacaoMiddleware] - req.headers.authorization: ", req.headers.authorization)
         clsAutenticacaoMiddleware.pesquisarToken(req.headers.authorization).then(function (idUsuario) {
-            console.log("[AutenticacaoMiddleware] - idUsuario: ", idUsuario);
+            //console.log("[AutenticacaoMiddleware] - idUsuario: ", idUsuario)
             _this.sessao.usuarioSessao = idUsuario.toString();
             next();
             // if (idUsuario) {

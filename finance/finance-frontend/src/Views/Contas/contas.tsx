@@ -206,9 +206,9 @@ export function Contas() {
       <Condicional condicao={rsPesquisa.length > 0}>
         <Grid container sx={{ p: 2 }}>
 
-          {rsPesquisa.map((conta) => {
+          {rsPesquisa.map((conta, i) => {
             return (
-              <Grid item xs={12} sm={4} sx={{ p: 1 }}>
+              <Grid key={i} item xs={12} sm={4} sx={{ p: 1 }}>
                 <AccountCard
                   nome={conta.name}
                   tipo={conta.type}

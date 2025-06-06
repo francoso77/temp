@@ -1,5 +1,5 @@
-import { Grid, Paper } from '@mui/material';
-import react from 'react';
+import { Box, Grid, Typography } from '@mui/material';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import InfoCard from '../../Componentes/InfoCard';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -8,33 +8,243 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import FinancialChart from './FinancialChart';
 import { CategoryDataPoint, DataPoint } from '../../types/graficoTypes';
 import CategoryPieChart from './CategoryPieChart';
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
+import ClsFormatacao from '../../Utils/ClsFormatacao';
+import { TransactionInterface } from '../../../../finance-backend/src/interfaces/transaction';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import ClsCrud from '../../Utils/ClsCrudApi';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
+import { ResetTransaction } from '../Transacoes/transacoes';
+import ClsApi from '../../Utils/ClsApi';
+import Condicional from '../../Componentes/Condicional/Condicional';
+import { TransacoesFicha } from '../Transacoes/transacoesFicha';
 
+
+interface DadosCardInterface {
+  saldo: number;
+  receitas: number;
+  despesas: number;
+  transacoes: number;
+}
 
 export default function Dashboard() {
 
-  const sampleData: DataPoint[] = [
-    { date: '2024-01', receitas: 4000, despesas: 2400 },
-    { date: '2024-02', receitas: 3000, despesas: 1398 },
-    { date: '2024-03', receitas: 2000, despesas: 9800 },
-    { date: '2024-04', receitas: 2780, despesas: 3908 },
-    { date: '2024-05', receitas: 1890, despesas: 4800 },
-    { date: '2024-06', receitas: 2390, despesas: 3800 },
-    { date: '2024-07', receitas: 3490, despesas: 4300 },
-  ];
 
-  const sampleCategoryData: CategoryDataPoint[] = [
-    // Despesas
-    { name: 'Alimentação', value: 450.75, color: '#FF6384', type: 'despesa' },
-    { name: 'Transporte', value: 120.00, color: '#36A2EB', type: 'despesa' },
-    { name: 'Moradia', value: 850.00, color: '#FFCE56', type: 'despesa' },
-    { name: 'Lazer', value: 200.50, color: '#4BC0C0', type: 'despesa' },
-    { name: 'Outros (D)', value: 95.20, color: '#9966FF', type: 'despesa' },
-    // Receitas
-    { name: 'Salário', value: 3500.00, color: '#8BC34A', type: 'receita' },
-    { name: 'Freelance', value: 750.00, color: '#CDDC39', type: 'receita' },
-    { name: 'Investimentos', value: 300.00, color: '#FF9800', type: 'receita' },
-    { name: 'Outros (R)', value: 50.00, color: '#00BCD4', type: 'receita' },
-  ];
+  const clsFormatacao = useMemo(() => new ClsFormatacao(), []);
+  const clsCrud = useMemo(() => new ClsCrud(), []);
+  const clsApi = useMemo(() => new ClsApi(), []);
+
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
+  const [transacoes, setTransacoes] = useState<TransactionInterface>(ResetTransaction);
+  const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface;
+  const [dadosCard, setDadosCard] = useState<DadosCardInterface>({ saldo: 0, receitas: 0, despesas: 0, transacoes: 0 });
+  const [dataPoints, setDataPoints] = useState<Array<DataPoint>>([]);
+  const [categoryData, setCategoryData] = useState<CategoryDataPoint[]>([]);
+  const [open, setOpen] = useState(false);
+
+
+  const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
+    {
+      cabecalho: 'Data',
+      alinhamento: 'left',
+      campo: 'date',
+      format: (data) => clsFormatacao.dataISOtoUser(data)
+    },
+    {
+      cabecalho: 'Descrição',
+      alinhamento: 'left',
+      campo: 'description',
+    },
+    {
+      cabecalho: 'Setor',
+      alinhamento: 'center',
+      campo: 'setor',
+    },
+    {
+      cabecalho: 'Empresa',
+      alinhamento: 'center',
+      campo: 'company',
+      format: (_v, rs: any) => rs.company.name
+    },
+    {
+      cabecalho: 'Categoria',
+      alinhamento: 'center',
+      campo: 'category',
+      format: (_v, rs: any) => rs.category.name
+    },
+    {
+      campo: 'type',
+      cabecalho: 'Tipo',
+      alinhamento: 'center',
+      chipColor: (valor) => {
+        switch (valor) {
+          case 'Receita': return 'success';
+          case 'Despesa': return 'error';
+          default: return 'default';
+        }
+      },
+    },
+    {
+      campo: 'amount',
+      cabecalho: 'Valor',
+      alinhamento: 'right',
+      render: (valor: number, row: TransactionInterface) => {
+        const isReceita = row.type === 'Receita'
+        return (
+          <span
+            style={{
+              color: isReceita ? '#4caf50' : '#f44336',
+              fontWeight: 'bold',
+            }}
+          >
+            {new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(valor)}
+          </span>
+        )
+      }
+    }
+  ]
+
+  const onEditar = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setTransacoes(rs)
+      setLocalState({ action: actionTypes.editando })
+    })
+    setOpen(true)
+  }
+  const onExcluir = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setTransacoes(rs)
+      setLocalState({ action: actionTypes.pesquisando })
+      setMensagemState({
+        titulo: 'Exclusão',
+        exibir: true,
+        mensagem: 'Deseja realmente excluir essa transação ' + rs.description + '?',
+        tipo: 'warning',
+        exibirBotao: 'SN',
+        cb: (resposta) => {
+          if (resposta) {
+            clsCrud.excluir({
+              entidade: "Transaction",
+              criterio: { id: id },
+              setMensagemState: setMensagemState,
+              token: usuarioState.token,
+              msg: 'Excluindo transação ...',
+            }).then((rs) => {
+              if (rs.ok) {
+                buscarDados()
+              }
+            })
+          }
+        }
+      })
+    })
+  }
+
+  const pesquisarID = async (id: string | number): Promise<TransactionInterface> => {
+    return await clsCrud
+      .pesquisar({
+        entidade: "Transaction",
+        criterio: {
+          id: id,
+        },
+      })
+      .then((rs: Array<TransactionInterface>) => {
+        return {
+          ...rs[0],
+        }
+      })
+  }
+
+  const buscarDados = async () => {
+
+    const dtInicial = layoutState.dataInicio ? clsFormatacao.dataISOtoDatetime(layoutState.dataInicio) : undefined
+    const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
+    const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
+    const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
+    const setor = layoutState.setor ? layoutState.setor : undefined
+    const tipo = layoutState.type ? layoutState.type : undefined
+    const groupedLinCol = new Map<string, DataPoint>()
+    const groupedCategory = new Map<string, CategoryDataPoint>()
+
+    setDadosCard({ saldo: 0, receitas: 0, despesas: 0, transacoes: 0 })
+
+    await clsApi.execute<Array<TransactionInterface>>({
+      url: 'selecaoTransacoes',
+      method: 'post',
+      token: usuarioState.token,
+      dtInicial,
+      dtFinal,
+      conta,
+      categoria,
+      setor,
+      tipo
+    }).then((rs: Array<any>) => {
+      if (rs.length > 0) {
+        let somaReceitas = 0;
+        let somaDespesas = 0;
+        rs.forEach((x) => {
+          if (x.type === 'Receita') {
+            somaReceitas += x.amount;
+          } else if (x.type === 'Despesa') {
+            somaDespesas += x.amount;
+          }
+        });
+        const quantidadeTransacoes = rs.length
+        const saldoInicial = rs[0].account.initialBalance
+        setDadosCard({ saldo: saldoInicial + somaReceitas - somaDespesas, receitas: somaReceitas, despesas: somaDespesas, transacoes: quantidadeTransacoes })
+      } else {
+        setDadosCard({ saldo: 0, receitas: 0, despesas: 0, transacoes: 0 });
+      }
+      rs.forEach((x) => {
+
+        const month = new Date(x.date).toISOString().slice(0, 7)
+
+        if (!groupedLinCol.has(month)) {
+          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0 })
+        }
+        const currentLinCol = groupedLinCol.get(month)!
+
+        if (x.type === 'Receita') {
+          currentLinCol.receitas += x.amount
+        } else if (x.type === 'Despesa') {
+          currentLinCol.despesas += x.amount
+        }
+
+        groupedLinCol.set(month, currentLinCol)
+
+        const key = `${x.category.name}-${x.type}`
+        if (!groupedCategory.has(key)) {
+          groupedCategory.set(key, {
+            name: x.category.name,
+            value: 0,
+            color: x.category.color,
+            type: x.type.toLowerCase() as 'receita' | 'despesa',
+          });
+        }
+
+        const current = groupedCategory.get(key)!;
+        current.value += x.amount;
+        groupedCategory.set(key, current);
+
+      })
+      const resultData: DataPoint[] = Array.from(groupedLinCol.values())
+      const resultCategory: CategoryDataPoint[] = Array.from(groupedCategory.values());
+      setDataPoints(resultData)
+      setCategoryData(resultCategory);
+      setRsPesquisa(rs)
+    })
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    buscarDados()
+  }, [layoutState])
 
   return (
     <div>
@@ -43,7 +253,7 @@ export default function Dashboard() {
           <InfoCard
             titulo="Saldo Atual"
             icone={<AttachMoneyIcon />}
-            valor={56801.5}
+            valor={dadosCard.saldo}
             formatoValor="moeda"
             texto="Atualizado em tempo real"
             corFundo="#1309aa"
@@ -55,7 +265,7 @@ export default function Dashboard() {
           <InfoCard
             titulo="Receitas"
             icone={<TrendingUpIcon />}
-            valor={184161.31}
+            valor={dadosCard.receitas}
             formatoValor="moeda"
             texto="Total de receitas no período"
             corFundo="#05880c"
@@ -67,7 +277,7 @@ export default function Dashboard() {
           <InfoCard
             titulo="Despesas"
             icone={<TrendingDownIcon />}
-            valor={132360.11}
+            valor={dadosCard.despesas}
             formatoValor="moeda"
             texto="Total de despesas no período"
             corFundo="#860505"
@@ -79,7 +289,7 @@ export default function Dashboard() {
           <InfoCard
             titulo="Transações"
             icone={<BarChartIcon />}
-            valor={87}
+            valor={dadosCard.transacoes}
             formatoValor="numero"
             texto="Total de transações no período"
             corFundo='#010108'
@@ -87,23 +297,51 @@ export default function Dashboard() {
             espessuraBorda={2}
           />
         </Grid>
-      </Grid>
-      <Grid container sx={{ p: 2 }}>
         <Grid item xs={12} sm={6} sx={{ p: 1 }}>
-          <Paper sx={{ padding: 2, marginTop: 2 }}>
-            <FinancialChart
-              data={sampleData}
-              backgroundColor="transparent" // Exemplo: fundo azul claro
-              borderColor="#3a3a3a"    // Exemplo: borda cinza
-            />
-          </Paper>
+          <FinancialChart
+            data={dataPoints}
+            backgroundColor="transparent" // Exemplo: fundo azul claro
+            borderColor="#3a3a3a"    // Exemplo: borda cinza
+          />
         </Grid>
         <Grid item xs={12} sm={6} sx={{ p: 1 }}>
-          <Paper sx={{ padding: 2, marginTop: 2 }}>
-            <CategoryPieChart data={sampleCategoryData} />
-          </Paper>
+          <CategoryPieChart data={categoryData} />
+        </Grid>
+        <Grid item xs={12} sm={12} sx={{ p: 1 }}>
+          <Box sx={{ bgcolor: 'transparent', p: 1, border: '1px solid #3a3a3a', borderRadius: '4px' }} >
+            <Typography variant="h6" sx={{ mb: 2 }}>Ultimas transações</Typography>
+            <DataTable
+              backgroundColor='#050516'
+              cabecalho={cabecalhoForm}
+              dados={rsPesquisa}
+              acoes={[
+                {
+                  icone: EditOutlinedIcon,
+                  corIcone: '#fff',
+                  onAcionador: (rs: TransactionInterface) =>
+                    onEditar(rs.id as string),
+                  toolTip: "Editar",
+                },
+                {
+                  icone: DeleteTwoToneIcon,
+                  corIcone: '#fff',
+                  onAcionador: (rs: TransactionInterface) =>
+                    onExcluir(rs.id as string),
+                  toolTip: "Excluir",
+                },
+              ]} />
+          </Box>
         </Grid>
       </Grid>
+      <Condicional condicao={localState.action !== actionTypes.pesquisando}>
+        <TransacoesFicha
+          open={open}
+          setOpen={setOpen}
+          //btPesquisar={buscarDados}
+          transacao={localState.action !== actionTypes.incluindo ? transacoes : undefined}
+          localState={localState}
+        />
+      </Condicional>
     </div>
   )
 }

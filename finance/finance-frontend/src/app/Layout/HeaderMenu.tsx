@@ -62,6 +62,10 @@ export default function HeaderMenu() {
   };
 
 
+  const handleNovaTransacao = () => {
+    navegar('/transacoes/nova')
+    setLayoutState({ ...layoutState, titulo: 'Transações', pathTitulo: '/transacoes' })
+  }
 
   return (
     <>
@@ -110,7 +114,7 @@ export default function HeaderMenu() {
           </Box>
           <Box>
             <CustomButton
-              onClick={() => navegar('/transacoes/nova')}
+              onClick={handleNovaTransacao}
               bgColor='#1976d2'
               textColor='black'
               iconPosition='start'

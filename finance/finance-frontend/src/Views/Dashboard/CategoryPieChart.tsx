@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Sector } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'; // Icon for Receitas
 import MoneyOffIcon from '@mui/icons-material/MoneyOff'; // Icon for Despesas
-import { CategoryPieChartProps, CategoryDataPoint } from '../../types/graficoTypes';
+import { CategoryPieChartProps } from '../../types/graficoTypes';
 
 /**
  * Componente CategoryPieChart
@@ -31,7 +31,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
 
   // Style for labels and legend (clear font color)
   const textStyle = { color: '#cccccc', fontSize: '0.9rem' };
-  const lightBorderColor = 'rgba(204, 204, 204, 0.5)';
+  const lightBorderColor = "#3a3a3a";
 
   // Custom Tooltip Content
   const CustomTooltip = ({ active, payload }: any) => {
@@ -54,15 +54,17 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
     return null;
   };
 
-  // Custom Label for Pie Slices
+  // Custom Label for Pie Slices - Shows Name and Value (R$)
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, name }: any) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.6; // Position label inside the slice
+    // Adjust label positioning: further out for better readability with two lines
+    const radius = outerRadius * 0.7;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const valueFormatted = `R$${value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`;
 
-    // Only render label if percent is large enough to avoid clutter
-    if (percent < 0.03) { // Threshold: 3%
+    // Only render label if percent is large enough
+    if (percent < 0.04) { // Slightly increased threshold: 4%
       return null;
     }
 
@@ -73,12 +75,15 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
         fill="#ffffff" // White text for labels
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize="0.8rem"
+        fontSize="0.75rem" // Slightly smaller font size for two lines
         fontWeight="bold"
-        // Add a subtle stroke for better contrast against similar slice colors
-        style={{ paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.5)', strokeWidth: '2px', strokeLinecap: 'butt', strokeLinejoin: 'miter' }}
+        // Add a subtle stroke for better contrast
+        style={{ paintOrder: 'stroke', stroke: 'rgba(0,0,0,0.6)', strokeWidth: '2px', strokeLinecap: 'butt', strokeLinejoin: 'miter' }}
       >
-        {`R$${value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`}
+        {/* Display Name on first line */}
+        <tspan x={x} dy="-0.6em">{name}</tspan>
+        {/* Display Value on second line */}
+        <tspan x={x} dy="1.2em">{valueFormatted}</tspan>
       </text>
     );
   };
@@ -87,11 +92,13 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
     <Paper
       elevation={0}
       sx={{
-        padding: 3,
+        padding: 5,
+        width: '100%',
         backgroundColor: 'transparent', // Transparent background
         border: `1px solid ${lightBorderColor}`, // Clear border
         borderRadius: '8px',
-        color: textStyle.color // Set default text color to clear
+        color: textStyle.color, // Set default text color to clear
+
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, flexWrap: 'wrap', gap: 1 }}>
@@ -120,35 +127,45 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
             }
           }}
         >
-          <ToggleButton value="receita" aria-label="receitas" sx={{ px: 1.5 }}>
+          <ToggleButton value="receita" aria-label="receitas" sx={{ px: 1.5, textTransform: 'none' }}>
             <AttachMoneyIcon fontSize="small" sx={{ mr: 0.5 }} /> Receitas
           </ToggleButton>
-          <ToggleButton value="despesa" aria-label="despesas" sx={{ px: 1.5 }}>
+          <ToggleButton value="despesa" aria-label="despesas" sx={{ px: 1.5, textTransform: 'none' }}>
             <MoneyOffIcon fontSize="small" sx={{ mr: 0.5 }} /> Despesas
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <PieChart>
+      {/* Adjust height to accommodate legend */}
+      <ResponsiveContainer width="100%" height={400}>
+        <PieChart margin={{ top: 5, right: 5, bottom: 40, left: 5 }}> {/* Add bottom margin for legend */}
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(204, 204, 204, 0.1)' }} />
           <Legend
-            layout="vertical"
-            align="right"
-            verticalAlign="middle"
-            wrapperStyle={{ color: textStyle.color, fontSize: textStyle.fontSize, paddingLeft: '20px' }}
+            layout="horizontal" // Horizontal layout
+            verticalAlign="bottom" // Position at the bottom
+            align="center" // Center align items
+            iconType="circle" // Use circle as icon
+            wrapperStyle={{
+              color: textStyle.color,
+              fontSize: textStyle.fontSize,
+              paddingTop: '20px' // Add padding above legend
+            }}
             formatter={(value, entry) => (
-              <span style={{ color: textStyle.color }}>{value}</span> // Legend text color
+              // Use the color from the payload for the circle icon (via CSS potentially, or render custom icon)
+              // Recharts default formatter doesn't easily allow custom icons with dynamic color here.
+              // A custom legend component might be needed for exact circle color matching.
+              // For now, just format the text.
+              <span style={{ color: textStyle.color, marginLeft: '5px' }}>{value}</span>
             )}
           />
           <Pie
             data={filteredData}
             cx="50%"
-            cy="50%"
+            cy="45%" // Adjusted cy for bottom legend
             labelLine={false}
-            label={renderCustomizedLabel} // Use the custom label renderer
-            outerRadius={130} // Slightly increased radius
-            innerRadius={40} // Add a small inner radius for donut effect, helps label placement
+            label={renderCustomizedLabel} // Use the updated custom label renderer
+            outerRadius={120} // Adjusted radius slightly
+            innerRadius={40} // Keep donut effect
             fill="#8884d8" // Default fill, overridden by Cell
             dataKey="value"
             nameKey="name"

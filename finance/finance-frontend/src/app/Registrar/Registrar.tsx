@@ -264,14 +264,14 @@ export default function Registrar() {
       // }
     }
 
-  }, [usuarioState, pesquisarID])
+  }, [usuarioState])
 
   return (
     <>
       <Form method='post' action='/Usuario' >
 
         <Container maxWidth="md" sx={{ mt: 5 }}>
-          <Paper variant="outlined" sx={{ p: 1, bgcolor: '#09072e' }}>
+          <Paper variant="outlined" sx={{ p: 1, bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
 
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
@@ -287,6 +287,9 @@ export default function Registrar() {
                 <TitleBar
                   title="Cadastro de Usuários"
                   onClose={() => btFechar()}
+                  textColor='#fff'
+                  backgroundColor='#050516'
+                  fontSize='1.75rem'
                 />
               </Grid>
               <Condicional condicao={localState.action === 'pesquisando'}>

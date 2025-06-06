@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Paper, ToggleButton, ToggleButtonGroup, Typography, Divider } from '@mui/material';
-import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Box, Paper, ToggleButton, ToggleButtonGroup, Typography, Divider, Tooltip as MuiTooltip } from '@mui/material'; // Renamed Tooltip to avoid conflict
+import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts'; // Renamed Tooltip from recharts
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney'; // Icon for Receitas
-import MoneyOffIcon from '@mui/icons-material/MoneyOff'; // Icon for Despesas
-import AllInclusiveIcon from '@mui/icons-material/AllInclusive'; // Icon for All data
-import TodayIcon from '@mui/icons-material/Today'; // Icon for Daily
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'; // Icon for Monthly
-import EventNoteIcon from '@mui/icons-material/EventNote'; // Icon for Annual
-import { FinancialChartProps, DataPoint } from '../../types/graficoTypes';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import MoneyOffIcon from '@mui/icons-material/MoneyOff';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import TodayIcon from '@mui/icons-material/Today';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import { FinancialChartProps } from '../../types/graficoTypes';
 
 /**
  * Componente FinancialChart
@@ -28,109 +28,59 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
   backgroundColor = 'transparent',
   borderColor = 'transparent'
 }) => {
-  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
+  const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
   const [dataFilter, setDataFilter] = useState<'all' | 'receitas' | 'despesas'>('all');
-  const [periodFilter, setPeriodFilter] = useState<'daily' | 'monthly' | 'annual'>('monthly'); // Default or based on initial data
+  const [periodFilter, setPeriodFilter] = useState<'daily' | 'monthly' | 'annual'>('monthly');
 
-  const handleChartTypeChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newChartType: 'line' | 'bar' | null,
-  ) => {
-    if (newChartType !== null) {
-      setChartType(newChartType);
-    }
+  // --- Handlers --- 
+  const handleChartTypeChange = (event: React.MouseEvent<HTMLElement>, newChartType: 'line' | 'bar' | null) => {
+    if (newChartType !== null) setChartType(newChartType);
   };
-
-  const handleDataFilterChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newDataFilter: 'all' | 'receitas' | 'despesas' | null,
-  ) => {
-    if (newDataFilter !== null) {
-      setDataFilter(newDataFilter);
-    }
+  const handleDataFilterChange = (event: React.MouseEvent<HTMLElement>, newDataFilter: 'all' | 'receitas' | 'despesas' | null) => {
+    if (newDataFilter !== null) setDataFilter(newDataFilter);
   };
-
-  const handlePeriodFilterChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newPeriodFilter: 'daily' | 'monthly' | 'annual' | null,
-  ) => {
+  const handlePeriodFilterChange = (event: React.MouseEvent<HTMLElement>, newPeriodFilter: 'daily' | 'monthly' | 'annual' | null) => {
     if (newPeriodFilter !== null) {
       setPeriodFilter(newPeriodFilter);
-      // NOTA IMPORTANTE: A lógica para buscar ou processar os dados com base
-      // no período selecionado (Diário, Mensal, Anual) deve ser tratada
-      // externamente. Este componente espera receber o array `data` já 
-      // correspondente ao período desejado. A mudança de estado aqui serve
-      // principalmente para indicar a seleção do usuário e atualizar a UI dos botões.
       console.log(`Período selecionado: ${newPeriodFilter}. Certifique-se de passar os dados corretos via props.`);
     }
   };
 
-  // Estilos para os eixos e grid - cores claras como solicitado
+  // --- Styles --- 
   const axisStyle = { stroke: '#aaaaaa', fontSize: '0.8rem' };
-  const gridStyle = { stroke: '#dddddd' }; // Grid com cor clara
+  const gridStyle = { stroke: '#dddddd' };
+  const lightTextColor = '#e0e0e0'; // Cor clara para textos
+  const buttonBorderColor = '#3a3a3a'; // Cor da borda dos botões solicitada
 
+  // --- Render Chart Elements --- 
   const renderChartElements = () => {
-    const commonPropsReceitas = {
-      type: 'monotone' as const,
-      dataKey: 'receitas',
-      stroke: '#4caf50', // Verde para receitas
-      fill: '#4caf50',
-      name: 'Receitas',
-    };
-    const commonPropsDespesas = {
-      type: 'monotone' as const,
-      dataKey: 'despesas',
-      stroke: '#f44336', // Vermelho para despesas
-      fill: '#f44336',
-      name: 'Despesas',
-    };
-
-    const lineProps = {
-      strokeWidth: 2,
-      dot: false,
-      activeDot: { r: 6 },
-    };
-
-    const barProps = {
-      barSize: 20,
-    };
+    const commonPropsReceitas = { type: 'monotone' as const, dataKey: 'receitas', stroke: '#4caf50', fill: '#4caf50', name: 'Receitas' };
+    const commonPropsDespesas = { type: 'monotone' as const, dataKey: 'despesas', stroke: '#f44336', fill: '#f44336', name: 'Despesas' };
+    const lineProps = { strokeWidth: 2, dot: false, activeDot: { r: 6 } };
+    const barProps = { barSize: 20 };
 
     return (
       <>
-        {/* Renderiza Receitas se 'all' ou 'receitas' estiver selecionado */}
         {(dataFilter === 'all' || dataFilter === 'receitas') && (
-          chartType === 'line' ? (
-            <Line {...commonPropsReceitas} {...lineProps} />
-          ) : (
-            <Bar {...commonPropsReceitas} {...barProps} />
-          )
+          chartType === 'line' ? <Line {...commonPropsReceitas} {...lineProps} /> : <Bar {...commonPropsReceitas} {...barProps} />
         )}
-
-        {/* Renderiza Despesas se 'all' ou 'despesas' estiver selecionado */}
         {(dataFilter === 'all' || dataFilter === 'despesas') && (
-          chartType === 'line' ? (
-            <Line {...commonPropsDespesas} {...lineProps} />
-          ) : (
-            <Bar {...commonPropsDespesas} {...barProps} />
-          )
+          chartType === 'line' ? <Line {...commonPropsDespesas} {...lineProps} /> : <Bar {...commonPropsDespesas} {...barProps} />
         )}
       </>
     );
   };
 
+  // --- Render Chart --- 
   const renderChart = () => {
     const ChartComponent = chartType === 'line' ? LineChart : BarChart;
-    const chartData = data;
-
     return (
       <ResponsiveContainer width="100%" height={400}>
-        <ChartComponent data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <ChartComponent data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={gridStyle.stroke} />
-          {/* Eixos X e Y com cores claras */}
           <XAxis dataKey="date" stroke={axisStyle.stroke} style={{ fontSize: axisStyle.fontSize }} tick={{ fill: axisStyle.stroke }} />
           <YAxis stroke={axisStyle.stroke} style={{ fontSize: axisStyle.fontSize }} tick={{ fill: axisStyle.stroke }} />
-          {/* Tooltip ao passar o mouse */}
-          <Tooltip
+          <RechartsTooltip
             contentStyle={{ backgroundColor: 'rgba(40, 40, 40, 0.85)', border: 'none', borderRadius: '4px', color: '#fff', padding: '8px 12px' }}
             itemStyle={{ color: '#fff', fontSize: '0.9rem' }}
             labelStyle={{ color: '#ddd', marginBottom: '5px', fontWeight: 'bold' }}
@@ -138,90 +88,136 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
             formatter={(value: number, name: string) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
           />
           <Legend wrapperStyle={{ paddingTop: '10px' }} />
-
-          {/* Renderiza os elementos do gráfico (Linha ou Barra) */}
           {renderChartElements()}
-
         </ChartComponent>
       </ResponsiveContainer>
     );
   };
 
+  // --- Button Group Styles --- 
+  const toggleButtonGroupSx = {
+    '& .MuiToggleButtonGroup-grouped': {
+      borderColor: buttonBorderColor, // Apply border color to individual buttons in the group
+      color: lightTextColor, // Ensure button icon/text color is light
+      '&:not(:first-of-type)': {
+        borderLeftColor: buttonBorderColor, // Ensure left border has the color too
+      },
+      '&.Mui-selected': {
+        color: '#ffffff', // Brighter text when selected
+        backgroundColor: 'rgba(58, 58, 58, 0.5)', // Darker background when selected for contrast
+        borderColor: buttonBorderColor, // Keep border color when selected
+        '&:hover': {
+          backgroundColor: 'rgba(58, 58, 58, 0.7)', // Slightly lighter on hover when selected
+        }
+      },
+      '&:hover': {
+        backgroundColor: 'rgba(58, 58, 58, 0.3)', // Hover effect for non-selected buttons
+        borderColor: buttonBorderColor, // Keep border color on hover
+      }
+    }
+  };
+
+  // --- Main Component Return --- 
   return (
     <Paper
       elevation={0}
       sx={{
-        padding: 2,
-        backgroundColor: backgroundColor, // Customizável via props
-        border: `1px solid ${borderColor}`, // Customizável via props
+        padding: 1,
+        backgroundColor: backgroundColor,
+        border: `1px solid ${borderColor}`,
         borderRadius: '8px'
       }}
     >
+      {/* Title Added Here */}
+      <Typography variant="h6" component="h2" sx={{ color: lightTextColor, marginBottom: 2, textAlign: 'left' }}>
+        Receitas e Despesas
+      </Typography>
+
+      {/* Control Buttons Section */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, marginBottom: 2 }}>
         {/* Data Filter Buttons */}
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', mr: 0.5 }}>Mostrar:</Typography>
+          <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Mostrar:</Typography>
           <ToggleButtonGroup
             value={dataFilter}
             exclusive
             onChange={handleDataFilterChange}
-            aria-label="data filter"
+            aria-label="Filtrar dados"
             size="small"
+            sx={toggleButtonGroupSx} // Apply shared styles
           >
-            <ToggleButton value="all" aria-label="show all" sx={{ px: 1.5 }}>
-              <AllInclusiveIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="receitas" aria-label="show receitas" sx={{ px: 1.5 }}>
-              <AttachMoneyIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="despesas" aria-label="show despesas" sx={{ px: 1.5 }}>
-              <MoneyOffIcon fontSize="small" />
-            </ToggleButton>
+            <MuiTooltip title="Mostrar Todos">
+              <ToggleButton value="all" aria-label="Mostrar tudo" sx={{ px: 1.5 }}>
+                <AllInclusiveIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
+            <MuiTooltip title="Mostrar Receitas">
+              <ToggleButton value="receitas" aria-label="Mostrar receitas" sx={{ px: 1.5 }}>
+                <AttachMoneyIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
+            <MuiTooltip title="Mostrar Despesas">
+              <ToggleButton value="despesas" aria-label="Mostrar despesas" sx={{ px: 1.5 }}>
+                <MoneyOffIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
           </ToggleButtonGroup>
         </Box>
 
         {/* Period Filter Buttons */}
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', mr: 0.5 }}>Período:</Typography>
+          <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Período:</Typography>
           <ToggleButtonGroup
             value={periodFilter}
             exclusive
             onChange={handlePeriodFilterChange}
-            aria-label="period filter"
+            aria-label="Filtrar período"
             size="small"
+            sx={toggleButtonGroupSx} // Apply shared styles
           >
-            <ToggleButton value="daily" aria-label="daily view" sx={{ px: 1.5 }}>
-              <TodayIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="monthly" aria-label="monthly view" sx={{ px: 1.5 }}>
-              <CalendarMonthIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="annual" aria-label="annual view" sx={{ px: 1.5 }}>
-              <EventNoteIcon fontSize="small" />
-            </ToggleButton>
+            <MuiTooltip title="Visão Diária">
+              <ToggleButton value="daily" aria-label="Visão diária" sx={{ px: 1.5 }}>
+                <TodayIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
+            <MuiTooltip title="Visão Mensal">
+              <ToggleButton value="monthly" aria-label="Visão mensal" sx={{ px: 1.5 }}>
+                <CalendarMonthIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
+            <MuiTooltip title="Visão Anual">
+              <ToggleButton value="annual" aria-label="Visão anual" sx={{ px: 1.5 }}>
+                <EventNoteIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
           </ToggleButtonGroup>
         </Box>
 
         {/* Chart Type Buttons */}
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', mr: 0.5 }}>Tipo:</Typography>
+          <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Tipo:</Typography>
           <ToggleButtonGroup
             value={chartType}
             exclusive
             onChange={handleChartTypeChange}
-            aria-label="chart type"
+            aria-label="Tipo de gráfico"
             size="small"
+            sx={toggleButtonGroupSx} // Apply shared styles
           >
-            <ToggleButton value="line" aria-label="line chart" sx={{ px: 1.5 }}>
-              <ShowChartIcon fontSize="small" />
-            </ToggleButton>
-            <ToggleButton value="bar" aria-label="bar chart" sx={{ px: 1.5 }}>
-              <BarChartIcon fontSize="small" />
-            </ToggleButton>
+            <MuiTooltip title="Gráfico de Linha">
+              <ToggleButton value="line" aria-label="Gráfico de linha" sx={{ px: 1.5 }}>
+                <ShowChartIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
+            <MuiTooltip title="Gráfico de Barras">
+              <ToggleButton value="bar" aria-label="Gráfico de barras" sx={{ px: 1.5 }}>
+                <BarChartIcon fontSize="small" />
+              </ToggleButton>
+            </MuiTooltip>
           </ToggleButtonGroup>
         </Box>
       </Box>
-      <Divider sx={{ marginBottom: 2 }} />
+      <Divider sx={{ marginBottom: 2, borderColor: 'rgba(255, 255, 255, 0.12)' }} />
       {renderChart()}
     </Paper>
   );

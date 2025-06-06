@@ -31,7 +31,7 @@ var AppModule = /** @class */ (function () {
             imports: [global_module_1.GlobalModule, config_1.ConfigModule.forRoot({
                     envFilePath: '.env',
                 })],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController, somar_controller_1.SomarController],
+            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController, somar_controller_1.SomarController,],
             providers: [sessao_service_1.SessaoService, {
                     provide: core_1.APP_GUARD,
                     useClass: roles_guard_1.RolesGuard,

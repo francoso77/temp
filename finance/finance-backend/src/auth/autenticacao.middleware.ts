@@ -16,11 +16,11 @@ export class AutenticacaoMiddleware implements NestMiddleware {
 
     const clsAutenticacaoMiddleware = new ClsAutenticacaoMiddleware()
 
-    console.log("[AutenticacaoMiddleware] - req.headers.authorization: ", req.headers.authorization)
+    //console.log("[AutenticacaoMiddleware] - req.headers.authorization: ", req.headers.authorization)
 
     clsAutenticacaoMiddleware.pesquisarToken(req.headers.authorization).then(idUsuario => {
 
-      console.log("[AutenticacaoMiddleware] - idUsuario: ", idUsuario)
+      //console.log("[AutenticacaoMiddleware] - idUsuario: ", idUsuario)
 
       this.sessao.usuarioSessao = idUsuario.toString()
       next()

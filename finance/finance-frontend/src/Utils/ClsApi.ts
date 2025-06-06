@@ -11,28 +11,20 @@ interface PropsInterface {
   mensagem?: string
   itemPesquisa?: string
   campo?: 'data' | 'nome'
-  tinturaria?: number
-  pedidos?: Array<number>
-  tipoProducao?: 'C' | 'A'
-  tipo?: 'Espuma' | 'Forro'
   dtInicial?: string
   dtFinal?: string
   grupo?: GraficoType
-  tipoStatus?: 'Incluir' | 'Excluir'
-  pedido?: number
-  produto?: number
-  qtd?: number
   id?: number
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
   cpf?: string
   senha?: string
-  idProduto?: number | null
-  idCor?: number | null
-  tipoProduto?: number | null
-  idFornecedor?: number | null
   operador?: string | null
   qtdComparar?: number | null
   token?: string
+  conta?: string
+  categoria?: string
+  setor?: 'Dublagem' | 'Malharia'
+  tipo?: 'Receita' | 'Despesa'
 }
 
 export default class ClsApi {
@@ -90,55 +82,40 @@ export default class ClsApi {
     dados,
     setMensagemState,
     mensagem,
-    tinturaria,
     itemPesquisa,
     campo,
-    pedidos,
-    tipoProducao,
-    tipo,
     dtInicial,
     dtFinal,
     grupo,
-    tipoStatus,
-    pedido,
-    produto,
-    qtd,
     id,
     cpf,
     senha,
-    idProduto,
-    idCor,
-    tipoProduto,
-    idFornecedor,
     operador,
     qtdComparar,
-    token = ''
+    token = '',
+    conta,
+    categoria,
+    setor,
+    tipo,
+
   }: PropsInterface): Promise<T> {
     const requestData = {
       ...dados,
       itemPesquisa,
       campo,
-      pedidos,
-      tipoProducao,
-      tipo,
-      tinturaria,
       dtInicial,
       dtFinal,
       grupo,
-      tipoStatus,
-      pedido,
-      produto,
-      qtd,
       id,
       cpf,
       senha,
-      idProduto,
-      idCor,
-      tipoProduto,
-      idFornecedor,
       operador,
       qtdComparar,
-      token
+      token,
+      conta,
+      categoria,
+      setor,
+      tipo,
     };
 
     if (setMensagemState) {

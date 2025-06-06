@@ -17,7 +17,7 @@ var LoggerMiddleware = /** @class */ (function () {
     function LoggerMiddleware(contexto, sessao) {
         this.contexto = contexto;
         this.sessao = sessao;
-        console.log('Constructor do Logger Middleware....');
+        //console.log('Constructor do Logger Middleware....')
     }
     LoggerMiddleware.prototype.use = function (req, res, next) {
         console.log("[logger.middleware] - usuarioContexto ", this.contexto.usuarioContexto);

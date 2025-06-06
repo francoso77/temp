@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -49,6 +52,7 @@ exports.OutController = void 0;
 var common_1 = require("@nestjs/common");
 var data_source_1 = require("../data-source");
 var account_1 = require("../entity/account");
+var transaction_1 = require("../entity/transaction");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
@@ -73,12 +77,113 @@ var OutController = /** @class */ (function () {
             });
         });
     };
+    // @Post('selecaoTransacoes')
+    // async selecaoTransacoes(
+    //   @Body('tipo') tipo?: 'Receita' | 'Despesa',
+    //   @Body('setor') setor?: 'Dublagem' | 'Malharia',
+    //   @Body('categoria') categoria?: string,
+    //   @Body('conta') conta?: string,
+    //   @Body('dtInicial') dtInicial?: string,
+    //   @Body('dtFinal') dtFinal?: string,
+    // ): Promise<any[]> {
+    //   const sql = `
+    //   SELECT 
+    //     t.id,
+    //     t.date,
+    //     t.amount,
+    //     t.setor,
+    //     t.type,
+    //     t.description,
+    //     c.name AS categoriaNome,
+    //     c.color AS categoriaCor,
+    //     a.name AS contaNome,
+    //     a.initialBalance AS contaSaldoInicial,
+    //     co.name AS empresaNome
+    //   FROM transactions t
+    //   LEFT JOIN categories c ON c.id = t.categoryId
+    //   LEFT JOIN accounts a ON a.id = t.accountId
+    //   LEFT JOIN companies co ON co.id = t.companyId
+    //   WHERE
+    //     (? IS NULL OR t.type = ?) AND
+    //     (? IS NULL OR t.setor = ?) AND
+    //     (? IS NULL OR t.categoryId = ?) AND
+    //     (? IS NULL OR t.accountId = ?) AND
+    //     (? IS NULL OR ? IS NULL OR t.date BETWEEN ? AND ?)
+    //   ORDER BY t.date DESC
+    // `;
+    //   const params = [
+    //     tipo, tipo,
+    //     setor, setor,
+    //     categoria, categoria,
+    //     conta, conta,
+    //     dtInicial, dtFinal, dtInicial, dtFinal,
+    //   ];
+    //   return AppDataSource.getRepository(Transaction).query(sql, params);
+    // }
+    OutController.prototype.selecaoTransacoes = function (tipo, setor, categoria, conta, dtInicial, dtFinal) {
+        return __awaiter(this, void 0, void 0, function () {
+            var tipoValor, setorValor, query;
+            return __generator(this, function (_a) {
+                tipoValor = tipo === null || tipo === void 0 ? void 0 : tipo.descricao;
+                setorValor = setor === null || setor === void 0 ? void 0 : setor.descricao;
+                query = data_source_1.AppDataSource.getRepository(transaction_1.default)
+                    .createQueryBuilder('t')
+                    .leftJoinAndSelect('t.account', 'account')
+                    .leftJoinAndSelect('t.category', 'category')
+                    .leftJoinAndSelect('t.company', 'company')
+                    .select([
+                    't.id',
+                    't.date',
+                    't.amount',
+                    't.setor',
+                    't.type',
+                    't.description',
+                    'category.name',
+                    'category.color',
+                    'account.name',
+                    'company.name',
+                    'account.initialBalance',
+                ]);
+                if (dtInicial && dtFinal) {
+                    query.andWhere('t.date BETWEEN :start AND :end', {
+                        start: dtInicial,
+                        end: dtFinal,
+                    });
+                }
+                if (setorValor) {
+                    query.andWhere('t.setor = :setorParam', { setorParam: setorValor });
+                }
+                if (tipoValor) {
+                    query.andWhere('t.type = :tipoParam', { tipoParam: tipoValor });
+                }
+                if (categoria) {
+                    query.andWhere('t.categoryId = :categoriaParam', { categoriaParam: categoria });
+                }
+                if (conta) {
+                    query.andWhere('t.accountId = :contaParam', { contaParam: conta });
+                }
+                return [2 /*return*/, query.getMany()];
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)("alterarPadrao"),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "alterarPadrao", null);
+    __decorate([
+        (0, common_1.Post)('selecaoTransacoes'),
+        __param(0, (0, common_1.Body)('tipo')),
+        __param(1, (0, common_1.Body)('setor')),
+        __param(2, (0, common_1.Body)('categoria')),
+        __param(3, (0, common_1.Body)('conta')),
+        __param(4, (0, common_1.Body)('dtInicial')),
+        __param(5, (0, common_1.Body)('dtFinal')),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object, String, String, String, String]),
+        __metadata("design:returntype", Promise)
+    ], OutController.prototype, "selecaoTransacoes", null);
     OutController = __decorate([
         (0, common_1.Controller)()
     ], OutController);

@@ -44,6 +44,7 @@ export function TransacoesFicha(
   const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
   const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
   const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
 
   const handleClose = () => {
@@ -100,6 +101,9 @@ export function TransacoesFicha(
       .pesquisar({
         entidade: "Account",
         campoOrder: ['name'],
+        criterio: {
+          id: layoutState.contaPadrao
+        }
       })
       .then((rs: Array<AccountInterface>) => {
         setRsContas(rs)

@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common"
 import { AppDataSource } from '../data-source'
 import Account from '../entity/account'
+import Transaction from '../entity/transaction';
 
 
 @Controller()
@@ -18,6 +19,110 @@ export class OutController {
     } catch (error) {
       return { success: false, error };
     }
+  }
+
+  // @Post('selecaoTransacoes')
+  // async selecaoTransacoes(
+  //   @Body('tipo') tipo?: 'Receita' | 'Despesa',
+  //   @Body('setor') setor?: 'Dublagem' | 'Malharia',
+  //   @Body('categoria') categoria?: string,
+  //   @Body('conta') conta?: string,
+  //   @Body('dtInicial') dtInicial?: string,
+  //   @Body('dtFinal') dtFinal?: string,
+  // ): Promise<any[]> {
+  //   const sql = `
+  //   SELECT 
+  //     t.id,
+  //     t.date,
+  //     t.amount,
+  //     t.setor,
+  //     t.type,
+  //     t.description,
+  //     c.name AS categoriaNome,
+  //     c.color AS categoriaCor,
+  //     a.name AS contaNome,
+  //     a.initialBalance AS contaSaldoInicial,
+  //     co.name AS empresaNome
+  //   FROM transactions t
+  //   LEFT JOIN categories c ON c.id = t.categoryId
+  //   LEFT JOIN accounts a ON a.id = t.accountId
+  //   LEFT JOIN companies co ON co.id = t.companyId
+  //   WHERE
+  //     (? IS NULL OR t.type = ?) AND
+  //     (? IS NULL OR t.setor = ?) AND
+  //     (? IS NULL OR t.categoryId = ?) AND
+  //     (? IS NULL OR t.accountId = ?) AND
+  //     (? IS NULL OR ? IS NULL OR t.date BETWEEN ? AND ?)
+  //   ORDER BY t.date DESC
+  // `;
+
+  //   const params = [
+  //     tipo, tipo,
+  //     setor, setor,
+  //     categoria, categoria,
+  //     conta, conta,
+  //     dtInicial, dtFinal, dtInicial, dtFinal,
+  //   ];
+
+  //   return AppDataSource.getRepository(Transaction).query(sql, params);
+  // }
+
+  @Post('selecaoTransacoes')
+  async selecaoTransacoes(
+    @Body('tipo') tipo?: { idTipoTransactionType: string; descricao: string },
+    @Body('setor') setor?: { id: string; descricao: string },
+    @Body('categoria') categoria?: string,
+    @Body('conta') conta?: string,
+    @Body('dtInicial') dtInicial?: string,
+    @Body('dtFinal') dtFinal?: string,
+  ): Promise<any[]> {
+
+    const tipoValor = tipo?.descricao;
+    const setorValor = setor?.descricao;
+
+    const query = AppDataSource.getRepository(Transaction)
+      .createQueryBuilder('t')
+      .leftJoinAndSelect('t.account', 'account')
+      .leftJoinAndSelect('t.category', 'category')
+      .leftJoinAndSelect('t.company', 'company')
+      .select([
+        't.id',
+        't.date',
+        't.amount',
+        't.setor',
+        't.type',
+        't.description',
+        'category.name',
+        'category.color',
+        'account.name',
+        'company.name',
+        'account.initialBalance',
+      ]);
+
+    if (dtInicial && dtFinal) {
+      query.andWhere('t.date BETWEEN :start AND :end', {
+        start: dtInicial,
+        end: dtFinal,
+      });
+    }
+
+    if (setorValor) {
+      query.andWhere('t.setor = :setorParam', { setorParam: setorValor });
+    }
+
+    if (tipoValor) {
+      query.andWhere('t.type = :tipoParam', { tipoParam: tipoValor });
+    }
+
+    if (categoria) {
+      query.andWhere('t.categoryId = :categoriaParam', { categoriaParam: categoria });
+    }
+
+    if (conta) {
+      query.andWhere('t.accountId = :contaParam', { contaParam: conta });
+    }
+
+    return query.getMany();
   }
 
 

@@ -12,7 +12,7 @@ export class LoggerMiddleware implements NestMiddleware {
     private contexto: ContextoService,
     private sessao: SessaoService
   ) {
-    console.log('Constructor do Logger Middleware....')
+    //console.log('Constructor do Logger Middleware....')
   }
 
   use(req: Request, res: Response, next: NextFunction) {

@@ -154,10 +154,10 @@ export default function Login() {
             contextGlobal.setLayoutState({
               ...layoutState,
               opcoesMenu: clsMenu.Menu,
-              titulo: 'Dashboard Financeiro',
+              titulo: 'Dashboard',
               contaPadrao: idContaPadrao
             })
-            navegar("/")
+            navegar("/dashboard")
 
 
           } else {

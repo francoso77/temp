@@ -51,8 +51,22 @@ export default function Menu() {
         key: K,
         value: (typeof layoutState)[K]
     ) => {
-        setLayoutState(prev => ({ ...prev, [key]: value }));
+        if (key === 'contaPadrao') {
+            setLayoutState(prev => ({
+                ...prev,
+                contaPadrao: value as string | null,
+                dataInicio: null,
+                dataFim: null,
+                accountId: null,
+                categoryId: null,
+                type: null,
+                setor: null,
+            }));
+        } else {
+            setLayoutState(prev => ({ ...prev, [key]: value }));
+        }
     };
+
 
     const handleConfirmarDatas = (inicio: string, fim: string) => {
         setDataInicio(inicio);
@@ -123,12 +137,12 @@ export default function Menu() {
 
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         BuscarDados()
     }, []);
 
     useEffect(() => {
-        console.log(layoutState)
     }, [dadosPesquisa]);
 
     return (

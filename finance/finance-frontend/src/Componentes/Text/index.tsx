@@ -203,7 +203,27 @@ export default function Text({
           autoComplete="new-password"
           id={field}
           value={dados[field]}
-          sx={{ my: 0, py: 0, height: 40 }}
+          //sx={{ my: 0, py: 0, height: 40 }}
+          sx={{
+            color: corFonte,
+            fontSize: tamanhoFonte,
+            my: 0, py: 0, height: 40,
+            // backgroundColor: corFundo,
+            // border: '0.5px solid  #3a3a3a',
+            // '&.Mui-disabled': {
+            //   //color: '#aa1e1e', // Cor da fonte
+            //   backgroundColor: '#c99999', // (opcional) Cor de fundo para desabilitado
+            //   border: '0.5px solid  #3a3a3a',
+
+            // },
+            '& .MuiOutlinedInput-notchedOutline': {
+              color: '#ccc', // Cor da borda
+              borderColor: '#ccc', // (opcional) Cor da borda
+              border: '0.5px solid  #3a3a3a',
+
+            },
+
+          }}
           placeholder={placeholder}
           disabled={disabled}
           type={exibirSenha}
