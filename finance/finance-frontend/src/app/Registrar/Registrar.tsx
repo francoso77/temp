@@ -12,25 +12,16 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
-import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TermoDeUsoModal from './TermoDeUsoModal';
 import TitleBar from '../../Componentes/BarraDeTitulo';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 
 
 export default function Registrar() {
 
-  interface PesquisaInterface {
-    itemPesquisa: string
-  }
 
   interface PropsInterface extends UserInterface {
     confirmePassword: string
   }
-
-
 
   const ResetDados: PropsInterface = {
     name: '',
@@ -52,30 +43,6 @@ export default function Registrar() {
   const [erros, setErros] = useState({})
   const [usuario, setUsuario] = useState<PropsInterface>(ResetDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<PropsInterface>>([])
-
-
-  const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
-    {
-      cabecalho: 'id',
-      alinhamento: 'left',
-      campo: 'id'
-    },
-    {
-      cabecalho: 'Nome',
-      alinhamento: 'left',
-      campo: 'name'
-    },
-
-    {
-      cabecalho: 'E-mail',
-      alinhamento: 'left',
-      campo: 'email'
-    },
-
-
-  ]
 
   const pesquisarID = async (id: string | number): Promise<PropsInterface> => {
 
@@ -93,31 +60,12 @@ export default function Registrar() {
   const btFechar = () => {
     setLayoutState({
       ...layoutState,
-      titulo: '',
-      pathTitulo: '/',
+      titulo: 'Dashboard',
+      pathTitulo: '/dashboard',
     })
 
-    irPara('/')
+    irPara('/dashboard')
 
-  }
-
-  const onEditar = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setUsuario(rs)
-      setLocalState({ action: actionTypes.editando })
-    })
-  }
-
-  const onExcluir = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setUsuario(rs)
-      setLocalState({ action: actionTypes.excluindo })
-    })
-  }
-
-  const btIncluir = () => {
-    setUsuario(ResetDados)
-    setLocalState({ action: actionTypes.incluindo })
   }
 
   const btCancelar = () => {
@@ -230,45 +178,22 @@ export default function Registrar() {
     }
   }
 
-  const btPesquisar = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "User",
-        criterio: {
-          name: "%".concat(pesquisa.itemPesquisa).concat("%"),
-        },
-        camposLike: ["name"],
-        msg: 'Pesquisando usuários ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<PropsInterface>) => {
-        setRsPesquisa(rs)
-      })
-  }
-
   useEffect(() => {
 
     if (!usuarioState.logado) {
       setLocalState({ action: actionTypes.incluindo })
     } else {
 
-      // if (verificarTipoUsuario()) {
-      //   setLocalState({ action: actionTypes.pesquisando })
-      // } else {
-      //   if (usuarioState.logado) {
-      //     pesquisarID(usuarioState.idUsuario).then((rs) => {
-      //       setLocalState({ action: actionTypes.editando })
-      //       setUsuario(rs)
-      //     })
-      //   }
-      // }
+      pesquisarID(usuarioState.idUsuario).then((rs) => {
+        setLocalState({ action: actionTypes.editando })
+        setUsuario(rs)
+      })
     }
-
   }, [usuarioState])
 
   return (
     <>
-      <Form method='post' action='/Usuario' >
+      <Form method='post' action='/User' >
 
         <Container maxWidth="md" sx={{ mt: 5 }}>
           <Paper variant="outlined" sx={{ p: 1, bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
@@ -276,14 +201,6 @@ export default function Registrar() {
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
 
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                {/* <Typography component="h5" variant="h5" align="left" sx={{ color: '#fff', fontWeight: 'bold' }}>
-                  Cadastro de Usuários
-                </Typography>
-                <Tooltip title={'Cancelar'}>
-                  <IconButton sx={{ color: '#fff' }} onClick={() => btFechar()}>
-                    <CloseIcon />
-                  </IconButton>
-                </Tooltip> */}
                 <TitleBar
                   title="Cadastro de Usuários"
                   onClose={() => btFechar()}
@@ -292,53 +209,6 @@ export default function Registrar() {
                   fontSize='1.75rem'
                 />
               </Grid>
-              <Condicional condicao={localState.action === 'pesquisando'}>
-                <Grid item xs={10} md={11}>
-                  <InputText
-                    label="Pesquisa"
-                    tipo="uppercase"
-                    dados={pesquisa}
-                    field="itemPesquisa"
-                    setState={setPesquisa}
-                    iconeEnd='searchicon'
-                    onClickIconeEnd={() => btPesquisar()}
-                    mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                    autoFocus
-                    corFonte='#fff'
-                  />
-                </Grid>
-                <Grid item xs={2} md={1}>
-                  <Tooltip title={'Incluir'}>
-                    <IconButton
-                      color="primary"
-                      sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
-                      onClick={() => btIncluir()}
-                    >
-                      <AddCircleIcon sx={{ fontSize: 50 }} />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-                <Grid item xs={12}>
-                  <DataTable
-                    cabecalho={cabecalhoForm}
-                    dados={rsPesquisa}
-                    acoes={[
-                      {
-                        icone: EditOutlinedIcon,
-                        onAcionador: (rs: UserInterface) =>
-                          onEditar(rs.id as string),
-                        toolTip: "Editar",
-                      },
-                      {
-                        icone: DeleteTwoToneIcon,
-                        onAcionador: (rs: UserInterface) =>
-                          onExcluir(rs.id as string),
-                        toolTip: "Excluir",
-                      },
-                    ]}
-                  />
-                </Grid>
-              </Condicional>
               <Condicional condicao={localState.action !== 'pesquisando'}>
                 <Grid item xs={12} sm={12} md={12} sx={{ color: '#fff', textAlign: 'left' }}>
                   <InputText
@@ -347,7 +217,6 @@ export default function Registrar() {
                     dados={usuario}
                     field="isActive"
                     setState={setUsuario}
-                    disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
 
                   />
@@ -363,7 +232,6 @@ export default function Registrar() {
                       erros={erros}
                       type="text"
                       tipo='uppercase'
-                      disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 3)}
                       corFonte='#fff'
                     />
@@ -380,7 +248,6 @@ export default function Registrar() {
                       erros={erros}
                       type="email"
                       tipo="text"
-                      disabled={localState.action === 'excluindo' ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 4)}
                       corFonte='#fff'
                     />
@@ -397,7 +264,6 @@ export default function Registrar() {
                       setState={setUsuario}
                       tipo='pass'
                       erros={erros}
-                      disabled={localState.action === 'excluindo' ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 5)}
                       corFonte='#fff'
                     />
@@ -414,7 +280,6 @@ export default function Registrar() {
                       setState={setUsuario}
                       tipo='pass'
                       erros={erros}
-                      disabled={localState.action === 'excluindo' ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 5)}
                       corFonte='#fff'
                     />
@@ -441,7 +306,6 @@ export default function Registrar() {
                       dados={usuario}
                       field="termsAccepted"
                       setState={setUsuario}
-                      disabled={['excluindo', 'editando'].includes(localState.action)}
                       onKeyDown={(event: any) => btPulaCampo(event, 1)}
                       erros={erros}
                     />

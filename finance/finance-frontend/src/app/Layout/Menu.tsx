@@ -132,7 +132,9 @@ export default function Menu() {
                 select: ['id'],
             })
             .then((rs: any) => {
-                setContaPadrao(rs[0].id as string || String(rs[0].id))
+                if(rs.length > 0){
+                    setContaPadrao(rs[0].id as string || String(rs[0].id))
+                }
             })
 
     }

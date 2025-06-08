@@ -11,6 +11,7 @@ import { Empresas } from '../Views/Empresas/empresas';
 import { Transacoes } from '../Views/Transacoes/transacoes';
 import PaginaTransacoes from '../Views/Transacoes/transacoesPage';
 import Dashboard from '../Views/Dashboard/Dashboard';
+import { ForgotPassword } from "../app/Registrar/ForgotPassword";
 
 export const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
       }
       // {
       //   path: "/Testes",

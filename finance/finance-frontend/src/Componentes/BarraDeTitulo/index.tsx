@@ -4,20 +4,22 @@ import CloseIcon from '@mui/icons-material/Close';
 
 interface TitleBarProps {
   title: string;
-  highlightIndex?: number; // índice da letra em destaque
+  highlightIndex?: number;
   onClose?: () => void;
   backgroundColor?: string;
   textColor?: string;
   fontSize?: string;
+  textAlign?: 'left' | 'center' | 'right'; // restringe valores válidos
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
   title,
   highlightIndex = 0,
   onClose,
-  backgroundColor = '#1976d2', // cor padrão (azul primário do MUI)
+  backgroundColor = '#1976d2',
   textColor = '#fff',
-  fontSize = '1rem'
+  fontSize = '1rem',
+  textAlign = 'left'
 }) => {
   const renderTitle = () => {
     return (
@@ -29,7 +31,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
             sx={{
               fontWeight: highlightIndex === index ? 'bold' : 'normal',
               color: textColor,
-              fontSize: fontSize
+              fontSize: fontSize,
             }}
           >
             {char}
@@ -51,7 +53,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
         padding: '8px 16px'
       }}
     >
-      <Box>{renderTitle()}</Box>
+      <Box sx={{ flex: 1, textAlign }}>
+        {renderTitle()}
+      </Box>
       {onClose && (
         <IconButton onClick={onClose} sx={{ color: textColor }}>
           <CloseIcon />

@@ -56,23 +56,39 @@ var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
     }
+    // @Post('forgot-password')
+    // async forgotPassword(@Body('email') email: string): Promise<{ ok: boolean, mensagem: string }> {
+    //   await this.userService.requestPasswordReset(email);
+    //   return Promise.resolve({ ok: true, mensagem: 'Instruções de redefinição de senha enviado para o seu e-mail.' });
+    // }
     UserController.prototype.forgotPassword = function (email) {
         return __awaiter(this, void 0, void 0, function () {
+            var error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.userService.forgotPassword(email)];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.userService.requestPasswordReset(email)];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/, { message: 'Instruções de redefinição enviadas para seu e-mail.' }];
+                        return [2 /*return*/, {
+                                ok: true,
+                                mensagem: 'Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha.',
+                            }];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error(error_1);
+                        throw new common_1.BadRequestException('Não foi possível processar a solicitação.');
+                    case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    UserController.prototype.resetPassword = function (token, novaSenha) {
+    UserController.prototype.resetPassword = function (body) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.userService.resetPassword(token, novaSenha)];
+                    case 0: return [4 /*yield*/, this.userService.resetPassword(body.token, body.newPassword)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, { message: 'Senha redefinida com sucesso.' }];
@@ -81,18 +97,17 @@ var UserController = /** @class */ (function () {
         });
     };
     __decorate([
-        (0, common_1.Post)('esqueci-senha'),
+        (0, common_1.Post)('forgot-password'),
         __param(0, (0, common_1.Body)('email')),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "forgotPassword", null);
     __decorate([
-        (0, common_1.Post)('resetar-senha'),
-        __param(0, (0, common_1.Body)('token')),
-        __param(1, (0, common_1.Body)('novaSenha')),
+        (0, common_1.Post)('reset-password'),
+        __param(0, (0, common_1.Body)()),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String, String]),
+        __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "resetPassword", null);
     UserController = __decorate([

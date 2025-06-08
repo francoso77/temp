@@ -15,7 +15,7 @@ import { ColorSelectList } from '../../Componentes/ColorSelect';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import ClsCrud from '../../Utils/ClsCrudApi';
-
+import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -65,6 +65,11 @@ export default function HeaderMenu() {
   const handleNovaTransacao = () => {
     navegar('/transacoes/nova')
     setLayoutState({ ...layoutState, titulo: 'Transações', pathTitulo: '/transacoes' })
+  }
+
+  const handleUser = () => {
+    navegar('/registrar')
+    setLayoutState({ ...layoutState, titulo: 'Perfil', pathTitulo: '/registrar' })
   }
 
   return (
@@ -129,7 +134,19 @@ export default function HeaderMenu() {
               Nova Transação
             </CustomButton>
           </Box>
-
+          <Box sx={{ marginRight: -2 }}>
+            <Tooltip title='Perfil'>
+              <IconButton
+                size="large"
+                edge="end"
+                color="primary"
+                sx={{ mr: 1 }}
+                onClick={handleUser}
+              >
+                <AccountCircleTwoToneIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
           <Box sx={{ marginRight: -2 }}>
             <Tooltip title='Sair'>
               <IconButton

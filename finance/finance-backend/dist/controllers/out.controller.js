@@ -122,47 +122,78 @@ var OutController = /** @class */ (function () {
     // }
     OutController.prototype.selecaoTransacoes = function (tipo, setor, categoria, conta, dtInicial, dtFinal) {
         return __awaiter(this, void 0, void 0, function () {
-            var tipoValor, setorValor, query;
+            var tipoValor, setorValor, query, transacoes, accountRepo, account;
             return __generator(this, function (_a) {
-                tipoValor = tipo === null || tipo === void 0 ? void 0 : tipo.descricao;
-                setorValor = setor === null || setor === void 0 ? void 0 : setor.descricao;
-                query = data_source_1.AppDataSource.getRepository(transaction_1.default)
-                    .createQueryBuilder('t')
-                    .leftJoinAndSelect('t.account', 'account')
-                    .leftJoinAndSelect('t.category', 'category')
-                    .leftJoinAndSelect('t.company', 'company')
-                    .select([
-                    't.id',
-                    't.date',
-                    't.amount',
-                    't.setor',
-                    't.type',
-                    't.description',
-                    'category.name',
-                    'category.color',
-                    'account.name',
-                    'company.name',
-                    'account.initialBalance',
-                ]);
-                if (dtInicial && dtFinal) {
-                    query.andWhere('t.date BETWEEN :start AND :end', {
-                        start: dtInicial,
-                        end: dtFinal,
-                    });
+                switch (_a.label) {
+                    case 0:
+                        tipoValor = tipo === null || tipo === void 0 ? void 0 : tipo.descricao;
+                        setorValor = setor === null || setor === void 0 ? void 0 : setor.descricao;
+                        query = data_source_1.AppDataSource.getRepository(transaction_1.default)
+                            .createQueryBuilder('t')
+                            .leftJoinAndSelect('t.account', 'account')
+                            .leftJoinAndSelect('t.category', 'category')
+                            .leftJoinAndSelect('t.company', 'company')
+                            .select([
+                            't.id',
+                            't.date',
+                            't.amount',
+                            't.setor',
+                            't.type',
+                            't.description',
+                            'category.name',
+                            'category.color',
+                            'account.name',
+                            'company.name',
+                            'account.initialBalance',
+                        ]);
+                        if (dtInicial && dtFinal) {
+                            query.andWhere('t.date BETWEEN :start AND :end', {
+                                start: dtInicial,
+                                end: dtFinal,
+                            });
+                        }
+                        if (setorValor) {
+                            query.andWhere('t.setor = :setorParam', { setorParam: setorValor });
+                        }
+                        if (tipoValor) {
+                            query.andWhere('t.type = :tipoParam', { tipoParam: tipoValor });
+                        }
+                        if (categoria) {
+                            query.andWhere('t.categoryId = :categoriaParam', { categoriaParam: categoria });
+                        }
+                        if (conta) {
+                            query.andWhere('t.accountId = :contaParam', { contaParam: conta });
+                        }
+                        return [4 /*yield*/, query.getMany()];
+                    case 1:
+                        transacoes = _a.sent();
+                        if (!(transacoes.length === 0 && conta)) return [3 /*break*/, 3];
+                        accountRepo = data_source_1.AppDataSource.getRepository('Account');
+                        return [4 /*yield*/, accountRepo.findOne({
+                                where: { id: conta },
+                                select: ['id', 'name', 'initialBalance'],
+                            })];
+                    case 2:
+                        account = _a.sent();
+                        if (account) {
+                            return [2 /*return*/, [{
+                                        id: null,
+                                        date: null,
+                                        amount: null,
+                                        setor: setorValor !== null && setorValor !== void 0 ? setorValor : null,
+                                        type: tipoValor !== null && tipoValor !== void 0 ? tipoValor : null,
+                                        description: 'Sem transações no período',
+                                        category: { name: null, color: null },
+                                        company: { name: null },
+                                        account: {
+                                            name: account.name,
+                                            initialBalance: account.initialBalance,
+                                        },
+                                    }]];
+                        }
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, transacoes];
                 }
-                if (setorValor) {
-                    query.andWhere('t.setor = :setorParam', { setorParam: setorValor });
-                }
-                if (tipoValor) {
-                    query.andWhere('t.type = :tipoParam', { tipoParam: tipoValor });
-                }
-                if (categoria) {
-                    query.andWhere('t.categoryId = :categoriaParam', { categoriaParam: categoria });
-                }
-                if (conta) {
-                    query.andWhere('t.accountId = :contaParam', { contaParam: conta });
-                }
-                return [2 /*return*/, query.getMany()];
             });
         });
     };

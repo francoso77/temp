@@ -51,18 +51,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 // user.service.ts
 var common_1 = require("@nestjs/common");
-var typeorm_1 = require("@nestjs/typeorm");
-var typeorm_2 = require("typeorm");
+var typeorm_1 = require("typeorm");
+var typeorm_2 = require("@nestjs/typeorm");
+var crypto = require("crypto");
 var bcrypt = require("bcrypt");
-var crypto_1 = require("crypto");
 var user_1 = require("../../entity/sistema/user");
-var email_service_1 = require("../../email/email.service");
 var UserService = /** @class */ (function () {
-    function UserService(userRepository, emailService) {
+    function UserService(userRepository) {
         this.userRepository = userRepository;
-        this.emailService = emailService;
     }
-    UserService.prototype.forgotPassword = function (email) {
+    UserService.prototype.requestPasswordReset = function (email) {
         return __awaiter(this, void 0, void 0, function () {
             var user, token, expires;
             return __generator(this, function (_a) {
@@ -70,19 +68,20 @@ var UserService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.userRepository.findOne({ where: { email: email } })];
                     case 1:
                         user = _a.sent();
-                        if (!user)
-                            throw new common_1.NotFoundException('Usuário não encontrado.');
-                        token = (0, crypto_1.randomUUID)();
-                        expires = new Date();
-                        expires.setMinutes(expires.getMinutes() + 30); // expira em 30 min
+                        if (!user) {
+                            //throw new NotFoundException('Usuário não encontrado');
+                            return [2 /*return*/];
+                        }
+                        token = crypto.randomBytes(32).toString('hex');
+                        expires = new Date(Date.now() + 1000 * 60 * 60);
                         user.resetToken = token;
                         user.resetTokenExpires = expires;
                         return [4 /*yield*/, this.userRepository.save(user)];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, this.emailService.sendPasswordReset(email, token)];
-                    case 3:
-                        _a.sent();
+                        // Aqui você envia o email usando seu serviço de e-mail
+                        // Por enquanto, log:
+                        console.log("Reset Token: http://192.168.1.183:4000/reset-password?token=".concat(token));
                         return [2 /*return*/];
                 }
             });
@@ -90,39 +89,37 @@ var UserService = /** @class */ (function () {
     };
     UserService.prototype.resetPassword = function (token, newPassword) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, salt, _a;
+            var user, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, this.userRepository.findOne({
-                            where: { resetToken: token },
+                            where: {
+                                resetToken: token,
+                                resetTokenExpires: (0, typeorm_1.MoreThan)(new Date()),
+                            },
                         })];
                     case 1:
                         user = _b.sent();
-                        if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-                            throw new common_1.NotFoundException('Token inválido ou expirado.');
-                        }
-                        return [4 /*yield*/, bcrypt.genSalt()];
-                    case 2:
-                        salt = _b.sent();
+                        if (!user)
+                            throw new common_1.BadRequestException('Token inválido ou expirado');
                         _a = user;
-                        return [4 /*yield*/, bcrypt.hash(newPassword, salt)];
-                    case 3:
+                        return [4 /*yield*/, bcrypt.hash(newPassword, 10)];
+                    case 2:
                         _a.password = _b.sent();
                         user.resetToken = null;
                         user.resetTokenExpires = null;
                         return [4 /*yield*/, this.userRepository.save(user)];
-                    case 4:
+                    case 3:
                         _b.sent();
                         return [2 /*return*/];
                 }
             });
         });
     };
-    var _a;
     UserService = __decorate([
         (0, common_1.Injectable)(),
-        __param(0, (0, typeorm_1.InjectRepository)(user_1.User)),
-        __metadata("design:paramtypes", [typeorm_2.Repository, typeof (_a = typeof email_service_1.EmailService !== "undefined" && email_service_1.EmailService) === "function" ? _a : Object])
+        __param(0, (0, typeorm_2.InjectRepository)(user_1.User)),
+        __metadata("design:paramtypes", [typeorm_1.Repository])
     ], UserService);
     return UserService;
 }());

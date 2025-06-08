@@ -189,61 +189,85 @@ export default function Dashboard() {
       if (rs.length > 0) {
         let somaReceitas = 0;
         let somaDespesas = 0;
+
         rs.forEach((x) => {
-          if (x.type === 'Receita') {
-            somaReceitas += x.amount;
-          } else if (x.type === 'Despesa') {
-            somaDespesas += x.amount;
+          const amount = x.amount ?? 0;
+          const type = x.type ?? '';
+
+          if (type === 'Receita') {
+            somaReceitas += amount;
+          } else if (type === 'Despesa') {
+            somaDespesas += amount;
           }
         });
-        const quantidadeTransacoes = rs.length
-        const saldoInicial = rs[0].account.initialBalance
-        setDadosCard({ saldo: saldoInicial + somaReceitas - somaDespesas, receitas: somaReceitas, despesas: somaDespesas, transacoes: quantidadeTransacoes })
+
+        const quantidadeTransacoes = rs[0].amount === null ? 0 : rs.length;
+        const saldoInicial = rs[0]?.account?.initialBalance ?? 0;
+
+        setDadosCard({
+          saldo: saldoInicial + somaReceitas - somaDespesas,
+          receitas: somaReceitas,
+          despesas: somaDespesas,
+          transacoes: quantidadeTransacoes,
+        });
+
+        if (rs[0].amount !== null) {
+          setRsPesquisa(rs)
+        }
       } else {
+
         setDadosCard({ saldo: 0, receitas: 0, despesas: 0, transacoes: 0 });
       }
-      rs.forEach((x) => {
 
-        const month = new Date(x.date).toISOString().slice(0, 7)
+      rs.forEach((x) => {
+        const amount = x.amount ?? 0;
+        const type = x.type;
+        const category = x.category;
+        const date = x.date;
+
+        if (!type || !category || !date) return; // pula itens inválidos
+
+        const month = new Date(date).toISOString().slice(0, 7);
 
         if (!groupedLinCol.has(month)) {
-          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0 })
-        }
-        const currentLinCol = groupedLinCol.get(month)!
-
-        if (x.type === 'Receita') {
-          currentLinCol.receitas += x.amount
-        } else if (x.type === 'Despesa') {
-          currentLinCol.despesas += x.amount
+          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0 });
         }
 
-        groupedLinCol.set(month, currentLinCol)
+        const currentLinCol = groupedLinCol.get(month)!;
+        if (type === 'Receita') {
+          currentLinCol.receitas += amount;
+        } else if (type === 'Despesa') {
+          currentLinCol.despesas += amount;
+        }
+        groupedLinCol.set(month, currentLinCol);
 
-        const key = `${x.category.name}-${x.type}`
+        const key = `${category.name}-${type}`;
         if (!groupedCategory.has(key)) {
           groupedCategory.set(key, {
-            name: x.category.name,
+            name: category.name ?? 'Sem nome',
             value: 0,
-            color: x.category.color,
-            type: x.type.toLowerCase() as 'receita' | 'despesa',
+            color: category.color ?? '#000000',
+            type: type.toLowerCase() as 'receita' | 'despesa',
           });
         }
 
         const current = groupedCategory.get(key)!;
-        current.value += x.amount;
+        current.value += amount;
         groupedCategory.set(key, current);
+      });
 
-      })
-      const resultData: DataPoint[] = Array.from(groupedLinCol.values())
+      const resultData: DataPoint[] = Array.from(groupedLinCol.values());
       const resultCategory: CategoryDataPoint[] = Array.from(groupedCategory.values());
-      setDataPoints(resultData)
+      setDataPoints(resultData);
       setCategoryData(resultCategory);
-      setRsPesquisa(rs)
-    })
+    });
+
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    buscarDados()
+    if (layoutState.contaPadrao !== "") {
+      buscarDados()
+    }
   }, [layoutState])
 
   return (

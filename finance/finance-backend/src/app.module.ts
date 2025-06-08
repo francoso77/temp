@@ -9,14 +9,17 @@ import { AutenticacaoMiddleware } from './auth/autenticacao.middleware';
 import { SomarController } from './controllers/somar.controller';
 import { SessaoService } from './auth/services/sessao.service';
 import { ConfigModule } from "@nestjs/config";
+import { UserModule } from "./user.module";
+import { DatabaseModule } from "./database.module";
 
 
 @Module({
-  imports: [GlobalModule, ConfigModule.forRoot(
-    {
-      envFilePath: '.env',
-    }
-  )],
+imports: [
+  ConfigModule.forRoot({ envFilePath: '.env' }),
+  GlobalModule,
+  DatabaseModule,
+  UserModule,
+],
   controllers: [CrudController, OutController, LoginUsuarioController, SomarController,],
   providers: [SessaoService, {
     provide: APP_GUARD,

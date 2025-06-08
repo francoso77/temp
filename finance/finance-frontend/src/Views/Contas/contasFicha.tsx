@@ -16,6 +16,7 @@ import { CurrencyTextField } from '../../Componentes/InputCurrency';
 import { CustomCheckbox } from '../../Componentes/CustomCheckbox';
 import { ResetAccount } from './contas';
 import { AccountTypes } from '../../types/accountTypes';
+import { useNavigate } from 'react-router-dom';
 
 
 interface PropsInterface {
@@ -30,16 +31,21 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
 
   const clsCrud = new ClsCrud()
   const clsApi = new ClsApi()
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<AccountInterface>(ResetAccount);
   const validaCampo: ClsValidacao = new ClsValidacao()
-
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const irPara = useNavigate()
 
   const handleClose = () => {
     btPesquisar && btPesquisar()
     setDados(ResetAccount)
     setOpen(false)
+    if (layoutState?.contaPadrao === "") {
+      setUsuarioState({ ...usuarioState, logado: false })
+      irPara('/')
+    }
   }
 
   const validarDados = () => {

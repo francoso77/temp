@@ -25,6 +25,7 @@ interface PropsInterface {
   categoria?: string
   setor?: 'Dublagem' | 'Malharia'
   tipo?: 'Receita' | 'Despesa'
+  email?: string
 }
 
 export default class ClsApi {
@@ -97,6 +98,7 @@ export default class ClsApi {
     categoria,
     setor,
     tipo,
+    email,
 
   }: PropsInterface): Promise<T> {
     const requestData = {
@@ -116,6 +118,7 @@ export default class ClsApi {
       categoria,
       setor,
       tipo,
+      email
     };
 
     if (setMensagemState) {

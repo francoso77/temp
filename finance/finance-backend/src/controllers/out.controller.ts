@@ -122,7 +122,35 @@ export class OutController {
       query.andWhere('t.accountId = :contaParam', { contaParam: conta });
     }
 
-    return query.getMany();
+    const transacoes = await query.getMany();
+
+    // Se não houver transações, trazer pelo menos a conta com o saldo inicial
+    if (transacoes.length === 0 && conta) {
+      const accountRepo = AppDataSource.getRepository('Account');
+      const account = await accountRepo.findOne({
+        where: { id: conta },
+        select: ['id', 'name', 'initialBalance'],
+      });
+
+      if (account) {
+        return [{
+          id: null,
+          date: null,
+          amount: null,
+          setor: setorValor ?? null,
+          type: tipoValor ?? null,
+          description: 'Sem transações no período',
+          category: { name: null, color: null },
+          company: { name: null },
+          account: {
+            name: account.name,
+            initialBalance: account.initialBalance,
+          },
+        }];
+      }
+    }
+
+    return transacoes;
   }
 
 

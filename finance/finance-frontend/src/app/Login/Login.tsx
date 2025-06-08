@@ -14,7 +14,6 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import CustomButton from '../../Componentes/Button';
 import LoginIcon from '@mui/icons-material/Login';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 
 
 
@@ -24,9 +23,8 @@ export default function Login() {
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState({ email: 'ti@jbtextil.com', senha: 'teste123' })
   const clsValidacao: ClsValidacao = new ClsValidacao()
-  const { mensagemState, setMensagemState, layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
-  //const { usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const clsApi = new ClsApi()
   const clsCrud = new ClsCrud()
   const navegar = useNavigate()
@@ -42,8 +40,6 @@ export default function Login() {
     setErros(tmpErros)
     return retorno
   }
-
-
 
   const btEntrar = () => {
 
@@ -151,14 +147,21 @@ export default function Login() {
 
             const clsMenu = new MenuCls(MENU)
 
+            let local: string = "/contas"
+            let titulo: string = "Contas"
+
+            if (idContaPadrao !== "") {
+              local = "/dashboard"
+              titulo = "Dashboard"
+            }
+
             contextGlobal.setLayoutState({
               ...layoutState,
               opcoesMenu: clsMenu.Menu,
-              titulo: 'Dashboard',
+              titulo: titulo,
               contaPadrao: idContaPadrao
             })
-            navegar("/dashboard")
-
+            navegar(local)
 
           } else {
             setMensagemState({
@@ -263,7 +266,7 @@ export default function Login() {
                     </CustomButton>
                   </Grid>
                   <Grid item xs={12} sx={{ textAlign: "center", mt: 1.5, mb: 2 }}>
-                    <Link href="#">Esqueci a senha</Link>
+                    <Link href="/forgot-password" >Esqueci a senha</Link>
                   </Grid>
                 </Grid>
                 <Copyright />

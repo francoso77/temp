@@ -8,4 +8,5 @@ export const ROTAS_LIVRES: Array<string> = [
   "empresas",
   "transacoes",
   "dashboard",
+  "forgot-password"
 ];

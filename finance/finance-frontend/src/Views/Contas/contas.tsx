@@ -40,6 +40,7 @@ export function Contas() {
   const [rsPesquisa, setRsPesquisa] = useState<Array<SomatorioInterface>>([])
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const clsCrud = new ClsCrud()
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -198,7 +199,13 @@ export function Contas() {
   };
 
   useEffect(() => {
-    btPesquisar()
+
+    if (layoutState.contaPadrao === "") {
+      setContas({ ...contas, isDefault: true })
+      setOpen(true);
+    } else {
+      btPesquisar()
+    }
   }, [])
 
   return (
@@ -227,62 +234,65 @@ export function Contas() {
           })}
         </Grid>
       </Condicional>
-      <Grid container sx={{ mt: 2 }}>
-        <Grid item xs={12}>
-          <Typography variant="h5" sx={{ m: 2, textAlign: 'left' }}>Lista de Contas</Typography>
-        </Grid>
-        <Grid item xs={6} sx={{ ml: 2 }}>
-          <InputText
-            label=""
-            placeholder="Buscar contas..."
-            tipo="uppercase"
-            dados={pesquisa}
-            field="name"
-            setState={setPesquisa}
-            iconeStart='searchicon'
-            onClickIconeStart={() => { btPesquisar() }}
-            mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-            autoFocus
-            width={'100%'}
+      <Condicional condicao={layoutState.contaPadrao !== ''}>
+        <Grid container sx={{ mt: 2 }}>
+          <Grid item xs={12}>
+            <Typography variant="h5" sx={{ m: 2, textAlign: 'left' }}>Lista de Contas</Typography>
+          </Grid>
+          <Grid item xs={6} sx={{ ml: 2 }}>
+            <InputText
+              label=""
+              placeholder="Buscar contas..."
+              tipo="uppercase"
+              dados={pesquisa}
+              field="name"
+              setState={setPesquisa}
+              iconeStart='searchicon'
+              onClickIconeStart={() => { btPesquisar() }}
+              mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
+              autoFocus
+              width={'100%'}
 
-          />
+            />
+          </Grid>
+          <Grid item xs={5}>
+            <CustomButton
+              onClick={() => { handleOpen() }}
+              bgColor='#1976d2'
+              textColor='#000'
+              iconPosition='start'
+              icon={<i className="material-icons">add</i>}
+              sx={{ mt: 2, ml: 1, textAlign: 'right' }}
+            >
+              Nova Conta
+            </CustomButton>
+          </Grid>
+          <Grid item xs={12} sx={{ m: 2 }}>
+            <DataTable
+              backgroundColor='#050516'
+              cabecalho={cabecalhoForm}
+              dados={rsPesquisa}
+              acoes={[
+                {
+                  icone: EditOutlinedIcon,
+                  corIcone: '#fff',
+                  onAcionador: (rs: AccountInterface) =>
+                    onEditar(rs.id as string),
+                  toolTip: "Editar",
+                },
+                {
+                  icone: DeleteTwoToneIcon,
+                  corIcone: '#fff',
+                  onAcionador: (rs: AccountInterface) =>
+                    onExcluir(rs.id as string),
+                  toolTip: "Excluir",
+                },
+              ]} />
+          </Grid>
         </Grid>
-        <Grid item xs={5}>
-          <CustomButton
-            onClick={() => { handleOpen() }}
-            bgColor='#1976d2'
-            textColor='#000'
-            iconPosition='start'
-            icon={<i className="material-icons">add</i>}
-            sx={{ mt: 2, ml: 1, textAlign: 'right' }}
-          >
-            Nova Conta
-          </CustomButton>
-        </Grid>
-        <Grid item xs={12} sx={{ m: 2 }}>
-          <DataTable
-            backgroundColor='#050516'
-            cabecalho={cabecalhoForm}
-            dados={rsPesquisa}
-            acoes={[
-              {
-                icone: EditOutlinedIcon,
-                corIcone: '#fff',
-                onAcionador: (rs: AccountInterface) =>
-                  onEditar(rs.id as string),
-                toolTip: "Editar",
-              },
-              {
-                icone: DeleteTwoToneIcon,
-                corIcone: '#fff',
-                onAcionador: (rs: AccountInterface) =>
-                  onExcluir(rs.id as string),
-                toolTip: "Excluir",
-              },
-            ]} />
-        </Grid>
-      </Grid>
-      <Condicional condicao={localState.action !== actionTypes.pesquisando}>
+
+      </Condicional>
+      <Condicional condicao={localState.action !== actionTypes.pesquisando || layoutState.contaPadrao === ""}>
         <ContasFicha
           open={open}
           setOpen={setOpen}
