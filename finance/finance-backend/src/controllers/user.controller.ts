@@ -4,7 +4,9 @@ import { UserService } from '../auth/services/user.service';
 
 @Controller('auth')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(
+    private readonly userService: UserService,
+  ) { }
 
   // @Post('forgot-password')
   // async forgotPassword(@Body('email') email: string): Promise<{ ok: boolean, mensagem: string }> {
@@ -34,4 +36,11 @@ export class UserController {
     await this.userService.resetPassword(body.token, body.newPassword);
     return { message: 'Senha redefinida com sucesso.' };
   }
+
+  @Post('send-email')
+  async sendEmail(@Body('email') email: string) {
+    await this.userService.notifyUser(email);
+    return { message: 'E-mail enviado com sucesso!' };
+  }
+
 }

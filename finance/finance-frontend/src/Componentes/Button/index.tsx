@@ -7,7 +7,7 @@ interface CustomButtonProps {
   bgColor?: string;
   textColor?: string;
   href?: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
   icon?: React.ReactNode;
   iconPosition?: 'start' | 'end';
   children: React.ReactNode;
@@ -26,8 +26,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    if (onClick) onClick();
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (onClick) onClick(event); // ✅ passa o evento corretamente
     if (href) navigate(href);
   };
 

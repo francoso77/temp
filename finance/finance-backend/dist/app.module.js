@@ -20,6 +20,7 @@ var sessao_service_1 = require("./auth/services/sessao.service");
 var config_1 = require("@nestjs/config");
 var user_module_1 = require("./user.module");
 var database_module_1 = require("./database.module");
+var email_modulo_1 = require("./email.modulo");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -31,10 +32,11 @@ var AppModule = /** @class */ (function () {
     AppModule = __decorate([
         (0, common_1.Module)({
             imports: [
-                config_1.ConfigModule.forRoot({ envFilePath: '.env' }),
+                config_1.ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
                 global_module_1.GlobalModule,
                 database_module_1.DatabaseModule,
                 user_module_1.UserModule,
+                email_modulo_1.EmailModule,
             ],
             controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController, somar_controller_1.SomarController,],
             providers: [sessao_service_1.SessaoService, {

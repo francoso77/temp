@@ -1,5 +1,5 @@
 // ForgotPassword.tsx
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ClsApi from '../../Utils/ClsApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
@@ -13,65 +13,60 @@ import SendIcon from '@mui/icons-material/Send';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { useNavigate } from 'react-router-dom';
 
-export function ForgotPassword() {
-    const [dados, setDados] = useState({ email: '' });
+export function ResetPassword() {
+    const [dados, setDados] = useState({ newPassword: '', confirmPassword: '' });
     const clsApi: ClsApi = new ClsApi();
     const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
     const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
     const clsCrud: ClsCrud = new ClsCrud();
     const [erros, setErros] = useState({});
     const validaCampo: ClsValidacao = new ClsValidacao();
-    const irPara = useNavigate()
+    const irPara = useNavigate();
+    const [token, setToken] = useState('');
 
     const validarDados = (): boolean => {
         let retorno: boolean = true
         let erros: { [key: string]: string } = {}
 
-        retorno = validaCampo.eEmail('email', dados, erros, retorno, false, 'Digite um e-mail valido')
+        retorno = validaCampo.naoVazio('newPassword', dados, erros, retorno, 'A senha não pode ser vázio')
+        retorno = validaCampo.tamanho("newPassword", dados, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
+        retorno = validaCampo.naoVazio('confirmPassword', dados, erros, retorno, 'A senha não pode ser vázio')
+        retorno = validaCampo.tamanho("confirmPassword", dados, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
+        retorno = validaCampo.eSenhaIgual('newPassword', 'confirmPassword', dados, erros, retorno, 'As senhas devem ser iguais')
 
         setErros(erros)
         return retorno
     }
 
-    const verificarEmail = async (): Promise<boolean> => {
-
-        if (!validarDados()) {
-            return false;
-        }
-        const rsEmail: Array<UserInterface> = await clsCrud.pesquisar({
-            entidade: "User",
-            criterio: { email: dados.email },
-        });
-
-        return rsEmail.length > 0;
-    };
-
     const handleSubmit = async () => {
-        const emailExiste = await verificarEmail();
 
-        if (emailExiste) {
-            const rsForgotPassword = await clsApi.execute<{ ok: boolean; mensagem: string }>({
-                method: 'post',
-                url: 'auth/forgot-password',
-                email: dados.email,
-                mensagem: 'Enviando instruções para o e-mail...',
-                token: usuarioState.token,
+        if (!validarDados()) return
+
+        const rsForgotPassword = await clsApi.execute<{ ok: boolean; mensagem: string }>({
+            method: 'post',
+            url: 'auth/reset-password',
+            dados: { dados, token },
+            token: usuarioState.token,
+        });
+        if (rsForgotPassword.ok) {
+
+            setMensagemState({
+                titulo: 'Redefinição de senha',
+                exibir: true,
+                mensagem: 'Instruções de redefinição de senha enviadas para o e-mail.',
+                tipo: MensagemTipo.Ok,
+                exibirBotao: true,
+                cb: null,
             });
-            if (rsForgotPassword.ok) {
-
-                setMensagemState({
-                    titulo: 'Redefinição de senha',
-                    exibir: true,
-                    mensagem: 'Instruções de redefinição de senha enviadas para o e-mail.',
-                    tipo: MensagemTipo.Ok,
-                    exibirBotao: true,
-                    cb: null,
-                });
-                irPara('/login')
-            }
+            irPara('/login')
         }
     };
 
+
+    useEffect(() => {
+        const url = new URL(window.location.href);
+        setToken(url.searchParams.get('token') || '');
+    }, []);
 
     return (
         <Grid
@@ -89,22 +84,31 @@ export function ForgotPassword() {
 
                     >
                         <TitleBar
-                            title="Redefinição de senha"
+                            title="Nova Senha"
                             textColor="#fff"
                             backgroundColor="transparent"
                             fontSize="1.75rem"
                             textAlign="center"
                         />
                         <Text
-                            corFonte='#fff'
-                            autofocus
-                            label='E-mail'
-                            tipo='text'
-                            field='email'
+                            field="newPassword"
+                            label="Senha"
                             dados={dados}
+                            type='password'
                             setState={setDados}
+                            tipo='pass'
                             erros={erros}
-                        //autocomplete='email'
+                            corFonte='#fff'
+                        />
+                        <Text
+                            field="confirmPassword"
+                            label="Confirme a Senha"
+                            dados={dados}
+                            type='password'
+                            setState={setDados}
+                            tipo='pass'
+                            erros={erros}
+                            corFonte='#fff'
                         />
                     </Box>
                 </Paper>
@@ -116,7 +120,7 @@ export function ForgotPassword() {
                         onClick={() => handleSubmit()}
                         sx={{ width: '100%', mt: 1.5 }}
                     >
-                        Enviar
+                        Alterar Senha
                     </CustomButton>
                 </Grid>
             </Grid>

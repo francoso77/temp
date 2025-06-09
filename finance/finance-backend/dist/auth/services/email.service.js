@@ -46,24 +46,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailService = void 0;
+// src/email/email.service.ts
 var common_1 = require("@nestjs/common");
-var mailer_1 = require("@nestjs-modules/mailer");
+var nodemailer = require("nodemailer");
 var EmailService = /** @class */ (function () {
-    function EmailService(mailerService) {
-        this.mailerService = mailerService;
+    function EmailService() {
+        this.transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT),
+            secure: false,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
     }
-    EmailService.prototype.sendPasswordResetEmail = function (email, resetLink) {
+    EmailService.prototype.sendMail = function (to, subject, text, html) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.mailerService.sendMail({
-                            to: email,
-                            subject: 'Redefinição de Senha',
-                            template: './redefinirSenha', // Nome do arquivo de template
-                            context: {
-                                // Dados a serem enviados para o template
-                                resetLink: resetLink,
-                            },
+                    case 0: return [4 /*yield*/, this.transporter.sendMail({
+                            from: '"Depto TI" <francoso@bol.com.br>',
+                            to: to,
+                            subject: subject,
+                            text: text,
+                            html: html,
                         })];
                     case 1:
                         _a.sent();
@@ -74,7 +81,7 @@ var EmailService = /** @class */ (function () {
     };
     EmailService = __decorate([
         (0, common_1.Injectable)(),
-        __metadata("design:paramtypes", [mailer_1.MailerService])
+        __metadata("design:paramtypes", [])
     ], EmailService);
     return EmailService;
 }());

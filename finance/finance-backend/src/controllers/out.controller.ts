@@ -92,9 +92,12 @@ export class OutController {
         't.setor',
         't.type',
         't.description',
+        'category.id',
         'category.name',
         'category.color',
+        'account.id',
         'account.name',
+        'company.id',
         'company.name',
         'account.initialBalance',
       ]);

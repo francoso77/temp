@@ -140,9 +140,12 @@ var OutController = /** @class */ (function () {
                             't.setor',
                             't.type',
                             't.description',
+                            'category.id',
                             'category.name',
                             'category.color',
+                            'account.id',
                             'account.name',
+                            'company.id',
                             'company.name',
                             'account.initialBalance',
                         ]);

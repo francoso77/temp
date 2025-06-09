@@ -96,6 +96,18 @@ var UserController = /** @class */ (function () {
             });
         });
     };
+    UserController.prototype.sendEmail = function (email) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.userService.notifyUser(email)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, { message: 'E-mail enviado com sucesso!' }];
+                }
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)('forgot-password'),
         __param(0, (0, common_1.Body)('email')),
@@ -110,6 +122,13 @@ var UserController = /** @class */ (function () {
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "resetPassword", null);
+    __decorate([
+        (0, common_1.Post)('send-email'),
+        __param(0, (0, common_1.Body)('email')),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String]),
+        __metadata("design:returntype", Promise)
+    ], UserController.prototype, "sendEmail", null);
     UserController = __decorate([
         (0, common_1.Controller)('auth'),
         __metadata("design:paramtypes", [user_service_1.UserService])

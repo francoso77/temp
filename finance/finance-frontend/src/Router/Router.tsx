@@ -12,6 +12,8 @@ import { Transacoes } from '../Views/Transacoes/transacoes';
 import PaginaTransacoes from '../Views/Transacoes/transacoesPage';
 import Dashboard from '../Views/Dashboard/Dashboard';
 import { ForgotPassword } from "../app/Registrar/ForgotPassword";
+import { ResetPassword } from '../app/Registrar/ResetPassword';
+import { Relatorios } from '../Views/Relatorios/relatorios';
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +65,14 @@ export const router = createBrowserRouter([
       {
         path: "/forgot-password",
         element: <ForgotPassword />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "/relatorios",
+        element: <Relatorios />,
       }
       // {
       //   path: "/Testes",

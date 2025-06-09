@@ -56,22 +56,24 @@ var typeorm_2 = require("@nestjs/typeorm");
 var crypto = require("crypto");
 var bcrypt = require("bcrypt");
 var user_1 = require("../../entity/sistema/user");
+var email_service_1 = require("./email.service");
+var config_1 = require("@nestjs/config");
 var UserService = /** @class */ (function () {
-    function UserService(userRepository) {
+    function UserService(userRepository, emailService, configService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
+        this.configService = configService;
     }
     UserService.prototype.requestPasswordReset = function (email) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, token, expires;
+            var user, token, expires, protocol, host, port, resetLink;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.userRepository.findOne({ where: { email: email } })];
                     case 1:
                         user = _a.sent();
-                        if (!user) {
-                            //throw new NotFoundException('Usuário não encontrado');
+                        if (!user)
                             return [2 /*return*/];
-                        }
                         token = crypto.randomBytes(32).toString('hex');
                         expires = new Date(Date.now() + 1000 * 60 * 60);
                         user.resetToken = token;
@@ -79,9 +81,13 @@ var UserService = /** @class */ (function () {
                         return [4 /*yield*/, this.userRepository.save(user)];
                     case 2:
                         _a.sent();
-                        // Aqui você envia o email usando seu serviço de e-mail
-                        // Por enquanto, log:
-                        console.log("Reset Token: http://192.168.1.183:4000/reset-password?token=".concat(token));
+                        protocol = this.configService.get('REACT_APP_BACKEND_PROTOCOLO');
+                        host = this.configService.get('REACT_APP_BACKEND_HOST');
+                        port = this.configService.get('REACT_APP_BACKEND_PORTA');
+                        resetLink = "".concat(protocol).concat(host, ":").concat(port, "/reset-password?token=").concat(token);
+                        return [4 /*yield*/, this.emailService.sendMail(user.email, 'Recuperação de senha', "Clique aqui para redefinir sua senha: ".concat(resetLink), "<p>Clique <a href=\"".concat(resetLink, "\">aqui</a> para redefinir sua senha.</p>"))];
+                    case 3:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -116,10 +122,24 @@ var UserService = /** @class */ (function () {
             });
         });
     };
+    UserService.prototype.notifyUser = function (email) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.emailService.sendMail(email, 'Bem-vindo!', 'Olá, seja bem-vindo ao nosso sistema!', '<b>Olá, seja bem-vindo ao nosso sistema!</b>')];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     UserService = __decorate([
         (0, common_1.Injectable)(),
         __param(0, (0, typeorm_2.InjectRepository)(user_1.User)),
-        __metadata("design:paramtypes", [typeorm_1.Repository])
+        __metadata("design:paramtypes", [typeorm_1.Repository,
+            email_service_1.EmailService,
+            config_1.ConfigService])
     ], UserService);
     return UserService;
 }());

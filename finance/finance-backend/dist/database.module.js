@@ -20,7 +20,8 @@ var DatabaseModule = /** @class */ (function () {
                     host: 'localhost',
                     port: 3306,
                     username: 'root',
-                    password: '071569',
+                    password: "Frk@071569#",
+                    //password: '071569',
                     database: 'finance',
                     synchronize: true,
                     autoLoadEntities: true, // importa automaticamente as entidades dos módulos

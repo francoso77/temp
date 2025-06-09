@@ -1,25 +1,25 @@
 // user.service.ts
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../entity/sistema/user';
+import { EmailService } from './email.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) { }
 
   async requestPasswordReset(email: string): Promise<void> {
-
     const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
-      //throw new NotFoundException('Usuário não encontrado');
-      return
-    }
+    if (!user) return;
 
     const token = crypto.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hora
@@ -28,9 +28,18 @@ export class UserService {
     user.resetTokenExpires = expires;
     await this.userRepository.save(user);
 
-    // Aqui você envia o email usando seu serviço de e-mail
-    // Por enquanto, log:
-    console.log(`Reset Token: http://192.168.1.183:4000/reset-password?token=${token}`);
+    const protocol = this.configService.get<string>('REACT_APP_BACKEND_PROTOCOLO');
+    const host = this.configService.get<string>('REACT_APP_BACKEND_HOST');
+    const port = this.configService.get<string>('REACT_APP_BACKEND_PORTA');
+
+    const resetLink = `${protocol}${host}:${port}/reset-password?token=${token}`;
+
+    await this.emailService.sendMail(
+      user.email,
+      'Recuperação de senha',
+      `Clique aqui para redefinir sua senha: ${resetLink}`,
+      `<p>Clique <a href="${resetLink}">aqui</a> para redefinir sua senha.</p>`,
+    );
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
@@ -47,5 +56,14 @@ export class UserService {
     user.resetToken = null;
     user.resetTokenExpires = null;
     await this.userRepository.save(user);
+  }
+
+  async notifyUser(email: string) {
+    await this.emailService.sendMail(
+      email,
+      'Bem-vindo!',
+      'Olá, seja bem-vindo ao nosso sistema!',
+      '<b>Olá, seja bem-vindo ao nosso sistema!</b>',
+    );
   }
 }

@@ -12,12 +12,14 @@ var typeorm_1 = require("@nestjs/typeorm");
 var user_1 = require("./entity/sistema/user");
 var user_service_1 = require("./auth/services/user.service");
 var user_controller_1 = require("./controllers/user.controller");
+var email_modulo_1 = require("./email.modulo");
+var config_1 = require("@nestjs/config");
 var UserModule = /** @class */ (function () {
     function UserModule() {
     }
     UserModule = __decorate([
         (0, common_1.Module)({
-            imports: [typeorm_1.TypeOrmModule.forFeature([user_1.User])],
+            imports: [typeorm_1.TypeOrmModule.forFeature([user_1.User]), email_modulo_1.EmailModule, config_1.ConfigModule],
             providers: [user_service_1.UserService],
             controllers: [user_controller_1.UserController],
             exports: [user_service_1.UserService],

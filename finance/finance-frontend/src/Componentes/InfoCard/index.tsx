@@ -4,11 +4,11 @@ import { SxProps } from '@mui/system';
 
 type InfoCardProps = {
   titulo: string;
-  icone: React.ReactNode;
+  icone?: React.ReactNode;
   valor: number;
   formatoValor: 'numero' | 'moeda';
-  texto: string;
-  corFundo: string;
+  texto?: string;
+  corFundo?: string;
   corBorda?: string;
   espessuraBorda?: number;
 };
@@ -28,7 +28,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
   valor,
   formatoValor,
   texto,
-  corFundo,
+  corFundo = '#81d4fa',
   corBorda = '#ffffff',
   espessuraBorda = 1,
 }) => {

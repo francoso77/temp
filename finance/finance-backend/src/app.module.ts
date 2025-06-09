@@ -11,15 +11,17 @@ import { SessaoService } from './auth/services/sessao.service';
 import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "./user.module";
 import { DatabaseModule } from "./database.module";
+import { EmailModule } from './email.modulo';
 
 
 @Module({
-imports: [
-  ConfigModule.forRoot({ envFilePath: '.env' }),
-  GlobalModule,
-  DatabaseModule,
-  UserModule,
-],
+  imports: [
+    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    GlobalModule,
+    DatabaseModule,
+    UserModule,
+    EmailModule,
+  ],
   controllers: [CrudController, OutController, LoginUsuarioController, SomarController,],
   providers: [SessaoService, {
     provide: APP_GUARD,
