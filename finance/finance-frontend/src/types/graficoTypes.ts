@@ -34,6 +34,8 @@ export interface FinancialChartProps {
   data: DataPoint[];
   backgroundColor?: string;
   borderColor?: string;
+  title?: string;
+  local?: "Dash" | "Visao"
   // Adicionaremos mais props para controle conforme necessário
 }
 

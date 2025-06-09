@@ -10,6 +10,9 @@ import TodayIcon from '@mui/icons-material/Today';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import { FinancialChartProps } from '../../types/graficoTypes';
+import { TitleObject } from 'highcharts';
+import { Locale } from 'date-fns';
+import Condicional from '../../Componentes/Condicional/Condicional';
 
 /**
  * Componente FinancialChart
@@ -22,11 +25,16 @@ import { FinancialChartProps } from '../../types/graficoTypes';
  * @param {DataPoint[]} data - Array de objetos contendo os dados do gráfico (date, receitas, despesas).
  * @param {string} [backgroundColor='transparent'] - Cor de fundo do container do gráfico.
  * @param {string} [borderColor='transparent'] - Cor da borda do container do gráfico.
+ * @param {Title} string - título a ser atribuido ao gráfico.
+ * @param {Local} Dash - o gráfico ficará em Dashboard
+ * @param {Local} Visao - o gráfico ficará em Relatórios 
  */
 const FinancialChart: React.FC<FinancialChartProps> = ({
   data,
   backgroundColor = 'transparent',
-  borderColor = 'transparent'
+  borderColor = 'transparent',
+  title = 'Gráfico Financeiro',
+  local = 'Dash',
 }) => {
   const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
   const [dataFilter, setDataFilter] = useState<'all' | 'receitas' | 'despesas'>('all');
@@ -130,40 +138,41 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
     >
       {/* Title Added Here */}
       <Typography variant="h6" component="h2" sx={{ color: lightTextColor, marginBottom: 2, textAlign: 'left' }}>
-        Receitas e Despesas
+        {title}
       </Typography>
 
       {/* Control Buttons Section */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, marginBottom: 2 }}>
         {/* Data Filter Buttons */}
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Mostrar:</Typography>
-          <ToggleButtonGroup
-            value={dataFilter}
-            exclusive
-            onChange={handleDataFilterChange}
-            aria-label="Filtrar dados"
-            size="small"
-            sx={toggleButtonGroupSx} // Apply shared styles
-          >
-            <MuiTooltip title="Mostrar Todos">
-              <ToggleButton value="all" aria-label="Mostrar tudo" sx={{ px: 1.5 }}>
-                <AllInclusiveIcon fontSize="small" />
-              </ToggleButton>
-            </MuiTooltip>
-            <MuiTooltip title="Mostrar Receitas">
-              <ToggleButton value="receitas" aria-label="Mostrar receitas" sx={{ px: 1.5 }}>
-                <AttachMoneyIcon fontSize="small" />
-              </ToggleButton>
-            </MuiTooltip>
-            <MuiTooltip title="Mostrar Despesas">
-              <ToggleButton value="despesas" aria-label="Mostrar despesas" sx={{ px: 1.5 }}>
-                <MoneyOffIcon fontSize="small" />
-              </ToggleButton>
-            </MuiTooltip>
-          </ToggleButtonGroup>
-        </Box>
-
+        <Condicional condicao={local === 'Dash'}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Mostrar:</Typography>
+            <ToggleButtonGroup
+              value={dataFilter}
+              exclusive
+              onChange={handleDataFilterChange}
+              aria-label="Filtrar dados"
+              size="small"
+              sx={toggleButtonGroupSx} // Apply shared styles
+            >
+              <MuiTooltip title="Mostrar Todos">
+                <ToggleButton value="all" aria-label="Mostrar tudo" sx={{ px: 1.5 }}>
+                  <AllInclusiveIcon fontSize="small" />
+                </ToggleButton>
+              </MuiTooltip>
+              <MuiTooltip title="Mostrar Receitas">
+                <ToggleButton value="receitas" aria-label="Mostrar receitas" sx={{ px: 1.5 }}>
+                  <AttachMoneyIcon fontSize="small" />
+                </ToggleButton>
+              </MuiTooltip>
+              <MuiTooltip title="Mostrar Despesas">
+                <ToggleButton value="despesas" aria-label="Mostrar despesas" sx={{ px: 1.5 }}>
+                  <MoneyOffIcon fontSize="small" />
+                </ToggleButton>
+              </MuiTooltip>
+            </ToggleButtonGroup>
+          </Box>
+        </Condicional>
         {/* Period Filter Buttons */}
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Período:</Typography>

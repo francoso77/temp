@@ -559,30 +559,13 @@ export function Relatorios() {
             espessuraBorda={2}
           />
         </Grid>
-        <Grid item xs={12} sm={4} sx={{ p: 1 }}>
-          <CustomTabs />
+        <Grid item xs={12} sx={{ p: 1 }}>
+          <CustomTabs
+            titleOverview='Visão Geral'
+            dataOverview={dataPoints}
+          />
         </Grid>
       </Grid>
-      {/* <Tabs
-        value={activeTab}
-        onChange={(event, newValue) => setActiveTab(newValue)}
-        orientation="horizontal"
-        textColor="primary"
-        indicatorColor="primary"
-        variant="scrollable"
-        scrollButtons="auto"
-      >
-        <Tab label="Visão Geral" value="overview" />
-        <Tab label="Receitas" value="receita" />
-        <Tab label="Despesas" value="despesa" />
-        <Tab label="Categorias" value="categoria" />
-        <Tab label="Transações" value="transacao" />
-      </Tabs>
-
-      <div style={{ marginTop: '1rem' }}>
-        {tabComponents[activeTab]?.()}
-      </div> */}
-
     </>
   )
 }
