@@ -1,8 +1,11 @@
-const CategoriaComponent = ({ categorias }: { categorias: string[] }) => (
+import { CategoryDataPoint } from '../../types/graficoTypes';
+import CategoryPieChart from '../../Views/Dashboard/CategoryPieChart';
+
+const CategoriaComponent = ({ data }: { data: CategoryDataPoint[] }) => (
   <div style={{ color: '#fff' }}>
-    Categorias:
-    <ul>{categorias.map((cat, i) => <li key={i}>{cat}</li>)}</ul>
+    <CategoryPieChart data={data} />
   </div>
 );
 
 export default CategoriaComponent;
+

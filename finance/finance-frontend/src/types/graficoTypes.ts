@@ -35,7 +35,6 @@ export interface FinancialChartProps {
   backgroundColor?: string;
   borderColor?: string;
   title?: string;
-  local?: "Dash" | "Visao"
   // Adicionaremos mais props para controle conforme necessário
 }
 
@@ -47,6 +46,7 @@ export interface CategoryDataPoint {
 }
 
 export interface CategoryPieChartProps {
+  title?: string;
   data: CategoryDataPoint[];
   // Props de estilo opcionais, se necessário além do solicitado
   // borderColor?: string; // Já solicitado como claro

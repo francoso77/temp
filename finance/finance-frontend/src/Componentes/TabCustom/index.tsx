@@ -1,37 +1,29 @@
 import React, { useState } from 'react';
 import { Tabs, Tab, Box } from '@mui/material';
 import OverviewComponent from './overviewComponent';
-import ReceitaComponent from './receitaComponent';
-import DespesaComponent from './despesaComponent';
 import CategoriaComponent from './categoriaComponent';
 import TransacaoComponent from './transacaoComponent';
-import { DataPoint } from '../../types/graficoTypes';
+import { CategoryDataPoint, DataPoint } from '../../types/graficoTypes';
+import { TransactionSelectInterface } from '../../Views/Relatorios/relatorios';
 
 interface TabProps {
-  titleOverview?: string;
-  titleReceita?: string;
-  titleDespesa?: string;
-  titleCategoria?: string;
-  titleTransacao?: string;
   dataOverview?: DataPoint[];
-
+  dataCategoria?: CategoryDataPoint[];
+  dataTransacao?: TransactionSelectInterface[];
 }
 
 const CustomTabs = ({
-  titleOverview = 'Visão Geral', 
-  titleReceita, 
-  titleDespesa, 
-  titleCategoria, 
-  titleTransacao, 
-  dataOverview = []
+
+  dataOverview = [],
+  dataCategoria = [],
+  dataTransacao = [],
+
 }: TabProps) => {
-  
+
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabList = [
     { label: 'Visão Geral', value: 'overview' },
-    { label: 'Receitas', value: 'receita' },
-    { label: 'Despesas', value: 'despesa' },
     { label: 'Categorias', value: 'categoria' },
     { label: 'Transações', value: 'transacao' },
   ];
@@ -39,15 +31,11 @@ const CustomTabs = ({
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewComponent title={titleOverview} data={dataOverview} />;
-      case 'receita':
-        return <ReceitaComponent data={['Venda A', 'Venda B']} />;
-      case 'despesa':
-        return <DespesaComponent tipo="mensal" />;
+        return <OverviewComponent data={dataOverview} />;
       case 'categoria':
-        return <CategoriaComponent categorias={['Alimentação', 'Transporte']} />;
+        return <CategoriaComponent data={dataCategoria} />;
       case 'transacao':
-        return <TransacaoComponent filtro={{ status: 'ativo' }} />;
+        return <TransacaoComponent data={dataTransacao} />;
       default:
         return null;
     }

@@ -327,7 +327,6 @@ export default function Dashboard() {
             data={dataPoints}
             backgroundColor="transparent" // Exemplo: fundo azul claro
             borderColor="#3a3a3a"    // Exemplo: borda cinza
-            local='Dash'
           />
         </Grid>
         <Grid item xs={12} sm={6} sx={{ p: 1 }}>

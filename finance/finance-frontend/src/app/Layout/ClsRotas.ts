@@ -3,12 +3,6 @@ export const ROTAS_LIVRES: Array<string> = [
   "welcome",
   "registrar",
   "testes",
-  "categorias",
-  "contas",
-  "empresas",
-  "transacoes",
-  "dashboard",
   "forgot-password",
   "reset-password",
-  "relatorios",
 ];

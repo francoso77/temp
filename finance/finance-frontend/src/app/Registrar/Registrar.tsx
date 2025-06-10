@@ -58,13 +58,18 @@ export default function Registrar() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
-      ...layoutState,
-      titulo: 'Dashboard',
-      pathTitulo: '/dashboard',
-    })
 
-    irPara('/dashboard')
+    if (usuarioState.logado) {
+      setLayoutState({
+        ...layoutState,
+        titulo: 'Dashboard',
+        pathTitulo: '/dashboard',
+      })
+
+      irPara('/dashboard')
+    } else {
+      irPara('/')
+    }
 
   }
 

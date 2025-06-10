@@ -14,7 +14,7 @@ import { CategoryPieChartProps } from '../../types/graficoTypes';
  * 
  * @param {CategoryDataPoint[]} data - Array de objetos contendo os dados das categorias (name, value, color, type).
  */
-const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
+const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, title = "Distribuição por Categoria" }) => {
   const [dataType, setDataType] = useState<'receita' | 'despesa'>('despesa'); // Default to despesas
 
   const handleDataTypeChange = (
@@ -103,7 +103,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data }) => {
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, flexWrap: 'wrap', gap: 1 }}>
         <Typography variant="h6" component="h2" sx={{ color: textStyle.color }}>
-          Distribuição por Categoria
+          {title}
         </Typography>
 
         {/* Filter Buttons */}

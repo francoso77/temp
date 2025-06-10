@@ -24,7 +24,7 @@ export default function ButtonMenu({
   nameButton = 'Menu',
   menuItems,
   textColor = '#fff',
-  backgroundColor = 'transparent',
+  backgroundColor = '#010108',
   hoverColor = '#444',
 }: PropsInterface) {
 
