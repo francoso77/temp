@@ -54,41 +54,6 @@ export default class ClsCrudController {
     Promise<RespostaPadraoInterface<any>> {
     const repositorio = AppDataSource.getRepository(entidade)
 
-    // let where: Record<string, any> = {}
-    // where = { ...criterio }
-
-    // camposLike.forEach((campo) => {
-    //   where[campo] = Like(where[campo])
-    // })
-
-    // console.log("where: ", where)
-    // const rep = AppDataSource.getRepository(entidade)
-    // const repository = AppDataSource.getRepository(entidade)
-    // let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())
-
-    // joins.forEach(join => {
-    //   queryBuilder = queryBuilder.leftJoinAndSelect(join.tabelaRelacao, join.relacao)
-    // })
-
-    // queryBuilder = queryBuilder
-    //   .select(select)
-    //   .where(where)
-
-    // const query = `
-    //   SELECT 
-    //       e.*,
-    //       p.nome AS nomeProduto,
-    //       tp.nome AS nomeTipoProduto
-    //   FROM 
-    //       estruturas e
-    //   INNER JOIN 
-    //       produtos p ON e.idProduto = p.idProduto
-    //   INNER JOIN 
-    //       tipoprodutos tp ON p.idTipoProduto = tp.idTipoProduto
-    //   WHERE 
-    //       p.nome LIKE '%%';
-    //   `;
-
     return repositorio.query(sql)
       .then((rs) => {
         return {
@@ -204,12 +169,6 @@ export default class ClsCrudController {
       campoOrder.forEach((campo) => {
         order[campo] = tipoOrder
       })
-
-      // console.log('entidade:', entidade)
-      // console.log('joins:', joins)
-      // console.log('groupBy:', groupBy)
-      // console.log('having:', having)
-      // console.log("where: ", where)
 
       const repository = AppDataSource.getRepository(entidade)
       let queryBuilder = repository.createQueryBuilder(entidade.toLowerCase())

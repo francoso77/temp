@@ -195,11 +195,11 @@ export default class ClsValidacao {
 
     if (dados[campo] !== dados[campoComparacao]) {
       erros[campoComparacao] = mensagemErro;
-      return false;
+      return true;
     }
 
     if (retorno) delete erros[campoComparacao];
-    return true;
+    return false;
   }
 
   public eTrue(
@@ -285,7 +285,7 @@ export default class ClsValidacao {
 
     } else {
 
-      erros[campo] = 'Campo não é String ou Número...'
+      erros[campo] = mensagemErro
       return false
 
     }

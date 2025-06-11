@@ -87,12 +87,14 @@ export default function Registrar() {
     retorno = validaCampo.naoVazio('name', usuario, erros, retorno, 'Digite um nome para o usuário')
     retorno = validaCampo.naoVazio('password', usuario, erros, retorno, 'A senha não pode ser vázio')
     retorno = validaCampo.tamanho("password", usuario, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
-    retorno = validaCampo.naoVazio('confirmePassword', usuario, erros, retorno, 'A senha não pode ser vázio')
-    retorno = validaCampo.tamanho("confirmePassword", usuario, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
     retorno = validaCampo.eEmail('email', usuario, erros, retorno, false)
-    retorno = validaCampo.eSenhaIgual('password', 'confirmePassword', usuario, erros, retorno, 'As senhas devem ser iguais')
     retorno = validaCampo.eTrue('termsAccepted', usuario, erros, retorno, true)
+    retorno = validaCampo.naoVazio('confirmePassword', usuario, erros, retorno, 'Confirme a senha')
 
+    if (usuario.password !== usuario.confirmePassword) {
+      erros['confirmePassword'] = 'As senhas devem ser iguais'
+      retorno = false
+    }
     setErros(erros)
     return retorno
   }
@@ -162,12 +164,13 @@ export default function Registrar() {
     }
   }
   const btConfirmar = async () => {
+
     if (!validarDados()) return;
 
     if (localState.action === actionTypes.incluindo && (await TemEmail())) {
       await executarAcao("incluir", "Usuário incluído com sucesso!");
     } else if (localState.action === actionTypes.editando) {
-      await executarAcao("editar", "Usuário alterado com sucesso!");
+      await executarAcao("editar", "Dados alterados com sucesso!");
     }
   }
 
@@ -192,6 +195,7 @@ export default function Registrar() {
       pesquisarID(usuarioState.idUsuario).then((rs) => {
         setLocalState({ action: actionTypes.editando })
         setUsuario(rs)
+        setUsuario({ ...rs, confirmePassword: rs.password })
       })
     }
   }, [usuarioState])
@@ -207,7 +211,7 @@ export default function Registrar() {
 
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <TitleBar
-                  title="Cadastro de Usuários"
+                  title="Cadastro de Usuário"
                   onClose={() => btFechar()}
                   textColor='#fff'
                   backgroundColor='#050516'
@@ -215,19 +219,8 @@ export default function Registrar() {
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
-                <Grid item xs={12} sm={12} md={12} sx={{ color: '#fff', textAlign: 'left' }}>
-                  <InputText
-                    label="Ativo"
-                    tipo="checkbox"
-                    dados={usuario}
-                    field="isActive"
-                    setState={setUsuario}
-                    onKeyDown={(event: any) => btPulaCampo(event, 1)}
-
-                  />
-                </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                  <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
 
                     <InputText
                       label="Nome"
@@ -237,13 +230,13 @@ export default function Registrar() {
                       erros={erros}
                       type="text"
                       tipo='uppercase'
-                      onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                      onKeyDown={(event: any) => btPulaCampo(event, 2)}
                       corFonte='#fff'
                     />
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                  <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
 
                     <InputText
                       label="E-mail"
@@ -253,13 +246,13 @@ export default function Registrar() {
                       erros={erros}
                       type="email"
                       tipo="text"
-                      onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                      onKeyDown={(event: any) => btPulaCampo(event, 3)}
                       corFonte='#fff'
                     />
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                  <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
 
                     <Text
                       field="password"
@@ -269,7 +262,7 @@ export default function Registrar() {
                       setState={setUsuario}
                       tipo='pass'
                       erros={erros}
-                      onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                      onKeyDown={(event: any) => btPulaCampo(event, 4)}
                       corFonte='#fff'
                     />
                   </Box>
@@ -285,7 +278,7 @@ export default function Registrar() {
                       setState={setUsuario}
                       tipo='pass'
                       erros={erros}
-                      onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                      onKeyDown={(event: any) => btPulaCampo(event, 1)}
                       corFonte='#fff'
                     />
                   </Box>
