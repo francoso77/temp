@@ -1,5 +1,5 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
@@ -37,7 +37,19 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
   const validaCampo: ClsValidacao = new ClsValidacao()
   const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const irPara = useNavigate()
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
   const handleClose = () => {
     btPesquisar && btPesquisar()
     setDados(ResetAccount)
@@ -146,41 +158,48 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>
           <Grid container spacing={2}>
             <Grid item xs={12} >
-              <InputText
-                autoFocus
-                label="Nome da conta"
-                type="text"
-                setState={setDados}
-                field="name"
-                erros={erros}
-                dados={dados}
-                corFonte={"#fff"}
-                onFocus={(e) => e.target.select()}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <InputText
+                  autoFocus
+                  label="Nome da conta"
+                  type="text"
+                  setState={setDados}
+                  field="name"
+                  erros={erros}
+                  dados={dados}
+                  corFonte={"#fff"}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} >
-              <ComboBox
-                label='Tipo'
-                corFundo='#050516'
-                corFonte={"#fff"}
-                opcoes={AccountTypes}
-                field='type'
-                setState={setDados}
-                dados={dados}
-                campoID='idAccountType'
-                campoDescricao='descricao'
-                mensagemPadraoCampoEmBranco='Escolha um Tipo'
-              />
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <ComboBox
+                  label='Tipo'
+                  corFundo='#050516'
+                  corFonte={"#fff"}
+                  opcoes={AccountTypes}
+                  field='type'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='idAccountType'
+                  campoDescricao='descricao'
+                  mensagemPadraoCampoEmBranco='Escolha um Tipo'
+                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                />
+              </Box>
             </Grid>
-
             <Grid item xs={12} >
-              <CurrencyTextField
-                label="Saldo inicial"
-                setState={setDados}
-                field="initialBalance"
-                erros={erros}
-                dados={dados}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <CurrencyTextField
+                  label="Saldo inicial"
+                  setState={setDados}
+                  field="initialBalance"
+                  erros={erros}
+                  dados={dados}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} >
               <ColorPicker

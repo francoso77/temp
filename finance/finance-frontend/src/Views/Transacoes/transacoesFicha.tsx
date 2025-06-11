@@ -1,5 +1,5 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
@@ -44,6 +44,7 @@ export function TransacoesFicha(
   const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
   const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
   const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
 
   const handleClose = () => {
@@ -95,6 +96,17 @@ export function TransacoesFicha(
     }
   };
 
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
@@ -153,121 +165,132 @@ export function TransacoesFicha(
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sx={{ mt: -1 }}>
-              <InputText
-                autoFocus
-                label="Descrição"
-                type="text"
-                setState={setDados}
-                field="description"
-                erros={erros}
-                dados={dados}
-                corFonte={"#fff"}
-                onFocus={(e) => e.target.select()}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <InputText
+                  autoFocus
+                  label="Descrição"
+                  type="text"
+                  setState={setDados}
+                  field="description"
+                  erros={erros}
+                  dados={dados}
+                  corFonte={"#fff"}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 2)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -3 }}>
-              <CurrencyTextField
-                label="Valor"
-                setState={setDados}
-                field="amount"
-                erros={erros}
-                dados={dados}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <CurrencyTextField
+                  label="Valor"
+                  setState={setDados}
+                  field="amount"
+                  erros={erros}
+                  dados={dados}
+                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -4 }}>
-              <ComboBox
-                label='Tipo'
-                corFundo='#050516'
-                corFonte={"#fff"}
-                opcoes={TipoTransactionTypes}
-                field='type'
-                setState={setDados}
-                dados={dados}
-                campoID='idTipoTransactionType'
-                campoDescricao='descricao'
-                mensagemPadraoCampoEmBranco='Escolha um tipo'
-              />
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <ComboBox
+                  label='Tipo'
+                  corFundo='#050516'
+                  corFonte={"#fff"}
+                  opcoes={TipoTransactionTypes}
+                  field='type'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='idTipoTransactionType'
+                  campoDescricao='descricao'
+                  mensagemPadraoCampoEmBranco='Escolha um tipo'
+                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -1 }}>
-              <ComboBox
-                label='Setor'
-                corFundo='#050516'
-                corFonte={"#fff"}
-                opcoes={SetorTypes}
-                field='setor'
-                setState={setDados}
-                dados={dados}
-                campoID='idSetorType'
-                campoDescricao='descricao'
-                mensagemPadraoCampoEmBranco='Escolha o setor'
-              />
+              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                <ComboBox
+                  label='Setor'
+                  corFundo='#050516'
+                  corFonte={"#fff"}
+                  opcoes={SetorTypes}
+                  field='setor'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='idSetorType'
+                  campoDescricao='descricao'
+                  mensagemPadraoCampoEmBranco='Escolha o setor'
+                  onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -1 }}>
-              <ComboBox
-                label='Conta'
-                corFundo='#050516'
-                corFonte={"#fff"}
-                opcoes={rsContas}
-                field='accountId'
-                setState={setDados}
-                dados={dados}
-                campoID='id'
-                campoDescricao='name'
-                mensagemPadraoCampoEmBranco='Escolha uma conta'
-              />
+              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                <ComboBox
+                  label='Conta'
+                  corFundo='#050516'
+                  corFonte={"#fff"}
+                  opcoes={rsContas}
+                  field='accountId'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='id'
+                  campoDescricao='name'
+                  mensagemPadraoCampoEmBranco='Escolha uma conta'
+                  onKeyDown={(event: any) => btPulaCampo(event, 6)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -1 }} >
-              <ComboBox
-                label='Categoria'
-                corFundo='#050516'
-                corFonte={"#fff"}
-                opcoes={rsCategorias}
-                field='categoryId'
-                setState={setDados}
-                dados={dados}
-                campoID='id'
-                campoDescricao='name'
-                mensagemPadraoCampoEmBranco='Escolha uma categoria'
-              />
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                <ComboBox
+                  label='Categoria'
+                  corFundo='#050516'
+                  corFonte={"#fff"}
+                  opcoes={rsCategorias}
+                  field='categoryId'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='id'
+                  campoDescricao='name'
+                  mensagemPadraoCampoEmBranco='Escolha uma categoria'
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -1 }}>
-              <ComboBox
-                label='Empresa'
-                corFundo='#050516'
-                corFonte={"#fff"}
-                opcoes={rsEmpresas}
-                field='companyId'
-                setState={setDados}
-                dados={dados}
-                campoID='id'
-                campoDescricao='name'
-                mensagemPadraoCampoEmBranco='Escolha uma empresa'
-              />
+              <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
+                <ComboBox
+                  label='Empresa'
+                  corFundo='#050516'
+                  corFonte={"#fff"}
+                  opcoes={rsEmpresas}
+                  field='companyId'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='id'
+                  campoDescricao='name'
+                  mensagemPadraoCampoEmBranco='Escolha uma empresa'
+                  onKeyDown={(event: any) => btPulaCampo(event, 8)}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -3 }} >
-              <InputText
-                type='tel'
-                tipo="date"
-                label="Data"
-                dados={dados}
-                field="date"
-                setState={setDados}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-              />
-              {/* <CustomDateInput
-                label="Data"
-                field="date"
-                setState={setDados}
-                dados={dados}
-                erros={erros}
-                colorConfig={{
-                  fontColor: '#000',
-                  borderColor: '#ccc',
-                  backgroundColor: '#f9f9f9',
-                }}
-              /> */}
-
+              <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
+                <InputText
+                  type='tel'
+                  tipo="date"
+                  label="Data"
+                  dados={dados}
+                  field="date"
+                  setState={setDados}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 9)}
+                />
+              </Box>
             </Grid>
           </Grid>
         </DialogContent>

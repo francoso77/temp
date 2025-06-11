@@ -9,7 +9,7 @@ import Text from '../../Componentes/Text';
 import CustomButton from '../../Componentes/Button';
 import SendIcon from '@mui/icons-material/Send';
 import ClsValidacao from '../../Utils/ClsValidacao';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Form, useNavigate, useSearchParams } from 'react-router-dom';
 
 export function ResetPassword() {
     const [dados, setDados] = useState({ newPassword: '', confirmPassword: '' });
@@ -29,8 +29,11 @@ export function ResetPassword() {
         retorno = validaCampo.tamanho("newPassword", dados, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
         retorno = validaCampo.naoVazio('confirmPassword', dados, erros, retorno, 'A senha não pode ser vázio')
         retorno = validaCampo.tamanho("confirmPassword", dados, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
-        retorno = validaCampo.eSenhaIgual('newPassword', 'confirmPassword', dados, erros, retorno, 'As senhas devem ser iguais')
 
+        if (dados.newPassword !== dados.confirmPassword) {
+            erros['confirmPassword'] = 'As senhas devem ser iguais'
+            retorno = false
+        }
         setErros(erros)
         return retorno
     }
@@ -47,10 +50,12 @@ export function ResetPassword() {
         });
         if (rsForgotPassword.ok) {
 
+            console.log(rsForgotPassword.mensagem)
+
             setMensagemState({
                 titulo: 'Redefinição de senha',
                 exibir: true,
-                mensagem: 'Instruções de redefinição de senha enviadas para o e-mail.',
+                mensagem: 'Senha redefinida!',
                 tipo: MensagemTipo.Ok,
                 exibirBotao: true,
                 cb: null,
@@ -66,63 +71,65 @@ export function ResetPassword() {
     // }, []);
 
     return (
-        <Grid
-            container
-            justifyContent='center'
-            alignItems='center'
-            height='90vh'
-        >
-            <Grid item xs={12} sm={8} md={6} lg={4} sx={{ border: '1px solid #3a3a3a', p: 2, borderRadius: 2 }}>
+        <Form method='post' onSubmit={handleSubmit}>
+            <Grid
+                container
+                justifyContent='center'
+                alignItems='center'
+                height='90vh'
+            >
+                <Grid item xs={12} sm={8} md={6} lg={4} sx={{ border: '1px solid #3a3a3a', p: 2, borderRadius: 2 }}>
 
-                <Paper sx={{ bgcolor: 'transparent' }}>
+                    <Paper sx={{ bgcolor: 'transparent' }}>
 
-                    <Box
-                        textAlign='center'
+                        <Box
+                            textAlign='center'
 
-                    >
-                        <TitleBar
-                            title="Nova Senha"
-                            textColor="#fff"
-                            backgroundColor="transparent"
-                            fontSize="1.75rem"
-                            textAlign="center"
-                        />
-                        <Text
-                            field="newPassword"
-                            label="Senha"
-                            dados={dados}
-                            type='password'
-                            setState={setDados}
-                            tipo='pass'
-                            erros={erros}
-                            corFonte='#fff'
-                            autocomplete='new-password'
-                        />
-                        <Text
-                            field="confirmPassword"
-                            label="Confirme a Senha"
-                            dados={dados}
-                            type='password'
-                            setState={setDados}
-                            tipo='pass'
-                            erros={erros}
-                            corFonte='#fff'
-                            autocomplete='confirmPassword'
-                        />
-                    </Box>
-                </Paper>
-                <Grid item xs={12}>
-                    <CustomButton
-                        bgColor='#1976d2'
-                        textColor='#ffffff'
-                        icon={<SendIcon />}
-                        onClick={() => handleSubmit()}
-                        sx={{ width: '100%', mt: 1.5 }}
-                    >
-                        Alterar Senha
-                    </CustomButton>
+                        >
+                            <TitleBar
+                                title="Nova Senha"
+                                textColor="#fff"
+                                backgroundColor="transparent"
+                                fontSize="1.75rem"
+                                textAlign="center"
+                            />
+                            <Text
+                                field="newPassword"
+                                label="Senha"
+                                dados={dados}
+                                type='password'
+                                setState={setDados}
+                                tipo='pass'
+                                erros={erros}
+                                corFonte='#fff'
+                                autocomplete='new-password'
+                            />
+                            <Text
+                                field="confirmPassword"
+                                label="Confirme a Senha"
+                                dados={dados}
+                                type='password'
+                                setState={setDados}
+                                tipo='pass'
+                                erros={erros}
+                                corFonte='#fff'
+                                autocomplete='confirmPassword'
+                            />
+                        </Box>
+                    </Paper>
+                    <Grid item xs={12}>
+                        <CustomButton
+                            bgColor='#1976d2'
+                            textColor='#ffffff'
+                            icon={<SendIcon />}
+                            onClick={() => handleSubmit()}
+                            sx={{ width: '100%', mt: 1.5 }}
+                        >
+                            Alterar Senha
+                        </CustomButton>
+                    </Grid>
                 </Grid>
             </Grid>
-        </Grid>
+        </Form>
     );
 }

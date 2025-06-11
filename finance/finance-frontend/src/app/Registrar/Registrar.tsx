@@ -264,6 +264,7 @@ export default function Registrar() {
                       erros={erros}
                       onKeyDown={(event: any) => btPulaCampo(event, 4)}
                       corFonte='#fff'
+                      autocomplete='password'
                     />
                   </Box>
                 </Grid>
@@ -280,6 +281,7 @@ export default function Registrar() {
                       erros={erros}
                       onKeyDown={(event: any) => btPulaCampo(event, 1)}
                       corFonte='#fff'
+                      autocomplete='confirmePassword'
                     />
                   </Box>
                 </Grid>

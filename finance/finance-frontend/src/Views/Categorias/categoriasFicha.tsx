@@ -1,5 +1,5 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
@@ -34,6 +34,19 @@ export function CategoriasFicha({ open, setOpen, btPesquisar, categoria, localSt
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<CategoryInterface>(ResetCategory);
   const validaCampo: ClsValidacao = new ClsValidacao()
+  const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key === 'Enter') {
+      const nextField = fieldRefs.current[index];
+      if (nextField) {
+        const input = nextField.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }
+  }
 
 
   const [tipos] = useState<tiposInterface[]>([
@@ -104,33 +117,37 @@ export function CategoriasFicha({ open, setOpen, btPesquisar, categoria, localSt
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>
           <Grid container spacing={2}>
             <Grid item xs={12} >
-              <InputText
-                autoFocus
-                label="Descrição"
-                type="text"
-                setState={setDados}
-                field="name"
-                erros={erros}
-                dados={dados}
-                corFonte={localState?.action === actionTypes.excluindo ? '#c96a6a' : "#fff"}
-                onFocus={(e) => e.target.select()}
-                disabled={localState?.action === actionTypes.excluindo ? true : false}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <InputText
+                  autoFocus
+                  label="Descrição"
+                  type="text"
+                  setState={setDados}
+                  field="name"
+                  erros={erros}
+                  dados={dados}
+                  corFonte={localState?.action === actionTypes.excluindo ? '#c96a6a' : "#fff"}
+                  onFocus={(e) => e.target.select()}
+                  disabled={localState?.action === actionTypes.excluindo ? true : false}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} >
-              <ComboBox
-                label='Tipo'
-                corFundo='#050516'
-                corFonte={localState?.action === actionTypes.excluindo ? '#c96a6a' : "#fff"}
-                opcoes={tipos}
-                field='type'
-                setState={setDados}
-                dados={dados}
-                campoID='id'
-                campoDescricao='name'
-                mensagemPadraoCampoEmBranco='Escolha um Tipo'
-                disabled={localState?.action === actionTypes.excluindo ? true : false}
-              />
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <ComboBox
+                  label='Tipo'
+                  corFundo='#050516'
+                  corFonte={localState?.action === actionTypes.excluindo ? '#c96a6a' : "#fff"}
+                  opcoes={tipos}
+                  field='type'
+                  setState={setDados}
+                  dados={dados}
+                  campoID='id'
+                  campoDescricao='name'
+                  mensagemPadraoCampoEmBranco='Escolha um Tipo'
+                  disabled={localState?.action === actionTypes.excluindo ? true : false}
+                />
+              </Box>
             </Grid>
             <Grid item xs={12} >
               <ColorPicker

@@ -21,6 +21,7 @@ interface CurrencyTextFieldProps {
     backgroundColor?: string;
   };
   textFieldProps?: TextFieldProps;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement> | undefined;
 }
 
 export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
@@ -39,6 +40,7 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
     backgroundColor: 'transparent',
   },
   textFieldProps,
+  onKeyDown
 }) => {
   const [input, setInput] = useState<string>(() =>
     typeof dados[field] === 'number'
@@ -97,6 +99,7 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
         value={input}
         onChange={handleChange}
         onBlur={handleBlur}
+        onKeyDown={onKeyDown}
         variant="outlined"
         error={hasError}
         helperText={hasError ? erros[field] : ' '}

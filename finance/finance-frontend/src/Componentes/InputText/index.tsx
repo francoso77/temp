@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react"
+import React, { forwardRef, useEffect, useRef, useState } from "react"
 import FormControl from "@mui/material/FormControl"
 import {
   OutlinedInput,
@@ -283,6 +283,17 @@ export default function InputText({
   const theme = useTheme()
 
   const clsFormatos: ClsFormatacao = new ClsFormatacao()
+  const inputRefLocal = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (autoFocus && inputRefLocal.current) {
+      // timeout para esperar o DOM montar completamente
+      setTimeout(() => {
+        inputRefLocal.current?.focus()
+        inputRefLocal.current?.select()
+      }, 100)
+    }
+  }, [autoFocus])
 
   const formatarDadosAoSair = (e: any) => {
     if (tipo === "date") {
@@ -384,7 +395,7 @@ export default function InputText({
             },
 
           }}
-          inputRef={inputRef}
+          inputRef={autoFocus ? inputRefLocal : inputRef}
           name={field}
           onBlur={onBlur ? onBlur : (e) => formatarDadosAoSair(e)}
           autoFocus={autoFocus}
