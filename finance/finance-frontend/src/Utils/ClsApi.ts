@@ -26,6 +26,7 @@ interface PropsInterface {
   setor?: 'Dublagem' | 'Malharia'
   tipo?: 'Receita' | 'Despesa'
   email?: string
+  newPassword?: string
 }
 
 export default class ClsApi {
@@ -93,12 +94,14 @@ export default class ClsApi {
     senha,
     operador,
     qtdComparar,
-    token = '',
+    token,
     conta,
     categoria,
     setor,
     tipo,
     email,
+    newPassword,
+
 
   }: PropsInterface): Promise<T> {
     const requestData = {
@@ -118,7 +121,8 @@ export default class ClsApi {
       categoria,
       setor,
       tipo,
-      email
+      email,
+      newPassword
     };
 
     if (setMensagemState) {

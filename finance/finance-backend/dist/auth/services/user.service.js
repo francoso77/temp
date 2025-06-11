@@ -54,7 +54,6 @@ var common_1 = require("@nestjs/common");
 var typeorm_1 = require("typeorm");
 var typeorm_2 = require("@nestjs/typeorm");
 var crypto = require("crypto");
-var bcrypt = require("bcrypt");
 var user_1 = require("../../entity/sistema/user");
 var email_service_1 = require("./email.service");
 var config_1 = require("@nestjs/config");
@@ -66,7 +65,7 @@ var UserService = /** @class */ (function () {
     }
     UserService.prototype.requestPasswordReset = function (email) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, token, expires, protocol, host, port, resetLink;
+            var user, token, expires, frontProtocol, frontHost, frontPort, resetLink;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.userRepository.findOne({ where: { email: email } })];
@@ -81,10 +80,10 @@ var UserService = /** @class */ (function () {
                         return [4 /*yield*/, this.userRepository.save(user)];
                     case 2:
                         _a.sent();
-                        protocol = this.configService.get('REACT_APP_BACKEND_PROTOCOLO');
-                        host = this.configService.get('REACT_APP_BACKEND_HOST');
-                        port = this.configService.get('REACT_APP_BACKEND_PORTA');
-                        resetLink = "".concat(protocol).concat(host, ":").concat(port, "/reset-password?token=").concat(token);
+                        frontProtocol = this.configService.get('REACT_APP_FRONT_PROTOCOLO');
+                        frontHost = this.configService.get('REACT_APP_FRONT_HOST');
+                        frontPort = this.configService.get('REACT_APP_FRONT_PORTA');
+                        resetLink = "".concat(frontProtocol).concat(frontHost, ":").concat(frontPort, "/reset-password?token=").concat(token);
                         return [4 /*yield*/, this.emailService.sendMail(user.email, 'Recuperação de senha', "Clique aqui para redefinir sua senha: ".concat(resetLink), "<p>Clique <a href=\"".concat(resetLink, "\">aqui</a> para redefinir sua senha.</p>"))];
                     case 3:
                         _a.sent();
@@ -95,9 +94,9 @@ var UserService = /** @class */ (function () {
     };
     UserService.prototype.resetPassword = function (token, newPassword) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0: return [4 /*yield*/, this.userRepository.findOne({
                             where: {
                                 resetToken: token,
@@ -105,18 +104,16 @@ var UserService = /** @class */ (function () {
                             },
                         })];
                     case 1:
-                        user = _b.sent();
+                        user = _a.sent();
                         if (!user)
                             throw new common_1.BadRequestException('Token inválido ou expirado');
-                        _a = user;
-                        return [4 /*yield*/, bcrypt.hash(newPassword, 10)];
-                    case 2:
-                        _a.password = _b.sent();
+                        user.password = newPassword;
+                        user.isActive = false;
                         user.resetToken = null;
                         user.resetTokenExpires = null;
                         return [4 /*yield*/, this.userRepository.save(user)];
-                    case 3:
-                        _b.sent();
+                    case 2:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });

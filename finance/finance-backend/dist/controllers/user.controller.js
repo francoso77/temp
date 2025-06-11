@@ -56,11 +56,6 @@ var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
     }
-    // @Post('forgot-password')
-    // async forgotPassword(@Body('email') email: string): Promise<{ ok: boolean, mensagem: string }> {
-    //   await this.userService.requestPasswordReset(email);
-    //   return Promise.resolve({ ok: true, mensagem: 'Instruções de redefinição de senha enviado para o seu e-mail.' });
-    // }
     UserController.prototype.forgotPassword = function (email) {
         return __awaiter(this, void 0, void 0, function () {
             var error_1;
@@ -84,14 +79,25 @@ var UserController = /** @class */ (function () {
             });
         });
     };
-    UserController.prototype.resetPassword = function (body) {
+    UserController.prototype.resetPassword = function (token, newPassword) {
         return __awaiter(this, void 0, void 0, function () {
+            var error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.userService.resetPassword(body.token, body.newPassword)];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.userService.resetPassword(token, newPassword)];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/, { message: 'Senha redefinida com sucesso.' }];
+                        return [2 /*return*/, {
+                                ok: true,
+                                mensagem: 'Senha redefinida com sucesso!',
+                            }];
+                    case 2:
+                        error_2 = _a.sent();
+                        console.error('Erro ao redefinir senha:', error_2);
+                        throw new common_1.InternalServerErrorException('Erro ao redefinir senha.');
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -117,9 +123,10 @@ var UserController = /** @class */ (function () {
     ], UserController.prototype, "forgotPassword", null);
     __decorate([
         (0, common_1.Post)('reset-password'),
-        __param(0, (0, common_1.Body)()),
+        __param(0, (0, common_1.Body)('token')),
+        __param(1, (0, common_1.Body)('newPassword')),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [Object]),
+        __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "resetPassword", null);
     __decorate([

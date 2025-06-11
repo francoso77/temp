@@ -3,7 +3,6 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from 'crypto';
-import * as bcrypt from 'bcrypt';
 import { User } from '../../entity/sistema/user';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
@@ -18,6 +17,7 @@ export class UserService {
   ) { }
 
   async requestPasswordReset(email: string): Promise<void> {
+
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) return;
 
@@ -28,11 +28,16 @@ export class UserService {
     user.resetTokenExpires = expires;
     await this.userRepository.save(user);
 
-    const protocol = this.configService.get<string>('REACT_APP_BACKEND_PROTOCOLO');
-    const host = this.configService.get<string>('REACT_APP_BACKEND_HOST');
-    const port = this.configService.get<string>('REACT_APP_BACKEND_PORTA');
+    //const protocol = this.configService.get<string>('REACT_APP_BACKEND_PROTOCOLO');
+    //const host = this.configService.get<string>('REACT_APP_BACKEND_HOST');
+    //const port = this.configService.get<string>('REACT_APP_BACKEND_PORTA');
 
-    const resetLink = `${protocol}${host}:${port}/reset-password?token=${token}`;
+    const frontProtocol = this.configService.get<string>('REACT_APP_FRONT_PROTOCOLO');
+    const frontHost = this.configService.get<string>('REACT_APP_FRONT_HOST');
+    const frontPort = this.configService.get<string>('REACT_APP_FRONT_PORTA');
+
+    //const resetLink = `${protocol}${host}:${port}/reset-password?token=${token}`;
+    const resetLink = `${frontProtocol}${frontHost}:${frontPort}/reset-password?token=${token}`;
 
     await this.emailService.sendMail(
       user.email,
@@ -52,7 +57,8 @@ export class UserService {
 
     if (!user) throw new BadRequestException('Token inválido ou expirado');
 
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.password = newPassword;
+    user.isActive = false;
     user.resetToken = null;
     user.resetTokenExpires = null;
     await this.userRepository.save(user);

@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { CategoryDataPoint, DataPoint } from '../../types/graficoTypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
-import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
@@ -12,7 +11,6 @@ import { Box, Grid, Typography } from '@mui/material';
 import CustomButton from '../../Componentes/Button';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import DescriptionTwoToneIcon from '@mui/icons-material/DescriptionTwoTone';
-import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveTwoTone';
 import ButtonMenu from '../../Componentes/ButtonMenu';
 import InfoCard from '../../Componentes/InfoCard';
 import CustomTabs from '../../Componentes/TabCustom';
@@ -51,12 +49,11 @@ export interface TransactionSelectInterface {
 
 export function Relatorios() {
 
-  const printRef = useRef<HTMLDivElement>(null);
   const clsFormatacao: ClsFormatacao = new ClsFormatacao();
   const clsApi: ClsApi = new ClsApi();
   const clsCrud: ClsCrud = new ClsCrud();
 
-  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
+  const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
   const [dadosCard, setDadosCard] = useState<DadosCardInterface>({ saldo: 0, receitas: 0, despesas: 0 });
   const [dataPoints, setDataPoints] = useState<Array<DataPoint>>([]);
   const [categoryData, setCategoryData] = useState<CategoryDataPoint[]>([]);
@@ -192,11 +189,6 @@ export function Relatorios() {
     }
   }, [layoutState])
 
-
-  const handleClose = () => {
-    setMensagemState({ ...mensagemState, exibir: false })
-  }
-
   const handleGeneratePDF = () => {
     const doc = new jsPDF();
     const currentDate = new Date().toLocaleDateString("pt-BR");
@@ -268,191 +260,14 @@ export function Relatorios() {
       align: "center",
     });
 
-    // Geração do PDF em blob
     const blob = doc.output("blob");
     const blobUrl = URL.createObjectURL(blob);
 
-    // Abre em nova aba (melhor para dispositivos móveis)
     window.open(blobUrl, "_blank");
 
-    // Libera o objeto após alguns segundos para evitar erro ao clicar "voltar"
     setTimeout(() => {
       URL.revokeObjectURL(blobUrl);
     }, 10000);
-  };
-
-
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-
-    if (!printWindow) {
-      setMensagemState({
-        titulo: 'Erro',
-        exibir: true,
-        mensagem: 'Não foi possível abrir a janela de impressão. Verifique se os pop-ups estão permitidos',
-        tipo: MensagemTipo.Error,
-        exibirBotao: true,
-        cb: handleClose
-      });
-      return;
-    }
-
-    const contentToPrint = printRef.current;
-    if (!contentToPrint || !rsPesquisa.length) {
-      printWindow.close();
-      return;
-    }
-
-    const currentDate = new Date().toLocaleDateString("pt-BR");
-
-    const formatCurrency = (value: number) =>
-      new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(value);
-
-    const buildTableRows = () =>
-      rsPesquisa.map((t) => {
-        const date = new Date(t.date).toLocaleDateString("pt-BR");
-        const category = categorys.find((c) => c.id === t.category.id)?.name || "Sem categoria";
-        const type = t.type === "Receita" ? "Receita" : "Despesa";
-        const amount = formatCurrency(t.amount);
-        const amountClass = t.type === "Receita" ? "income" : "expense";
-
-        return `
-        <tr>
-          <td>${date}</td>
-          <td>${t.description}</td>
-          <td>${category}</td>
-          <td>${type}</td>
-          <td class="${amountClass}">${amount}</td>
-        </tr>`;
-      }).join("");
-
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>Relatório Financeiro - ${currentDate}</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            color: #333;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-          }
-          .account-info {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-          }
-          .summary {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-          }
-          .summary-item {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            width: 30%;
-          }
-          .summary-item h3 {
-            margin-top: 0;
-            font-size: 16px;
-            color: #666;
-          }
-          .summary-item p {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0 5px;
-          }
-          .income { color: #22c55e; }
-          .expense { color: #ef4444; }
-          .balance { color: #3b82f6; }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          th {
-            background-color: #f2f2f2;
-          }
-          .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-          }
-          @media print {
-            body { print-color-adjust: exact; }
-          }
-        </style>
-      </head>
-      <body onload="window.print(); window.close();">
-        <div class="header">
-          <h1>Relatório Financeiro</h1>
-          <p>Gerado em ${currentDate}</p>
-        </div>
-
-        <div class="account-info">
-          <h2>Conta: ${rsPesquisa[0].account.name}</h2>
-          <p>Saldo Inicial: ${formatCurrency(rsPesquisa[0].account.initialBalance)}</p>
-        </div>
-
-        <div class="summary">
-          <div class="summary-item">
-            <h3>Saldo</h3>
-            <p class="balance">${formatCurrency(dadosCard.saldo)}</p>
-          </div>
-          <div class="summary-item">
-            <h3>Receitas</h3>
-            <p class="income">${formatCurrency(dadosCard.receitas)}</p>
-          </div>
-          <div class="summary-item">
-            <h3>Despesas</h3>
-            <p class="expense">${formatCurrency(dadosCard.despesas)}</p>
-          </div>
-        </div>
-
-        <h2>Transações</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Descrição</th>
-              <th>Categoria</th>
-              <th>Tipo</th>
-              <th>Valor</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${buildTableRows()}
-          </tbody>
-        </table>
-
-        <div class="footer">
-          <p>FinanceControl - Sistema de Gestão Financeira</p>
-        </div>
-      </body>
-    </html>
-  `;
-
-    // Escreve o HTML completo e força a renderização + impressão
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
   };
 
   const handleExportCSV = () => {

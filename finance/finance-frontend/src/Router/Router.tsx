@@ -5,7 +5,6 @@ import { Welcome } from '../app/Layout/Welcome';
 import Registrar from '../app/Registrar/Registrar';
 import Login from '../app/Login/Login';
 import { Categorias } from '../Views/Categorias/categorias';
-import Testes from '../Views/Testes/testes';
 import { Contas } from '../Views/Contas/contas';
 import { Empresas } from '../Views/Empresas/empresas';
 import { Transacoes } from '../Views/Transacoes/transacoes';
@@ -33,10 +32,6 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
-      },
-      {
-        path: "/testes",
-        element: <Testes />,
       },
       {
         path: "/categorias",

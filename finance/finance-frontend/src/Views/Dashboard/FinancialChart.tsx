@@ -10,7 +10,6 @@ import TodayIcon from '@mui/icons-material/Today';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import { FinancialChartProps } from '../../types/graficoTypes';
-import Condicional from '../../Componentes/Condicional/Condicional';
 
 /**
  * Componente FinancialChart

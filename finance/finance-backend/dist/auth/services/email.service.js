@@ -66,7 +66,7 @@ var EmailService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.transporter.sendMail({
-                            from: '"Depto TI" <francoso@bol.com.br>',
+                            from: "\"Controle Financeiro\" <".concat(process.env.SMTP_USER, ">"),
                             to: to,
                             subject: subject,
                             text: text,

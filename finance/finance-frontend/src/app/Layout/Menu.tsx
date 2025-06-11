@@ -36,6 +36,7 @@ export default function Menu() {
     const [dadosPesquisa, setDadosPesquisa] = useState<DadosPesquisa>(dadosIniciais)
     const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
     const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [contaPadrao, setContaPadrao] = useState<string | null>(null)
     const clsCrud = new ClsCrud()
 
@@ -132,7 +133,7 @@ export default function Menu() {
                 select: ['id'],
             })
             .then((rs: any) => {
-                if(rs.length > 0){
+                if (rs.length > 0) {
                     setContaPadrao(rs[0].id as string || String(rs[0].id))
                 }
             })
@@ -144,6 +145,7 @@ export default function Menu() {
         BuscarDados()
     }, []);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
     }, [dadosPesquisa]);
 

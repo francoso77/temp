@@ -1,9 +1,7 @@
 // ForgotPassword.tsx
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import ClsApi from '../../Utils/ClsApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import ClsCrud from '../../Utils/ClsCrudApi';
-import { UserInterface } from '../../../../finance-backend/src/interfaces/sistema/user';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import { Box, Grid, Paper } from '@mui/material';
 import TitleBar from '../../Componentes/BarraDeTitulo';
@@ -11,18 +9,17 @@ import Text from '../../Componentes/Text';
 import CustomButton from '../../Componentes/Button';
 import SendIcon from '@mui/icons-material/Send';
 import ClsValidacao from '../../Utils/ClsValidacao';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export function ResetPassword() {
     const [dados, setDados] = useState({ newPassword: '', confirmPassword: '' });
     const clsApi: ClsApi = new ClsApi();
-    const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
     const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
-    const clsCrud: ClsCrud = new ClsCrud();
     const [erros, setErros] = useState({});
     const validaCampo: ClsValidacao = new ClsValidacao();
     const irPara = useNavigate();
-    const [token, setToken] = useState('');
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
 
     const validarDados = (): boolean => {
         let retorno: boolean = true
@@ -45,8 +42,8 @@ export function ResetPassword() {
         const rsForgotPassword = await clsApi.execute<{ ok: boolean; mensagem: string }>({
             method: 'post',
             url: 'auth/reset-password',
-            dados: { dados, token },
-            token: usuarioState.token,
+            newPassword: dados.newPassword,
+            token: token ?? '',
         });
         if (rsForgotPassword.ok) {
 
@@ -63,10 +60,10 @@ export function ResetPassword() {
     };
 
 
-    useEffect(() => {
-        const url = new URL(window.location.href);
-        setToken(url.searchParams.get('token') || '');
-    }, []);
+    // useEffect(() => {
+    //     const url = new URL(window.location.href);
+    //     setToken(url.searchParams.get('token') || '');
+    // }, []);
 
     return (
         <Grid
@@ -99,6 +96,7 @@ export function ResetPassword() {
                             tipo='pass'
                             erros={erros}
                             corFonte='#fff'
+                            autocomplete='new-password'
                         />
                         <Text
                             field="confirmPassword"
@@ -109,6 +107,7 @@ export function ResetPassword() {
                             tipo='pass'
                             erros={erros}
                             corFonte='#fff'
+                            autocomplete='confirmPassword'
                         />
                     </Box>
                 </Paper>

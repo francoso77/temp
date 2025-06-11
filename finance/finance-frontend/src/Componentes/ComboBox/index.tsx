@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react'
 import FormControl from '@mui/material/FormControl'
 import { Typography, Autocomplete, TextField, InputAdornment, IconButton, Icon } from '@mui/material'
-import { useTheme } from '@mui/material'
 import Condicional from '../Condicional/Condicional'
 
 interface mapKeyPressInterface {
@@ -146,7 +145,6 @@ export default function ComboBox<T>(
   }
 
   const [pesquisa, setPesquisa] = useState('')
-  const theme = useTheme()
   const chaveLista = useRef(0)
 
   return (

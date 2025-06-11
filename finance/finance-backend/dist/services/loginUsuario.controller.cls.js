@@ -64,6 +64,28 @@ var userSection_1 = require("../entity/sistema/userSection");
 var ClsLoginUsuarioController = /** @class */ (function () {
     function ClsLoginUsuarioController() {
     }
+    ClsLoginUsuarioController.prototype.logout = function (email) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.fecharSessoesEmAberto(email).then(function (rsUsuarioExistente) {
+                        if (rsUsuarioExistente) {
+                            return data_source_1.AppDataSource.getRepository(user_1.User).update({ email: email }, { isActive: false }).then(function () {
+                                return {
+                                    ok: true,
+                                    mensagem: 'Usuário deslogado com sucesso.',
+                                    dados: {
+                                        idUsuario: '',
+                                        nomeUsuario: '',
+                                        token: '',
+                                        emailUsuario: ''
+                                    }
+                                };
+                            });
+                        }
+                    })];
+            });
+        });
+    };
     ClsLoginUsuarioController.prototype.logar = function (email, senha) {
         return __awaiter(this, void 0, void 0, function () {
             var retorno;
@@ -89,7 +111,6 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                                             isActive: true,
                                             token: token_1,
                                         }).then(function () {
-                                            console.log('token gerado no login: ', token_1);
                                             return {
                                                 ok: true,
                                                 mensagem: 'Login efetuado com sucesso.',

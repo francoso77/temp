@@ -20,7 +20,7 @@ export class EmailService {
 
   async sendMail(to: string, subject: string, text: string, html?: string): Promise<void> {
     await this.transporter.sendMail({
-      from: '"Depto TI" <francoso@bol.com.br>',
+      from: `"Controle Financeiro" <${process.env.SMTP_USER}>`,
       to,
       subject,
       text,

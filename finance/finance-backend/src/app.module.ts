@@ -6,7 +6,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { GlobalModule } from './global.module';
 import { LoginUsuarioController } from './controllers/loginUsuario.controller';
 import { AutenticacaoMiddleware } from './auth/autenticacao.middleware';
-import { SomarController } from './controllers/somar.controller';
 import { SessaoService } from './auth/services/sessao.service';
 import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "./user.module";
@@ -22,7 +21,7 @@ import { EmailModule } from './email.modulo';
     UserModule,
     EmailModule,
   ],
-  controllers: [CrudController, OutController, LoginUsuarioController, SomarController,],
+  controllers: [CrudController, OutController, LoginUsuarioController,],
   providers: [SessaoService, {
     provide: APP_GUARD,
     useClass: RolesGuard,

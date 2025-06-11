@@ -197,7 +197,7 @@ export function Contas() {
 
     return receitas - despesas;
   };
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
 
     if (layoutState.contaPadrao === "") {

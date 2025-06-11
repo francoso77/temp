@@ -23,9 +23,20 @@ var LoginUsuarioController = /** @class */ (function () {
         this.sessao = sessao;
         //console.log('Controller de Login e Permissões do Usuário....')
     }
-    //verifica o cpf e senha no login
     LoginUsuarioController.prototype.loginUsuario = function (email, senha) {
         return new loginUsuario_controller_cls_1.default().logar(email, senha);
+    };
+    // //verfica quais as permissoes do usuario logado
+    // @Post('permissoesUsuario')
+    // public permissoesUsuario(): Promise<PermissoesTypeInterface> {
+    //   if(this.sessao.usuarioSessao){
+    //     return new ClsLoginUsuarioController().permissoesUsuario(this.sessao.usuarioSessao)
+    //   } else{
+    //     return Promise.reject(null)
+    //   }
+    // }
+    LoginUsuarioController.prototype.logoutUsuario = function (email) {
+        return new loginUsuario_controller_cls_1.default().logout(email);
     };
     __decorate([
         (0, common_1.Post)('loginUsuario'),
@@ -35,6 +46,13 @@ var LoginUsuarioController = /** @class */ (function () {
         __metadata("design:paramtypes", [String, String]),
         __metadata("design:returntype", Promise)
     ], LoginUsuarioController.prototype, "loginUsuario", null);
+    __decorate([
+        (0, common_1.Post)('logoutUsuario'),
+        __param(0, (0, common_1.Body)('email')),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String]),
+        __metadata("design:returntype", Promise)
+    ], LoginUsuarioController.prototype, "logoutUsuario", null);
     LoginUsuarioController = __decorate([
         (0, common_1.Controller)(),
         __metadata("design:paramtypes", [sessao_service_1.SessaoService])

@@ -16,13 +16,17 @@ import Condicional from '../../Componentes/Condicional/Condicional';
 import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+import ClsApi from '../../Utils/ClsApi';
+import { RespostaPadraoInterface } from '../../../../finance-backend/src/interfaces/respostaPadrao.interface';
+import { LoginInterface } from '../../../../finance-backend/src/interfaces/login';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
 export default function HeaderMenu() {
 
   const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
-  const clsCrud = new ClsCrud()
+  const clsCrud: ClsCrud = new ClsCrud()
+  const clsApi: ClsApi = new ClsApi()
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -40,12 +44,32 @@ export default function HeaderMenu() {
     setLayoutState({ ...layoutState, exibirMenu: false })
   }
 
-  const handleClick = () => {
+  const handleLogout = async () => {
 
-    setUsuarioState({ ...usuarioState, logado: false })
-    navegar('/')
+    const Logout = await clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
+      method: 'post',
+      url: 'logoutUsuario',
+      token: usuarioState.token,
+      email: usuarioState.emailUsuario
+    })
+
+    if (Logout.ok) {
+
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+
+      setUsuarioState({
+        idUsuario: '0',
+        nomeUsuario: '',
+        logado: false,
+        token: '',
+        emailUsuario: ''
+      })
+      navegar('/')
+    }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     clsCrud
       .pesquisar({
@@ -154,7 +178,7 @@ export default function HeaderMenu() {
                 edge="end"
                 color="primary"
                 sx={{ mr: 1 }}
-                onClick={handleClick}
+                onClick={handleLogout}
               >
                 <LogoutIcon />
               </IconButton>

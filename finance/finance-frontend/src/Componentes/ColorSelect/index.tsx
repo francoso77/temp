@@ -4,7 +4,6 @@ import {
   Typography,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Stack,
   SelectProps,
 } from '@mui/material';

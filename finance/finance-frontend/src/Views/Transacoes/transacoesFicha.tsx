@@ -17,7 +17,6 @@ import { SetorTypes } from '../../types/setorTypes';
 import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
-import { CustomDateInput } from '../../Componentes/CustomDateInput';
 
 interface PropsInterface {
   open: boolean,

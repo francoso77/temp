@@ -21,13 +21,14 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 export default function Login() {
 
   const [erros, setErros] = useState({})
-  const [dados, setDados] = useState({ email: 'ti@jbtextil.com', senha: 'teste123' })
+  const [dados, setDados] = useState({ email: '', senha: '' })
   const clsValidacao: ClsValidacao = new ClsValidacao()
   const { mensagemState, setMensagemState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
   const clsApi = new ClsApi()
   const clsCrud = new ClsCrud()
   const navegar = useNavigate()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [contaPadrao, setContaPadrao] = useState<string | null>(null)
 
   const validarDados = (): boolean => {
@@ -48,7 +49,8 @@ export default function Login() {
       clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
         url: 'loginUsuario',
         method: 'post',
-        dados: dados,
+        email: dados.email,
+        senha: dados.senha,
         mensagem: 'Verificando usuário e senha',
         setMensagemState: setMensagemState
       })

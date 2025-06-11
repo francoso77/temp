@@ -12,7 +12,6 @@ export class LoginUsuarioController {
   ) {
     //console.log('Controller de Login e Permissões do Usuário....')
   }
-  //verifica o cpf e senha no login
   @Post('loginUsuario')
   public loginUsuario(
     @Body('email') email: string,
@@ -33,4 +32,12 @@ export class LoginUsuarioController {
   //     return Promise.reject(null)
   //   }
   // }
+
+  @Post('logoutUsuario')
+  public logoutUsuario(
+    @Body('email') email: string,
+  ): Promise<RespostaPadraoInterface<LoginInterface>> {
+
+    return new ClsLoginUsuarioController().logout(email);
+  }
 }

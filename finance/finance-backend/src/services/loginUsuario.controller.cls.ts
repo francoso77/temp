@@ -32,6 +32,30 @@ import { UserSection } from '../entity/sistema/userSection';
 // `
 
 export default class ClsLoginUsuarioController {
+
+  public async logout(email: string): Promise<RespostaPadraoInterface<LoginInterface>> {
+
+    return this.fecharSessoesEmAberto(email).then((rsUsuarioExistente) => {
+
+      if (rsUsuarioExistente) {
+
+        return AppDataSource.getRepository(User).update({ email: email }, { isActive: false }).then(() => {
+
+          return {
+            ok: true,
+            mensagem: 'Usuário deslogado com sucesso.',
+            dados: {
+              idUsuario: '',
+              nomeUsuario: '',
+              token: '',
+              emailUsuario: ''
+            }
+          }
+        })
+      }
+    })
+  }
+
   public async logar(email: string, senha: string): Promise<RespostaPadraoInterface<LoginInterface>> {
 
     let retorno: RespostaPadraoInterface<LoginInterface> = {
@@ -62,7 +86,6 @@ export default class ClsLoginUsuarioController {
                 token: token,
               }).then(() => {
 
-                console.log('token gerado no login: ', token)
                 return {
                   ok: true,
                   mensagem: 'Login efetuado com sucesso.',

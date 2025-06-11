@@ -15,7 +15,6 @@ var core_1 = require("@nestjs/core");
 var global_module_1 = require("./global.module");
 var loginUsuario_controller_1 = require("./controllers/loginUsuario.controller");
 var autenticacao_middleware_1 = require("./auth/autenticacao.middleware");
-var somar_controller_1 = require("./controllers/somar.controller");
 var sessao_service_1 = require("./auth/services/sessao.service");
 var config_1 = require("@nestjs/config");
 var user_module_1 = require("./user.module");
@@ -38,7 +37,7 @@ var AppModule = /** @class */ (function () {
                 user_module_1.UserModule,
                 email_modulo_1.EmailModule,
             ],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController, somar_controller_1.SomarController,],
+            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController,],
             providers: [sessao_service_1.SessaoService, {
                     provide: core_1.APP_GUARD,
                     useClass: roles_guard_1.RolesGuard,
