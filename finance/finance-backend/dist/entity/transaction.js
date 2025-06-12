@@ -13,6 +13,8 @@ var typeorm_1 = require("typeorm");
 var category_1 = require("./category");
 var account_1 = require("./account");
 var company_1 = require("./company");
+var user_1 = require("./sistema/user");
+var sector_1 = require("./sector");
 var Transaction = /** @class */ (function () {
     function Transaction() {
     }
@@ -31,11 +33,12 @@ var Transaction = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
-    ], Transaction.prototype, "type", void 0);
+    ], Transaction.prototype, "sectorId", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Transaction.prototype, "setor", void 0);
+        (0, typeorm_1.JoinColumn)({ name: 'sectorId' }),
+        (0, typeorm_1.ManyToOne)(function () { return sector_1.default; }),
+        __metadata("design:type", sector_1.default)
+    ], Transaction.prototype, "sector", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
@@ -75,6 +78,15 @@ var Transaction = /** @class */ (function () {
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Transaction.prototype, "updateAt", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], Transaction.prototype, "userId", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'userId' }),
+        (0, typeorm_1.ManyToOne)(function () { return user_1.User; }),
+        __metadata("design:type", user_1.User)
+    ], Transaction.prototype, "user", void 0);
     Transaction = __decorate([
         (0, typeorm_1.Index)(['date', 'description']),
         (0, typeorm_1.Entity)({ name: 'transactions' })

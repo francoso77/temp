@@ -3,6 +3,8 @@ import { TransactionInterface } from '../interfaces/transaction';
 import Category from './category';
 import Account from './account';
 import Company from './company';
+import { User } from './sistema/user';
+import Sector from './sector';
 
 @Index(['date', 'description'])
 @Entity({ name: 'transactions' })
@@ -18,10 +20,11 @@ export default class Transaction implements TransactionInterface {
   amount: number;
 
   @Column()
-  type: 'Receita' | 'Despesa';
+  sectorId: string;
 
-  @Column()
-  setor: 'Dublagem' | 'Malharia';
+  @JoinColumn({ name: 'sectorId' })
+  @ManyToOne(() => Sector)
+  sector: Sector
 
   @Column()
   categoryId: string;
@@ -52,4 +55,11 @@ export default class Transaction implements TransactionInterface {
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
+
+  @Column({ nullable: true })
+  userId: string
+
+  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => User)
+  user: User
 }

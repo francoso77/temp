@@ -14,6 +14,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import BusinessIcon from "@mui/icons-material/Business";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import PrintIcon from '@mui/icons-material/Print';
+import SourceTwoToneIcon from '@mui/icons-material/SourceTwoTone';
 
 export const iconMap: { [key: string]: React.ReactNode } = {
   FactoryIcon: <FactoryIcon />,
@@ -31,5 +32,6 @@ export const iconMap: { [key: string]: React.ReactNode } = {
   CategoryIcon: <CategoryIcon />,
   BusinessIcon: <BusinessIcon />,
   BarChartIcon: <BarChartIcon />,
-  PrintIcon: <PrintIcon />
+  PrintIcon: <PrintIcon />,
+  SourceTwoToneIcon: <SourceTwoToneIcon />
 }

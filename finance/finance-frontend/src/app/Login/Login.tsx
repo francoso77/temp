@@ -23,7 +23,7 @@ export default function Login() {
   const [erros, setErros] = useState({})
   const [dados, setDados] = useState({ email: '', senha: '' })
   const clsValidacao: ClsValidacao = new ClsValidacao()
-  const { mensagemState, setMensagemState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
   const clsApi = new ClsApi()
   const clsCrud = new ClsCrud()
@@ -44,6 +44,8 @@ export default function Login() {
 
   const btEntrar = () => {
 
+    let usuario: string = ""
+
     if (validarDados()) {
 
       clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
@@ -55,7 +57,11 @@ export default function Login() {
         setMensagemState: setMensagemState
       })
         .then(async (rs) => {
+
+
           if (rs.ok && rs.dados) {
+
+            usuario = rs.dados.idUsuario
 
             contextGlobal.setUsuarioState({
               idUsuario: rs.dados.idUsuario,
@@ -127,6 +133,16 @@ export default function Login() {
                 permitido: true
               },
               {
+                id: '8',
+                parentId: null,
+                descricao: 'Setores',
+                path: '/setores',
+                icon: 'source_two_tone_icon',
+                filhos: [],
+                //permitido: rs.dados.permissoes.PRODUTO.PERMISSOES.MANUTENCAO.length > 0,
+                permitido: true
+              },
+              {
                 id: '11',
                 parentId: null,
                 descricao: 'Configurações',
@@ -139,12 +155,14 @@ export default function Login() {
 
             const contas = await clsCrud.pesquisar({
               entidade: "Account",
-              criterio: { isDefault: true },
-              select: ["id"],
+              criterio: {
+                isDefault: true,
+                userId: usuario,
+              },
+              select: ["id", "name", "isDefault", "userId"],
             })
 
             const idContaPadrao = contas.length > 0 ? contas[0].id as string : ""
-
             setContaPadrao(idContaPadrao)
 
             const clsMenu = new MenuCls(MENU)

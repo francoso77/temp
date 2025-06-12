@@ -9,51 +9,56 @@ export class OutController {
 
 
   @Post("alterarPadrao")
-  async alterarPadrao(): Promise<{ success: boolean; affected?: number; error?: any }> {
+  async alterarPadrao(
+    @Body("idUsuario") idUsuario: string
+  ): Promise<{ success: boolean; affected?: number; error?: any }> {
     try {
       const result = await AppDataSource
         .getRepository(Account)
-        .update({ isDefault: true }, { isDefault: false });
+        .update(
+          { isDefault: true, userId: idUsuario },
+          { isDefault: false }
+        );
 
       return { success: true, affected: result.affected };
     } catch (error) {
       return { success: false, error };
     }
   }
-
   @Post('selecaoTransacoes')
   async selecaoTransacoes(
-    @Body('tipo') tipo?: { idTipoTransactionType: string; descricao: string },
-    @Body('setor') setor?: { id: string; descricao: string },
+    @Body('setor') setor?: string,
     @Body('categoria') categoria?: string,
     @Body('conta') conta?: string,
     @Body('dtInicial') dtInicial?: string,
     @Body('dtFinal') dtFinal?: string,
+    @Body('idUsuario') idUsuario?: string
   ): Promise<any[]> {
 
-    const tipoValor = tipo?.descricao;
-    const setorValor = setor?.descricao;
 
     const query = AppDataSource.getRepository(Transaction)
       .createQueryBuilder('t')
       .leftJoinAndSelect('t.account', 'account')
       .leftJoinAndSelect('t.category', 'category')
       .leftJoinAndSelect('t.company', 'company')
+      .leftJoinAndSelect('t.sector', 'sector') // novo join com a tabela setor
       .select([
         't.id',
         't.date',
         't.amount',
-        't.setor',
-        't.type',
         't.description',
+        't.userId',
         'category.id',
         'category.name',
         'category.color',
+        'category.type',
         'account.id',
         'account.name',
+        'account.initialBalance',
         'company.id',
         'company.name',
-        'account.initialBalance',
+        'sector.id',
+        'sector.name'
       ]);
 
     if (dtInicial && dtFinal) {
@@ -63,12 +68,8 @@ export class OutController {
       });
     }
 
-    if (setorValor) {
-      query.andWhere('t.setor = :setorParam', { setorParam: setorValor });
-    }
-
-    if (tipoValor) {
-      query.andWhere('t.type = :tipoParam', { tipoParam: tipoValor });
+    if (setor) {
+      query.andWhere('t.sectorId = :setorParam', { setorParam: setor });
     }
 
     if (categoria) {
@@ -79,9 +80,13 @@ export class OutController {
       query.andWhere('t.accountId = :contaParam', { contaParam: conta });
     }
 
+    if (idUsuario) {
+      query.andWhere('t.userId = :idUsuarioParam', { idUsuarioParam: idUsuario });
+    }
+
     const transacoes = await query.getMany();
 
-    // Se não houver transações, trazer pelo menos a conta com o saldo inicial
+    // Retornar saldo inicial da conta caso não haja transações
     if (transacoes.length === 0 && conta) {
       const accountRepo = AppDataSource.getRepository('Account');
       const account = await accountRepo.findOne({
@@ -94,11 +99,10 @@ export class OutController {
           id: null,
           date: null,
           amount: null,
-          setor: setorValor ?? null,
-          type: tipoValor ?? null,
           description: 'Sem transações no período',
-          category: { name: null, color: null },
+          category: { name: null, color: null, type: null },
           company: { name: null },
+          sector: { name: null },
           account: {
             name: account.name,
             initialBalance: account.initialBalance,

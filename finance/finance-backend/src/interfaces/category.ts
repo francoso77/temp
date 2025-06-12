@@ -3,4 +3,5 @@ export interface CategoryInterface {
   name: string
   type: 'Receita' | 'Despesa'
   color: string
+  userId?: string
 }

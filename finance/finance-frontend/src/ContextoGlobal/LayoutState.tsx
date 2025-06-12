@@ -12,7 +12,7 @@ export interface LayoutStateInterface {
   accountId?: string | null
   categoryId?: string | null
   type?: 'Receita' | 'Despesa' | null;
-  setor?: 'Dublagem' | 'Malharia' | null;
+  sectorId?: string | null
 }
 
 export default function useLayoutState() {
@@ -27,7 +27,7 @@ export default function useLayoutState() {
     categoryId: null,
     accountId: null,
     type: null,
-    setor: null
+    sectorId: null
   })
 
   return { layoutState, setLayoutState }

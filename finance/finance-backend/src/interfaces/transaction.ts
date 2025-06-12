@@ -1,11 +1,20 @@
+import { AccountInterface } from './account'
+import { CategoryInterface } from './category'
+import { CompanyInterface } from './company'
+import { SectorInterface } from './sector'
+
 export interface TransactionInterface {
   id?: string
   description: string
   amount: number
-  type: 'Receita' | 'Despesa'
-  setor: 'Dublagem' | 'Malharia'
   categoryId: string
   accountId: string
   companyId: string
+  sectorId: string
   date: string
+  userId?: string
+  company?: CompanyInterface
+  category?: CategoryInterface
+  sector?: SectorInterface
+  account?: AccountInterface
 }

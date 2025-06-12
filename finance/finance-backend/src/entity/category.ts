@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { CategoryInterface } from '../interfaces/category';
+import { User } from './sistema/user';
 
 @Entity({ name: 'categorys' })
 export default class Category implements CategoryInterface {
@@ -21,4 +22,11 @@ export default class Category implements CategoryInterface {
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
+
+  @Column({ nullable: true })
+  userId: string
+
+  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => User)
+  user: User
 }

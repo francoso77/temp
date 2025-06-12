@@ -4,104 +4,69 @@ import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
+import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import Condicional from '../../Componentes/Condicional/Condicional';
-import { CategoriasFicha } from './categoriasFicha';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import { SetoresFicha } from './setoresFicha';
 
 
 interface PesquisaInterface {
   name: string
 }
 
-export const ResetCategory: CategoryInterface = {
+export const ResetSetor: SectorInterface = {
   name: '',
-  type: 'Despesa',
-  color: '#b1a1a1',
   userId: ''
 }
 
-export function Categorias() {
+export function Setores() {
 
   const [open, setOpen] = useState(false);
 
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
-  const [categorias, setCategorias] = React.useState<CategoryInterface>(ResetCategory);
+  const [setores, setSetores] = React.useState<SectorInterface>(ResetSetor);
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
-  const [rsPesquisa, setRsPesquisa] = useState<Array<CategoryInterface>>([])
+  const [rsPesquisa, setRsPesquisa] = useState<Array<SectorInterface>>([])
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const clsCrud = new ClsCrud()
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
-      cabecalho: 'Cor',
-      alinhamento: 'center',
-      campo: 'color',
-      render: (valor: string) => (
-        <div
-          style={{
-            backgroundColor: valor,
-            width: 16,
-            height: 16,
-            borderRadius: '50%',
-            border: '1px solid #ccc',
-            margin: '0 auto'
-
-          }}
-          title={valor}
-        />
-      )
-    },
-    {
-      cabecalho: 'Categoria',
+      cabecalho: 'Nome',
       alinhamento: 'center',
       campo: 'name',
       //format: (arg: string) => arg.toUpperCase()
-    },
-    {
-      campo: 'type',
-      cabecalho: 'Tipo',
-      alinhamento: 'center',
-      chipColor: (valor) => {
-        switch (valor) {
-          case 'Receita': return 'success';
-          case 'Despesa': return 'error';
-          default: return 'default';
-        }
-      },
-      //chipLabel: (valor) => valor.toUpperCase() // Ex: transforma "ativo" em "ATIVO"
     }
-
   ]
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setCategorias(rs)
+      setSetores(rs)
       setLocalState({ action: actionTypes.editando })
       setOpen(true)
     })
   }
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setCategorias(rs)
+      setSetores(rs)
       setLocalState({ action: actionTypes.pesquisando })
       setMensagemState({
         titulo: 'Exclusão',
         exibir: true,
-        mensagem: 'Deseja realmente excluir a categoria ' + rs.name + '?',
+        mensagem: 'Deseja realmente excluir o setor ' + rs.name + '?',
         tipo: 'warning',
         exibirBotao: 'SN',
         cb: (resposta) => {
           if (resposta) {
             clsCrud.excluir({
-              entidade: "Category",
+              entidade: "Setor",
               criterio: { id: id },
               setMensagemState: setMensagemState,
               token: usuarioState.token,
-              msg: 'Excluindo categoria ...',
+              msg: 'Excluindo setor ...',
             }).then((rs) => {
               if (rs.ok) {
                 btPesquisar()
@@ -113,39 +78,39 @@ export function Categorias() {
     })
   }
 
-  const pesquisarID = async (id: string | number): Promise<CategoryInterface> => {
+  const pesquisarID = async (id: string | number): Promise<SectorInterface> => {
     return await clsCrud
       .pesquisar({
-        entidade: "Category",
+        entidade: "Sector",
         criterio: {
           id: id,
         },
       })
-      .then((rs: Array<CategoryInterface>) => {
+      .then((rs: Array<SectorInterface>) => {
         return rs[0]
       })
   }
   const btPesquisar = () => {
     clsCrud
       .pesquisar({
-        entidade: "Category",
+        entidade: "Sector",
         criterio: {
           name: "%".concat(pesquisa.name).concat("%"),
           userId: usuarioState.idUsuario
         },
         camposLike: ["name"],
-        select: ["id", "name", "type", "color"],
-        msg: 'Pesquisando categrorias ...',
+        select: ["id", "name"],
+        msg: 'Pesquisando setores ...',
         setMensagemState: setMensagemState
       })
-      .then((rs: Array<CategoryInterface>) => {
+      .then((rs: Array<SectorInterface>) => {
         setRsPesquisa(rs)
       })
   }
 
   const handleOpen = () => {
-    setCategorias(ResetCategory)
     setLocalState({ action: actionTypes.incluindo })
+    setSetores(ResetSetor)
     setOpen(true);
   }
 
@@ -158,12 +123,12 @@ export function Categorias() {
     <>
       <Grid container>
         <Grid item xs={12}>
-          <Typography variant="h5" sx={{ m: 1, textAlign: 'left' }}>Lista de Categorias</Typography>
+          <Typography variant="h5" sx={{ m: 1, textAlign: 'left' }}>Lista de Setores</Typography>
         </Grid>
         <Grid item xs={6} sx={{ ml: 2 }}>
           <InputText
             label=""
-            placeholder="Buscar categorias..."
+            placeholder="Buscar setores..."
             tipo="uppercase"
             dados={pesquisa}
             field="name"
@@ -185,7 +150,7 @@ export function Categorias() {
             icon={<i className="material-icons">add</i>}
             sx={{ mt: 2, ml: 1, textAlign: 'right' }}
           >
-            Nova Categoria
+            Novo Setor
           </CustomButton>
         </Grid>
         <Grid item xs={12} sx={{ m: 2 }}>
@@ -197,14 +162,14 @@ export function Categorias() {
               {
                 icone: EditOutlinedIcon,
                 corIcone: '#fff',
-                onAcionador: (rs: CategoryInterface) =>
+                onAcionador: (rs: SectorInterface) =>
                   onEditar(rs.id as string),
                 toolTip: "Editar",
               },
               {
                 icone: DeleteTwoToneIcon,
                 corIcone: '#fff',
-                onAcionador: (rs: CategoryInterface) =>
+                onAcionador: (rs: SectorInterface) =>
                   onExcluir(rs.id as string),
                 toolTip: "Excluir",
               },
@@ -212,11 +177,11 @@ export function Categorias() {
         </Grid>
       </Grid>
       <Condicional condicao={localState.action !== actionTypes.pesquisando}>
-        <CategoriasFicha
+        <SetoresFicha
           open={open}
           setOpen={setOpen}
           btPesquisar={btPesquisar}
-          categoria={localState.action !== actionTypes.incluindo ? categorias : undefined}
+          setor={localState.action !== actionTypes.incluindo ? setores : undefined}
           localState={localState}
         />
       </Condicional>

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { CompanyInterface } from '../interfaces/company';
+import { User } from './sistema/user';
 
 @Index(['name'], { unique: true })
 @Entity({ name: 'companies' })
@@ -15,4 +16,11 @@ export default class Company implements CompanyInterface {
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
+
+  @Column({ nullable: true })
+  userId: string
+
+  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => User)
+  user: User
 }

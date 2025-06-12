@@ -11,55 +11,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var user_1 = require("./sistema/user");
-var Account = /** @class */ (function () {
-    function Account() {
+var Company = /** @class */ (function () {
+    function Company() {
     }
     __decorate([
         (0, typeorm_1.PrimaryColumn)({ generated: 'uuid' }),
         __metadata("design:type", String)
-    ], Account.prototype, "id", void 0);
+    ], Company.prototype, "id", void 0);
     __decorate([
-        (0, typeorm_1.Column)(),
+        (0, typeorm_1.Column)({ length: 100 }),
         __metadata("design:type", String)
-    ], Account.prototype, "name", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Account.prototype, "type", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 2 }),
-        __metadata("design:type", Number)
-    ], Account.prototype, "initialBalance", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
-    ], Account.prototype, "color", void 0);
-    __decorate([
-        (0, typeorm_1.Column)({ default: false }),
-        __metadata("design:type", Boolean)
-    ], Account.prototype, "isDefault", void 0);
+    ], Company.prototype, "name", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], Account.prototype, "createAt", void 0);
+    ], Company.prototype, "createAt", void 0);
     __decorate([
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
-    ], Account.prototype, "updateAt", void 0);
+    ], Company.prototype, "updateAt", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", String)
-    ], Account.prototype, "userId", void 0);
+    ], Company.prototype, "userId", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'userId' }),
         (0, typeorm_1.ManyToOne)(function () { return user_1.User; }),
         __metadata("design:type", user_1.User)
-    ], Account.prototype, "user", void 0);
-    Account = __decorate([
-        (0, typeorm_1.Index)(['name']),
-        (0, typeorm_1.Entity)('accounts')
-    ], Account);
-    return Account;
+    ], Company.prototype, "user", void 0);
+    Company = __decorate([
+        (0, typeorm_1.Index)(['name'], { unique: true }),
+        (0, typeorm_1.Entity)({ name: 'companies' })
+    ], Company);
+    return Company;
 }());
-exports.default = Account;
-//# sourceMappingURL=account.js.map
+exports.default = Company;
+//# sourceMappingURL=company%20copy.js.map

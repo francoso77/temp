@@ -15,6 +15,7 @@ interface PropsInterface {
   dtFinal?: string
   grupo?: GraficoType
   id?: number
+  idUsuario?: string
   setMensagemState?: React.Dispatch<React.SetStateAction<MensagemStateInterface>>
   cpf?: string
   senha?: string
@@ -90,6 +91,7 @@ export default class ClsApi {
     dtFinal,
     grupo,
     id,
+    idUsuario,
     cpf,
     senha,
     operador,
@@ -112,6 +114,7 @@ export default class ClsApi {
       dtFinal,
       grupo,
       id,
+      idUsuario,
       cpf,
       senha,
       operador,

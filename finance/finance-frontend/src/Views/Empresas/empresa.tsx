@@ -1,5 +1,5 @@
 import { Grid, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
@@ -19,6 +19,7 @@ interface PesquisaInterface {
 
 export const ResetCompany: CompanyInterface = {
   name: '',
+  userId: ''
 }
 
 export function Empresas() {
@@ -95,6 +96,7 @@ export function Empresas() {
         entidade: "Company",
         criterio: {
           name: "%".concat(pesquisa.name).concat("%"),
+          userId: usuarioState.idUsuario
         },
         camposLike: ["name"],
         select: ["id", "name"],
@@ -111,6 +113,11 @@ export function Empresas() {
     setEmpresas(ResetCompany)
     setOpen(true);
   }
+
+  useEffect(() => {
+
+    btPesquisar()
+  }, [])
 
   return (
     <>

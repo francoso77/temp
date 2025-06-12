@@ -23,7 +23,8 @@ export const ResetAccount: AccountInterface = {
   type: 'corrente',
   initialBalance: 0,
   color: '#b1a1a1',
-  isDefault: false
+  isDefault: false,
+  userId: ''
 }
 
 interface SomatorioInterface extends AccountInterface {
@@ -102,7 +103,21 @@ export function Contas() {
     })
   }
   const onExcluir = (id: string | number) => {
+
     pesquisarID(id).then((rs) => {
+
+      if (rs.isDefault) {
+        setMensagemState({
+          titulo: 'Atenção',
+          exibir: true,
+          mensagem: 'A conta Padrão ' + rs.name + ', não pode ser excluida!',
+          tipo: 'warning',
+          exibirBotao: true,
+          cb: null
+        })
+        return
+      }
+
       setContas(rs)
       setLocalState({ action: actionTypes.pesquisando })
       setMensagemState({
@@ -147,6 +162,7 @@ export function Contas() {
       entidade: "Account",
       criterio: {
         name: "%".concat(pesquisa.name).concat("%"),
+        userId: usuarioState.idUsuario
       },
       camposLike: ["name"],
       select: ["id", "name", "type", "initialBalance", "color", "isDefault"],
@@ -181,6 +197,7 @@ export function Contas() {
       entidade: "Transaction",
       criterio: {
         accountId: id,
+        userId: usuarioState.emailUsuario
       },
     });
 

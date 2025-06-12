@@ -1,7 +1,6 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Chip, Typography } from '@mui/material';
 import DataTable, { DataTableCabecalhoInterface } from '../DataTable';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { TransactionInterface } from '../../../../finance-backend/src/interfaces/transaction';
 import { TransactionSelectInterface } from '../../Views/Relatorios/relatorios';
 
 const clsFormatacao: ClsFormatacao = new ClsFormatacao();
@@ -21,38 +20,45 @@ const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
   {
     cabecalho: 'Setor',
     alinhamento: 'center',
-    campo: 'setor',
+    campo: 'sector',
+    format: (_v, rs: any) => rs.sector.name
   },
   {
     cabecalho: 'Empresa',
     alinhamento: 'center',
-    campo: 'company',
+    campo: 'companyId',
     format: (_v, rs: any) => rs.company.name
   },
   {
     cabecalho: 'Categoria',
     alinhamento: 'center',
-    campo: 'category',
+    campo: 'categoryId',
     format: (_v, rs: any) => rs.category.name
   },
   {
-    campo: 'type',
+    campo: 'categoryId',
     cabecalho: 'Tipo',
     alinhamento: 'center',
-    chipColor: (valor) => {
-      switch (valor) {
-        case 'Receita': return 'success';
-        case 'Despesa': return 'error';
-        default: return 'default';
-      }
+    render: (_valor: number, row: any) => {
+      const type = row?.category?.type;
+      const isReceita = type === 'Receita';
+
+      return (
+        <Chip
+          label={type}
+          color={isReceita ? 'success' : 'error'}
+          size="small"
+          sx={{ fontWeight: 'bold' }}
+        />
+      );
     },
   },
   {
     campo: 'amount',
     cabecalho: 'Valor',
     alinhamento: 'right',
-    render: (valor: number, row: TransactionInterface) => {
-      const isReceita = row.type === 'Receita'
+    render: (valor: number, row: any) => {
+      const isReceita = row?.category?.type === 'Receita'
       return (
         <span
           style={{

@@ -56,7 +56,7 @@ var transaction_1 = require("../entity/transaction");
 var OutController = /** @class */ (function () {
     function OutController() {
     }
-    OutController.prototype.alterarPadrao = function () {
+    OutController.prototype.alterarPadrao = function (idUsuario) {
         return __awaiter(this, void 0, void 0, function () {
             var result, error_1;
             return __generator(this, function (_a) {
@@ -65,7 +65,7 @@ var OutController = /** @class */ (function () {
                         _a.trys.push([0, 2, , 3]);
                         return [4 /*yield*/, data_source_1.AppDataSource
                                 .getRepository(account_1.default)
-                                .update({ isDefault: true }, { isDefault: false })];
+                                .update({ isDefault: true, userId: idUsuario }, { isDefault: false })];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, { success: true, affected: result.affected }];
@@ -77,34 +77,35 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.selecaoTransacoes = function (tipo, setor, categoria, conta, dtInicial, dtFinal) {
+    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario) {
         return __awaiter(this, void 0, void 0, function () {
-            var tipoValor, setorValor, query, transacoes, accountRepo, account;
+            var query, transacoes, accountRepo, account;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        tipoValor = tipo === null || tipo === void 0 ? void 0 : tipo.descricao;
-                        setorValor = setor === null || setor === void 0 ? void 0 : setor.descricao;
                         query = data_source_1.AppDataSource.getRepository(transaction_1.default)
                             .createQueryBuilder('t')
                             .leftJoinAndSelect('t.account', 'account')
                             .leftJoinAndSelect('t.category', 'category')
                             .leftJoinAndSelect('t.company', 'company')
+                            .leftJoinAndSelect('t.sector', 'sector') // novo join com a tabela setor
                             .select([
                             't.id',
                             't.date',
                             't.amount',
-                            't.setor',
-                            't.type',
                             't.description',
+                            't.userId',
                             'category.id',
                             'category.name',
                             'category.color',
+                            'category.type',
                             'account.id',
                             'account.name',
+                            'account.initialBalance',
                             'company.id',
                             'company.name',
-                            'account.initialBalance',
+                            'sector.id',
+                            'sector.name'
                         ]);
                         if (dtInicial && dtFinal) {
                             query.andWhere('t.date BETWEEN :start AND :end', {
@@ -112,17 +113,17 @@ var OutController = /** @class */ (function () {
                                 end: dtFinal,
                             });
                         }
-                        if (setorValor) {
-                            query.andWhere('t.setor = :setorParam', { setorParam: setorValor });
-                        }
-                        if (tipoValor) {
-                            query.andWhere('t.type = :tipoParam', { tipoParam: tipoValor });
+                        if (setor) {
+                            query.andWhere('t.sectorId = :setorParam', { setorParam: setor });
                         }
                         if (categoria) {
                             query.andWhere('t.categoryId = :categoriaParam', { categoriaParam: categoria });
                         }
                         if (conta) {
                             query.andWhere('t.accountId = :contaParam', { contaParam: conta });
+                        }
+                        if (idUsuario) {
+                            query.andWhere('t.userId = :idUsuarioParam', { idUsuarioParam: idUsuario });
                         }
                         return [4 /*yield*/, query.getMany()];
                     case 1:
@@ -140,11 +141,10 @@ var OutController = /** @class */ (function () {
                                         id: null,
                                         date: null,
                                         amount: null,
-                                        setor: setorValor !== null && setorValor !== void 0 ? setorValor : null,
-                                        type: tipoValor !== null && tipoValor !== void 0 ? tipoValor : null,
                                         description: 'Sem transações no período',
-                                        category: { name: null, color: null },
+                                        category: { name: null, color: null, type: null },
                                         company: { name: null },
+                                        sector: { name: null },
                                         account: {
                                             name: account.name,
                                             initialBalance: account.initialBalance,
@@ -159,20 +159,21 @@ var OutController = /** @class */ (function () {
     };
     __decorate([
         (0, common_1.Post)("alterarPadrao"),
+        __param(0, (0, common_1.Body)("idUsuario")),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", []),
+        __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "alterarPadrao", null);
     __decorate([
         (0, common_1.Post)('selecaoTransacoes'),
-        __param(0, (0, common_1.Body)('tipo')),
-        __param(1, (0, common_1.Body)('setor')),
-        __param(2, (0, common_1.Body)('categoria')),
-        __param(3, (0, common_1.Body)('conta')),
-        __param(4, (0, common_1.Body)('dtInicial')),
-        __param(5, (0, common_1.Body)('dtFinal')),
+        __param(0, (0, common_1.Body)('setor')),
+        __param(1, (0, common_1.Body)('categoria')),
+        __param(2, (0, common_1.Body)('conta')),
+        __param(3, (0, common_1.Body)('dtInicial')),
+        __param(4, (0, common_1.Body)('dtFinal')),
+        __param(5, (0, common_1.Body)('idUsuario')),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [Object, Object, String, String, String, String]),
+        __metadata("design:paramtypes", [String, String, String, String, String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "selecaoTransacoes", null);
     OutController = __decorate([

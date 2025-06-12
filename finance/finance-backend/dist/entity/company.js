@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
+var user_1 = require("./sistema/user");
 var Company = /** @class */ (function () {
     function Company() {
     }
@@ -29,6 +30,15 @@ var Company = /** @class */ (function () {
         (0, typeorm_1.UpdateDateColumn)({ name: 'updatedAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
     ], Company.prototype, "updateAt", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
+        __metadata("design:type", String)
+    ], Company.prototype, "userId", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'userId' }),
+        (0, typeorm_1.ManyToOne)(function () { return user_1.User; }),
+        __metadata("design:type", user_1.User)
+    ], Company.prototype, "user", void 0);
     Company = __decorate([
         (0, typeorm_1.Index)(['name'], { unique: true }),
         (0, typeorm_1.Entity)({ name: 'companies' })

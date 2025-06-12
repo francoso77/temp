@@ -169,8 +169,10 @@ export default function Registrar() {
 
     if (localState.action === actionTypes.incluindo && (await TemEmail())) {
       await executarAcao("incluir", "Usuário incluído com sucesso!");
+      irPara('/login')
     } else if (localState.action === actionTypes.editando) {
       await executarAcao("editar", "Dados alterados com sucesso!");
+      irPara('/dashboard')
     }
   }
 

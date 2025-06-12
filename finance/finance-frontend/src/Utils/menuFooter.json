@@ -45,6 +45,17 @@
   },
   {
     "id": 5,
+    "tooltipTitle": "Setores",
+    "route": "/setores",
+    "icon": "SourceTwoToneIcon",
+    "color": "primary",
+    "iconSize": {
+      "width": 35,
+      "height": 35
+    }
+  },
+  {
+    "id": 6,
     "tooltipTitle": "Empresas",
     "route": "/empresas",
     "icon": "FactoryIcon",
@@ -55,7 +66,7 @@
     }
   },
   {
-    "id": 6,
+    "id": 7,
     "tooltipTitle": "Relatórios",
     "route": "/relatorios",
     "icon": "PrintIcon",

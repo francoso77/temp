@@ -1,27 +1,15 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
-import { AccountInterface } from '../interfaces/account';
 import { User } from './sistema/user';
+import { SectorInterface } from '../interfaces/sector';
 
-@Index(['name'])
-@Entity('accounts')
-export default class Account implements AccountInterface {
+@Index(['name'], { unique: true })
+@Entity({ name: 'sectors' })
+export default class Sector implements SectorInterface {
   @PrimaryColumn({ generated: 'uuid' })
   id: string;
 
-  @Column()
+  @Column({ length: 60 })
   name: string;
-
-  @Column()
-  type: 'corrente' | 'poupanca' | 'investimento' | 'credito' | 'dinheiro' | 'outros'
-
-  @Column({ type: 'float', precision: 2 })
-  initialBalance: number;
-
-  @Column()
-  color: string;
-
-  @Column({ default: false })
-  isDefault: boolean;
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

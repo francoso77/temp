@@ -1,5 +1,5 @@
-import { Grid, Typography } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import { Chip, Grid, Typography } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
@@ -18,23 +18,27 @@ interface PesquisaInterface {
   description: string
 }
 
-export const ResetTransaction: TransactionInterface = {
-  description: '',
-  type: 'Despesa',
-  setor: 'Malharia',
-  amount: 0,
-  categoryId: '',
-  accountId: '',
-  companyId: '',
-  date: ''
-}
 
 export function Transacoes() {
+
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+
+  const ResetTransaction: TransactionInterface = {
+
+    date: '',
+    amount: 0,
+    description: '',
+    userId: '',
+    categoryId: '',
+    accountId: '',
+    companyId: '',
+    sectorId: '',
+  }
 
   const [open, setOpen] = useState(false);
   const clsFormatacao = new ClsFormatacao();
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
-  const [transacoes, setTransacoes] = React.useState<TransactionInterface>(ResetTransaction);
+  const [transacoes, setTransacoes] = React.useState<TransactionInterface>();
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ description: '' });
   const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
@@ -55,7 +59,8 @@ export function Transacoes() {
     {
       cabecalho: 'Setor',
       alinhamento: 'center',
-      campo: 'setor',
+      campo: 'sector',
+      format: (_v, rs: any) => rs.sector.name
     },
     {
       cabecalho: 'Empresa',
@@ -70,29 +75,29 @@ export function Transacoes() {
       format: (_v, rs: any) => rs.category.name
     },
     {
-      campo: 'type',
+      campo: 'categoryId',
       cabecalho: 'Tipo',
       alinhamento: 'center',
-      chipColor: (valor) => {
-        switch (valor) {
-          case 'Receita': return 'success';
-          case 'Despesa': return 'error';
-          default: return 'default';
-        }
+      render: (_valor: number, row: any) => {
+        const type = row?.category?.type;
+        const isReceita = type === 'Receita';
+
+        return (
+          <Chip
+            label={type}
+            color={isReceita ? 'success' : 'error'}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
       },
     },
-    // {
-    //   cabecalho: 'Valor',
-    //   campo: 'amount',
-    //   alinhamento: 'center',
-    //   format: (arg: number) => arg.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })
-    // },
     {
       campo: 'amount',
       cabecalho: 'Valor',
       alinhamento: 'right',
       render: (valor: number, row: any) => {
-        const isReceita = row.type === 'Receita'
+        const isReceita = row?.category?.type === 'Receita'
         return (
           <span
             style={{
@@ -152,6 +157,7 @@ export function Transacoes() {
         entidade: "Transaction",
         criterio: {
           id: id,
+          idUsuario: usuarioState.idUsuario,
         },
       })
       .then((rs: Array<TransactionInterface>) => {
@@ -166,17 +172,18 @@ export function Transacoes() {
     clsCrud
       .pesquisar({
         entidade: "Transaction",
-        relations: ['company', 'category'],
+        relations: ['company', 'category', 'sector', 'account'],
         token: usuarioState.token,
         criterio: {
           description: "%".concat(pesquisa.description).concat("%"),
+          userId: usuarioState.idUsuario
         },
         camposLike: ["description"],
-        select: ["id", "description", "type", "amount", "companyId", "categoryId", "setor", "date"],
+        select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
         msg: 'Pesquisando transação ...',
         setMensagemState: setMensagemState
       })
-      .then((rs: Array<TransactionInterface>) => {
+      .then((rs: Array<any>) => {
         setRsPesquisa(rs)
       })
   }
@@ -186,6 +193,11 @@ export function Transacoes() {
     setLocalState({ action: actionTypes.incluindo })
     setOpen(true);
   }
+
+  useEffect(() => {
+
+    btPesquisar()
+  }, [])
 
   return (
     <>

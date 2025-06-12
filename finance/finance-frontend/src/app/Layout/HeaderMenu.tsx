@@ -65,6 +65,8 @@ export default function HeaderMenu() {
         token: '',
         emailUsuario: ''
       })
+
+      setLayoutState({ ...layoutState, contaPadrao: null })
       navegar('/')
     }
   }
@@ -74,6 +76,7 @@ export default function HeaderMenu() {
     clsCrud
       .pesquisar({
         entidade: "Account",
+        criterio: { userId: usuarioState.idUsuario },
         campoOrder: ['name'],
       })
       .then((rs: Array<AccountInterface>) => {
@@ -95,6 +98,11 @@ export default function HeaderMenu() {
     navegar('/registrar')
     setLayoutState({ ...layoutState, titulo: 'Perfil', pathTitulo: '/registrar' })
   }
+
+  useEffect(() => {
+    setLayoutState({ ...layoutState, contaPadrao: layoutState.contaPadrao });
+  }, [layoutState]);
+
 
   return (
     <>

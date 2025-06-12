@@ -5,4 +5,5 @@ export interface AccountInterface {
   initialBalance: number
   color: string
   isDefault?: boolean
+  userId?: string
 }

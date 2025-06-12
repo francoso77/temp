@@ -9,7 +9,7 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { ResetCompany } from './empresas';
+import { ResetCompany } from './empresa';
 
 
 
@@ -50,6 +50,8 @@ export function EmpresasFicha({ open, setOpen, btPesquisar, empresa, localState 
     if (!validarDados()) {
       return
     }
+
+    dados.userId = usuarioState.idUsuario
 
     clsCrud.incluir({
       entidade: 'Company',

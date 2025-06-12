@@ -35,7 +35,7 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<AccountInterface>(ResetAccount);
   const validaCampo: ClsValidacao = new ClsValidacao()
-  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const irPara = useNavigate()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -51,13 +51,10 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
     }
   }
   const handleClose = () => {
+
     btPesquisar && btPesquisar()
     setDados(ResetAccount)
     setOpen(false)
-    if (layoutState?.contaPadrao === "") {
-      setUsuarioState({ ...usuarioState, logado: false })
-      irPara('/')
-    }
   }
 
   const validarDados = () => {
@@ -81,6 +78,7 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
           method: 'post',
           url: 'alterarPadrao',
           mensagem: 'Alterando Conta Padrão...',
+          idUsuario: usuarioState.idUsuario,
           token: usuarioState.token,
           setMensagemState,
         });
@@ -112,6 +110,8 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
     }
 
     // Agora pode incluir ou editar a conta
+    dados.userId = usuarioState.idUsuario
+
     const rs = await clsCrud.incluir({
       entidade: 'Account',
       criterio: dados,
@@ -121,6 +121,18 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
     });
 
     if (rs.ok) {
+
+      const idGerado = rs.dados?.id
+
+      // Se a conta for padrão, atualiza o layoutState com o id gerado
+      if (dados?.isDefault && idGerado) {
+        setLayoutState(prev => ({
+          ...prev,
+          contaPadrao: idGerado,
+
+        }));
+      }
+
       setMensagemState({
         titulo: 'Cadastro',
         exibir: true,
@@ -132,7 +144,14 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
         exibirBotao: true,
         cb: null,
       });
-      handleClose();
+
+      if (localState?.action === actionTypes.editando) {
+        setLayoutState(prev => ({
+          ...prev,
+          contaPadrao: rs.dados?.id
+        }))
+      }
+      handleClose()
     }
   };
 

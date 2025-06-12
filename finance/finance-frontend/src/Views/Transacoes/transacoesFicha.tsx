@@ -10,13 +10,10 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { CurrencyTextField } from '../../Componentes/InputCurrency';
-import { ResetTransaction } from './transacoes';
 import { TransactionInterface } from '../../../../finance-backend/src/interfaces/transaction';
-import { TipoTransactionTypes } from '../../types/tipoTransactionTypes';
-import { SetorTypes } from '../../types/setorTypes';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
+import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
 
 interface PropsInterface {
   open: boolean,
@@ -35,15 +32,28 @@ export function TransacoesFicha(
     localState
   }: PropsInterface) {
 
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+
+  const ResetTransaction: TransactionInterface = {
+
+    date: '',
+    amount: 0,
+    description: '',
+    userId: '',
+    categoryId: '',
+    accountId: '',
+    companyId: '',
+    sectorId: '',
+  }
+
   const clsCrud = new ClsCrud()
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<TransactionInterface>(ResetTransaction)
   const validaCampo: ClsValidacao = new ClsValidacao()
-  const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
+  const [rsSetores, setRsSetores] = useState<Array<SectorInterface>>([])
   const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
   const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
-  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
 
@@ -58,10 +68,9 @@ export function TransacoesFicha(
     let erros: { [key: string]: string } = {}
 
     retorno = validaCampo.naoVazio('description', dados, erros, retorno, 'Forneça um nome válido')
-    retorno = validaCampo.naoVazio('type', dados, erros, retorno)
+    retorno = validaCampo.naoVazio('sectorId', dados, erros, retorno, 'Selecione um setor')
     retorno = validaCampo.naoVazio('companyId', dados, erros, retorno, 'Selecione uma empresa')
     retorno = validaCampo.naoVazio('categoryId', dados, erros, retorno, 'Selecione uma categoria')
-    retorno = validaCampo.naoVazio('accountId', dados, erros, retorno, 'Selecione uma conta')
     retorno = validaCampo.naoVazio('amount', dados, erros, retorno, 'Forneça um valor valido')
     retorno = validaCampo.eData('date', dados, erros, retorno)
 
@@ -70,7 +79,11 @@ export function TransacoesFicha(
   }
 
   const handleConfirmar = async () => {
+    dados.userId = usuarioState.idUsuario as string ?? ""
+    dados.accountId = layoutState.contaPadrao as string ?? ""
+
     if (!validarDados()) return;
+
 
     const rs = await clsCrud.incluir({
       entidade: 'Transaction',
@@ -108,21 +121,13 @@ export function TransacoesFicha(
     }
   }
   const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "Account",
-        campoOrder: ['name'],
-        criterio: {
-          id: layoutState.contaPadrao
-        }
-      })
-      .then((rs: Array<AccountInterface>) => {
-        setRsContas(rs)
-      })
 
     clsCrud
       .pesquisar({
         entidade: "Category",
+        criterio: {
+          userId: usuarioState.idUsuario,
+        },
         campoOrder: ['name'],
       })
       .then((rs: Array<CategoryInterface>) => {
@@ -132,10 +137,25 @@ export function TransacoesFicha(
     clsCrud
       .pesquisar({
         entidade: "Company",
+        criterio: {
+          userId: usuarioState.idUsuario,
+        },
         campoOrder: ['name'],
       })
       .then((rs: Array<CompanyInterface>) => {
         setRsEmpresas(rs)
+      })
+
+    clsCrud
+      .pesquisar({
+        entidade: "Sector",
+        criterio: {
+          userId: usuarioState.idUsuario,
+        },
+        campoOrder: ['name'],
+      })
+      .then((rs: Array<SectorInterface>) => {
+        setRsSetores(rs)
       })
 
   }
@@ -192,7 +212,7 @@ export function TransacoesFicha(
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sx={{ mt: -4 }}>
+            {/* <Grid item xs={12} sx={{ mt: -4 }}>
               <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox
                   label='Tipo'
@@ -208,25 +228,25 @@ export function TransacoesFicha(
                   onKeyDown={(event: any) => btPulaCampo(event, 4)}
                 />
               </Box>
-            </Grid>
-            <Grid item xs={12} sx={{ mt: -1 }}>
+            </Grid> */}
+            <Grid item xs={12} sx={{ mt: -4 }}>
               <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                 <ComboBox
                   label='Setor'
                   corFundo='#050516'
                   corFonte={"#fff"}
-                  opcoes={SetorTypes}
-                  field='setor'
+                  opcoes={rsSetores}
+                  field='sectorId'
                   setState={setDados}
                   dados={dados}
-                  campoID='idSetorType'
-                  campoDescricao='descricao'
+                  campoID='id'
+                  campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha o setor'
                   onKeyDown={(event: any) => btPulaCampo(event, 5)}
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sx={{ mt: -1 }}>
+            {/* <Grid item xs={12} sx={{ mt: -1 }}>
               <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                 <ComboBox
                   label='Conta'
@@ -242,7 +262,7 @@ export function TransacoesFicha(
                   onKeyDown={(event: any) => btPulaCampo(event, 6)}
                 />
               </Box>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} sx={{ mt: -1 }} >
               <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
                 <ComboBox

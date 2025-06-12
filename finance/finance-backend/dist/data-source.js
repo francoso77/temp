@@ -9,6 +9,7 @@ var account_1 = require("./entity/account");
 var category_1 = require("./entity/category");
 var company_1 = require("./entity/company");
 var transaction_1 = require("./entity/transaction");
+var sector_1 = require("./entity/sector");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -25,7 +26,8 @@ exports.AppDataSource = new typeorm_1.DataSource({
         account_1.default,
         category_1.default,
         company_1.default,
-        transaction_1.default
+        transaction_1.default,
+        sector_1.default
     ], // ./entity/**'
     migrations: [],
     subscribers: [],

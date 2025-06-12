@@ -11,7 +11,7 @@ import { AccountInterface } from '../../../../finance-backend/src/interfaces/acc
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { TipoTransactionType, TipoTransactionTypes } from '../../types/tipoTransactionTypes';
-import { SetorType, SetorTypes } from '../../types/setorTypes';
+import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -28,7 +28,7 @@ export interface DadosPesquisa {
 
 export default function Menu() {
 
-    const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
+    const { layoutState, setLayoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
     const dadosIniciais: DadosPesquisa = { dataInicio: '', dataFim: '', categoria: '', conta: layoutState.contaPadrao ?? '', setor: '', tipo: '' }
     const [modalOpen, setModalOpen] = useState(false);
     const [dataInicio, setDataInicio] = useState<string>('');
@@ -36,6 +36,7 @@ export default function Menu() {
     const [dadosPesquisa, setDadosPesquisa] = useState<DadosPesquisa>(dadosIniciais)
     const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
     const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
+    const [rsSetores, setRsSetores] = useState<Array<SectorInterface>>([])
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [contaPadrao, setContaPadrao] = useState<string | null>(null)
     const clsCrud = new ClsCrud()
@@ -61,7 +62,7 @@ export default function Menu() {
                 accountId: null,
                 categoryId: null,
                 type: null,
-                setor: null,
+                sectorId: null,
             }));
         } else {
             setLayoutState(prev => ({ ...prev, [key]: value }));
@@ -88,9 +89,9 @@ export default function Menu() {
         setDadosPesquisa({ ...dadosPesquisa, categoria: selected?.id ?? "" })
     };
 
-    const handleItemChangeSetor = (selected: "Dublagem" | "Malharia" | null) => {
-        updateLayoutState("setor", selected);
-        setDadosPesquisa({ ...dadosPesquisa, setor: selected ?? "" })
+    const handleItemChangeSetor = (selected: SectorInterface | null) => {
+        updateLayoutState("sectorId", selected?.id ?? null);
+        setDadosPesquisa({ ...dadosPesquisa, setor: selected?.id ?? "" })
     };
 
     const handleItemChangeTipo = (selected: "Receita" | "Despesa" | null) => {
@@ -102,6 +103,7 @@ export default function Menu() {
         clsCrud
             .pesquisar({
                 entidade: "Account",
+                criterio: { userId: usuarioState.idUsuario },
                 campoOrder: ['name'],
             })
             .then((rs: Array<AccountInterface>) => {
@@ -111,6 +113,7 @@ export default function Menu() {
         clsCrud
             .pesquisar({
                 entidade: "Category",
+                criterio: { userId: usuarioState.idUsuario },
                 campoOrder: ['name'],
             })
             .then((rs: Array<CategoryInterface>) => {
@@ -119,7 +122,18 @@ export default function Menu() {
 
         clsCrud
             .pesquisar({
+                entidade: "Sector",
+                criterio: { userId: usuarioState.idUsuario },
+                campoOrder: ['name'],
+            })
+            .then((rs: Array<SectorInterface>) => {
+                setRsSetores(rs)
+            })
+
+        clsCrud
+            .pesquisar({
                 entidade: "Account",
+                criterio: { userId: usuarioState.idUsuario },
                 campoOrder: ['name'],
             })
             .then((rs: Array<AccountInterface>) => {
@@ -129,7 +143,7 @@ export default function Menu() {
         clsCrud
             .pesquisar({
                 entidade: "Account",
-                criterio: { isDefault: true },
+                criterio: { isDefault: true, userId: usuarioState.idUsuario },
                 select: ['id'],
             })
             .then((rs: any) => {
@@ -143,7 +157,7 @@ export default function Menu() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         BuscarDados()
-    }, []);
+    }, [layoutState]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
@@ -242,7 +256,6 @@ export default function Menu() {
                         campoDescricao='name'
                         mensagemPadraoCampoEmBranco='Escolha uma categoria'
                         onChange={handleItemChangeCategory}
-                        valorPadraoCampoEmBranco={SetorType.Malharia}
                     />
                 </Box>
                 <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
@@ -266,15 +279,14 @@ export default function Menu() {
                         label='Setor'
                         corFundo='#010108'
                         corFonte={"#fff"}
-                        opcoes={SetorTypes}
+                        opcoes={rsSetores}
                         field='setor'
                         setState={setDadosPesquisa}
                         dados={dadosPesquisa}
-                        campoID='idSetorType'
-                        campoDescricao='descricao'
+                        campoID='id'
+                        campoDescricao='name'
                         mensagemPadraoCampoEmBranco='Escolha o setor'
                         onChange={handleItemChangeSetor}
-                        valorPadraoCampoEmBranco={SetorType.Malharia}
                     />
                 </Box>
                 <Offset />

@@ -6,6 +6,7 @@ import Account from './entity/account'
 import Category from './entity/category'
 import Company from './entity/company'
 import Transaction from './entity/transaction'
+import Sector from './entity/sector'
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -23,7 +24,8 @@ export const AppDataSource = new DataSource({
     Account,
     Category,
     Company,
-    Transaction
+    Transaction,
+    Sector
   ],// ./entity/**'
   migrations: [],
   subscribers: [],

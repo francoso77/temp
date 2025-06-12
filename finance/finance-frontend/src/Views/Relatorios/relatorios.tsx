@@ -25,16 +25,15 @@ interface DadosCardInterface {
 }
 
 export interface TransactionSelectInterface {
-  id: number;
   date: string | Date; // Pode ser string se vier do banco como ISO ou Date se já for convertido
   amount: number;
-  setor: string;
-  type: string;
   description: string;
+  userId: string;
   category: {
     id: string;
     name: string;
     color: string;
+    type: string;
   };
   account: {
     id: string;
@@ -42,6 +41,10 @@ export interface TransactionSelectInterface {
     initialBalance: number;
   };
   company: {
+    id: string;
+    name: string;
+  };
+  sector: {
     id: string;
     name: string;
   };
@@ -69,7 +72,6 @@ export function Relatorios() {
     const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
-    const setor = layoutState.setor ? layoutState.setor : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
     const groupedLinCol = new Map<string, DataPoint>()
     const groupedCategory = new Map<string, CategoryDataPoint>()
@@ -84,8 +86,8 @@ export function Relatorios() {
       dtFinal,
       conta,
       categoria,
-      setor,
-      tipo
+      tipo,
+      idUsuario: usuarioState.idUsuario
     }).then((rs: Array<TransactionSelectInterface>) => {
       if (rs.length > 0) {
         let somaReceitas = 0;
@@ -93,7 +95,7 @@ export function Relatorios() {
 
         rs.forEach((x) => {
           const amount = x.amount ?? 0;
-          const type = x.type ?? '';
+          const type = x.category?.type ?? '';
 
           if (type === 'Receita') {
             somaReceitas += amount;
@@ -120,7 +122,7 @@ export function Relatorios() {
 
       rs.forEach((x) => {
         const amount = x.amount ?? 0;
-        const type = x.type;
+        const type = x.category?.type;
         const category = x.category;
         const date = x.date;
 
@@ -163,6 +165,9 @@ export function Relatorios() {
 
     const rsCategorys = await clsCrud.pesquisar({
       entidade: 'Category',
+      criterio: {
+        userId: usuarioState.emailUsuario
+      },
       campoOrder: ['name'],
     })
 
@@ -170,6 +175,9 @@ export function Relatorios() {
 
     const rsCompanys = await clsCrud.pesquisar({
       entidade: 'Company',
+      criterio: {
+        userId: usuarioState.emailUsuario
+      },
       campoOrder: ['name'],
     })
 
@@ -177,6 +185,9 @@ export function Relatorios() {
 
     const rsAccounts = await clsCrud.pesquisar({
       entidade: 'Account',
+      criterio: {
+        userId: usuarioState.emailUsuario
+      },
       campoOrder: ['name'],
     })
 
@@ -231,7 +242,7 @@ export function Relatorios() {
     const rows = rsPesquisa.map((t) => {
       const date = new Date(t.date).toLocaleDateString("pt-BR");
       const category = categorys.find((c) => c.id === t.category.id)?.name || "Sem categoria";
-      const type = t.type;
+      const type = t.category?.type;
       const valor = formatCurrency(t.amount);
       return [date, t.description, category, type, valor];
     });
@@ -278,7 +289,7 @@ export function Relatorios() {
       const description = (t.description || "").replace(/"/g, '""');
       const company = (companys.find((c) => c.id === t.company?.id)?.name || "Sem empresa").replace(/"/g, '""');
       const category = (categorys.find((c) => c.id === t.category?.id)?.name || "Sem categoria").replace(/"/g, '""');
-      const type = t.type === "Receita" ? "Receita" : "Despesa";
+      const type = t.category?.type === "Receita" ? "Receita" : "Despesa";
       const amount = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
@@ -320,7 +331,7 @@ export function Relatorios() {
         .replace(/</g, "&lt;").replace(/>/g, "&gt;");
       const category = (categorys.find((c) => c.id === t.category?.id)?.name || "Sem categoria")
         .replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const type = t.type === "Receita" ? "Receita" : "Despesa";
+      const type = t.category?.type === "Receita" ? "Receita" : "Despesa";
       const amount = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",

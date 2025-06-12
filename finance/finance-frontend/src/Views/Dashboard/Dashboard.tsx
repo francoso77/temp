@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Chip, Grid, Typography } from '@mui/material';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import InfoCard from '../../Componentes/InfoCard';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -16,7 +16,6 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { ResetTransaction } from '../Transacoes/transacoes';
 import ClsApi from '../../Utils/ClsApi';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import { TransacoesFicha } from '../Transacoes/transacoesFicha';
@@ -29,6 +28,7 @@ interface DadosCardInterface {
   transacoes: number;
 }
 
+
 export default function Dashboard() {
 
 
@@ -36,11 +36,24 @@ export default function Dashboard() {
   const clsCrud = useMemo(() => new ClsCrud(), []);
   const clsApi = useMemo(() => new ClsApi(), []);
 
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+
+  const ResetTransaction: TransactionInterface = {
+
+    date: '',
+    amount: 0,
+    description: '',
+    userId: '',
+    categoryId: '',
+    accountId: layoutState.contaPadrao ?? '',
+    companyId: '',
+    sectorId: '',
+  }
+
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
   const [transacoes, setTransacoes] = useState<TransactionInterface>(ResetTransaction);
   const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
-  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface;
   const [dadosCard, setDadosCard] = useState<DadosCardInterface>({ saldo: 0, receitas: 0, despesas: 0, transacoes: 0 });
   const [dataPoints, setDataPoints] = useState<Array<DataPoint>>([]);
   const [categoryData, setCategoryData] = useState<CategoryDataPoint[]>([]);
@@ -62,38 +75,45 @@ export default function Dashboard() {
     {
       cabecalho: 'Setor',
       alinhamento: 'center',
-      campo: 'setor',
+      campo: 'sector',
+      format: (_v, rs: any) => rs.sector.name
     },
     {
       cabecalho: 'Empresa',
       alinhamento: 'center',
-      campo: 'company',
+      campo: 'companyId',
       format: (_v, rs: any) => rs.company.name
     },
     {
       cabecalho: 'Categoria',
       alinhamento: 'center',
-      campo: 'category',
+      campo: 'categoryId',
       format: (_v, rs: any) => rs.category.name
     },
     {
-      campo: 'type',
+      campo: 'categoryId',
       cabecalho: 'Tipo',
       alinhamento: 'center',
-      chipColor: (valor) => {
-        switch (valor) {
-          case 'Receita': return 'success';
-          case 'Despesa': return 'error';
-          default: return 'default';
-        }
+      render: (_valor: number, row: any) => {
+        const type = row?.category?.type;
+        const isReceita = type === 'Receita';
+
+        return (
+          <Chip
+            label={type}
+            color={isReceita ? 'success' : 'error'}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
       },
     },
     {
       campo: 'amount',
       cabecalho: 'Valor',
       alinhamento: 'right',
-      render: (valor: number, row: TransactionInterface) => {
-        const isReceita = row.type === 'Receita'
+      render: (valor: number, row: any) => {
+        const isReceita = row?.category?.type === 'Receita'
         return (
           <span
             style={{
@@ -153,6 +173,7 @@ export default function Dashboard() {
         entidade: "Transaction",
         criterio: {
           id: id,
+          idUsuario: usuarioState.idUsuario
         },
       })
       .then((rs: Array<TransactionInterface>) => {
@@ -168,7 +189,6 @@ export default function Dashboard() {
     const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
-    const setor = layoutState.setor ? layoutState.setor : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
     const groupedLinCol = new Map<string, DataPoint>()
     const groupedCategory = new Map<string, CategoryDataPoint>()
@@ -183,16 +203,17 @@ export default function Dashboard() {
       dtFinal,
       conta,
       categoria,
-      setor,
-      tipo
-    }).then((rs: Array<any>) => {
+      tipo,
+      idUsuario: usuarioState.idUsuario
+    }).then((rs: Array<TransactionInterface>) => {
+
       if (rs.length > 0) {
         let somaReceitas = 0;
         let somaDespesas = 0;
 
         rs.forEach((x) => {
           const amount = x.amount ?? 0;
-          const type = x.type ?? '';
+          const type = x.category?.type ?? '';
 
           if (type === 'Receita') {
             somaReceitas += amount;
@@ -221,7 +242,7 @@ export default function Dashboard() {
 
       rs.forEach((x) => {
         const amount = x.amount ?? 0;
-        const type = x.type;
+        const type = x.category?.type;
         const category = x.category;
         const date = x.date;
 
