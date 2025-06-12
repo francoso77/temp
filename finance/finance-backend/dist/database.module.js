@@ -21,7 +21,7 @@ var DatabaseModule = /** @class */ (function () {
                     port: 3306,
                     username: 'root',
                     password: "Frk@071569#",
-                    //password: '071569',
+                    //password: '071569', //casa
                     database: 'finance',
                     synchronize: true,
                     autoLoadEntities: true, // importa automaticamente as entidades dos módulos

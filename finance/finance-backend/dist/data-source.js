@@ -15,7 +15,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     port: 3306,
     username: "root",
     password: "Frk@071569#",
-    //password: "071569",
+    //password: "071569", //casa
     database: "finance",
     synchronize: true,
     logging: false,
