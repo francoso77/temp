@@ -133,7 +133,6 @@ export function Setores() {
           <InputText
             label=""
             placeholder="Buscar setores..."
-            tipo="uppercase"
             dados={pesquisa}
             field="name"
             setState={setPesquisa}

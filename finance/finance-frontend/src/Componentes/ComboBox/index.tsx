@@ -188,7 +188,7 @@ export default function ComboBox<T>(
         clearOnEscape
         disabled={disabled}
         value={dados[field]}
-        disablePortal
+        //disablePortal
         id={id}
         onKeyDown={onKeyDown}
         getOptionLabel={(opcao) => {

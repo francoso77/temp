@@ -264,7 +264,6 @@ export function Contas() {
             <InputText
               label=""
               placeholder="Buscar contas..."
-              tipo="uppercase"
               dados={pesquisa}
               field="name"
               setState={setPesquisa}

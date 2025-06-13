@@ -168,7 +168,6 @@ export function Categorias() {
           <InputText
             label=""
             placeholder="Buscar categorias..."
-            tipo="uppercase"
             dados={pesquisa}
             field="name"
             setState={setPesquisa}

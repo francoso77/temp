@@ -133,7 +133,6 @@ export function Empresas() {
           <InputText
             label=""
             placeholder="Buscar empresas..."
-            tipo="uppercase"
             dados={pesquisa}
             field="name"
             setState={setPesquisa}

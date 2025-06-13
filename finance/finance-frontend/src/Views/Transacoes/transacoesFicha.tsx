@@ -172,7 +172,7 @@ export function TransacoesFicha(
 
   return (
     <>
-      <Dialog open={open} >
+      <Dialog open={open} fullWidth maxWidth="sm">
         <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a', }}>
           <TitleBar
             title="Nova Transação"
@@ -208,29 +208,13 @@ export function TransacoesFicha(
                   field="amount"
                   erros={erros}
                   dados={dados}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 3)}
                 />
               </Box>
             </Grid>
-            {/* <Grid item xs={12} sx={{ mt: -4 }}>
-              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
-                <ComboBox
-                  label='Tipo'
-                  corFundo='#050516'
-                  corFonte={"#fff"}
-                  opcoes={TipoTransactionTypes}
-                  field='type'
-                  setState={setDados}
-                  dados={dados}
-                  campoID='idTipoTransactionType'
-                  campoDescricao='descricao'
-                  mensagemPadraoCampoEmBranco='Escolha um tipo'
-                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                />
-              </Box>
-            </Grid> */}
             <Grid item xs={12} sx={{ mt: -4 }}>
-              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox
                   label='Setor'
                   corFundo='#050516'
@@ -242,29 +226,12 @@ export function TransacoesFicha(
                   campoID='id'
                   campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha o setor'
-                  onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
                 />
               </Box>
             </Grid>
-            {/* <Grid item xs={12} sx={{ mt: -1 }}>
-              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-                <ComboBox
-                  label='Conta'
-                  corFundo='#050516'
-                  corFonte={"#fff"}
-                  opcoes={rsContas}
-                  field='accountId'
-                  setState={setDados}
-                  dados={dados}
-                  campoID='id'
-                  campoDescricao='name'
-                  mensagemPadraoCampoEmBranco='Escolha uma conta'
-                  onKeyDown={(event: any) => btPulaCampo(event, 6)}
-                />
-              </Box>
-            </Grid> */}
             <Grid item xs={12} sx={{ mt: -1 }} >
-              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                 <ComboBox
                   label='Categoria'
                   corFundo='#050516'
@@ -276,12 +243,12 @@ export function TransacoesFicha(
                   campoID='id'
                   campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha uma categoria'
-                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 5)}
                 />
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -1 }}>
-              <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
+              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                 <ComboBox
                   label='Empresa'
                   corFundo='#050516'
@@ -293,12 +260,12 @@ export function TransacoesFicha(
                   campoID='id'
                   campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha uma empresa'
-                  onKeyDown={(event: any) => btPulaCampo(event, 8)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 6)}
                 />
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -3 }} >
-              <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
                 <InputText
                   type='tel'
                   tipo="date"
@@ -308,7 +275,7 @@ export function TransacoesFicha(
                   setState={setDados}
                   erros={erros}
                   onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 9)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
                 />
               </Box>
             </Grid>
@@ -342,7 +309,6 @@ export function TransacoesFicha(
           </CustomButton>
         </DialogActions>
       </Dialog>
-
     </>
   );
 }

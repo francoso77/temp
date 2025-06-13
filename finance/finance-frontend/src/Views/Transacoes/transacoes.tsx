@@ -43,6 +43,7 @@ export function Transacoes() {
   const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
   const clsCrud = new ClsCrud()
+  const [debouncedValue, setDebouncedValue] = useState("")
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -171,6 +172,38 @@ export function Transacoes() {
         }
       })
   }
+
+  const handleChange = (event: any) => {
+
+    const value = pesquisa.description.concat(event)
+    if (pesquisa.description === '') {
+      setPesquisa({ description: value })
+
+    } else {
+      setPesquisa({ description: event })
+    }
+
+  };
+  const onSearch = async (e: string) => {
+
+    clsCrud
+      .pesquisar({
+        entidade: "Transaction",
+        relations: ['company', 'category', 'sector', 'account'],
+        token: usuarioState.token,
+        criterio: {
+          description: "%".concat(e).concat("%"),
+          userId: usuarioState.idUsuario
+        },
+        camposLike: ["description"],
+        select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
+        msg: 'Pesquisando transação ...',
+        setMensagemState: setMensagemState
+      })
+      .then((rs: Array<any>) => {
+        setRsPesquisa(rs)
+      })
+  }
   const btPesquisar = () => {
     clsCrud
       .pesquisar({
@@ -198,9 +231,24 @@ export function Transacoes() {
   }
 
   useEffect(() => {
-
     btPesquisar()
-  }, [])
+  }, [layoutState])
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(pesquisa.description);
+    }, 2); // Adicionando um atraso de 500ms
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [pesquisa.description]);
+
+  useEffect(() => {
+    if (debouncedValue) {
+      onSearch(debouncedValue);
+    }
+  }, [debouncedValue, onSearch]);
 
   return (
     <>
@@ -212,7 +260,6 @@ export function Transacoes() {
           <InputText
             label=""
             placeholder="Buscar transações..."
-            tipo="uppercase"
             dados={pesquisa}
             field="description"
             setState={setPesquisa}
@@ -221,7 +268,7 @@ export function Transacoes() {
             mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
             autoFocus
             width={'100%'}
-
+            onChange={(e) => handleChange(e)}
           />
         </Grid>
         <Grid item xs={5}>
