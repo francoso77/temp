@@ -130,7 +130,10 @@ export function Contas() {
           if (resposta) {
             clsCrud.excluir({
               entidade: "Account",
-              criterio: { id: id },
+              criterio: {
+                id: id,
+                userId: usuarioState.idUsuario
+              },
               setMensagemState: setMensagemState,
               token: usuarioState.token,
               msg: 'Excluindo conta ...',
@@ -151,6 +154,7 @@ export function Contas() {
         entidade: "Account",
         criterio: {
           id: id,
+          userId: usuarioState.idUsuario
         },
       })
       .then((rs: Array<AccountInterface>) => {

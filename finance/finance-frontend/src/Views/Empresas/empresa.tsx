@@ -63,7 +63,10 @@ export function Empresas() {
           if (resposta) {
             clsCrud.excluir({
               entidade: "Company",
-              criterio: { id: id },
+              criterio: {
+                id: id,
+                userId: usuarioState.idUsuario
+              },
               setMensagemState: setMensagemState,
               token: usuarioState.token,
               msg: 'Excluindo empresa ...',
@@ -84,6 +87,7 @@ export function Empresas() {
         entidade: "Company",
         criterio: {
           id: id,
+          userId: usuarioState.idUsuario
         },
       })
       .then((rs: Array<CompanyInterface>) => {

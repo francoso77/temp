@@ -152,7 +152,10 @@ export default function Dashboard() {
           if (resposta) {
             clsCrud.excluir({
               entidade: "Transaction",
-              criterio: { id: id },
+              criterio: {
+                id: id,
+                userId: usuarioState.idUsuario
+              },
               setMensagemState: setMensagemState,
               token: usuarioState.token,
               msg: 'Excluindo transação ...',
@@ -289,7 +292,7 @@ export default function Dashboard() {
     if (layoutState.contaPadrao !== "") {
       buscarDados()
     }
-  }, [layoutState])
+  }, [layoutState.contaPadrao])
 
   return (
     <div>

@@ -157,11 +157,7 @@ export default function Menu() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         BuscarDados()
-    }, [layoutState]);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-    }, [dadosPesquisa]);
+    }, [layoutState, dadosPesquisa]);
 
     return (
         <>

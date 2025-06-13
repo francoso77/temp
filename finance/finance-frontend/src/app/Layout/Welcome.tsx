@@ -86,7 +86,7 @@ export function Welcome() {
           <CustomButton
             bgColor="#8280d8"
             textColor="black"
-            href="/registrar"
+            href="/login"
             icon={<ArrowForwardIosIcon />}
             iconPosition='end'
             sx={{ fontSize: 20 }}

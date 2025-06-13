@@ -98,7 +98,10 @@ export function Categorias() {
           if (resposta) {
             clsCrud.excluir({
               entidade: "Category",
-              criterio: { id: id },
+              criterio: {
+                id: id,
+                userId: usuarioState.idUsuario
+              },
               setMensagemState: setMensagemState,
               token: usuarioState.token,
               msg: 'Excluindo categoria ...',
@@ -119,6 +122,7 @@ export function Categorias() {
         entidade: "Category",
         criterio: {
           id: id,
+          userId: usuarioState.idUsuario
         },
       })
       .then((rs: Array<CategoryInterface>) => {

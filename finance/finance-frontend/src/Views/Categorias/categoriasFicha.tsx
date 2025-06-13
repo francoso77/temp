@@ -12,12 +12,8 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { ResetCategory } from './categorias';
+import { SetorTypes } from '../../types/setorTypes';
 
-
-interface tiposInterface {
-  id: string;
-  name: string;
-}
 
 interface PropsInterface {
   open: boolean,
@@ -47,12 +43,6 @@ export function CategoriasFicha({ open, setOpen, btPesquisar, categoria, localSt
       }
     }
   }
-
-
-  const [tipos] = useState<tiposInterface[]>([
-    { id: 'Despesa', name: 'Despesa' },
-    { id: 'Receita', name: 'Receita' },
-  ])
 
   const handleClose = () => {
     btPesquisar && btPesquisar()
@@ -140,12 +130,12 @@ export function CategoriasFicha({ open, setOpen, btPesquisar, categoria, localSt
                   label='Tipo'
                   corFundo='#050516'
                   corFonte={localState?.action === actionTypes.excluindo ? '#c96a6a' : "#fff"}
-                  opcoes={tipos}
+                  opcoes={SetorTypes}
                   field='type'
                   setState={setDados}
                   dados={dados}
-                  campoID='id'
-                  campoDescricao='name'
+                  campoID='idTipoTransactionType'
+                  campoDescricao='descricao'
                   mensagemPadraoCampoEmBranco='Escolha um Tipo'
                   disabled={localState?.action === actionTypes.excluindo ? true : false}
                 />

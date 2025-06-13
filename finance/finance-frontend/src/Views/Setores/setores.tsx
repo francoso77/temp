@@ -63,7 +63,10 @@ export function Setores() {
           if (resposta) {
             clsCrud.excluir({
               entidade: "Setor",
-              criterio: { id: id },
+              criterio: {
+                id: id,
+                userId: usuarioState.idUsuario
+              },
               setMensagemState: setMensagemState,
               token: usuarioState.token,
               msg: 'Excluindo setor ...',
@@ -84,6 +87,7 @@ export function Setores() {
         entidade: "Sector",
         criterio: {
           id: id,
+          userId: usuarioState.idUsuario
         },
       })
       .then((rs: Array<SectorInterface>) => {

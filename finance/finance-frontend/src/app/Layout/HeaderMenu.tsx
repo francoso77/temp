@@ -71,8 +71,7 @@ export default function HeaderMenu() {
     }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
+  const BuscarDados = () => {
     clsCrud
       .pesquisar({
         entidade: "Account",
@@ -82,7 +81,11 @@ export default function HeaderMenu() {
       .then((rs: Array<AccountInterface>) => {
         setRsContas(rs)
       })
-  }, []);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    BuscarDados()
+  }, [layoutState]);
 
   const handleItemChange = (selected: AccountInterface | null) => {
     setLayoutState({ ...layoutState, contaPadrao: selected?.id });
@@ -98,10 +101,6 @@ export default function HeaderMenu() {
     navegar('/registrar')
     setLayoutState({ ...layoutState, titulo: 'Perfil', pathTitulo: '/registrar' })
   }
-
-  useEffect(() => {
-    setLayoutState({ ...layoutState, contaPadrao: layoutState.contaPadrao });
-  }, [layoutState]);
 
 
   return (
