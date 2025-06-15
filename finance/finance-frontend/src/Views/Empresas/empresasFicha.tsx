@@ -10,7 +10,7 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { ResetCompany } from './empresa';
-
+import { iconMap } from '../../Utils/IconsMenuFooter';
 
 
 interface PropsInterface {
@@ -82,13 +82,13 @@ export function EmpresasFicha({ open, setOpen, btPesquisar, empresa, localState 
   return (
     <>
       <Dialog open={open} >
-        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a', }}>
+        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
           <TitleBar
+            icon={iconMap["FactoryIcon"]}
             title="Cadastro de Empresas"
             onClose={handleClose}
             textColor='#fff'
             backgroundColor='#050516'
-            fontSize='1.75rem'
           />
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>

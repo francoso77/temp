@@ -12,7 +12,9 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { ResetCategory } from './categorias';
-import { SetorTypes } from '../../types/setorTypes';
+import { TipoTransactionTypes } from '../../types/tipoTransactionTypes';
+import { iconMap } from '../../Utils/IconsMenuFooter';
+
 
 
 interface PropsInterface {
@@ -97,13 +99,13 @@ export function CategoriasFicha({ open, setOpen, btPesquisar, categoria, localSt
   return (
     <>
       <Dialog open={open} >
-        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a', }}>
+        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
           <TitleBar
+            icon={iconMap["CategoryIcon"]}
             title="Cadastro de Categorias"
             onClose={handleClose}
             textColor='#fff'
             backgroundColor='#050516'
-            fontSize='1.75rem'
           />
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>
@@ -130,13 +132,15 @@ export function CategoriasFicha({ open, setOpen, btPesquisar, categoria, localSt
                   label='Tipo'
                   corFundo='#050516'
                   corFonte={localState?.action === actionTypes.excluindo ? '#c96a6a' : "#fff"}
-                  opcoes={SetorTypes}
+                  opcoes={TipoTransactionTypes}
                   field='type'
                   setState={setDados}
                   dados={dados}
                   campoID='idTipoTransactionType'
                   campoDescricao='descricao'
                   mensagemPadraoCampoEmBranco='Escolha um Tipo'
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
                   disabled={localState?.action === actionTypes.excluindo ? true : false}
                 />
               </Box>

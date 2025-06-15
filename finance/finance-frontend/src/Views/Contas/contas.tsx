@@ -199,17 +199,19 @@ export function Contas() {
   const ApuraSaldo = async (id: string): Promise<number> => {
     const rs = await clsCrud.pesquisar({
       entidade: "Transaction",
+      relations: ['company', 'category', 'sector', 'account'],
       criterio: {
         accountId: id,
-        userId: usuarioState.emailUsuario
+        userId: usuarioState.idUsuario
       },
+      select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
     });
 
     let receitas = 0;
     let despesas = 0;
 
     rs?.forEach((item) => {
-      if (item.type === 'Receita') {
+      if (item.category?.type === 'Receita') {
         receitas += item.amount;
       } else {
         despesas += item.amount;

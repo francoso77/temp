@@ -32,7 +32,8 @@ export class OutController {
     @Body('conta') conta?: string,
     @Body('dtInicial') dtInicial?: string,
     @Body('dtFinal') dtFinal?: string,
-    @Body('idUsuario') idUsuario?: string
+    @Body('idUsuario') idUsuario?: string,
+    @Body('tipo') tipo?: string
   ): Promise<any[]> {
 
 
@@ -66,6 +67,10 @@ export class OutController {
         start: dtInicial,
         end: dtFinal,
       });
+    }
+
+    if (tipo) {
+      query.andWhere('category.type = :tipoParam', { tipoParam: tipo });
     }
 
     if (setor) {

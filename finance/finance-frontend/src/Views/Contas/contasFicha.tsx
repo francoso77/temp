@@ -16,7 +16,7 @@ import { CurrencyTextField } from '../../Componentes/InputCurrency';
 import { CustomCheckbox } from '../../Componentes/CustomCheckbox';
 import { ResetAccount } from './contas';
 import { AccountTypes } from '../../types/accountTypes';
-import { useNavigate } from 'react-router-dom';
+import { iconMap } from '../../Utils/IconsMenuFooter';
 
 
 interface PropsInterface {
@@ -36,7 +36,6 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
   const [dados, setDados] = useState<AccountInterface>(ResetAccount);
   const validaCampo: ClsValidacao = new ClsValidacao()
   const { setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
-  const irPara = useNavigate()
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -165,13 +164,13 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
   return (
     <>
       <Dialog open={open} >
-        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a', }}>
+        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
           <TitleBar
+            icon={iconMap["AccountBalanceIcon"]}
             title="Cadastro de Contas"
             onClose={handleClose}
             textColor='#fff'
             backgroundColor='#050516'
-            fontSize='1.75rem'
           />
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>

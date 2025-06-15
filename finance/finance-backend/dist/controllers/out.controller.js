@@ -77,7 +77,7 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario) {
+    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario, tipo) {
         return __awaiter(this, void 0, void 0, function () {
             var query, transacoes, accountRepo, account;
             return __generator(this, function (_a) {
@@ -112,6 +112,9 @@ var OutController = /** @class */ (function () {
                                 start: dtInicial,
                                 end: dtFinal,
                             });
+                        }
+                        if (tipo) {
+                            query.andWhere('category.type = :tipoParam', { tipoParam: tipo });
                         }
                         if (setor) {
                             query.andWhere('t.sectorId = :setorParam', { setorParam: setor });
@@ -172,8 +175,9 @@ var OutController = /** @class */ (function () {
         __param(3, (0, common_1.Body)('dtInicial')),
         __param(4, (0, common_1.Body)('dtFinal')),
         __param(5, (0, common_1.Body)('idUsuario')),
+        __param(6, (0, common_1.Body)('tipo')),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String, String, String, String, String, String]),
+        __metadata("design:paramtypes", [String, String, String, String, String, String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "selecaoTransacoes", null);
     OutController = __decorate([

@@ -94,9 +94,15 @@ export default function Menu() {
         setDadosPesquisa({ ...dadosPesquisa, setor: selected?.id ?? "" })
     };
 
-    const handleItemChangeTipo = (selected: "Receita" | "Despesa" | null) => {
-        updateLayoutState("type", selected);
-        setDadosPesquisa({ ...dadosPesquisa, tipo: selected ?? "" })
+    interface TipoTransactionOption {
+        idTipoTransactionType: TipoTransactionType;
+        descricao: string;
+    }
+
+    const handleItemChangeTipo = (selected: TipoTransactionOption | null) => {
+
+        updateLayoutState("type", selected?.descricao ?? null);
+        setDadosPesquisa({ ...dadosPesquisa, tipo: selected?.descricao ?? "" })
     };
 
     const BuscarDados = () => {
@@ -251,6 +257,7 @@ export default function Menu() {
                         campoID='id'
                         campoDescricao='name'
                         mensagemPadraoCampoEmBranco='Escolha uma categoria'
+                        onFocus={(e) => e.target.select()}
                         onChange={handleItemChangeCategory}
                     />
                 </Box>
@@ -267,7 +274,7 @@ export default function Menu() {
                         campoDescricao='descricao'
                         mensagemPadraoCampoEmBranco='Escolha um tipo'
                         onChange={handleItemChangeTipo}
-                        valorPadraoCampoEmBranco={TipoTransactionType.Receita}
+                        onFocus={(e) => e.target.select()}
                     />
                 </Box>
                 <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
@@ -282,6 +289,7 @@ export default function Menu() {
                         campoID='id'
                         campoDescricao='name'
                         mensagemPadraoCampoEmBranco='Escolha o setor'
+                        onFocus={(e) => e.target.select()}
                         onChange={handleItemChangeSetor}
                     />
                 </Box>

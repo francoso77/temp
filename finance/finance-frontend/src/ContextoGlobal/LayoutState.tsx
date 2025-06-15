@@ -11,7 +11,7 @@ export interface LayoutStateInterface {
   dataFim?: string | null
   accountId?: string | null
   categoryId?: string | null
-  type?: 'Receita' | 'Despesa' | null;
+  type?: string | null;
   sectorId?: string | null
 }
 

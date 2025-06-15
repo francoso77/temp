@@ -288,6 +288,9 @@ export default function Login() {
                   <Grid item xs={12} sx={{ textAlign: "center", mt: 1.5, mb: 2 }}>
                     <Link href="/forgot-password" >Esqueci a senha</Link>
                   </Grid>
+                  <Grid item xs={12} sx={{ textAlign: "center", mt: 1.5, mb: 2 }}>
+                    <Link href="/registrar" >Registrar-me</Link>
+                  </Grid>
                 </Grid>
                 <Copyright />
               </Box>

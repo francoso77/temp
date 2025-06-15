@@ -166,7 +166,7 @@ export function Relatorios() {
     const rsCategorys = await clsCrud.pesquisar({
       entidade: 'Category',
       criterio: {
-        userId: usuarioState.emailUsuario
+        userId: usuarioState.idUsuario
       },
       campoOrder: ['name'],
     })
@@ -176,7 +176,7 @@ export function Relatorios() {
     const rsCompanys = await clsCrud.pesquisar({
       entidade: 'Company',
       criterio: {
-        userId: usuarioState.emailUsuario
+        userId: usuarioState.idUsuario
       },
       campoOrder: ['name'],
     })
@@ -186,7 +186,7 @@ export function Relatorios() {
     const rsAccounts = await clsCrud.pesquisar({
       entidade: 'Account',
       criterio: {
-        userId: usuarioState.emailUsuario
+        userId: usuarioState.idUsuario
       },
       campoOrder: ['name'],
     })

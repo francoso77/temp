@@ -24,8 +24,8 @@ interface PropsInterface {
   token?: string
   conta?: string
   categoria?: string
-  setor?: 'Dublagem' | 'Malharia'
-  tipo?: 'Receita' | 'Despesa'
+  setor?: string
+  tipo?: string
   email?: string
   newPassword?: string
 }

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, Icon, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+
 
 interface TitleBarProps {
   title: string;
@@ -10,6 +11,7 @@ interface TitleBarProps {
   textColor?: string;
   fontSize?: string;
   textAlign?: 'left' | 'center' | 'right'; // restringe valores válidos
+  icon?: React.ReactNode;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -18,8 +20,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
   onClose,
   backgroundColor = '#1976d2',
   textColor = '#fff',
-  fontSize = '1rem',
-  textAlign = 'left'
+  fontSize = '1.2rem',
+  textAlign = 'left',
+  icon
 }) => {
   const renderTitle = () => {
     return (
@@ -53,6 +56,11 @@ const TitleBar: React.FC<TitleBarProps> = ({
         padding: '8px 16px'
       }}
     >
+      <Icon sx={{ color: textColor, marginRight: '10px' }} >
+        <Box >
+          {icon}
+        </Box>
+      </Icon>
       <Box sx={{ flex: 1, textAlign }}>
         {renderTitle()}
       </Box>

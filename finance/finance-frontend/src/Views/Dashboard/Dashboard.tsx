@@ -135,6 +135,7 @@ export default function Dashboard() {
     pesquisarID(id).then((rs) => {
       setTransacoes(rs)
       setLocalState({ action: actionTypes.editando })
+      buscarDados()
     })
     setOpen(true)
   }
@@ -176,12 +177,14 @@ export default function Dashboard() {
         entidade: "Transaction",
         criterio: {
           id: id,
-          idUsuario: usuarioState.idUsuario
+          userId: usuarioState.idUsuario
         },
       })
       .then((rs: Array<TransactionInterface>) => {
+        let dt: string = clsFormatacao.dataISOtoUser(rs[0].date)
         return {
           ...rs[0],
+          date: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
         }
       })
   }
@@ -292,7 +295,7 @@ export default function Dashboard() {
     if (layoutState.contaPadrao !== "") {
       buscarDados()
     }
-  }, [layoutState.contaPadrao])
+  }, [layoutState])
 
   return (
     <div>

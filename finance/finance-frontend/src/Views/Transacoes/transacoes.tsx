@@ -161,7 +161,7 @@ export function Transacoes() {
         entidade: "Transaction",
         criterio: {
           id: id,
-          idUsuario: usuarioState.idUsuario,
+          userId: usuarioState.idUsuario,
         },
       })
       .then((rs: Array<TransactionInterface>) => {

@@ -231,7 +231,6 @@ export default function Registrar() {
                       field="name"
                       erros={erros}
                       type="text"
-                      tipo='uppercase'
                       onKeyDown={(event: any) => btPulaCampo(event, 2)}
                       corFonte='#fff'
                     />

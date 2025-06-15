@@ -14,6 +14,8 @@ import { TransactionInterface } from '../../../../finance-backend/src/interfaces
 import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
 import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
+import { iconMap } from '../../Utils/IconsMenuFooter';
+
 
 interface PropsInterface {
   open: boolean,
@@ -173,13 +175,13 @@ export function TransacoesFicha(
   return (
     <>
       <Dialog open={open} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a', }}>
+        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
           <TitleBar
+            icon={iconMap["SyncAltIcon"]}
             title="Nova Transação"
             onClose={handleClose}
             textColor='#fff'
             backgroundColor='#050516'
-            fontSize='1.75rem'
           />
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>
@@ -226,6 +228,8 @@ export function TransacoesFicha(
                   campoID='id'
                   campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha o setor'
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 4)}
                 />
               </Box>
@@ -243,6 +247,8 @@ export function TransacoesFicha(
                   campoID='id'
                   campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha uma categoria'
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 5)}
                 />
               </Box>
@@ -260,6 +266,8 @@ export function TransacoesFicha(
                   campoID='id'
                   campoDescricao='name'
                   mensagemPadraoCampoEmBranco='Escolha uma empresa'
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 6)}
                 />
               </Box>

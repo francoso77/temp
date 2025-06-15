@@ -1,4 +1,4 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, Icon } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import InputText from '../../Componentes/InputText';
@@ -10,6 +10,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
 import { ResetSetor } from './setores';
+import { iconMap } from '../../Utils/IconsMenuFooter';
 
 
 interface PropsInterface {
@@ -81,13 +82,13 @@ export function SetoresFicha({ open, setOpen, btPesquisar, setor, localState }: 
   return (
     <>
       <Dialog open={open} >
-        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a', }}>
+        <DialogTitle sx={{ bgcolor: '#050516', border: '1px solid #3a3a3a' }}>
           <TitleBar
+            icon={iconMap["SourceTwoToneIcon"]}
             title="Cadastro de Setores"
             onClose={handleClose}
             textColor='#fff'
             backgroundColor='#050516'
-            fontSize='1.75rem'
           />
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#050516', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a', }}>
