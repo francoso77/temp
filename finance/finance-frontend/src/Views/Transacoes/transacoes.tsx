@@ -27,6 +27,8 @@ export function Transacoes() {
 
     date: '',
     amount: 0,
+    qtd: 0,
+    price: 0,
     description: '',
     userId: '',
     categoryId: '',
@@ -117,6 +119,7 @@ export function Transacoes() {
   ]
 
   const onEditar = (id: string | number) => {
+
     pesquisarID(id).then((rs) => {
       setTransacoes(rs)
       setLocalState({ action: actionTypes.editando })

@@ -51,7 +51,7 @@ export function EmpresasFicha({ open, setOpen, btPesquisar, empresa, localState 
       return
     }
 
-    dados.userId = usuarioState.idUsuario
+    if (!dados.userId) dados.userId = usuarioState?.idUsuario || ''
 
     clsCrud.incluir({
       entidade: 'Company',

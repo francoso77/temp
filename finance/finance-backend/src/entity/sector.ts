@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, Primary
 import { User } from './sistema/user';
 import { SectorInterface } from '../interfaces/sector';
 
-@Index(['name'], { unique: true })
+@Index(['userId', 'name'], { unique: true })
 @Entity({ name: 'sectors' })
 export default class Sector implements SectorInterface {
   @PrimaryColumn({ generated: 'uuid' })
@@ -17,7 +17,7 @@ export default class Sector implements SectorInterface {
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   userId: string
 
   @JoinColumn({ name: 'userId' })

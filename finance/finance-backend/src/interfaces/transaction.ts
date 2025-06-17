@@ -7,6 +7,8 @@ export interface TransactionInterface {
   id?: string
   description: string
   amount: number
+  qtd: number
+  price: number
   categoryId: string
   accountId: string
   companyId: string

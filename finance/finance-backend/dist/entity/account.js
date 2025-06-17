@@ -47,7 +47,7 @@ var Account = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Account.prototype, "updateAt", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", String)
     ], Account.prototype, "userId", void 0);
     __decorate([

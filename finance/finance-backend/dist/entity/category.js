@@ -40,7 +40,7 @@ var Category = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Category.prototype, "updateAt", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", String)
     ], Category.prototype, "userId", void 0);
     __decorate([
@@ -49,6 +49,7 @@ var Category = /** @class */ (function () {
         __metadata("design:type", user_1.User)
     ], Category.prototype, "user", void 0);
     Category = __decorate([
+        (0, typeorm_1.Index)(['userId', 'name'], { unique: true }),
         (0, typeorm_1.Entity)({ name: 'categorys' })
     ], Category);
     return Category;

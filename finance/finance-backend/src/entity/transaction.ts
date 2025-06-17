@@ -19,6 +19,12 @@ export default class Transaction implements TransactionInterface {
   @Column({ type: 'float', precision: 3 })
   amount: number;
 
+  @Column({ type: 'float', precision: 3 })
+  qtd: number
+
+  @Column({ type: 'float', precision: 3 })
+  price: number
+
   @Column()
   sectorId: string;
 
@@ -56,7 +62,7 @@ export default class Transaction implements TransactionInterface {
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   userId: string
 
   @JoinColumn({ name: 'userId' })

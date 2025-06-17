@@ -31,7 +31,7 @@ var Company = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Company.prototype, "updateAt", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", String)
     ], Company.prototype, "userId", void 0);
     __decorate([
@@ -40,7 +40,7 @@ var Company = /** @class */ (function () {
         __metadata("design:type", user_1.User)
     ], Company.prototype, "user", void 0);
     Company = __decorate([
-        (0, typeorm_1.Index)(['name'], { unique: true }),
+        (0, typeorm_1.Index)(['userId', 'name'], { unique: true }),
         (0, typeorm_1.Entity)({ name: 'companies' })
     ], Company);
     return Company;

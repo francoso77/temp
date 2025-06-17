@@ -158,7 +158,7 @@ export default function HeaderMenu() {
               sx={{
                 fontSize: isMobile ? '0.6rem' : '0.875rem',
                 py: isMobile ? 0 : 0.75,
-                px: isMobile ? 1 : 1
+                px: isMobile ? 0 : 0.75
               }}
 
             >

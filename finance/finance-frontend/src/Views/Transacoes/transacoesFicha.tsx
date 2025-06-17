@@ -15,6 +15,7 @@ import { CompanyInterface } from '../../../../finance-backend/src/interfaces/com
 import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
 import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
 import { iconMap } from '../../Utils/IconsMenuFooter';
+import Condicional from '../../Componentes/Condicional/Condicional';
 
 
 interface PropsInterface {
@@ -40,6 +41,8 @@ export function TransacoesFicha(
 
     date: '',
     amount: 0,
+    qtd: 0,
+    price: 0,
     description: '',
     userId: '',
     categoryId: '',
@@ -57,12 +60,12 @@ export function TransacoesFicha(
   const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
   const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
-
-
+  const [temReceita, setTemReceita] = useState(false)
   const handleClose = () => {
     btPesquisar && btPesquisar()
     setDados(ResetTransaction)
     setOpen(false)
+    setTemReceita(false)
   }
 
   const validarDados = () => {
@@ -75,6 +78,8 @@ export function TransacoesFicha(
     retorno = validaCampo.naoVazio('categoryId', dados, erros, retorno, 'Selecione uma categoria')
     retorno = validaCampo.naoVazio('amount', dados, erros, retorno, 'Forneça um valor valido')
     retorno = validaCampo.eData('date', dados, erros, retorno)
+    retorno = temReceita ? validaCampo.naoVazio('price', dados, erros, retorno, 'Forneça um valor válido') : true
+    retorno = temReceita ? validaCampo.naoVazio('qtd', dados, erros, retorno, 'Forneça um valor válido') : true
 
     setErros(erros)
     return retorno
@@ -112,6 +117,7 @@ export function TransacoesFicha(
   };
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+
     if (event.key === 'Enter') {
       const nextField = fieldRefs.current[index];
       if (nextField) {
@@ -162,15 +168,38 @@ export function TransacoesFicha(
 
   }
 
+  const HandleReceita = (name: string) => {
+
+    if (name) {
+      rsCategorias.find((c) => c.name === name)?.type === "Receita" ? setTemReceita(true) : setTemReceita(false)
+    }
+  }
   useEffect(() => {
     BuscarDados()
   }, []);
 
   useEffect(() => {
     if (transacao) {
+
+      setTemReceita(transacao.categoryId ? rsCategorias.find((c) => c.id === transacao.categoryId)?.type === "Receita" : false)
+
       setDados(transacao)
     }
   }, [transacao])
+
+  useEffect(() => {
+    if (temReceita) {
+      const qtd = Number(dados.qtd) || 0;
+      const price = Number(dados.price) || 0;
+      const amount = qtd * price;
+
+      setDados(prev => ({
+        ...prev,
+        amount: amount
+      }));
+    }
+  }, [dados.qtd, dados.price, temReceita]);
+
 
   return (
     <>
@@ -202,21 +231,8 @@ export function TransacoesFicha(
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sx={{ mt: -3 }}>
+            <Grid item xs={12} sx={{ mt: -1 }}>
               <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-                <CurrencyTextField
-                  label="Valor"
-                  setState={setDados}
-                  field="amount"
-                  erros={erros}
-                  dados={dados}
-                  onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} sx={{ mt: -4 }}>
-              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox
                   label='Setor'
                   corFundo='#050516'
@@ -230,12 +246,12 @@ export function TransacoesFicha(
                   mensagemPadraoCampoEmBranco='Escolha o setor'
                   erros={erros}
                   onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 3)}
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sx={{ mt: -1 }} >
-              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+            <Grid item xs={12} sx={{ mt: -1 }}>
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox
                   label='Categoria'
                   corFundo='#050516'
@@ -249,12 +265,75 @@ export function TransacoesFicha(
                   mensagemPadraoCampoEmBranco='Escolha uma categoria'
                   erros={erros}
                   onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                  onBlur={(e) => HandleReceita(e.target.value as string)} // opcional
+                  onKeyDown={(event: any) => {
+                    if (event.key === 'Enter') {
+                      HandleReceita(event.currentTarget.value as string);
+                      if (temReceita) {
+                        btPulaCampo(event, 4);
+                      } else {
+                        btPulaCampo(event, 6);
+                      }
+                    }
+                  }}
+                />
+              </Box>
+            </Grid>
+            <Condicional condicao={temReceita}>
+              <Grid item xs={6} sx={{ mt: -3 }}>
+                <Box
+                  sx={{ border: '1px solid #3a3a3a', borderRadius: '4px', p: 1, mt: 2 }}
+                  ref={(el: any) => (fieldRefs.current[4] = el)}>
+                  <InputText
+                    label="Quantidade"
+                    labelAlign='center'
+                    textAlign='center'
+                    setState={setDados}
+                    field="qtd"
+                    tipo='currency'
+                    erros={erros}
+                    dados={dados}
+                    onFocus={(e) => e.target.select()}
+                    disabled={temReceita ? false : true}
+                    onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={6} sx={{ mt: -3 }}>
+                <Box
+                  sx={{ border: '1px solid #3a3a3a', borderRadius: '4px', p: 1, mt: 2 }}
+                  ref={(el: any) => (fieldRefs.current[5] = el)}>
+                  <CurrencyTextField
+                    label="Valor Unitário"
+                    labelAlign='center'
+                    textAlign='center'
+                    setState={setDados}
+                    field="price"
+                    erros={erros}
+                    dados={dados}
+                    onFocus={(e) => e.target.select()}
+                    disabled={temReceita ? false : true}
+                    onKeyDown={(event: any) => btPulaCampo(event, 6)}
+                  />
+                </Box>
+              </Grid>
+            </Condicional>
+            <Grid item xs={12} sx={{ mt: -2 }} >
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                <CurrencyTextField
+                  label="Valor Total"
+                  setState={setDados}
+                  field="amount"
+                  erros={erros}
+                  dados={dados}
+                  onFocus={(e) => e.target.select()}
+                  disabled={temReceita ? true : false}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
                 />
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -1 }}>
-              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+              <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
                 <ComboBox
                   label='Empresa'
                   corFundo='#050516'
@@ -268,12 +347,12 @@ export function TransacoesFicha(
                   mensagemPadraoCampoEmBranco='Escolha uma empresa'
                   erros={erros}
                   onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 6)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 8)}
                 />
               </Box>
             </Grid>
             <Grid item xs={12} sx={{ mt: -3 }} >
-              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+              <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
                 <InputText
                   type='tel'
                   tipo="date"
@@ -283,7 +362,7 @@ export function TransacoesFicha(
                   setState={setDados}
                   erros={erros}
                   onFocus={(e) => e.target.select()}
-                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                  onKeyDown={(event: any) => btPulaCampo(event, 8)}
                 />
               </Box>
             </Grid>

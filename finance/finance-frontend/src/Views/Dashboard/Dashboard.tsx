@@ -42,6 +42,8 @@ export default function Dashboard() {
 
     date: '',
     amount: 0,
+    qtd: 0,
+    price: 0,
     description: '',
     userId: '',
     categoryId: '',
@@ -306,7 +308,7 @@ export default function Dashboard() {
             icone={<AttachMoneyIcon />}
             valor={dadosCard.saldo}
             formatoValor="moeda"
-            texto="Atualizado em tempo real"
+            texto="Atualização do saldo em tempo real"
             corFundo="#1309aa"
             corBorda="#3a3a3a"
             espessuraBorda={2}

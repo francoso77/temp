@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, Primary
 import { CompanyInterface } from '../interfaces/company';
 import { User } from './sistema/user';
 
-@Index(['name'], { unique: true })
+@Index(['userId', 'name'], { unique: true })
 @Entity({ name: 'companies' })
 export default class Company implements CompanyInterface {
   @PrimaryColumn({ generated: 'uuid' })
@@ -17,7 +17,7 @@ export default class Company implements CompanyInterface {
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   userId: string
 
   @JoinColumn({ name: 'userId' })

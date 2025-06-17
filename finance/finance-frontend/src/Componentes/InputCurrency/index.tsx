@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material";
 interface CurrencyTextFieldProps {
   posicaoLabel?: 'top' | 'bottom';
   labelAlign?: 'left' | 'right' | 'center';
+  textAlign?: 'left' | 'right' | 'center';
   tamanhoFonte?: number;
   corFonte?: string;
   label: string;
@@ -23,11 +24,13 @@ interface CurrencyTextFieldProps {
   textFieldProps?: TextFieldProps;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement> | undefined;
   onFocus?: (v: any) => void
+  disabled?: boolean
 }
 
 export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
   posicaoLabel = 'top',
   labelAlign = 'left',
+  textAlign = 'left',
   tamanhoFonte = 16,
   corFonte = '#ffffff',
   label,
@@ -42,7 +45,8 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
   },
   textFieldProps,
   onKeyDown,
-  onFocus
+  onFocus,
+  disabled = false,
 }) => {
   const [input, setInput] = useState<string>(() =>
     typeof dados[field] === 'number'
@@ -98,6 +102,7 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
       </Condicional>
       <TextField
         fullWidth
+        disabled={disabled}
         value={input}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -105,7 +110,7 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
         onFocus={onFocus}
         variant="outlined"
         error={hasError}
-        helperText={hasError ? erros[field] : ' '}
+        //helperText={hasError ? erros[field] : ' '}
         InputProps={{
           style: {
             color: colorConfig.fontColor,
@@ -119,8 +124,6 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
         }}
         size='small'
         sx={{
-          //width: '100%',
-
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderColor: colorConfig.borderColor,
@@ -137,9 +140,24 @@ export const CurrencyTextField: React.FC<CurrencyTextFieldProps> = ({
           '& .MuiFormHelperText-root': {
             color: hasError ? '#ff5252' : colorConfig.fontColor,
           },
+          // 🔽 Corrige cor do texto quando desabilitado
+          '& .Mui-disabled': {
+            WebkitTextFillColor: colorConfig.fontColor + ' !important',
+            opacity: 1,
+            color: colorConfig.fontColor + ' !important',
+            backgroundColor: colorConfig.backgroundColor,
+          },
+          '& .MuiInputBase-input': {
+            textAlign: textAlign,
+          },
         }}
         {...textFieldProps}
       />
+      <Condicional condicao={typeof erros[field] !== "undefined"}>
+        <Typography variant="caption" textAlign="left" color="warning.main">
+          {erros[field]}
+        </Typography>
+      </Condicional>
     </FormControl>
   );
 };

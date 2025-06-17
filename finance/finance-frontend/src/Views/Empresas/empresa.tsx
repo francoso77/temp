@@ -25,7 +25,6 @@ export const ResetCompany: CompanyInterface = {
 export function Empresas() {
 
   const [open, setOpen] = useState(false);
-
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [empresas, setEmpresas] = React.useState<CompanyInterface>(ResetCompany);
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
@@ -103,7 +102,7 @@ export function Empresas() {
           userId: usuarioState.idUsuario
         },
         camposLike: ["name"],
-        select: ["id", "name"],
+        select: ["id", "name", "userId"],
         msg: 'Pesquisando empresas ...',
         setMensagemState: setMensagemState
       })

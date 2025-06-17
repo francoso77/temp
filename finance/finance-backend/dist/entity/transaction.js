@@ -31,6 +31,14 @@ var Transaction = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Transaction.prototype, "amount", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ type: 'float', precision: 3 }),
+        __metadata("design:type", Number)
+    ], Transaction.prototype, "qtd", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: 'float', precision: 3 }),
+        __metadata("design:type", Number)
+    ], Transaction.prototype, "price", void 0);
+    __decorate([
         (0, typeorm_1.Column)(),
         __metadata("design:type", String)
     ], Transaction.prototype, "sectorId", void 0);
@@ -79,7 +87,7 @@ var Transaction = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Transaction.prototype, "updateAt", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", String)
     ], Transaction.prototype, "userId", void 0);
     __decorate([

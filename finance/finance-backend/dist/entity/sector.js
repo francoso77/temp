@@ -31,7 +31,7 @@ var Sector = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Sector.prototype, "updateAt", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", String)
     ], Sector.prototype, "userId", void 0);
     __decorate([
@@ -40,7 +40,7 @@ var Sector = /** @class */ (function () {
         __metadata("design:type", user_1.User)
     ], Sector.prototype, "user", void 0);
     Sector = __decorate([
-        (0, typeorm_1.Index)(['name'], { unique: true }),
+        (0, typeorm_1.Index)(['userId', 'name'], { unique: true }),
         (0, typeorm_1.Entity)({ name: 'sectors' })
     ], Sector);
     return Sector;

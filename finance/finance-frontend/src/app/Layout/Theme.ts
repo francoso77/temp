@@ -97,7 +97,7 @@ export const THEME = createTheme({
 
   },
   inputs: {
-    marginTop: 2,
+    marginTop: 1,
   },
   menu: {
     corIcone: CORES.azulEscuro
