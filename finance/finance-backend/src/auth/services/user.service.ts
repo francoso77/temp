@@ -1,11 +1,12 @@
 // user.service.ts
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as crypto from 'crypto';
 import { User } from '../../entity/sistema/user';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -72,4 +73,58 @@ export class UserService {
       '<b>Olá, seja bem-vindo ao nosso sistema!</b>',
     );
   }
+
+  async createUser(data: any): Promise<User> {
+    const user = new User();
+
+    user.name = data.name;
+    user.email = data.email;
+
+    // Criptografa a senha
+    //const salt = await bcrypt.genSalt();
+    //user.password = await bcrypt.hash(data.password, salt);
+
+    user.password = data.password;
+
+    user.termsAccepted = data.termsAccepted === 'true' || data.termsAccepted === true;
+    user.termsAcceptedAt = new Date();
+    user.profilePicture = data.profilePicture || null;
+    user.isActive = true;
+    user.tentativasLogin = 0;
+
+    return await this.userRepository.save(user);
+  }
+
+  // async updateUser(id: string, data: User): Promise<User> {
+  //   const user = await this.userRepository.findOne({ where: { id } });
+
+  //   if (!user) {
+  //     throw new NotFoundException('Usuário não encontrado');
+  //   }
+
+  //   if (data.password) {
+  //     const salt = await bcrypt.genSalt();
+  //     data.password = await bcrypt.hash(data.password, salt);
+  //   }
+
+  //   Object.assign(user, data);
+
+  //   return this.userRepository.save(user);
+  // }
+
+  async updateUser(id: string, data: Partial<User>): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    // Aqui você pode transformar a string em boolean se necessário
+    //data.termsAccepted = data.termsAccepted === 'true';
+
+    Object.assign(user, data);
+
+    return this.userRepository.save(user);
+  }
+
 }

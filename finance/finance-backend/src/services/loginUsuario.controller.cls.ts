@@ -48,7 +48,8 @@ export default class ClsLoginUsuarioController {
               idUsuario: '',
               nomeUsuario: '',
               token: '',
-              emailUsuario: ''
+              emailUsuario: '',
+              fotoUsuario: ''
             }
           }
         })
@@ -65,7 +66,8 @@ export default class ClsLoginUsuarioController {
         idUsuario: '',
         nomeUsuario: '',
         token: '',
-        emailUsuario: ''
+        emailUsuario: '',
+        fotoUsuario: ''
       }
     }
 
@@ -94,6 +96,7 @@ export default class ClsLoginUsuarioController {
                     nomeUsuario: rsUsuarioLogado.name,
                     token: token,
                     emailUsuario: rsUsuarioLogado.email,
+                    fotoUsuario: rsUsuarioLogado.profilePicture
                   }
                 }
                 // return this.permissoesUsuario(rsUsuarioLogado.idUsuario).then((rsPermissoes) => {

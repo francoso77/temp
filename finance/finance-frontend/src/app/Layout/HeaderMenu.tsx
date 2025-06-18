@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import AppBar from '@mui/material/AppBar';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { Tooltip, Typography, useMediaQuery } from '@mui/material';
+import { Avatar, Tooltip, Typography, useMediaQuery } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
@@ -63,7 +63,8 @@ export default function HeaderMenu() {
         nomeUsuario: '',
         logado: false,
         token: '',
-        emailUsuario: ''
+        emailUsuario: '',
+        fotoUsuario: ''
       })
 
       setLayoutState({ ...layoutState, contaPadrao: null })
@@ -85,7 +86,7 @@ export default function HeaderMenu() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     BuscarDados()
-  }, [layoutState]);
+  }, [layoutState, usuarioState]);
 
   const handleItemChange = (selected: AccountInterface | null) => {
     setLayoutState({ ...layoutState, contaPadrao: selected?.id });
@@ -157,8 +158,8 @@ export default function HeaderMenu() {
               icon={<MonetizationOnIcon />}
               sx={{
                 fontSize: isMobile ? '0.6rem' : '0.875rem',
-                py: isMobile ? 0 : 0.75,
-                px: isMobile ? 0 : 0.75
+                py: isMobile ? 0.3 : 0.75,
+                px: isMobile ? 0.3 : 0.75
               }}
 
             >
@@ -166,7 +167,7 @@ export default function HeaderMenu() {
             </CustomButton>
           </Box>
           <Box sx={{ marginRight: -2 }}>
-            <Tooltip title='Perfil'>
+            <Tooltip title={usuarioState.emailUsuario}>
               <IconButton
                 size="large"
                 edge="end"
@@ -174,10 +175,19 @@ export default function HeaderMenu() {
                 sx={{ mr: 1 }}
                 onClick={handleUser}
               >
-                <AccountCircleTwoToneIcon />
+                {usuarioState.fotoUsuario ? (
+                  <Avatar
+                    alt={usuarioState.nomeUsuario}
+                    src={usuarioState.fotoUsuario}
+                    sx={{ width: 32, height: 32 }}
+                  />
+                ) : (
+                  <AccountCircleTwoToneIcon />
+                )}
               </IconButton>
             </Tooltip>
           </Box>
+
           <Box sx={{ marginRight: -2 }}>
             <Tooltip title='Sair'>
               <IconButton

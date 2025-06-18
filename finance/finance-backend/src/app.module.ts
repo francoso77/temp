@@ -11,10 +11,16 @@ import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "./user.module";
 import { DatabaseModule } from "./database.module";
 import { EmailModule } from './email.modulo';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'), // Caminho absoluto para a pasta 'uploads'
+      serveRoot: '/uploads', // Caminho da URL pública
+    }),
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     GlobalModule,
     DatabaseModule,

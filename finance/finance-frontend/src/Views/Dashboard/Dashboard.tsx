@@ -198,6 +198,7 @@ export default function Dashboard() {
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
+    const setor = layoutState.sectorId ? layoutState.sectorId : undefined
     const groupedLinCol = new Map<string, DataPoint>()
     const groupedCategory = new Map<string, CategoryDataPoint>()
 
@@ -212,6 +213,7 @@ export default function Dashboard() {
       conta,
       categoria,
       tipo,
+      setor,
       idUsuario: usuarioState.idUsuario
     }).then((rs: Array<TransactionInterface>) => {
 

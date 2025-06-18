@@ -1,6 +1,10 @@
 // user.controller.ts
-import { BadRequestException, Body, Controller, InternalServerErrorException, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, InternalServerErrorException, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from '../auth/services/user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { User } from '../entity/sistema/user';
 
 @Controller('auth')
 export class UserController {
@@ -51,4 +55,57 @@ export class UserController {
     return { message: 'E-mail enviado com sucesso!' };
   }
 
+  @Post('upload-profile')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/users',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async uploadProfilePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
+    const user = await this.userService.createUser({
+      ...body,
+      profilePicture: file.filename,
+    });
+
+    return {
+      ok: true,
+      message: 'Usuário cadastrado com sucesso!',
+      user,
+    };
+  }
+
+  @Patch(':id')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/users', // pasta onde a imagem será salva
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+
+  async updateUser(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any, // usa `any` pois os campos do `FormData` chegam como strings
+  ) {
+    const updatedData = {
+      ...body,
+      profilePicture: file?.filename ?? body.profilePicture,
+    };
+
+    return this.userService.updateUser(id, updatedData);
+  }
 }

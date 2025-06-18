@@ -40,6 +40,8 @@ var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
 var data_source_1 = require("./data-source");
 var dotenv = require("dotenv");
+var path_1 = require("path");
+var express = require("express");
 dotenv.config();
 function iniciandoBD() {
     return __awaiter(this, void 0, void 0, function () {
@@ -51,7 +53,10 @@ function iniciandoBD() {
                     return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
                 case 1:
                     app = _a.sent();
+                    // Libera acesso CORS
                     app.enableCors({ origin: [corsOrigin] });
+                    // ✅ Expõe a pasta de uploads como pública
+                    app.use('/uploads', express.static((0, path_1.join)(__dirname, '..', 'uploads')));
                     return [4 /*yield*/, data_source_1.AppDataSource.initialize()];
                 case 2:
                     _a.sent();

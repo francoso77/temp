@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -52,6 +63,9 @@ exports.UserController = void 0;
 // user.controller.ts
 var common_1 = require("@nestjs/common");
 var user_service_1 = require("../auth/services/user.service");
+var platform_express_1 = require("@nestjs/platform-express");
+var multer_1 = require("multer");
+var path_1 = require("path");
 var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
@@ -114,6 +128,33 @@ var UserController = /** @class */ (function () {
             });
         });
     };
+    UserController.prototype.uploadProfilePicture = function (file, body) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.userService.createUser(__assign(__assign({}, body), { profilePicture: file.filename }))];
+                    case 1:
+                        user = _a.sent();
+                        return [2 /*return*/, {
+                                ok: true,
+                                message: 'Usuário cadastrado com sucesso!',
+                                user: user,
+                            }];
+                }
+            });
+        });
+    };
+    UserController.prototype.updateUser = function (id, file, body) {
+        return __awaiter(this, void 0, void 0, function () {
+            var updatedData;
+            var _a;
+            return __generator(this, function (_b) {
+                updatedData = __assign(__assign({}, body), { profilePicture: (_a = file === null || file === void 0 ? void 0 : file.filename) !== null && _a !== void 0 ? _a : body.profilePicture });
+                return [2 /*return*/, this.userService.updateUser(id, updatedData)];
+            });
+        });
+    };
     __decorate([
         (0, common_1.Post)('forgot-password'),
         __param(0, (0, common_1.Body)('email')),
@@ -136,6 +177,41 @@ var UserController = /** @class */ (function () {
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Promise)
     ], UserController.prototype, "sendEmail", null);
+    __decorate([
+        (0, common_1.Post)('upload-profile'),
+        (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+            storage: (0, multer_1.diskStorage)({
+                destination: './uploads/users',
+                filename: function (req, file, cb) {
+                    var uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    cb(null, "".concat(uniqueSuffix).concat((0, path_1.extname)(file.originalname)));
+                },
+            }),
+        })),
+        __param(0, (0, common_1.UploadedFile)()),
+        __param(1, (0, common_1.Body)()),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], UserController.prototype, "uploadProfilePicture", null);
+    __decorate([
+        (0, common_1.Patch)(':id'),
+        (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+            storage: (0, multer_1.diskStorage)({
+                destination: './uploads/users', // pasta onde a imagem será salva
+                filename: function (req, file, cb) {
+                    var uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    cb(null, uniqueSuffix + (0, path_1.extname)(file.originalname));
+                },
+            }),
+        })),
+        __param(0, (0, common_1.Param)('id')),
+        __param(1, (0, common_1.UploadedFile)()),
+        __param(2, (0, common_1.Body)()),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [String, Object, Object]),
+        __metadata("design:returntype", Promise)
+    ], UserController.prototype, "updateUser", null);
     UserController = __decorate([
         (0, common_1.Controller)('auth'),
         __metadata("design:paramtypes", [user_service_1.UserService])

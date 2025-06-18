@@ -131,6 +131,61 @@ var UserService = /** @class */ (function () {
             });
         });
     };
+    UserService.prototype.createUser = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        user = new user_1.User();
+                        user.name = data.name;
+                        user.email = data.email;
+                        // Criptografa a senha
+                        //const salt = await bcrypt.genSalt();
+                        //user.password = await bcrypt.hash(data.password, salt);
+                        user.password = data.password;
+                        user.termsAccepted = data.termsAccepted === 'true' || data.termsAccepted === true;
+                        user.termsAcceptedAt = new Date();
+                        user.profilePicture = data.profilePicture || null;
+                        user.isActive = true;
+                        user.tentativasLogin = 0;
+                        return [4 /*yield*/, this.userRepository.save(user)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    // async updateUser(id: string, data: User): Promise<User> {
+    //   const user = await this.userRepository.findOne({ where: { id } });
+    //   if (!user) {
+    //     throw new NotFoundException('Usuário não encontrado');
+    //   }
+    //   if (data.password) {
+    //     const salt = await bcrypt.genSalt();
+    //     data.password = await bcrypt.hash(data.password, salt);
+    //   }
+    //   Object.assign(user, data);
+    //   return this.userRepository.save(user);
+    // }
+    UserService.prototype.updateUser = function (id, data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.userRepository.findOne({ where: { id: id } })];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.NotFoundException('Usuário não encontrado');
+                        }
+                        // Aqui você pode transformar a string em boolean se necessário
+                        //data.termsAccepted = data.termsAccepted === 'true';
+                        Object.assign(user, data);
+                        return [2 /*return*/, this.userRepository.save(user)];
+                }
+            });
+        });
+    };
     UserService = __decorate([
         (0, common_1.Injectable)(),
         __param(0, (0, typeorm_2.InjectRepository)(user_1.User)),

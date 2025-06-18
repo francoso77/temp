@@ -266,16 +266,6 @@ export function TransacoesFicha(
                   erros={erros}
                   onFocus={(e) => e.target.select()}
                   onBlur={(e) => HandleReceita(e.target.value as string)} // opcional
-                  onKeyDown={(event: any) => {
-                    if (event.key === 'Enter') {
-                      HandleReceita(event.currentTarget.value as string);
-                      if (temReceita) {
-                        btPulaCampo(event, 4);
-                      } else {
-                        btPulaCampo(event, 6);
-                      }
-                    }
-                  }}
                 />
               </Box>
             </Grid>
@@ -326,7 +316,7 @@ export function TransacoesFicha(
                   field="amount"
                   erros={erros}
                   dados={dados}
-                  onFocus={(e) => e.target.select()}
+                  onFocus={temReceita ? (event: any) => btPulaCampo(event, 4) : (e) => e.target.select()}
                   disabled={temReceita ? true : false}
                   onKeyDown={(event: any) => btPulaCampo(event, 7)}
                 />

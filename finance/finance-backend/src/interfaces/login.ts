@@ -3,4 +3,5 @@ export interface LoginInterface {
   nomeUsuario: string
   emailUsuario: string
   token: string
+  fotoUsuario: string
 }

@@ -20,6 +20,8 @@ var config_1 = require("@nestjs/config");
 var user_module_1 = require("./user.module");
 var database_module_1 = require("./database.module");
 var email_modulo_1 = require("./email.modulo");
+var serve_static_1 = require("@nestjs/serve-static");
+var path_1 = require("path");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -31,6 +33,10 @@ var AppModule = /** @class */ (function () {
     AppModule = __decorate([
         (0, common_1.Module)({
             imports: [
+                serve_static_1.ServeStaticModule.forRoot({
+                    rootPath: (0, path_1.join)(__dirname, '..', 'uploads'), // Caminho absoluto para a pasta 'uploads'
+                    serveRoot: '/uploads', // Caminho da URL pública
+                }),
                 config_1.ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
                 global_module_1.GlobalModule,
                 database_module_1.DatabaseModule,

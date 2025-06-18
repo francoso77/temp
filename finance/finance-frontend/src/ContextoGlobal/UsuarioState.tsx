@@ -12,6 +12,7 @@ export default function useUsuarioState() {
     logado: false,
     token: '',
     emailUsuario: '',
+    fotoUsuario: ''
   })
 
   return { usuarioState, setUsuarioState }

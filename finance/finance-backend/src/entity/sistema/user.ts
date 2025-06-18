@@ -34,6 +34,9 @@ export class User implements UserInterface {
   @Column({ type: "timestamp", nullable: true })
   resetTokenExpires: Date;
 
+  @Column({ nullable: true, length: 255 })
+  profilePicture: string;
+
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date
 

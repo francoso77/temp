@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, Paper, Tooltip, Box } from '@mui/material';
+import { Container, Grid, IconButton, Paper, Tooltip, Box, Avatar } from '@mui/material';
 import Text from '../../Componentes/Text';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Form, useNavigate } from 'react-router-dom';
@@ -14,6 +14,10 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import TermoDeUsoModal from './TermoDeUsoModal';
 import TitleBar from '../../Componentes/BarraDeTitulo';
+import { URL_BACKEND } from '../../Utils/Servidor';
+import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
+import { deepPurple } from '@mui/material/colors';
+
 
 
 export default function Registrar() {
@@ -33,16 +37,48 @@ export default function Registrar() {
     resetToken: '',
     resetTokenExpires: new Date(),
     termsAccepted: false,
-    termsAcceptedAt: new Date()
+    termsAcceptedAt: new Date(),
+    profilePicture: ''
   }
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
-  const { mensagemState, setMensagemState, usuarioState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, setUsuarioState, usuarioState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [usuario, setUsuario] = useState<PropsInterface>(ResetDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setUsuario((prev: any) => ({
+        ...prev,
+        profilePicture: file,
+      }))
+    }
+  }
+
+  const isFile = (obj: any): obj is File =>
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.name === 'string' &&
+    typeof obj.size === 'number' &&
+    typeof obj.type === 'string';
+
+  const fotoUrl =
+    typeof usuario.profilePicture === 'string' && usuario.profilePicture !== ''
+      ? `${URL_BACKEND || 'http://localhost:3000'}${usuario.profilePicture}`
+      : isFile(usuario.profilePicture)
+        ? URL.createObjectURL(usuario.profilePicture)
+        : null;
+
+
 
   const pesquisarID = async (id: string | number): Promise<PropsInterface> => {
 
@@ -149,20 +185,52 @@ export default function Registrar() {
 
   const executarAcao = async (acao: "incluir" | "editar", mensagemSucesso: string) => {
     try {
-      const rs = await clsCrud.incluir({
-        entidade: "User",
-        criterio: usuario,
-      })
+      const formData = new FormData();
+      formData.append("name", usuario.name);
+      formData.append("email", usuario.email);
+      formData.append("password", usuario.password);
+      formData.append("termsAccepted", usuario.termsAccepted.toString());
 
-      if (rs.ok) {
-        exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok)
+      if (
+        usuario.profilePicture &&
+        typeof usuario.profilePicture === "object" &&
+        "name" in usuario.profilePicture &&
+        "type" in usuario.profilePicture
+      ) {
+        // É um File (ou parecido com File)
+        formData.append("file", usuario.profilePicture as File);
+      } else if (typeof usuario.profilePicture === "string") {
+        // É um nome de arquivo (string)
+        formData.append("profilePicture", usuario.profilePicture);
+      }
+
+
+      const endpoint =
+        acao === "incluir"
+          ? `${URL_BACKEND}/auth/upload-profile`
+          : `${URL_BACKEND}/auth/${usuario.id}`;
+
+      const method = acao === "incluir" ? "POST" : "PATCH";
+
+      const response = await fetch(endpoint, {
+        method,
+        body: formData,
+      });
+
+      const rs = await response.json();
+
+      if (rs.ok || response.ok) {
+        exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok);
         btFechar();
-        setLocalState({ action: actionTypes.pesquisando })
+        setLocalState({ action: actionTypes.pesquisando });
+      } else {
+        exibirMensagem("Erro", rs.mensagem || "Erro ao salvar usuário", MensagemTipo.Error);
       }
     } catch (error) {
-      exibirMensagem("Erro de conexão", "Erro na conexão com banco de dados!", MensagemTipo.Error)
+      exibirMensagem("Erro de conexão", "Erro na conexão com banco de dados!", MensagemTipo.Error);
     }
   }
+
   const btConfirmar = async () => {
 
     if (!validarDados()) return;
@@ -172,6 +240,7 @@ export default function Registrar() {
       irPara('/login')
     } else if (localState.action === actionTypes.editando) {
       await executarAcao("editar", "Dados alterados com sucesso!");
+
       irPara('/dashboard')
     }
   }
@@ -198,6 +267,7 @@ export default function Registrar() {
         setLocalState({ action: actionTypes.editando })
         setUsuario(rs)
         setUsuario({ ...rs, confirmePassword: rs.password })
+        setUsuario({ ...rs, profilePicture: "/uploads/users/".concat(rs.profilePicture) })
       })
     }
   }, [usuarioState])
@@ -217,10 +287,39 @@ export default function Registrar() {
                   onClose={() => btFechar()}
                   textColor='#fff'
                   backgroundColor='#050516'
-                  fontSize='1.75rem'
+                  fontSize='1.5rem'
                 />
               </Grid>
               <Condicional condicao={localState.action !== 'pesquisando'}>
+                <Grid item xs={12} md={12} sx={{ justifyItems: 'center' }}>
+                  <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+
+                    <Tooltip title="Clique para alterar a foto">
+                      <IconButton onClick={handleImageClick}>
+                        <Avatar
+                          alt={usuarioState.emailUsuario}
+                          src={fotoUrl || undefined}
+                          sx={{
+                            width: 64,
+                            height: 64,
+                            bgcolor: deepPurple[200],
+                          }}
+                        >
+                          {!fotoUrl && (
+                            <AccountCircleTwoToneIcon fontSize="large" sx={{ color: "#fff" }} />
+                          )}
+                        </Avatar>
+                      </IconButton>
+                    </Tooltip>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={handleFileChange}
+                    />
+                  </Box>
+                </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
 

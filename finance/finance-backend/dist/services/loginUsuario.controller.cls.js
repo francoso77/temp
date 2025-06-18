@@ -77,7 +77,8 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                                         idUsuario: '',
                                         nomeUsuario: '',
                                         token: '',
-                                        emailUsuario: ''
+                                        emailUsuario: '',
+                                        fotoUsuario: ''
                                     }
                                 };
                             });
@@ -97,7 +98,8 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                         idUsuario: '',
                         nomeUsuario: '',
                         token: '',
-                        emailUsuario: ''
+                        emailUsuario: '',
+                        fotoUsuario: ''
                     }
                 };
                 return [2 /*return*/, this.fecharSessoesEmAberto(email).then(function (rsUsuarioExistente) {
@@ -119,6 +121,7 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                                                     nomeUsuario: rsUsuarioLogado.name,
                                                     token: token_1,
                                                     emailUsuario: rsUsuarioLogado.email,
+                                                    fotoUsuario: rsUsuarioLogado.profilePicture
                                                 }
                                             };
                                             // return this.permissoesUsuario(rsUsuarioLogado.idUsuario).then((rsPermissoes) => {
