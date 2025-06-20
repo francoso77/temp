@@ -41,6 +41,7 @@ var uuid_1 = require("uuid");
 var typeorm_1 = require("typeorm");
 var user_1 = require("../entity/sistema/user");
 var userSection_1 = require("../entity/sistema/userSection");
+var bcrypt = require("bcrypt");
 // interface rsSqlPermissaoPorUsuario {
 //   modulo: string
 //   permissao: string
@@ -89,57 +90,69 @@ var ClsLoginUsuarioController = /** @class */ (function () {
     };
     ClsLoginUsuarioController.prototype.logar = function (email, senha) {
         return __awaiter(this, void 0, void 0, function () {
-            var retorno;
+            var retorno, usuarioAtivo, usuario, senhaValida, token;
             return __generator(this, function (_a) {
-                retorno = {
-                    ok: false,
-                    mensagem: 'Usuário ou senha inválidos.',
-                    dados: {
-                        idUsuario: '',
-                        nomeUsuario: '',
-                        token: '',
-                        emailUsuario: '',
-                        fotoUsuario: ''
-                    }
-                };
-                return [2 /*return*/, this.fecharSessoesEmAberto(email).then(function (rsUsuarioExistente) {
-                        if (rsUsuarioExistente) {
-                            return data_source_1.AppDataSource.getRepository(user_1.User).findOne({ where: { email: email, password: senha, tentativasLogin: (0, typeorm_1.LessThan)(4) } }).then(function (rsUsuarioLogado) {
-                                if (rsUsuarioLogado) {
-                                    var token_1 = (0, uuid_1.v4)();
-                                    return data_source_1.AppDataSource.getRepository(user_1.User).update({ id: rsUsuarioLogado.id }, { tentativasLogin: 0 }).then(function () {
-                                        return data_source_1.AppDataSource.getRepository(userSection_1.UserSection).save({
-                                            userId: rsUsuarioLogado.id,
-                                            isActive: true,
-                                            token: token_1,
-                                        }).then(function () {
-                                            return {
-                                                ok: true,
-                                                mensagem: 'Login efetuado com sucesso.',
-                                                dados: {
-                                                    idUsuario: rsUsuarioLogado.id,
-                                                    nomeUsuario: rsUsuarioLogado.name,
-                                                    token: token_1,
-                                                    emailUsuario: rsUsuarioLogado.email,
-                                                    fotoUsuario: rsUsuarioLogado.profilePicture
-                                                }
-                                            };
-                                            // return this.permissoesUsuario(rsUsuarioLogado.idUsuario).then((rsPermissoes) => {
-                                            // })
-                                        });
-                                    });
-                                }
-                                else {
-                                    return data_source_1.AppDataSource.getRepository(user_1.User).update({ email: email }, { tentativasLogin: function () { return "tentativasLogin + 1"; } }).then(function () {
-                                        return retorno;
-                                    });
-                                }
-                            });
+                switch (_a.label) {
+                    case 0:
+                        retorno = {
+                            ok: false,
+                            mensagem: 'Usuário ou senha inválidos.',
+                            dados: {
+                                idUsuario: '',
+                                nomeUsuario: '',
+                                token: '',
+                                emailUsuario: '',
+                                fotoUsuario: ''
+                            }
+                        };
+                        return [4 /*yield*/, this.fecharSessoesEmAberto(email)];
+                    case 1:
+                        usuarioAtivo = _a.sent();
+                        if (!usuarioAtivo) {
+                            return [2 /*return*/, retorno];
                         }
-                        else {
-                            return retorno;
+                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(user_1.User).findOne({
+                                where: { email: email, tentativasLogin: (0, typeorm_1.LessThan)(4) }
+                            })];
+                    case 2:
+                        usuario = _a.sent();
+                        if (!usuario) {
+                            return [2 /*return*/, retorno];
                         }
-                    })];
+                        return [4 /*yield*/, bcrypt.compare(senha, usuario.password)];
+                    case 3:
+                        senhaValida = _a.sent();
+                        if (!!senhaValida) return [3 /*break*/, 5];
+                        // Incrementa tentativas de login
+                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(user_1.User).update({ email: email }, { tentativasLogin: function () { return "tentativasLogin + 1"; } })];
+                    case 4:
+                        // Incrementa tentativas de login
+                        _a.sent();
+                        return [2 /*return*/, retorno];
+                    case 5:
+                        token = (0, uuid_1.v4)();
+                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(user_1.User).update({ id: usuario.id }, { tentativasLogin: 0 })];
+                    case 6:
+                        _a.sent();
+                        return [4 /*yield*/, data_source_1.AppDataSource.getRepository(userSection_1.UserSection).save({
+                                userId: usuario.id,
+                                isActive: true,
+                                token: token,
+                            })];
+                    case 7:
+                        _a.sent();
+                        return [2 /*return*/, {
+                                ok: true,
+                                mensagem: 'Login efetuado com sucesso.',
+                                dados: {
+                                    idUsuario: usuario.id,
+                                    nomeUsuario: usuario.name,
+                                    token: token,
+                                    emailUsuario: usuario.email,
+                                    fotoUsuario: usuario.profilePicture
+                                }
+                            }];
+                }
             });
         });
     };

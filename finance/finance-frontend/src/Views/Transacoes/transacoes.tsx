@@ -12,6 +12,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { TransacoesFicha } from './transacoesFicha';
+import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyTwoTone';
 
 
 interface PesquisaInterface {
@@ -126,6 +127,17 @@ export function Transacoes() {
       setOpen(true)
     })
   }
+
+  const onDuplicar = (id: string | number) => {
+
+    pesquisarID(id).then((rs) => {
+      setTransacoes(rs)
+      setTransacoes({ ...rs, description: rs.description.concat(' TRANSAÇÃO DUPLICADA'), id: undefined })
+      setLocalState({ action: actionTypes.duplicando })
+      setOpen(true)
+    })
+  }
+
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setTransacoes(rs)
@@ -187,6 +199,7 @@ export function Transacoes() {
     }
 
   };
+
   const onSearch = async (e: string) => {
 
     clsCrud
@@ -292,6 +305,13 @@ export function Transacoes() {
             cabecalho={cabecalhoForm}
             dados={rsPesquisa}
             acoes={[
+              {
+                icone: FileCopyTwoToneIcon,
+                corIcone: '#fff',
+                onAcionador: (rs: TransactionInterface) =>
+                  onDuplicar(rs.id as string),
+                toolTip: "Duplicar",
+              },
               {
                 icone: EditOutlinedIcon,
                 corIcone: '#fff',

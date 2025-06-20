@@ -18,7 +18,6 @@ import { ResetAccount } from './contas';
 import { AccountTypes } from '../../types/accountTypes';
 import { iconMap } from '../../Utils/IconsMenuFooter';
 
-
 interface PropsInterface {
   open: boolean,
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -31,7 +30,7 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
 
   const clsCrud = new ClsCrud()
   const clsApi = new ClsApi()
-  const { setMensagemState, usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<AccountInterface>(ResetAccount);
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -49,11 +48,24 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
       }
     }
   }
-  const handleClose = () => {
+  const handleClose = async () => {
 
-    btPesquisar && btPesquisar()
-    setDados(ResetAccount)
-    setOpen(false)
+    if (dados.name === '' && layoutState.contaPadrao === '') {
+
+      setMensagemState({
+        titulo: 'Erro',
+        exibir: true,
+        mensagem: 'Crie uma conta padrão.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null,
+      });
+
+    } else {
+      btPesquisar && btPesquisar()
+      setDados(ResetAccount)
+      setOpen(false)
+    }
   }
 
   const validarDados = () => {

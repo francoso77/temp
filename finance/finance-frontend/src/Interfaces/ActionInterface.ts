@@ -3,8 +3,7 @@ export enum actionTypes {
   editando = 'editando',
   excluindo = 'excluindo',
   incluindo = 'incluindo',
-  detalhes = 'detalhes',
-  pessoa = 'pessoa'
+  duplicando = 'duplicando',
 }
 
 export interface ActionInterface {

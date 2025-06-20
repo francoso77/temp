@@ -178,7 +178,12 @@ export default function HeaderMenu() {
                 {usuarioState.fotoUsuario ? (
                   <Avatar
                     alt={usuarioState.nomeUsuario}
-                    src={usuarioState.fotoUsuario}
+                    //src={usuarioState.fotoUsuario}
+                    src={
+                      usuarioState.fotoUsuario
+                        ? `${usuarioState.fotoUsuario}?v=${usuarioState.fotoUsuarioVersao || 0}`
+                        : undefined
+                    }
                     sx={{ width: 32, height: 32 }}
                   />
                 ) : (

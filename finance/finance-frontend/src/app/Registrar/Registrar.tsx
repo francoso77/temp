@@ -18,8 +18,6 @@ import { URL_BACKEND } from '../../Utils/Servidor';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import { deepPurple } from '@mui/material/colors';
 
-
-
 export default function Registrar() {
 
 
@@ -41,9 +39,9 @@ export default function Registrar() {
     profilePicture: ''
   }
   const validaCampo: ClsValidacao = new ClsValidacao()
-  const clsCrud = new ClsCrud()
+  const clsCrud: ClsCrud = new ClsCrud()
 
-  const { mensagemState, setMensagemState, setUsuarioState, usuarioState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, setUsuarioState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [usuario, setUsuario] = useState<PropsInterface>(ResetDados)
@@ -71,13 +69,13 @@ export default function Registrar() {
     typeof obj.size === 'number' &&
     typeof obj.type === 'string';
 
-  const fotoUrl =
-    typeof usuario.profilePicture === 'string' && usuario.profilePicture !== ''
-      ? `${URL_BACKEND || 'http://localhost:3000'}${usuario.profilePicture}`
-      : isFile(usuario.profilePicture)
-        ? URL.createObjectURL(usuario.profilePicture)
-        : null;
 
+  const fotoUrl =
+    isFile(usuario.profilePicture)
+      ? URL.createObjectURL(usuario.profilePicture)
+      : usuario.profilePicture
+        ? `${URL_BACKEND}/uploads/users/${usuario.profilePicture}`
+        : null;
 
 
   const pesquisarID = async (id: string | number): Promise<PropsInterface> => {
@@ -93,20 +91,8 @@ export default function Registrar() {
   }
 
   const irPara = useNavigate()
-  const btFechar = () => {
-
-    if (usuarioState.logado) {
-      setLayoutState({
-        ...layoutState,
-        titulo: 'Dashboard',
-        pathTitulo: '/dashboard',
-      })
-
-      irPara('/dashboard')
-    } else {
-      irPara('/')
-    }
-
+  const btFechar = async () => {
+    irPara('/dashboard')
   }
 
   const btCancelar = () => {
@@ -219,13 +205,33 @@ export default function Registrar() {
 
       const rs = await response.json();
 
+
       if (rs.ok || response.ok) {
         exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok);
+
+        // Se for edição, atualize o contexto global com a nova foto
+        if (acao === "editar") {
+          const novaFoto =
+            typeof usuario.profilePicture === "string"
+              ? usuario.profilePicture
+              : rs.dados?.profilePicture || "";
+
+          setUsuarioState({
+            ...usuarioState,
+            nomeUsuario: usuario.name,
+            emailUsuario: usuario.email,
+            fotoUsuario: novaFoto
+              ? `${URL_BACKEND}/uploads/users/${novaFoto}`
+              : usuarioState.fotoUsuario,
+            fotoUsuarioVersao: Date.now(), // Adicionado
+          });
+
+        }
+
         btFechar();
         setLocalState({ action: actionTypes.pesquisando });
-      } else {
-        exibirMensagem("Erro", rs.mensagem || "Erro ao salvar usuário", MensagemTipo.Error);
       }
+
     } catch (error) {
       exibirMensagem("Erro de conexão", "Erro na conexão com banco de dados!", MensagemTipo.Error);
     }
@@ -266,8 +272,12 @@ export default function Registrar() {
       pesquisarID(usuarioState.idUsuario).then((rs) => {
         setLocalState({ action: actionTypes.editando })
         setUsuario(rs)
-        setUsuario({ ...rs, confirmePassword: rs.password })
-        setUsuario({ ...rs, profilePicture: "/uploads/users/".concat(rs.profilePicture) })
+        setUsuario({
+          ...rs,
+          confirmePassword: '',
+          password: '',
+          //profilePicture: rs.profilePicture,
+        });
       })
     }
   }, [usuarioState])

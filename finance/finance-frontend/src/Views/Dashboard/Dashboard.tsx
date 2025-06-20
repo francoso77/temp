@@ -19,6 +19,8 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import ClsApi from '../../Utils/ClsApi';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import { TransacoesFicha } from '../Transacoes/transacoesFicha';
+import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyTwoTone';
+
 
 
 interface DadosCardInterface {
@@ -132,6 +134,16 @@ export default function Dashboard() {
       }
     }
   ]
+
+  const onDuplicar = (id: string | number) => {
+
+    pesquisarID(id).then((rs) => {
+      setTransacoes(rs)
+      setTransacoes({ ...rs, description: rs.description.concat(' TRANSAÇÃO DUPLICADA'), id: undefined })
+      setLocalState({ action: actionTypes.duplicando })
+      setOpen(true)
+    })
+  }
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
@@ -371,6 +383,13 @@ export default function Dashboard() {
               cabecalho={cabecalhoForm}
               dados={rsPesquisa}
               acoes={[
+                {
+                  icone: FileCopyTwoToneIcon,
+                  corIcone: '#fff',
+                  onAcionador: (rs: TransactionInterface) =>
+                    onDuplicar(rs.id as string),
+                  toolTip: "Duplicar",
+                },
                 {
                   icone: EditOutlinedIcon,
                   corIcone: '#fff',

@@ -5,6 +5,7 @@ import { LoginInterface } from '../interfaces/login';
 import { LessThan } from 'typeorm';
 import { User } from '../entity/sistema/user';
 import { UserSection } from '../entity/sistema/userSection';
+import * as bcrypt from 'bcrypt';
 
 
 // interface rsSqlPermissaoPorUsuario {
@@ -58,7 +59,6 @@ export default class ClsLoginUsuarioController {
   }
 
   public async logar(email: string, senha: string): Promise<RespostaPadraoInterface<LoginInterface>> {
-
     let retorno: RespostaPadraoInterface<LoginInterface> = {
       ok: false,
       mensagem: 'Usuário ou senha inválidos.',
@@ -69,57 +69,53 @@ export default class ClsLoginUsuarioController {
         emailUsuario: '',
         fotoUsuario: ''
       }
+    };
+
+    const usuarioAtivo = await this.fecharSessoesEmAberto(email);
+
+    if (!usuarioAtivo) {
+      return retorno;
     }
 
-    return this.fecharSessoesEmAberto(email).then((rsUsuarioExistente) => {
-      if (rsUsuarioExistente) {
+    // Busca apenas pelo email e tentativas < 4
+    const usuario = await AppDataSource.getRepository(User).findOne({
+      where: { email, tentativasLogin: LessThan(4) }
+    });
 
-        return AppDataSource.getRepository(User).findOne({ where: { email: email, password: senha, tentativasLogin: LessThan(4) } }).then((rsUsuarioLogado) => {
+    if (!usuario) {
+      return retorno;
+    }
 
-          if (rsUsuarioLogado) {
+    const senhaValida = await bcrypt.compare(senha, usuario.password);
 
-            const token: string = uuidv4()
+    if (!senhaValida) {
+      // Incrementa tentativas de login
+      await AppDataSource.getRepository(User).update({ email }, { tentativasLogin: () => "tentativasLogin + 1" });
+      return retorno;
+    }
 
-            return AppDataSource.getRepository(User).update({ id: rsUsuarioLogado.id }, { tentativasLogin: 0 }).then(() => {
+    // Login válido
+    const token = uuidv4();
 
-              return AppDataSource.getRepository(UserSection).save({
-                userId: rsUsuarioLogado.id,
-                isActive: true,
-                token: token,
-              }).then(() => {
+    await AppDataSource.getRepository(User).update({ id: usuario.id }, { tentativasLogin: 0 });
 
-                return {
-                  ok: true,
-                  mensagem: 'Login efetuado com sucesso.',
-                  dados: {
-                    idUsuario: rsUsuarioLogado.id,
-                    nomeUsuario: rsUsuarioLogado.name,
-                    token: token,
-                    emailUsuario: rsUsuarioLogado.email,
-                    fotoUsuario: rsUsuarioLogado.profilePicture
-                  }
-                }
-                // return this.permissoesUsuario(rsUsuarioLogado.idUsuario).then((rsPermissoes) => {
+    await AppDataSource.getRepository(UserSection).save({
+      userId: usuario.id,
+      isActive: true,
+      token: token,
+    });
 
-                // })
-              })
-            })
-
-          } else {
-
-            return AppDataSource.getRepository(User).update({ email: email }, { tentativasLogin: () => "tentativasLogin + 1" }).then(() => {
-              return retorno
-            })
-
-          }
-
-        })
-
-      } else {
-        return retorno
+    return {
+      ok: true,
+      mensagem: 'Login efetuado com sucesso.',
+      dados: {
+        idUsuario: usuario.id,
+        nomeUsuario: usuario.name,
+        token: token,
+        emailUsuario: usuario.email,
+        fotoUsuario: usuario.profilePicture
       }
-    })
-
+    };
   }
 
   private async fecharSessoesEmAberto(email: string): Promise<boolean> {

@@ -6,7 +6,6 @@ import * as crypto from 'crypto';
 import { User } from '../../entity/sistema/user';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -29,15 +28,10 @@ export class UserService {
     user.resetTokenExpires = expires;
     await this.userRepository.save(user);
 
-    //const protocol = this.configService.get<string>('REACT_APP_BACKEND_PROTOCOLO');
-    //const host = this.configService.get<string>('REACT_APP_BACKEND_HOST');
-    //const port = this.configService.get<string>('REACT_APP_BACKEND_PORTA');
-
     const frontProtocol = this.configService.get<string>('REACT_APP_FRONT_PROTOCOLO');
     const frontHost = this.configService.get<string>('REACT_APP_FRONT_HOST');
     const frontPort = this.configService.get<string>('REACT_APP_FRONT_PORTA');
 
-    //const resetLink = `${protocol}${host}:${port}/reset-password?token=${token}`;
     const resetLink = `${frontProtocol}${frontHost}:${frontPort}/reset-password?token=${token}`;
 
     await this.emailService.sendMail(
@@ -79,13 +73,7 @@ export class UserService {
 
     user.name = data.name;
     user.email = data.email;
-
-    // Criptografa a senha
-    //const salt = await bcrypt.genSalt();
-    //user.password = await bcrypt.hash(data.password, salt);
-
     user.password = data.password;
-
     user.termsAccepted = data.termsAccepted === 'true' || data.termsAccepted === true;
     user.termsAcceptedAt = new Date();
     user.profilePicture = data.profilePicture || null;
@@ -95,23 +83,6 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  // async updateUser(id: string, data: User): Promise<User> {
-  //   const user = await this.userRepository.findOne({ where: { id } });
-
-  //   if (!user) {
-  //     throw new NotFoundException('Usuário não encontrado');
-  //   }
-
-  //   if (data.password) {
-  //     const salt = await bcrypt.genSalt();
-  //     data.password = await bcrypt.hash(data.password, salt);
-  //   }
-
-  //   Object.assign(user, data);
-
-  //   return this.userRepository.save(user);
-  // }
-
   async updateUser(id: string, data: Partial<User>): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
 
@@ -119,12 +90,19 @@ export class UserService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    // Aqui você pode transformar a string em boolean se necessário
-    //data.termsAccepted = data.termsAccepted === 'true';
+    // Separa o campo password dos demais
+    const { password, ...rest } = data;
 
-    Object.assign(user, data);
+    // Atribui os demais campos normalmente
+    Object.assign(user, rest);
+
+    // Se a senha foi enviada, atualiza e deixa o hook cuidar do hash
+    if (password) {
+      user.password = password;
+    }
 
     return this.userRepository.save(user);
   }
+
 
 }

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { UserInterface } from '../../interfaces/sistema/user';
+import * as bcrypt from 'bcrypt';
 
 @Entity({ name: 'users' })
 export class User implements UserInterface {
@@ -13,7 +14,7 @@ export class User implements UserInterface {
   @Index({ unique: true })
   email: string
 
-  @Column({ length: 25 })
+  @Column({ length: 255 })
   password: string
 
   @Column({ nullable: true })
@@ -42,4 +43,15 @@ export class User implements UserInterface {
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
+
+  // Hash automático da senha antes de inserir ou atualizar
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password) {
+      const salt = await bcrypt.genSalt();
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
+
 }

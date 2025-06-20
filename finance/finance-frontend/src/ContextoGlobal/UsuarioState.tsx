@@ -2,7 +2,8 @@ import { useState } from "react"
 import { LoginInterface } from '../../../finance-backend/src/interfaces/login'
 
 export interface UsuarioStateInterface extends LoginInterface {
-  logado: boolean
+  logado: boolean,
+  fotoUsuarioVersao?: number;
 }
 
 export default function useUsuarioState() {

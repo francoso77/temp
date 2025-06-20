@@ -4,7 +4,6 @@ import { UserService } from '../auth/services/user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { User } from '../entity/sistema/user';
 
 @Controller('auth')
 export class UserController {
