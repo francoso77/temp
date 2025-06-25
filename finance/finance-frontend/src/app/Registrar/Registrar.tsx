@@ -112,6 +112,7 @@ export default function Registrar() {
     retorno = validaCampo.eEmail('email', usuario, erros, retorno, false)
     retorno = validaCampo.eTrue('termsAccepted', usuario, erros, retorno, true)
     retorno = validaCampo.naoVazio('confirmePassword', usuario, erros, retorno, 'Confirme a senha')
+    retorno = validaCampo.naoVazio('profilePicture', usuario, erros, retorno, 'Selecione uma foto de perfil')
 
     if (usuario.password !== usuario.confirmePassword) {
       erros['confirmePassword'] = 'As senhas devem ser iguais'
