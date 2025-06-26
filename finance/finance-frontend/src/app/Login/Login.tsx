@@ -8,13 +8,13 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsApi from '../../Utils/ClsApi';
 import Copyright from '../Layout/Copyright';
 import MenuCls, { MenuOpcoesInterface } from '../Layout/ClsMenu';
-import { RespostaPadraoInterface } from '../../../../finance-backend/src/interfaces/respostaPadrao.interface';
-import { LoginInterface } from '../../../../finance-backend/src/interfaces/login';
+import { RespostaPadraoInterface } from '../../Interfaces/respostaPadrao.interface';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import CustomButton from '../../Componentes/Button';
 import LoginIcon from '@mui/icons-material/Login';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { URL_BACKEND } from '../../Utils/Servidor';
+import { LoginInterface } from '../../Interfaces/login';
 
 
 

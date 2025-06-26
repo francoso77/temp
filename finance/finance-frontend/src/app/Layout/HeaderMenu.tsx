@@ -11,14 +11,14 @@ import { useNavigate } from 'react-router-dom';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import CustomButton from '../../Componentes/Button';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import { ColorSelectList } from '../../Componentes/ColorSelect';
-import Condicional from '../../Componentes/Condicional/Condicional';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import ClsApi from '../../Utils/ClsApi';
-import { RespostaPadraoInterface } from '../../../../finance-backend/src/interfaces/respostaPadrao.interface';
-import { LoginInterface } from '../../../../finance-backend/src/interfaces/login';
+import { RespostaPadraoInterface } from '../../Interfaces/respostaPadrao.interface';
+import { LoginInterface } from '../../Interfaces/login';
+import Condicional from '../../Componentes/Condicional/Condicional';
+import { ColorSelectList } from '../../Componentes/ColorSelect';
+import { AccountInterface } from '../../Interfaces/account';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 

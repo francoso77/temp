@@ -10,10 +10,10 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { CurrencyTextField } from '../../Componentes/InputCurrency';
-import { TransactionInterface } from '../../../../finance-backend/src/interfaces/transaction';
-import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
-import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
-import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
+import { TransactionInterface } from '../../Interfaces/transaction';
+import { CompanyInterface } from '../../Interfaces/company';
+import { CategoryInterface } from '../../Interfaces/category';
+import { SectorInterface } from '../../Interfaces/sector';
 import { iconMap } from '../../Utils/IconsMenuFooter';
 import Condicional from '../../Componentes/Condicional/Condicional';
 

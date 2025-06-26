@@ -10,7 +10,7 @@ import { CategoryDataPoint, DataPoint } from '../../types/graficoTypes';
 import CategoryPieChart from './CategoryPieChart';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { TransactionInterface } from '../../../../finance-backend/src/interfaces/transaction';
+import { TransactionInterface } from '../../Interfaces/transaction';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import ClsCrud from '../../Utils/ClsCrudApi';

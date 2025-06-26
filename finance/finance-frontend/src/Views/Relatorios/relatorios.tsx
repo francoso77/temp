@@ -3,10 +3,7 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { CategoryDataPoint, DataPoint } from '../../types/graficoTypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
-import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import { Box, Grid, Typography } from '@mui/material';
 import CustomButton from '../../Componentes/Button';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
@@ -16,6 +13,9 @@ import InfoCard from '../../Componentes/InfoCard';
 import CustomTabs from '../../Componentes/TabCustom';
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { CompanyInterface } from '../../Interfaces/company';
+import { AccountInterface } from '../../Interfaces/account';
+import { CategoryInterface } from '../../Interfaces/category';
 
 
 interface DadosCardInterface {

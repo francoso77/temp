@@ -4,7 +4,7 @@ import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
+import { CompanyInterface } from '../../Interfaces/company';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import Condicional from '../../Componentes/Condicional/Condicional';

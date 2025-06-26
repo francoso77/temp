@@ -4,7 +4,6 @@ import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -12,6 +11,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { AccountCard } from '../../Componentes/AccountCard';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import { ContasFicha } from './contasFicha';
+import { AccountInterface } from '../../Interfaces/account';
 
 
 interface PesquisaInterface {

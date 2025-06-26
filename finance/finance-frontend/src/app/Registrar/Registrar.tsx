@@ -6,7 +6,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { UserInterface } from '../../../../finance-backend/src/interfaces/sistema/user';
+import { UserInterface } from '../../Interfaces/sistema/user';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -92,7 +92,11 @@ export default function Registrar() {
 
   const irPara = useNavigate()
   const btFechar = async () => {
-    irPara('/dashboard')
+    if (!usuario) {
+      irPara('/login')
+    } else {
+      irPara('/dashboard')
+    }
   }
 
   const btCancelar = () => {
@@ -206,6 +210,8 @@ export default function Registrar() {
 
       const rs = await response.json();
 
+      console.log('URL: ', URL_BACKEND)
+      console.log(rs)
 
       if (rs.ok || response.ok) {
         exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok);
@@ -242,12 +248,13 @@ export default function Registrar() {
 
     if (!validarDados()) return;
 
+    console.log('btConfirmar', validarDados())
+
     if (localState.action === actionTypes.incluindo && (await TemEmail())) {
       await executarAcao("incluir", "Usuário incluído com sucesso!");
       irPara('/login')
     } else if (localState.action === actionTypes.editando) {
       await executarAcao("editar", "Dados alterados com sucesso!");
-
       irPara('/dashboard')
     }
   }

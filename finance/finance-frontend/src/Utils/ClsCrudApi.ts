@@ -1,11 +1,8 @@
-import {
-  PadraoPesquisaInterface,
-  RespostaPadraoInterface,
-} from "../../../finance-backend/src/interfaces/respostaPadrao.interface"
 import axios, { AxiosRequestConfig } from "axios"
 import { MensagemStateInterface, MensagemTipo } from '../ContextoGlobal/MensagemState'
 import { ActionInterface, actionTypes } from '../Interfaces/ActionInterface'
 import { URL_BACKEND } from './Servidor'
+import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../Interfaces/respostaPadrao.interface'
 
 export interface PropsInterface extends PadraoPesquisaInterface {
   localState?: ActionInterface | undefined,

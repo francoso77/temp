@@ -10,13 +10,13 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import ClsApi from '../../Utils/ClsApi';
 import { CurrencyTextField } from '../../Componentes/InputCurrency';
 import { CustomCheckbox } from '../../Componentes/CustomCheckbox';
 import { ResetAccount } from './contas';
 import { AccountTypes } from '../../types/accountTypes';
 import { iconMap } from '../../Utils/IconsMenuFooter';
+import { AccountInterface } from '../../Interfaces/account';
 
 interface PropsInterface {
   open: boolean,

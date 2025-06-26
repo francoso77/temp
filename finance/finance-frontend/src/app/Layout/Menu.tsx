@@ -7,11 +7,11 @@ import { ColorSelectList } from '../../Componentes/ColorSelect';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import ComboBox from '../../Componentes/ComboBox';
 import DateRangeSelectorModal from '../../Componentes/DateRangeSelector';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
-import { CategoryInterface } from '../../../../finance-backend/src/interfaces/category';
+import { CategoryInterface } from '../../Interfaces/category';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { TipoTransactionType, TipoTransactionTypes } from '../../types/tipoTransactionTypes';
-import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
+import { SectorInterface } from '../../Interfaces/sector';
+import { AccountInterface } from '../../Interfaces/account';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 

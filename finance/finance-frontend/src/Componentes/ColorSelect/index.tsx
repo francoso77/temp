@@ -9,8 +9,8 @@ import {
 } from '@mui/material';
 import { Circle } from '@mui/icons-material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-import { AccountInterface } from '../../../../finance-backend/src/interfaces/account';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import { AccountInterface } from '../../Interfaces/account';
 
 interface ColorSelectListProps {
   label: string;

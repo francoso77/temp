@@ -4,7 +4,7 @@ import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { TransactionInterface } from '../../../../finance-backend/src/interfaces/transaction';
+import { TransactionInterface } from '../../Interfaces/transaction';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';

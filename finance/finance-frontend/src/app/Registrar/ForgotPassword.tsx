@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import ClsApi from '../../Utils/ClsApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { UserInterface } from '../../../../finance-backend/src/interfaces/sistema/user';
+import { UserInterface } from '../../Interfaces/sistema/user';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import { Box, Grid, Paper } from '@mui/material';
 import TitleBar from '../../Componentes/BarraDeTitulo';

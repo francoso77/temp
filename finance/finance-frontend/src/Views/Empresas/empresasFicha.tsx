@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import InputText from '../../Componentes/InputText';
 import TitleBar from '../../Componentes/BarraDeTitulo';
-import { CompanyInterface } from '../../../../finance-backend/src/interfaces/company';
+import { CompanyInterface } from '../../Interfaces/company';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';

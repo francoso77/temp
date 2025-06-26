@@ -8,7 +8,7 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { SectorInterface } from '../../../../finance-backend/src/interfaces/sector';
+import { SectorInterface } from '../../Interfaces/sector';
 import { ResetSetor } from './setores';
 import { iconMap } from '../../Utils/IconsMenuFooter';
 

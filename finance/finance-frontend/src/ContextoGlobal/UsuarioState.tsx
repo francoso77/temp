@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { LoginInterface } from '../../../finance-backend/src/interfaces/login'
+import { LoginInterface } from '../Interfaces/login';
 
 export interface UsuarioStateInterface extends LoginInterface {
   logado: boolean,
