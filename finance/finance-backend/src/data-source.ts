@@ -27,6 +27,6 @@ export const AppDataSource = new DataSource({
     Transaction,
     Sector
   ],
-  migrations: [],
+  migrations: [__dirname + '/migration/*.ts'],
   subscribers: [],
 })

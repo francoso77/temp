@@ -28,7 +28,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         transaction_1.default,
         sector_1.default
     ],
-    migrations: [],
+    migrations: [__dirname + '/migration/*.ts'],
     subscribers: [],
 });
 //# sourceMappingURL=data-source.js.map
