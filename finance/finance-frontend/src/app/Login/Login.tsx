@@ -38,7 +38,6 @@ export default function Login() {
 
     retorno = clsValidacao.eEmail("email", dados, tmpErros, retorno)
     retorno = clsValidacao.naoVazio("senha", dados, tmpErros, retorno)
-    retorno = clsValidacao.tamanho("senha", dados, tmpErros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
     setErros(tmpErros)
     return retorno
   }

@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, Paper, Tooltip, Box, Avatar } from '@mui/material';
+import { Container, Grid, IconButton, Paper, Tooltip, Box, Avatar, Typography } from '@mui/material';
 import Text from '../../Componentes/Text';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Form, useNavigate } from 'react-router-dom';
@@ -92,7 +92,7 @@ export default function Registrar() {
 
   const irPara = useNavigate()
   const btFechar = async () => {
-    if (!usuario) {
+    if (!usuarioState.logado) {
       irPara('/login')
     } else {
       irPara('/dashboard')
@@ -112,16 +112,15 @@ export default function Registrar() {
 
     retorno = validaCampo.naoVazio('name', usuario, erros, retorno, 'Digite um nome para o usuário')
     retorno = validaCampo.naoVazio('password', usuario, erros, retorno, 'A senha não pode ser vázio')
-    retorno = validaCampo.tamanho("password", usuario, erros, retorno, false, 6, 10, "Campo deve ter entre 6 e 10 caracteres")
     retorno = validaCampo.eEmail('email', usuario, erros, retorno, false)
     retorno = validaCampo.eTrue('termsAccepted', usuario, erros, retorno, true)
     retorno = validaCampo.naoVazio('confirmePassword', usuario, erros, retorno, 'Confirme a senha')
-    retorno = validaCampo.naoVazio('profilePicture', usuario, erros, retorno, 'Selecione uma foto de perfil')
 
     if (usuario.password !== usuario.confirmePassword) {
       erros['confirmePassword'] = 'As senhas devem ser iguais'
       retorno = false
     }
+
     setErros(erros)
     return retorno
   }
@@ -210,9 +209,6 @@ export default function Registrar() {
 
       const rs = await response.json();
 
-      console.log('URL: ', URL_BACKEND)
-      console.log(rs)
-
       if (rs.ok || response.ok) {
         exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok);
 
@@ -247,8 +243,6 @@ export default function Registrar() {
   const btConfirmar = async () => {
 
     if (!validarDados()) return;
-
-    console.log('btConfirmar', validarDados())
 
     if (localState.action === actionTypes.incluindo && (await TemEmail())) {
       await executarAcao("incluir", "Usuário incluído com sucesso!");

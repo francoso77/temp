@@ -10,7 +10,7 @@ import { SessaoService } from './auth/services/sessao.service';
 import { ConfigModule } from "@nestjs/config";
 import { UserModule } from "./user.module";
 import { DatabaseModule } from "./database.module";
-import { EmailModule } from './email.modulo';
+import { EmailModule } from './email.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 

@@ -72,7 +72,7 @@ export class UserController {
   ) {
     const user = await this.userService.createUser({
       ...body,
-      profilePicture: file.filename,
+      profilePicture: file?.filename ?? null,
     });
 
     return {
@@ -102,7 +102,7 @@ export class UserController {
   ) {
     const updatedData = {
       ...body,
-      profilePicture: file?.filename ?? body.profilePicture,
+      profilePicture: file?.filename ?? body.profilePicture ?? null,
     };
 
     return this.userService.updateUser(id, updatedData);
