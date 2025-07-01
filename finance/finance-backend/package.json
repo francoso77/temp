@@ -8,10 +8,12 @@
     "rodar": "nodemon --watch src/**/*.ts --exec ts-node src/index.ts",
     "start:dev": "nest start --watch",
     "build": "nest build",
-    "typeorm": "npm run build && ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "npm run typeorm -- migration:generate -d ./src/data-source.ts ./src/migration/InitialSchema",
-    "migration:run": "npm run typeorm -- migration:run -d ./src/data-source.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d ./src/data-source.ts"
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:generate": "npm run typeorm -- migration:generate -d src/data-source.ts src/migration/InitialSchema",
+    "migration:create": "npm run typeorm -- migration:create src/migration/InitialSchema",
+    "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts",
+    "migration:run:prod": "npm run build && typeorm migration:run -d dist/data-source.js"
   },
   "keywords": [],
   "author": "",
@@ -35,7 +37,7 @@
     "nodemailer": "^6.10.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.23",
+    "typeorm": "^0.3.25",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

@@ -16,13 +16,13 @@ export default class Transaction implements TransactionInterface {
   @Column({ length: 100 })
   description: string;
 
-  @Column({ type: 'float', precision: 3 })
+  @Column({ type: 'decimal', precision: 12, scale: 4, default: 0 })
   amount: number;
 
-  @Column({ type: 'float', precision: 3 })
-  qtd: number
+  @Column({ type: 'decimal', precision: 12, scale: 4, default: 0 })
+  qtd: number;
 
-  @Column({ type: 'float', precision: 3 })
+  @Column({ type: 'decimal', precision: 12, scale: 4, default: 0 })
   price: number
 
   @Column()

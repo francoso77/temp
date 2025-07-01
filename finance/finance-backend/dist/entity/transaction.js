@@ -27,15 +27,15 @@ var Transaction = /** @class */ (function () {
         __metadata("design:type", String)
     ], Transaction.prototype, "description", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 3 }),
+        (0, typeorm_1.Column)({ type: 'decimal', precision: 12, scale: 4, default: 0 }),
         __metadata("design:type", Number)
     ], Transaction.prototype, "amount", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 3 }),
+        (0, typeorm_1.Column)({ type: 'decimal', precision: 12, scale: 4, default: 0 }),
         __metadata("design:type", Number)
     ], Transaction.prototype, "qtd", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ type: 'float', precision: 3 }),
+        (0, typeorm_1.Column)({ type: 'decimal', precision: 12, scale: 4, default: 0 }),
         __metadata("design:type", Number)
     ], Transaction.prototype, "price", void 0);
     __decorate([

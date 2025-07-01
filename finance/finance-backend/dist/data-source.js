@@ -10,13 +10,14 @@ var category_1 = require("./entity/category");
 var company_1 = require("./entity/company");
 var transaction_1 = require("./entity/transaction");
 var sector_1 = require("./entity/sector");
+var isCompiled = __dirname.includes('dist');
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT) || 3306,
-    username: process.env.DB_USERNAME || "root",
-    password: process.env.DB_PASSWORD || "Frk@071569#",
-    database: process.env.DB_DATABASE || "finance",
+    host: 'mysql',
+    port: 3306,
+    username: 'root',
+    password: 'Frk@071569#',
+    database: 'finance',
     synchronize: false,
     logging: false,
     entities: [
@@ -28,7 +29,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         transaction_1.default,
         sector_1.default
     ],
-    migrations: [__dirname + '/migration/*.ts'],
+    migrations: [__dirname + (isCompiled ? '/migration/*.js' : '/migration/*.ts')],
     subscribers: [],
 });
 //# sourceMappingURL=data-source.js.map

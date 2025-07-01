@@ -14,7 +14,7 @@ export default class Account implements AccountInterface {
   @Column()
   type: 'corrente' | 'poupanca' | 'investimento' | 'credito' | 'dinheiro' | 'outros'
 
-  @Column({ type: 'float', precision: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   initialBalance: number;
 
   @Column()

@@ -8,14 +8,16 @@ import Company from './entity/company'
 import Transaction from './entity/transaction'
 import Sector from './entity/sector'
 
+const isCompiled = __dirname.includes('dist');
+
 export const AppDataSource = new DataSource({
 
   type: "mysql",
-  host: process.env.DB_HOST || "localhost",
-  port: Number(process.env.DB_PORT) || 3306,
-  username: process.env.DB_USERNAME || "root",
-  password: process.env.DB_PASSWORD || "Frk@071569#",
-  database: process.env.DB_DATABASE || "finance",
+  host: 'mysql',
+  port: 3306,
+  username: 'root',
+  password: 'Frk@071569#',
+  database: 'finance',
   synchronize: false,
   logging: false,
   entities: [
@@ -27,6 +29,6 @@ export const AppDataSource = new DataSource({
     Transaction,
     Sector
   ],
-  migrations: [__dirname + '/migration/*.ts'],
+  migrations: [__dirname + (isCompiled ? '/migration/*.js' : '/migration/*.ts')],
   subscribers: [],
 })
