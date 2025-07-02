@@ -10,15 +10,17 @@ var category_1 = require("./entity/category");
 var company_1 = require("./entity/company");
 var transaction_1 = require("./entity/transaction");
 var sector_1 = require("./entity/sector");
+var dotenv = require("dotenv");
+dotenv.config();
 var isCompiled = __dirname.includes('dist');
 exports.AppDataSource = new typeorm_1.DataSource({
-    type: "mysql",
-    host: 'mysql',
-    port: 3306,
-    username: 'root',
-    password: 'Frk@071569#',
-    database: 'finance',
-    synchronize: false,
+    type: process.env.DB_TYPE,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || "3306", 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    synchronize: true,
     logging: false,
     entities: [
         user_1.User,

@@ -7,18 +7,20 @@ import Category from './entity/category'
 import Company from './entity/company'
 import Transaction from './entity/transaction'
 import Sector from './entity/sector'
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const isCompiled = __dirname.includes('dist');
 
 export const AppDataSource = new DataSource({
 
-  type: "mysql",
-  host: 'mysql',
-  port: 3306,
-  username: 'root',
-  password: 'Frk@071569#',
-  database: 'finance',
-  synchronize: false,
+  type: process.env.DB_TYPE as any,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "3306", 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  synchronize: true,
   logging: false,
   entities: [
     User,
