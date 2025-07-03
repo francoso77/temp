@@ -29,6 +29,7 @@ export default function Registrar() {
     name: '',
     email: '',
     password: '',
+    whatsapp: '',
     confirmePassword: '',
     isActive: true,
     tentativasLogin: 0,
@@ -93,7 +94,7 @@ export default function Registrar() {
   const irPara = useNavigate()
   const btFechar = async () => {
     if (!usuarioState.logado) {
-      irPara('/login')
+      irPara('/')
     } else {
       irPara('/dashboard')
     }
@@ -113,6 +114,7 @@ export default function Registrar() {
     retorno = validaCampo.naoVazio('name', usuario, erros, retorno, 'Digite um nome para o usuário')
     retorno = validaCampo.naoVazio('password', usuario, erros, retorno, 'A senha não pode ser vázio')
     retorno = validaCampo.eEmail('email', usuario, erros, retorno, false)
+    retorno = validaCampo.eTelefone('whatsapp', usuario, erros, retorno, false)
     retorno = validaCampo.eTrue('termsAccepted', usuario, erros, retorno, true)
     retorno = validaCampo.naoVazio('confirmePassword', usuario, erros, retorno, 'Confirme a senha')
 
@@ -179,6 +181,7 @@ export default function Registrar() {
       formData.append("name", usuario.name);
       formData.append("email", usuario.email);
       formData.append("password", usuario.password);
+      formData.append("whatsapp", usuario.whatsapp);
       formData.append("termsAccepted", usuario.termsAccepted.toString());
 
       if (
@@ -334,7 +337,6 @@ export default function Registrar() {
                 </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
-
                     <InputText
                       label="Nome"
                       setState={setUsuario}
@@ -349,7 +351,6 @@ export default function Registrar() {
                 </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-
                     <InputText
                       label="E-mail"
                       setState={setUsuario}
@@ -365,7 +366,21 @@ export default function Registrar() {
                 </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
                   <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
-
+                    <InputText
+                      label="Whatsapp"
+                      setState={setUsuario}
+                      dados={usuario}
+                      field="whatsapp"
+                      erros={erros}
+                      type="tel"
+                      mask='tel'
+                      onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                      corFonte='#fff'
+                    />
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
+                  <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                     <Text
                       field="password"
                       label="Senha"
@@ -374,15 +389,14 @@ export default function Registrar() {
                       setState={setUsuario}
                       tipo='pass'
                       erros={erros}
-                      onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                      onKeyDown={(event: any) => btPulaCampo(event, 5)}
                       corFonte='#fff'
                       autocomplete='password'
                     />
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-
+                  <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                     <Text
                       field="confirmePassword"
                       label="Confirme a Senha"

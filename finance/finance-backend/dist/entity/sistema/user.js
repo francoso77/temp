@@ -90,6 +90,10 @@ var User = /** @class */ (function () {
         __metadata("design:type", String)
     ], User.prototype, "password", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ length: 15, nullable: true, }),
+        __metadata("design:type", String)
+    ], User.prototype, "whatsapp", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Boolean)
     ], User.prototype, "isActive", void 0);

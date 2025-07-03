@@ -17,6 +17,9 @@ export class User implements UserInterface {
   @Column({ length: 255 })
   password: string
 
+  @Column({ length: 15, nullable: true, })
+  whatsapp: string
+
   @Column({ nullable: true })
   isActive: boolean
 

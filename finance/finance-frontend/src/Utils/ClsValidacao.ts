@@ -208,7 +208,7 @@ export default class ClsValidacao {
     erros: { [key: string]: string },
     retorno: boolean,
     valorEsperado: boolean = true,
-    mensagemErro: string = 'Este campo deve ser marcado'
+    mensagemErro: string = 'Campo Obrigatório'
   ): boolean {
     if (dados[campo] !== valorEsperado) {
       erros[campo] = mensagemErro;
@@ -237,7 +237,7 @@ export default class ClsValidacao {
     retorno: boolean,
     permiteVazio: boolean = false,
     mensagemErro: string = 'Email Inválido',
-    mensagemErroVazio: string = 'Forneça um Email Válido'
+    mensagemErroVazio: string = 'Forneça um E-mail Válido'
   ): boolean {
 
     //eslint-disable-next-line

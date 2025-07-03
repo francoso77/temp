@@ -3,6 +3,7 @@ export interface UserInterface {
   name: string;
   email: string;
   password: string;
+  whatsapp: string;
   isActive: boolean;
   tentativasLogin: number;
   resetToken: string;
