@@ -481,8 +481,4 @@ export default class ClsCrud {
         return rs.data.dados as any
       })
   }
-
-
-
-
 }
