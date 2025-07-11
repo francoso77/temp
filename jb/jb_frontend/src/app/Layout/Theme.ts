@@ -40,16 +40,16 @@ export const THEME = createTheme({
     MuiIconButton: {
       defaultProps: {
         color: 'secondary',
-        style: { height: '35px', width: '35px' }
+        style: { height: '50px', width: '50px' }
       },
       styleOverrides: {
         root: {
           color: 'secondary', //' #DC7B3F', // cor padrão
-          // '&:hover': {
-          //   color: 'white', // cor ao passar o mouse
-          //   backgroundColor: '#ffcc80', // fundo ao passar o mouse
-          // },
-          style: { height: '35px', width: '35px' }
+          '&:hover': {
+            color: "#3c486b", // cor ao passar o mouse
+            backgroundColor: '#ffcc80', // fundo ao passar o mouse
+          },
+          style: { height: '50px', width: '50px' }
         },
       },
     }

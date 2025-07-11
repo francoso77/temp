@@ -107,7 +107,14 @@ var ProducaoMalharia = /** @class */ (function () {
         __metadata("design:type", Date)
     ], ProducaoMalharia.prototype, "updateAt", void 0);
     ProducaoMalharia = __decorate([
-        (0, typeorm_1.Entity)({ name: 'producaomalharias' })
+        (0, typeorm_1.Entity)({ name: 'producaomalharias' }),
+        (0, typeorm_1.Index)('IDX_ID_PRODUTO', ['idProduto']),
+        (0, typeorm_1.Index)('IDX_ID_MAQUINA', ['idMaquina']),
+        (0, typeorm_1.Index)('IDX_ID_TECELAO', ['idPessoa_tecelao']),
+        (0, typeorm_1.Index)('IDX_ID_REVISADOR', ['idPessoa_revisador']),
+        (0, typeorm_1.Index)('IDX_FECHADO', ['fechado']),
+        (0, typeorm_1.Index)('IDX_ID_TINTURARIA', ['idTinturaria']),
+        (0, typeorm_1.Index)('IDX_DATA_MAQUINA_PRODUTO', ['dataProducao', 'idMaquina', 'idProduto'])
     ], ProducaoMalharia);
     return ProducaoMalharia;
 }());

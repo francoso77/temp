@@ -4,16 +4,16 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
+import { DetalheProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
 import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import ClsApi from '../../Utils/ClsApi';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import CloseIcon from '@mui/icons-material/Close'
 import TableSelect from '../../Componentes/DataTable/tableSelect';
-import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao';
 import ArticleTwoToneIcon from '@mui/icons-material/ArticleTwoTone';
 import SellTwoToneIcon from '@mui/icons-material/SellTwoTone';
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 
 interface PropsInterface {
   programacao: number,

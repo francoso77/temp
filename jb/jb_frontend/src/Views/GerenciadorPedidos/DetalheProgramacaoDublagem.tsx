@@ -1,4 +1,4 @@
-import { Dialog, Grid, IconButton, Paper, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Chip, Dialog, Grid, IconButton, Paper, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
@@ -8,12 +8,12 @@ import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTa
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
-import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } from '../../Interfaces//programacaoDublagemInterface';
+import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import GerenciadorPedido from './GerenciadorPedidos';
 import ClsApi from '../../Utils/ClsApi';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 
 
 interface PropsInterface {
@@ -30,10 +30,12 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
   const clsApi = new ClsApi()
 
   const [open, setOpen] = useState(false);
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
   const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
   const [rsPessoa, setRsPessoa] = useState<Array<PessoaInterface>>([])
   const [_rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
+
+
 
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -69,9 +71,48 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
     {
       cabecalho: 'Status',
       alinhamento: 'center',
-      campo: 'statusPedido',
-      format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rsPedido.find(v => v.idPedido === rs.idPedido)?.statusPedido)?.descricao
-    }
+      campo: 'statusPedido', // O 'campo' ainda pode apontar para onde o status *deveria* estar para identificação
+      render: (_valor: any, row: any) => { // O _valor aqui seria o que 'campo' aponta, mas não usaremos diretamente
+        // 1. Encontrar o statusPedido real dentro de rsPedido
+        const pedidoCorrespondente = rsPedido.find((p: any) => p.idPedido === row.idPedido);
+        const statusCode = pedidoCorrespondente ? pedidoCorrespondente.statusPedido : undefined;
+
+        // 2. Encontrar as informações completas do status (descrição e id)
+        const statusInfo = StatusPedidoTypes.find(
+          (status) => status.idStatusPedido === statusCode
+        );
+
+        const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+        // 3. Definir a cor do Chip com base no statusCode
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+
+        switch (statusCode) {
+          case StatusPedidoType.aberto:
+            color = 'info'; // Azul para aberto
+            break;
+          case StatusPedidoType.finalizado:
+            color = 'success'; // Verde para finalizado
+            break;
+          case StatusPedidoType.producao:
+            color = 'warning'; // Laranja para produção
+            break;
+          default:
+            color = 'default'; // Cor padrão para status não reconhecido
+            break;
+        }
+
+        // 4. Retornar o componente Chip
+        return (
+          <Chip
+            label={descricaoStatus}
+            color={color}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
+      },
+    },
 
   ]
 
@@ -80,8 +121,9 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
       url: 'produzirPedidos',
       method: 'post',
       pedidos,
-      tipoProducao: 'A',
+      tipoProducao: 1,
       mensagem: 'Alterando status dos pedidos ...',
+      token: usuarioState.token,
       setMensagemState: setMensagemState
     })
     setTimeout(() => {

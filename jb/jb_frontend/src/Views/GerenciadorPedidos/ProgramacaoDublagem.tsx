@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState } from 'react';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { ProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
+import { ProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { Box, Container, Grid, IconButton, Paper, Tooltip, useMediaQuery, useTheme, Dialog } from '@mui/material';
 import Condicional from '../../Componentes/Condicional/Condicional';
@@ -17,10 +17,10 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { useNavigate } from 'react-router-dom';
 import DetalheProgramacaoDublagem from './DetalheProgramacaoDublagem';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import ClsApi from '../../Utils/ClsApi';
-import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao';
 import EtiquetasPedido from './EtiquetasPedido';
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 
 
 export default function ProgramacaoDublagem() {
@@ -45,7 +45,7 @@ export default function ProgramacaoDublagem() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [programacaoDublagem, setProgramacaoDublagem] = useState<ProgramacaoDublagemInterface>(resetDados)
-  const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -118,11 +118,11 @@ export default function ProgramacaoDublagem() {
     clsRelatorioProgramacao.renderRelacao(dataPesquisa);
   }
 
-  // const onFicha = async (id: string | number) => {
-  //   const { dataProgramacao } = await pesquisarID(id);
-  //   const dataPesquisa = formatarData(dataProgramacao);
-  //   clsRelatorioProgramacao.renderFicha(dataPesquisa);
-  // }
+  const onFicha = async (id: string | number) => {
+    const { dataProgramacao } = await pesquisarID(id);
+    const dataPesquisa = formatarData(dataProgramacao);
+    clsRelatorioProgramacao.renderFicha(dataPesquisa);
+  }
 
   const onEtiqueta = async (id: number) => {
     setId(id)
@@ -158,7 +158,8 @@ export default function ProgramacaoDublagem() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Programação Dublagem',
       pathTitulo: '/',
@@ -171,8 +172,10 @@ export default function ProgramacaoDublagem() {
     return `${year}-${month}-${day} 00:00:00`
   }
   const btPesquisar = async () => {
+
     let itemPesquisado = pesquisa.itemPesquisa
     const temNumero = /\d/.test(itemPesquisado)
+
     if (temNumero && pesquisa.itemPesquisa.includes('/')) {
       itemPesquisado = formatDateTimeForMySQL(itemPesquisado)
     }
@@ -181,7 +184,8 @@ export default function ProgramacaoDublagem() {
       method: 'post',
       itemPesquisa: itemPesquisado,
       mensagem: 'Pesquisando Programação de Dublagem ...',
-      setMensagemState: setMensagemState
+      setMensagemState: setMensagemState,
+      token: usuarioState.token
     }).then((rs: Array<any>) => {
       setRsPesquisa(rs)
     })
@@ -202,9 +206,10 @@ export default function ProgramacaoDublagem() {
       url: 'produzirPedidos',
       method: 'post',
       pedidos,
-      tipoProducao: 'A',
+      tipoProducao: 1,
       mensagem: 'Alterando status dos pedidos ...',
-      setMensagemState: setMensagemState
+      setMensagemState: setMensagemState,
+      token: usuarioState.token
     })
   }
   const btConfirmar = () => {
@@ -215,7 +220,8 @@ export default function ProgramacaoDublagem() {
           criterio: programacaoDublagem,
           localState: localState,
           setMensagemState: setMensagemState,
-          cb: () => btPesquisar()
+          token: usuarioState.token,
+          cb: btPesquisar
         })
           .then((rs) => {
             if (rs.ok) {
@@ -237,7 +243,8 @@ export default function ProgramacaoDublagem() {
           criterio: {
             idProgramacaoDublagem: programacaoDublagem.idProgramacaoDublagem
           },
-          cb: () => btPesquisar(),
+          token: usuarioState.token,
+          cb: btPesquisar,
           setMensagemState: setMensagemState
         })
           .then((rs) => {
@@ -287,7 +294,7 @@ export default function ProgramacaoDublagem() {
             <Condicional condicao={localState.action === 'pesquisando'}>
               <Grid item xs={10} md={11}>
                 <InputText
-                  label="Pesquisa"
+                  label="Buscar data de programação"
                   tipo="uppercase"
                   dados={pesquisa}
                   field="itemPesquisa"
@@ -326,12 +333,12 @@ export default function ProgramacaoDublagem() {
                         onEtiqueta(rs.idProgramacaoDublagem as number),
                       toolTip: "Etiqueta",
                     },
-                    // {
-                    //   icone: "receipt_long.two_tone",
-                    //   onAcionador: (rs: ProgramacaoDublagemInterface) =>
-                    //     onFicha(rs.idProgramacaoDublagem as number),
-                    //   toolTip: "Ficha de Corte",
-                    // },
+                    {
+                      icone: "receipt_long.two_tone",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onFicha(rs.idProgramacaoDublagem as number),
+                      toolTip: "Ficha de Corte",
+                    },
                     {
                       icone: "edit",
                       onAcionador: (rs: ProgramacaoDublagemInterface) =>

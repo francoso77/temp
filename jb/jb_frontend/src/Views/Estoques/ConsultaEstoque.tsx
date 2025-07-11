@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface'
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface'
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
+import { ProdutoInterface } from '../../Interfaces/produtoInterface'
+import { CorInterface } from '../../Interfaces/corInteface'
+import { PessoaInterface } from '../../Interfaces/pessoaInterface'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsApi from '../../Utils/ClsApi'
 import ClsCrud from '../../Utils/ClsCrudApi'
@@ -180,14 +180,14 @@ export const ConsultaEstoque = () => {
 
   return (
     <div>
-      <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
+      <Paper variant="outlined" sx={{ padding: 1, m: 1, borderRadius: 2 }}>
         <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: 1 }}>
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
           </Grid>
-          <Grid item xs={12} sm={4} >
+          <Grid item xs={12} sm={4} sx={{ mt: -5 }}>
             <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
               <ComboBox
                 opcoes={rsProdutos}
@@ -204,7 +204,7 @@ export const ConsultaEstoque = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4}  >
+          <Grid item xs={12} sm={4} sx={{ mt: { xs: -3, sm: -5 } }}>
             <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
               <ComboBox
                 opcoes={rsCores}
@@ -221,7 +221,7 @@ export const ConsultaEstoque = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4}  >
+          <Grid item xs={12} sm={4} sx={{ mt: { xs: -3, sm: -5 } }}>
             <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
               <ComboBox
                 opcoes={TipoProdutoTypes}
@@ -238,7 +238,7 @@ export const ConsultaEstoque = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4} >
+          <Grid item xs={12} sm={4} sx={{ mt: { xs: -3, sm: -1 } }}>
             <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
               <ComboBox
                 opcoes={rsFornecedores}
@@ -255,9 +255,9 @@ export const ConsultaEstoque = () => {
               />
             </Box>
           </Grid>
-          <Paper sx={{ padding: 1, ml: 1.5, mt: 1.5, width: '55%' }} variant="outlined" >
+          <Paper sx={{ padding: 1, ml: 1, mt: 1, width: '55%' }} variant="outlined" >
             <Grid container direction="row" spacing={2}>
-              <Grid item xs={12} md={6} >
+              <Grid item xs={12} md={6} sx={{ mt: -3 }}>
                 <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
                   <OperatorSelect
                     value={dados.operador}
@@ -267,7 +267,7 @@ export const ConsultaEstoque = () => {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={6} >
+              <Grid item xs={12} md={6} sx={{ mt: -3 }} >
                 <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                   <InputText
                     tipo='uppercase'
@@ -285,18 +285,18 @@ export const ConsultaEstoque = () => {
               </Grid>
             </Grid>
           </Paper>
-          <Grid item xs={2} md={1}>
+          <Grid item xs={2} md={1} >
             <Tooltip title={'Pesquisar'}>
               <IconButton
                 color="secondary"
-                sx={{ mt: 5, ml: 6, mb: 5 }}
+                sx={{ mt: 1.5, ml: 6, mb: 2 }}
                 onClick={() => btPesquisar()}
               >
                 <ContentPasteSearchTwoToneIcon sx={{ fontSize: 60 }} />
               </IconButton>
             </Tooltip>
           </Grid>
-          <Grid item xs={12} sx={{ m: 0.5 }}>
+          <Grid item xs={12} >
             <DataTable
               cabecalho={cabecalhoForm}
               dados={rsPesquisa}

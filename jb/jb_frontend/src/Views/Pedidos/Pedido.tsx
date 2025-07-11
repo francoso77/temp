@@ -16,12 +16,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import { StatusPedidoType } from '../../types/statusPedidoTypes';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { PrazoEntregaInterface } from '../../../../jb_backend/src/interfaces/prazoEntregaInterface';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
+import { PrazoEntregaInterface } from '../../Interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import ClsApi from '../../Utils/ClsApi';
-import { PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalhePedido from './DetalhePedido';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -247,7 +247,7 @@ export default function Pedido() {
       "detalhePedidos.cor",
     ];
 
-    const msg = 'Pesquisando pedidos ...'
+    const msg = 'Pesquisando dados ...'
     const setMensagem = setMensagemState
 
     let dadosPesquisa = {}
@@ -261,16 +261,22 @@ export default function Pedido() {
       const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
       criterio = {
         dataPedido: formattedDateTime,
-        statusPedido: "A",
+        statusPedido: 1,
       }
-      camposLike = ['dataPedido', 'statusPedido']
-      comparador = 'I'
+      camposLike = ['dataPedido']
+    } else if (temNumero) {
+
+      criterio = {
+        idPedido: pesquisa.itemPesquisa
+      }
+      camposLike = ['idPedido']
     } else {
+
       criterio = {
         idPessoa_cliente: idCliente,
-        statusPedido: "A",
+        statusPedido: 1,
       }
-      camposLike = ['idPessoa_cliente', 'statusPedido']
+      camposLike = ['idPessoa_cliente']
       comparador = 'I'
     }
 
@@ -374,7 +380,7 @@ export default function Pedido() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
               <InputText
-                label="Pesquise por data ou cliente"
+                label="Buscar por pedido, data ou cliente"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"
@@ -400,7 +406,7 @@ export default function Pedido() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: PedidoInterface) =>
@@ -413,7 +419,7 @@ export default function Pedido() {
                       onExcluir(rs.idPedido as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>
@@ -517,7 +523,7 @@ export default function Pedido() {
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Qtd Total"
+                label="Metros Total"
                 labelAlign='center'
                 dados={rsSomatorio}
                 field="totalQtd"
@@ -531,7 +537,7 @@ export default function Pedido() {
               <InputText
                 tipo='currency'
                 scale={2}
-                label="Total Pedido"
+                label="Valor Total Pedido"
                 labelAlign='center'
                 dados={rsSomatorio}
                 field="total"

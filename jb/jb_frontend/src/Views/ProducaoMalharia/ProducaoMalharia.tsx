@@ -1,12 +1,12 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface'
+import { ProducaoMalhariaInterface } from '../../Interfaces/producaoMalhariaInterface'
 import { TurnoType, TurnoTypes } from '../../types/turnoTypes'
 import ClsCrud from '../../Utils/ClsCrudApi'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsValidacao from '../../Utils/ClsValidacao'
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
-import { MaquinaInterface } from '../../../../jb_backend/src/interfaces/maquinaInterface'
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface'
+import { PessoaInterface } from '../../Interfaces/pessoaInterface'
+import { MaquinaInterface } from '../../Interfaces/maquinaInterface'
+import { ProdutoInterface } from '../../Interfaces/produtoInterface'
 import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import ComboBox from '../../Componentes/ComboBox'
 import InputText from '../../Componentes/InputText'
@@ -22,6 +22,12 @@ import LeaderboardTwoToneIcon from '@mui/icons-material/LeaderboardTwoTone'
 import ContentCutTwoToneIcon from '@mui/icons-material/ContentCutTwoTone'
 import Graficos from './Graficos'
 import PerdasMalharia from './PerdasMalharia'
+import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
+import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
+import AddCircleIcon from "@mui/icons-material/AddCircle"
+import DeleteIcon from '@mui/icons-material/Delete'
+import { UsuarioType } from '../../types/usuarioTypes'
+
 interface DadosPecaInterface {
   nomeProduto: string | undefined
   peca: string
@@ -38,6 +44,10 @@ interface MesPesquisado {
   mes: string
 }
 
+
+interface PesquisaInterface {
+  itemPesquisa: string
+}
 export function ProducaoMalharia() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -86,11 +96,99 @@ export function ProducaoMalharia() {
   const [rsMeses, setRsMeses] = useState<Array<any>>([])
   const [rsTotais, setRsTotais] = useState<DadosTotaisInterface>(ResetDadosTotais)
   const [selectedValue, setSelectedValue] = useState<MesPesquisado>({ mes: "" })
-
+  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
+  const [rsProducaoMalharia, setRsProducaoMalharia] = useState<Array<ProducaoMalhariaInterface>>([])
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
 
 
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
   const firstFieldRef = useRef<HTMLInputElement>(null)
+
+  const cabecalhoProducaoMalharia: Array<DataTableCabecalhoInterface> = [
+    // {
+    //   cabecalho: 'Maquina',
+    //   alinhamento: 'center',
+    //   campo: 'idMaquina',
+    //   format: (idMaquina) => rsMaquina.find(x => x.idMaquina === idMaquina)?.nome
+    // },
+    {
+      cabecalho: 'Peça',
+      alinhamento: 'left',
+      campo: 'peca',
+    },
+    {
+      cabecalho: 'Produção',
+      alinhamento: 'center',
+      campo: 'dataProducao',
+      format: (data) => clsFormatacao.dataISOtoUser(data)
+    },
+    {
+      cabecalho: 'Turno',
+      alinhamento: 'center',
+      campo: 'turno',
+      format: (turno) => TurnoTypes.find(x => x.idTurno === turno)?.descricao
+    },
+    {
+      cabecalho: 'Tecelão',
+      alinhamento: 'center',
+      campo: 'idPessoa_tecelao',
+      format: (idPessoa_tecelao) => rsTecelao.find(x => x.idPessoa === idPessoa_tecelao)?.nome
+    },
+    {
+      cabecalho: 'Produto',
+      alinhamento: 'left',
+      campo: 'idProduto',
+      format: (idProduto) => rsProduto.find(x => x.idProduto === idProduto)?.nome
+    },
+    {
+      cabecalho: 'Peso',
+      alinhamento: 'right',
+      campo: 'peso',
+      format: (peso) => clsFormatacao.currency(peso)
+    },
+  ]
+
+  const onEditar = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setProducaoMalharia(rs)
+      setLocalState({ action: actionTypes.editando })
+    })
+  }
+
+  const onExcluir = (id: string | number) => {
+    pesquisarID(id).then((rs) => {
+      setProducaoMalharia(rs)
+      setLocalState({ action: actionTypes.excluindo })
+    })
+  }
+
+  const btIncluir = () => {
+    setProducaoMalharia(ResetDados)
+    setLocalState({ action: actionTypes.incluindo })
+  }
+
+
+  const pesquisarID = (id: string | number): Promise<ProducaoMalhariaInterface> => {
+    return clsCrud
+      .pesquisar({
+        entidade: "ProducaoMalharia",
+        relations: [
+          'tecelao',
+          'maquina',
+          'produto'
+        ],
+        criterio: {
+          idMalharia: id,
+        },
+      })
+      .then((rs: Array<ProducaoMalhariaInterface>) => {
+        let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataProducao)
+        return {
+          ...rs[0],
+          dataProducao: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+        }
+      })
+  }
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
@@ -169,6 +267,25 @@ export function ProducaoMalharia() {
         } else {
           setSelectedValue({ mes: '' });
         }
+      })
+
+    clsCrud.pesquisar({
+      entidade: 'ProducaoMalharia',
+      relations: [
+        'tecelao',
+        'maquina',
+        'produto'
+      ],
+      tipoOrder: 'DESC',
+      campoOrder: ['dataProducao'],
+      criterio: {
+        fechado: 0
+      },
+      camposLike: ['fechado'],
+      select: ['idMalharia', 'dataProducao', 'peca', 'peso', 'idPessoa_tecelao', 'idMaquina', 'idProduto', 'fechado', 'turno']
+    })
+      .then((rs: Array<any>) => {
+        setRsProducaoMalharia(rs)
       })
   }
 
@@ -269,6 +386,14 @@ export function ProducaoMalharia() {
     }
   }
 
+
+  // const btCancelarProducao = () => {
+  //   setErros({})
+  //   setProducaoMalharia(ResetDados)
+  //   setLocalState({ action: actionTypes.pesquisando })
+  //   setOpen(false)
+  //   btPesquisar()
+  // }
   const btCancelar = () => {
     setOpen(false)
   }
@@ -282,7 +407,7 @@ export function ProducaoMalharia() {
           peca: producaoMalharia.peca
         }
       }).then((rs) => {
-        if (rs.length > 0) {
+        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
           setMensagemState({
             titulo: 'Duplicidade',
             mensagem: 'Peça já informada!',
@@ -301,11 +426,11 @@ export function ProducaoMalharia() {
               if (rs.ok) {
                 setMensagemState({
                   titulo: 'Produção...',
-                  mensagem: 'Peça lançada com sucesso!',
+                  mensagem: localState.action === actionTypes.incluindo ? 'Peça incluida com sucesso!' : 'Peça alterada com sucesso!',
                   exibir: true,
                   exibirBotao: true,
                   cb: null,
-                  tipo: MensagemTipo.Ok,
+                  tipo: localState.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
                 })
                 Totalizador()
                 setProducaoMalharia(ResetDados)
@@ -345,26 +470,131 @@ export function ProducaoMalharia() {
   }
   const btConfirmar = () => {
 
-    if (validarDados()) {
-      setRsDadosPeca({
-        nomeProduto: NomeProduto(producaoMalharia.idProduto, rsProduto),
-        peca: producaoMalharia.peca,
-        peso: producaoMalharia.peso.toString()
-      })
-      setOpen(true)
+    if (localState.action === actionTypes.editando) {
+      const dia = producaoMalharia.dataProducao.substring(0, 2)
+      const mes = producaoMalharia.dataProducao.substring(2, 4)
+      const ano = producaoMalharia.dataProducao.substring(4, 8)
+      const data = `${ano}-${mes}-${dia}`
+      producaoMalharia.dataProducao = data
+    } else if (localState.action === actionTypes.excluindo) {
+      clsCrud
+        .excluir({
+          entidade: "ProducaoMalharia",
+          criterio: {
+            idMalharia: producaoMalharia.idMalharia
+          },
+          token: usuarioState.token
+        }).then((rs) => {
+          if (rs.ok) {
+            setMensagemState({
+              titulo: 'Produção...',
+              mensagem: 'Peça excluida com sucesso!',
+              exibir: true,
+              exibirBotao: true,
+              cb: btFechar,
+              tipo: MensagemTipo.Error
+            })
+          }
+        })
+
+    } else {
+
+      if (validarDados()) {
+        setRsDadosPeca({
+          nomeProduto: NomeProduto(producaoMalharia.idProduto, rsProduto),
+          peca: producaoMalharia.peca,
+          peso: producaoMalharia.peso.toString()
+        })
+        setOpen(true)
+      }
     }
   }
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({
-      ...layoutState,
-      titulo: '',
-      tituloAnterior: 'Produção Malharia',
-      pathTitulo: '/',
-      pathTituloAnterior: '/ProducaoMalharia'
-    })
-    irPara('/')
+    if (['incluindo', 'editando', 'excluindo'].includes(localState.action)) {
+      setLocalState({ action: actionTypes.pesquisando })
+      btPesquisar()
+    } else {
+
+      setLayoutState({
+        ...layoutState,
+        titulo: '',
+        tituloAnterior: 'Produção Malharia',
+        pathTitulo: '/',
+        pathTituloAnterior: '/ProducaoMalharia'
+      })
+      irPara('/')
+    }
+  }
+
+  const formatDateTimeForMySQL = (dateString: string): string => {
+    const [day, month, year] = dateString.split('/')
+    return `${year}-${month}-${day} 00:00:00`
+  }
+  const btPesquisar = () => {
+    const relations = [
+      'tecelao',
+      'maquina',
+      'produto'
+    ]
+
+    const msg = 'Pesquisando dados ...'
+    const setMensagem = setMensagemState
+    const idsTec = rsTecelao
+      .filter(tecelao => tecelao.nome.includes(pesquisa.itemPesquisa))
+      .map(tecelao => tecelao.idPessoa)
+
+    let dadosPesquisa = {}
+    let criterio = {}
+    let camposLike = []
+    let comparador = "L"
+    let tipoOrder = 'DESC'
+    let campoOrder = ['dataProducao']
+
+    const temNumero = /\d/.test(pesquisa.itemPesquisa)
+
+    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
+
+      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
+      criterio = {
+        dataProducao: formattedDateTime,
+        fechado: 0
+      }
+      camposLike = ['dataProducao']
+    } else if (temNumero && pesquisa.itemPesquisa.includes('-')) {
+
+      criterio = {
+        peca: pesquisa.itemPesquisa,
+        fechado: 0
+      }
+      camposLike = ['peca']
+    } else {
+      criterio = {
+        idPessoa_tecelao: idsTec,
+        fechado: 0
+      }
+      camposLike = ['idPessoa_tecelao']
+      comparador = 'I'
+    }
+
+    dadosPesquisa = {
+      entidade: "ProducaoMalharia",
+      relations,
+      comparador,
+      criterio,
+      camposLike,
+      tipoOrder,
+      campoOrder,
+      msg,
+      setMensagemState: setMensagem
+    }
+
+    clsCrud
+      .pesquisar(dadosPesquisa)
+      .then((rs: Array<any>) => {
+        setRsProducaoMalharia(rs);
+      });
   }
 
   useEffect(() => {
@@ -382,273 +612,346 @@ export function ProducaoMalharia() {
 
   return (
     <>
-      <Paper variant="outlined" sx={{ padding: 1, m: 1 }}>
-        <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Grid item xs={12} sx={{ textAlign: 'right' }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
-          </Grid>
-          <Grid item xs={12} sm={2} >
-            <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
-              <ComboBox
-                inputRef={firstFieldRef}
-                opcoes={rsMaquina}
-                campoDescricao="nome"
-                campoID="idMaquina"
-                dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco=""
-                field="idMaquina"
-                label="Tear"
-                erros={erros}
-                setState={setProducaoMalharia}
-                onFocus={(e) => e.target.select(1)}
-                onBlur={(e) => novaPeca(producaoMalharia.idMaquina)}
-                onKeyDown={(event) => btPulaCampo(event, 1)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={4}  >
-            <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
-              <ComboBox
-                opcoes={rsProduto}
-                campoDescricao="nome"
-                campoID="idProduto"
-                dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco="Escolha um produto"
-                field="idProduto"
-                label="Produtos"
-                erros={erros}
-                setState={setProducaoMalharia}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event) => btPulaCampo(event, 2)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6}  >
-            <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-              <ComboBox
-                opcoes={TurnoTypes}
-                campoDescricao="descricao"
-                campoID="idTurno"
-                dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco="Qual o turno"
-                field="turno"
-                label="Turno"
-                erros={erros}
-                setState={setProducaoMalharia}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event) => btPulaCampo(event, 3)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={4} >
-            <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
-              <ComboBox
-                opcoes={rsRevisador}
-                campoDescricao="nome"
-                campoID="idPessoa"
-                dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco="Escolha um revisador"
-                field="idPessoa_revisador"
-                label="Revisador"
-                erros={erros}
-                setState={setProducaoMalharia}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={4} >
-            <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-              <ComboBox
-                opcoes={rsTecelao}
-                campoDescricao="nome"
-                campoID="idPessoa"
-                dados={producaoMalharia}
-                mensagemPadraoCampoEmBranco="Escolha um tecelão"
-                field="idPessoa_tecelao"
-                label="Tecelão"
-                erros={erros}
-                setState={setProducaoMalharia}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event) => btPulaCampo(event, 7)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4} >
-            <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-              <InputText
-                tipo='uppercase'
-                label="Localização"
-                dados={producaoMalharia}
-                field="localizacao"
-                setState={setProducaoMalharia}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={25}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={5} >
-            <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
-              <InputText
-                type='tel'
-                tipo="date"
-                label="Data"
-                posicaoLabel={'bottom'}
-                dados={producaoMalharia}
-                field="dataProducao"
-                setState={setProducaoMalharia}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 7)}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={3} >
-            <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
-              <InputText
-                tipo='currency'
-                scale={3}
-                label="Peso"
-                posicaoLabel={'bottom'}
-                dados={producaoMalharia}
-                field="peso"
-                setState={setProducaoMalharia}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 8)}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4} >
-            <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
-              <InputText
-                tipo='number'
-                label="Peça"
-                posicaoLabel={'bottom'}
-                dados={producaoMalharia}
-                field="peca"
-                setState={setProducaoMalharia}
-                disabled={true}
-                erros={erros}
-                onFocus={(e) => e.target.select()}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <Graficos open={openGraficos} clickFechar={btGraficos} />
-          </Grid>
-          <Grid item xs={12}>
-            <PerdasMalharia open={openPerdas} clickFechar={btPerdas} />
-          </Grid>
-        </Grid>
-      </Paper>
-      <Condicional condicao={isDesktop}>
-        <Paper variant="outlined" sx={{ p: 0.5, m: 1, bgcolor: 'greenyellow' }}>
+      <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
+        <Paper variant="outlined" sx={{ padding: 1, m: 1, borderRadius: 2 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'right', mt: 1 }}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={12} sm={2} >
+              <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                <ComboBox
+                  inputRef={firstFieldRef}
+                  opcoes={rsMaquina}
+                  campoDescricao="nome"
+                  campoID="idMaquina"
+                  dados={producaoMalharia}
+                  mensagemPadraoCampoEmBranco=""
+                  field="idMaquina"
+                  label="Tear"
+                  erros={erros}
+                  setState={setProducaoMalharia}
+                  onFocus={(e) => e.target.select(1)}
+                  onBlur={(e) => novaPeca(producaoMalharia.idMaquina)}
+                  onKeyDown={(event) => btPulaCampo(event, 1)}
+                  tamanhoFonte={25}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}  >
+              <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                <ComboBox
+                  opcoes={rsProduto}
+                  campoDescricao="nome"
+                  campoID="idProduto"
+                  dados={producaoMalharia}
+                  mensagemPadraoCampoEmBranco="Escolha um produto"
+                  field="idProduto"
+                  label="Produtos"
+                  erros={erros}
+                  setState={setProducaoMalharia}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event) => btPulaCampo(event, 2)}
+                  tamanhoFonte={25}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6}  >
+              <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                <ComboBox
+                  opcoes={TurnoTypes}
+                  campoDescricao="descricao"
+                  campoID="idTurno"
+                  dados={producaoMalharia}
+                  mensagemPadraoCampoEmBranco="Qual o turno"
+                  field="turno"
+                  label="Turno"
+                  erros={erros}
+                  setState={setProducaoMalharia}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event) => btPulaCampo(event, 3)}
+                  tamanhoFonte={25}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
             <Grid item xs={12} sm={4} >
-              <ComboBox
-                opcoes={rsMeses}
-                campoDescricao="mes"
-                campoID="mes"
-                dados={selectedValue}
-                field="mes"
-                setState={setSelectedValue}
-                mensagemPadraoCampoEmBranco=""
-                label="Período"
-                erros={erros}
-                onBlur={Totalizador}
-                tamanhoFonte={40}
-                corFundo={'#cbdce9'}
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                <ComboBox
+                  opcoes={rsRevisador}
+                  campoDescricao="nome"
+                  campoID="idPessoa"
+                  dados={producaoMalharia}
+                  mensagemPadraoCampoEmBranco="Escolha um revisador"
+                  field="idPessoa_revisador"
+                  label="Revisador"
+                  erros={erros}
+                  setState={setProducaoMalharia}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                  tamanhoFonte={25}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4} >
+              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                <ComboBox
+                  opcoes={rsTecelao}
+                  campoDescricao="nome"
+                  campoID="idPessoa"
+                  dados={producaoMalharia}
+                  mensagemPadraoCampoEmBranco="Escolha um tecelão"
+                  field="idPessoa_tecelao"
+                  label="Tecelão"
+                  erros={erros}
+                  setState={setProducaoMalharia}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event) => btPulaCampo(event, 7)}
+                  tamanhoFonte={25}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4} >
+              <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                <InputText
+                  tipo='uppercase'
+                  label="Localização"
+                  dados={producaoMalharia}
+                  field="localizacao"
+                  setState={setProducaoMalharia}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                  tamanhoFonte={25}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={5} >
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                <InputText
+                  type='tel'
+                  tipo="date"
+                  label="Data"
+                  posicaoLabel={'bottom'}
+                  dados={producaoMalharia}
+                  field="dataProducao"
+                  setState={setProducaoMalharia}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                  tamanhoFonte={40}
+                  textAlign={'center'}
+                  labelAlign={'center'}
+                  corFundo={'#cbdce9'}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={3} >
+              <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
+                <InputText
+                  tipo='currency'
+                  scale={3}
+                  label="Peso"
+                  posicaoLabel={'bottom'}
+                  dados={producaoMalharia}
+                  field="peso"
+                  setState={setProducaoMalharia}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 8)}
+                  tamanhoFonte={40}
+                  textAlign={'center'}
+                  labelAlign={'center'}
+                  corFundo={'#cbdce9'}
+                  disabled={localState.action === 'excluindo'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4} >
+              <Box ref={(el: any) => (fieldRefs.current[8] = el)}>
+                <InputText
+                  tipo='number'
+                  label="Peça"
+                  posicaoLabel={'bottom'}
+                  dados={producaoMalharia}
+                  field="peca"
+                  setState={setProducaoMalharia}
+                  disabled={true}
+                  erros={erros}
+                  onFocus={(e) => e.target.select()}
+                  tamanhoFonte={40}
+                  textAlign={'center'}
+                  labelAlign={'center'}
+                  corFundo={'#cbdce9'}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Graficos open={openGraficos} clickFechar={btGraficos} />
+            </Grid>
+            <Grid item xs={12}>
+              <PerdasMalharia open={openPerdas} clickFechar={btPerdas} />
+            </Grid>
+          </Grid>
+        </Paper>
+        <Condicional condicao={isDesktop}>
+          <Paper variant="outlined" sx={{ p: 0.5, m: 1, bgcolor: '#ffcc80' }}>
+            <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Grid item xs={12} sm={4} >
+                <ComboBox
+                  opcoes={rsMeses}
+                  campoDescricao="mes"
+                  campoID="mes"
+                  dados={selectedValue}
+                  field="mes"
+                  setState={setSelectedValue}
+                  mensagemPadraoCampoEmBranco=""
+                  label="Período"
+                  erros={erros}
+                  onBlur={Totalizador}
+                  tamanhoFonte={40}
+                  corFundo={'#cbdce9'}
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12} md={4} >
+                <InputCalc
+                  tipo='currency'
+                  scale={2}
+                  label="Peso Total"
+                  posicaoLabel={'top'}
+                  value={rsTotais?.pesoTotal.toString()}
+                  disabled={true}
+                  onFocus={(e) => e.target.select()}
+                  tamanhoFonte={40}
+                  textAlign={'center'}
+                  labelAlign={'center'}
+                  corFundo={'#cbdce9'}
+                />
+              </Grid>
+              <Grid item xs={12} md={4} >
+                <InputCalc
+                  tipo='number'
+                  label="Qtd Total"
+                  posicaoLabel={'top'}
+                  value={rsTotais?.qtdTotal}
+                  disabled={true}
+                  onFocus={(e) => e.target.select()}
+                  tamanhoFonte={40}
+                  textAlign={'center'}
+                  labelAlign={'center'}
+                  corFundo={'#cbdce9'}
+                />
+              </Grid>
+            </Grid>
+          </Paper>
+        </Condicional>
+        <Box sx={{ height: 20 }} />
+        <Grid item xs={12} sx={{ textAlign: 'right' }}>
+
+          <Tooltip title={'Perdas'}>
+            <IconButton
+              color="secondary"
+              sx={{ mt: 0, mr: 5 }}
+              onClick={() => btPerdas()}
+            >
+              <ContentCutTwoToneIcon sx={{ fontSize: 55 }} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title={'Gráficos'}>
+            <IconButton
+              color="secondary"
+              sx={{ mt: 0, mr: 15 }}
+              onClick={() => btGraficos()}
+            >
+              <LeaderboardTwoToneIcon sx={{ fontSize: 55 }} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title={'Confirmar'}>
+            <IconButton
+              color="secondary"
+              sx={{ mt: 0, mr: 5 }}
+              onClick={() => btConfirmar()}
+            >
+              {localState.action === 'excluindo' ? <DeleteIcon sx={{ fontSize: 55 }} /> : <CheckCircleRoundedIcon sx={{ fontSize: 55 }} />}
+
+            </IconButton>
+          </Tooltip>
+        </Grid>
+      </Condicional>
+      <Condicional condicao={localState.action === actionTypes.pesquisando}>
+        <Paper variant="outlined" sx={{ p: 0.5, m: 1 }}>
+          <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: -5 }}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={10} md={11}>
+              <InputText
+                label='Buscar Peça, Data de Produção, Tecelão'
+                tipo="uppercase"
+                dados={pesquisa}
+                field="itemPesquisa"
+                setState={setPesquisa}
+                iconeEnd='searchicon'
+                onClickIconeEnd={() => btPesquisar()}
+                mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
               />
             </Grid>
-            <Grid item xs={12} md={4} >
-              <InputCalc
-                tipo='currency'
-                scale={2}
-                label="Peso Total"
-                posicaoLabel={'top'}
-                value={rsTotais?.pesoTotal.toString()}
-                disabled={true}
-                onFocus={(e) => e.target.select()}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
-              />
+            <Grid item xs={2} md={1}>
+              <Tooltip title={'Incluir'}>
+                <IconButton
+                  color="secondary"
+                  sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
+                  onClick={() => btIncluir()}
+                >
+                  <AddCircleIcon sx={{ fontSize: 50 }} />
+                </IconButton>
+              </Tooltip>
             </Grid>
-            <Grid item xs={12} md={4} >
-              <InputCalc
-                tipo='number'
-                label="Qtd Total"
-                posicaoLabel={'top'}
-                value={rsTotais?.qtdTotal}
-                disabled={true}
-                onFocus={(e) => e.target.select()}
-                tamanhoFonte={40}
-                textAlign={'center'}
-                labelAlign={'center'}
-                corFundo={'#cbdce9'}
+            <Grid item xs={12} >
+              <Box sx={{ height: 20 }}>
+                <Typography variant="h5" align="left" sx={{ mb: 2 }}>
+                  Últimos lançamentos
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} >
+              <DataTable
+                cabecalho={cabecalhoProducaoMalharia}
+                dados={rsProducaoMalharia}
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ?
+                  [
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: ProducaoMalhariaInterface) =>
+                        onEditar(rs.idMalharia as number),
+                      toolTip: "Editar",
+                    },
+                    {
+                      icone: "delete",
+                      onAcionador: (rs: ProducaoMalhariaInterface) =>
+                        onExcluir(rs.idMalharia as number),
+                      toolTip: "Excluir",
+                    },
+                  ] : []}
               />
             </Grid>
           </Grid>
         </Paper>
       </Condicional>
-
-      <Grid item xs={12} sx={{ textAlign: 'right' }}>
-
-        <Tooltip title={'Perdas'}>
-          <IconButton
-            color="secondary"
-            sx={{ mt: 0, mr: 5 }}
-            onClick={() => btPerdas()}
-          >
-            <ContentCutTwoToneIcon sx={{ fontSize: 55 }} />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title={'Gráficos'}>
-          <IconButton
-            color="secondary"
-            sx={{ mt: 0, mr: 5 }}
-            onClick={() => btGraficos()}
-          >
-            <LeaderboardTwoToneIcon sx={{ fontSize: 55 }} />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title={'Confirmar'}>
-          <IconButton
-            color="secondary"
-            sx={{ mt: 0, mr: 5 }}
-            onClick={() => btConfirmar()}
-          >
-            <CheckCircleRoundedIcon sx={{ fontSize: 55 }} />
-          </IconButton>
-        </Tooltip>
-      </Grid>
-
       <Dialog
         open={open}
         fullScreen={fullScreen}

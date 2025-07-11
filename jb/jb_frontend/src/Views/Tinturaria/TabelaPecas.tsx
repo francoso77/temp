@@ -15,7 +15,7 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import FactCheckTwoToneIcon from '@mui/icons-material/FactCheckTwoTone';
-import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface';
+import { ProducaoMalhariaInterface } from '../../Interfaces/producaoMalhariaInterface';
 
 
 interface PropsInterface {
@@ -119,7 +119,7 @@ export default function DetalhePecaTinturaria({ openPecas, setOpenPecas, rsPecas
     clsCrud.pesquisar({
       entidade: "ProducaoMalharia",
       criterio: {
-        fechado: false
+        fechado: 0
       },
       relations: ['produto'],
       camposLike: ['fechado'],

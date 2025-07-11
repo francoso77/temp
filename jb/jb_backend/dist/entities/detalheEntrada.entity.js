@@ -24,6 +24,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "idDetalheEntrada", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)('IDX_ID_ENTRADA'),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idEntrada", void 0);
     __decorate([
@@ -37,6 +38,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "entrada", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)('IDX_ID_PRODUTO'),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idProduto", void 0);
     __decorate([
@@ -46,6 +48,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "produto", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Index)('IDX_ID_COR'),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idCor", void 0);
     __decorate([
@@ -75,6 +78,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "gm2", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Index)('IDX_ID_REVISADOR'),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idPessoa_revisador", void 0);
     __decorate([
@@ -84,6 +88,7 @@ var DetalheEntrada = /** @class */ (function () {
     ], DetalheEntrada.prototype, "revisador", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Index)('IDX_ID_TINTURARIA'),
         __metadata("design:type", Number)
     ], DetalheEntrada.prototype, "idTinturaria", void 0);
     __decorate([
@@ -108,7 +113,8 @@ var DetalheEntrada = /** @class */ (function () {
         __metadata("design:type", Date)
     ], DetalheEntrada.prototype, "updateAt", void 0);
     DetalheEntrada = __decorate([
-        (0, typeorm_1.Entity)({ name: 'detalheentradas' })
+        (0, typeorm_1.Entity)({ name: 'detalheentradas' }),
+        (0, typeorm_1.Index)('IDX_ENTRADA_PRODUTO', ['idEntrada', 'idProduto'])
     ], DetalheEntrada);
     return DetalheEntrada;
 }());

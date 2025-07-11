@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import Produto from './produto.entity';
 import { DetalheEntradaInterface } from '../interfaces/entradaInterface';
 import Entrada from './entrada.entity';
@@ -7,12 +7,14 @@ import Pessoa from './pessoa.entity';
 import Tinturaria from './tinturaria.entity';
 
 @Entity({ name: 'detalheentradas' })
+@Index('IDX_ENTRADA_PRODUTO', ['idEntrada', 'idProduto'])
 export default class DetalheEntrada implements DetalheEntradaInterface {
 
   @PrimaryGeneratedColumn()
   idDetalheEntrada: number
 
   @Column()
+  @Index('IDX_ID_ENTRADA')
   idEntrada: number
 
   @JoinColumn({ name: 'idEntrada' })
@@ -24,6 +26,7 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   entrada: Entrada
 
   @Column()
+  @Index('IDX_ID_PRODUTO')
   idProduto: number;
 
   @JoinColumn({ name: 'idProduto' })
@@ -31,6 +34,7 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   produto: Produto
 
   @Column({ nullable: true })
+  @Index('IDX_ID_COR')
   idCor: number | null;
 
   @JoinColumn({ name: 'idCor' })
@@ -53,6 +57,7 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   gm2: number
 
   @Column({ nullable: true })
+  @Index('IDX_ID_REVISADOR')
   idPessoa_revisador: number | null
 
   @JoinColumn({ name: 'idPessoa_revisador' })
@@ -60,6 +65,7 @@ export default class DetalheEntrada implements DetalheEntradaInterface {
   revisador: Pessoa
 
   @Column({ nullable: true })
+  @Index('IDX_ID_TINTURARIA')
   idTinturaria: number | null
 
   @JoinColumn({ name: 'idTinturaria' })

@@ -10,10 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var statusPedidoTypes_1 = require("../types/statusPedidoTypes");
 var prazoEntrega_entity_1 = require("./prazoEntrega.entity");
 var detalhePedido_entity_1 = require("./detalhePedido.entity");
 var pessoa_entity_1 = require("./pessoa.entity");
+var statusPedidoTypes_1 = require("../types/statusPedidoTypes");
 var Pedido = /** @class */ (function () {
     function Pedido() {
     }
@@ -63,8 +63,8 @@ var Pedido = /** @class */ (function () {
         __metadata("design:type", Array)
     ], Pedido.prototype, "detalhePedidos", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 1 }),
-        __metadata("design:type", String)
+        (0, typeorm_1.Column)({}),
+        __metadata("design:type", Number)
     ], Pedido.prototype, "statusPedido", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
@@ -75,7 +75,12 @@ var Pedido = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Pedido.prototype, "updateAt", void 0);
     Pedido = __decorate([
-        (0, typeorm_1.Entity)({ name: 'pedidos' })
+        (0, typeorm_1.Entity)({ name: 'pedidos' }),
+        (0, typeorm_1.Index)('IDX_CLIENTE', ['idPessoa_cliente']),
+        (0, typeorm_1.Index)('IDX_VENDEDOR', ['idPessoa_vendedor']),
+        (0, typeorm_1.Index)('IDX_STATUS', ['statusPedido']),
+        (0, typeorm_1.Index)('IDX_STATUS_DATA', ['statusPedido', 'dataPedido']),
+        (0, typeorm_1.Index)('IDX_CLIENTE_STATUS', ['idPessoa_cliente', 'statusPedido'])
     ], Pedido);
     return Pedido;
 }());

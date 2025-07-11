@@ -52,6 +52,10 @@ var DetalheEstrutura = /** @class */ (function () {
         __metadata("design:type", cor_entity_1.default)
     ], DetalheEstrutura.prototype, "cor", void 0);
     __decorate([
+        (0, typeorm_1.Column)({}),
+        __metadata("design:type", String)
+    ], DetalheEstrutura.prototype, "nivel", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
     ], DetalheEstrutura.prototype, "qtd", void 0);
@@ -64,7 +68,12 @@ var DetalheEstrutura = /** @class */ (function () {
         __metadata("design:type", Date)
     ], DetalheEstrutura.prototype, "updateAt", void 0);
     DetalheEstrutura = __decorate([
-        (0, typeorm_1.Entity)({ name: 'detalheestruturas' })
+        (0, typeorm_1.Entity)({ name: 'detalheestruturas' }),
+        (0, typeorm_1.Unique)(['idEstrutura', 'nivel']),
+        (0, typeorm_1.Index)('IDX_ID_ESTRUTURA', ['idEstrutura']),
+        (0, typeorm_1.Index)('IDX_ID_PRODUTO', ['idProduto']),
+        (0, typeorm_1.Index)('IDX_ID_COR', ['idCor']),
+        (0, typeorm_1.Index)('IDX_ESTRUTURA_PRODUTO', ['idEstrutura', 'idProduto'])
     ], DetalheEstrutura);
     return DetalheEstrutura;
 }());

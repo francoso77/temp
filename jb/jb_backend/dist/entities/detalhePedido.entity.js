@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var produto_entity_1 = require("./produto.entity");
-var statusPedidoItemTypes_1 = require("../types/statusPedidoItemTypes");
 var pedido_entity_1 = require("./pedido.entity");
 var cor_entity_1 = require("./cor.entity");
+var statusPedidoItemTypes_1 = require("../types/statusPedidoItemTypes");
 var DetalhePedido = /** @class */ (function () {
     function DetalhePedido() {
     }
@@ -66,7 +66,7 @@ var DetalhePedido = /** @class */ (function () {
     ], DetalhePedido.prototype, "qtdAtendida", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
-        __metadata("design:type", Number)
+        __metadata("design:type", String)
     ], DetalhePedido.prototype, "statusItem", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
@@ -77,7 +77,13 @@ var DetalhePedido = /** @class */ (function () {
         __metadata("design:type", Date)
     ], DetalhePedido.prototype, "updateAt", void 0);
     DetalhePedido = __decorate([
-        (0, typeorm_1.Entity)({ name: 'detalhepedidos' })
+        (0, typeorm_1.Entity)({ name: 'detalhepedidos' }),
+        (0, typeorm_1.Index)('IDX_PEDIDO', ['idPedido']),
+        (0, typeorm_1.Index)('IDX_PRODUTO', ['idProduto']),
+        (0, typeorm_1.Index)('IDX_COR', ['idCor']),
+        (0, typeorm_1.Index)('IDX_STATUS_ITEM', ['statusItem']),
+        (0, typeorm_1.Index)('IDX_PEDIDO_PRODUTO', ['idPedido', 'idProduto']),
+        (0, typeorm_1.Index)('IDX_PRODUTO_STATUS', ['idProduto', 'statusItem'])
     ], DetalhePedido);
     return DetalhePedido;
 }());

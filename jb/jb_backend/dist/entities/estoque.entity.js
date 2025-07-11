@@ -60,7 +60,11 @@ var Estoque = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Estoque.prototype, "updateAt", void 0);
     Estoque = __decorate([
-        (0, typeorm_1.Entity)({ name: 'estoques' })
+        (0, typeorm_1.Entity)({ name: 'estoques' }),
+        (0, typeorm_1.Index)('IDX_ESTOQUE_PRODUTO', ['idProduto']),
+        (0, typeorm_1.Index)('IDX_ESTOQUE_FORNECEDOR', ['idPessoa_fornecedor']),
+        (0, typeorm_1.Index)('IDX_ESTOQUE_COR', ['idCor']),
+        (0, typeorm_1.Index)('IDX_ESTOQUE_UNICO', ['idProduto', 'idCor', 'idPessoa_fornecedor'], { unique: true }) // opcional, se 1 estoque por combinação
     ], Estoque);
     return Estoque;
 }());

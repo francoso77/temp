@@ -32,16 +32,16 @@ import { GrupoUsuario } from './entities/sistema/grupoUsuario.entity'
 import { UsuarioPermissao } from './entities/sistema/usuarioPermissao.entity'
 import { Modulo } from './entities/sistema/modulo.entity'
 import { ModuloPermissao } from './entities/sistema/moduloPermissao.entity'
-
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export const AppDataSource = new DataSource({
-  type: "mysql",
-  host: "localhost",
-  port: 3306,
-  username: "root",
-  password: "Frk@071569#",
-  // password: "071569",
-  database: "jb",
+  type: process.env.DB_TYPE as any,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "3306", 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
   synchronize: true,
   logging: false,
   entities: [

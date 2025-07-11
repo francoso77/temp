@@ -7,6 +7,13 @@ import { TurnoType } from '../types/turnoTypes';
 import Tinturaria from './tinturaria.entity';
 
 @Entity({ name: 'producaomalharias' })
+@Index('IDX_ID_PRODUTO', ['idProduto'])
+@Index('IDX_ID_MAQUINA', ['idMaquina'])
+@Index('IDX_ID_TECELAO', ['idPessoa_tecelao'])
+@Index('IDX_ID_REVISADOR', ['idPessoa_revisador'])
+@Index('IDX_FECHADO', ['fechado'])
+@Index('IDX_ID_TINTURARIA', ['idTinturaria'])
+@Index('IDX_DATA_MAQUINA_PRODUTO', ['dataProducao', 'idMaquina', 'idProduto'])
 export default class ProducaoMalharia implements ProducaoMalhariaInterface {
 
   @PrimaryGeneratedColumn()

@@ -70,7 +70,7 @@ export class CrudController {
     @Body("select") select: Array<string>,
     @Body("relations") relations: Array<string>,
     @Body("campoOrder") campoOrder: Array<any>,
-    @Body("comparador") comparador: "N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=",
+    @Body("comparador") comparador: "D" | "I" | "L" | "N" | "=" | ">" | "<" | ">=" | "<=",
     @Body("tipoOrder") tipoOrder: "ASC" | "DESC",
   ): Promise<RespostaPadraoInterface<any>> {
     return new ClsCrudController().pesquisar({

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon, TableFooter } from '@mui/material'
+import { useTheme, tableCellClasses, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Tooltip, Icon, TableFooter, Chip } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
@@ -22,6 +22,10 @@ export interface DataTableCabecalhoInterface {
   alinhamento?: 'left' | 'right' | 'center'
   largura?: number
   format?: (arg: any, row: any) => string | number | undefined
+  render?: (arg: any, row: any) => React.ReactNode
+  // 👇 Novas props opcionais para suporte ao Chip
+  chipColor?: (valor: any, row?: any) => 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
+  chipLabel?: (valor: any, row?: any) => string // caso queira customizar o texto do chip
 }
 
 export interface ItemSpeedDial {
@@ -231,6 +235,19 @@ export default function DataTable<T>({
 
   const totalColunas = sumColumns(dados, colunaSoma)
 
+  const chipStyle = (valor: string) => {
+    switch (valor) {
+      case 'Receita':
+        return { backgroundColor: '#2e7d32', color: '#fff' }; // verde escuro
+      case 'Despesa':
+        return { backgroundColor: '#d32f2f', color: '#fff' }; // vermelho
+      case 'status':
+        return { backgroundColor: '#616161', color: '#fff' }; // cinza
+      default:
+        return { backgroundColor: '#616161', color: '#fff' }; // cinza
+    }
+  }
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -256,7 +273,7 @@ export default function DataTable<T>({
               ))}
               <Condicional condicao={acoes.length > 0}>
                 <StyledTableCell align='center'>
-                  Opções
+                  Ações
                 </StyledTableCell>
               </Condicional>
             </StyledTableRow>
@@ -276,8 +293,29 @@ export default function DataTable<T>({
                           <StyledTableCell
                             key={indice}
                             align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
-                            {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
-                          </StyledTableCell>
+                            {
+                              coluna.render
+                                ? coluna.render((row as any)[coluna.campo], row)
+                                : coluna.chipColor
+                                  ? (
+                                    <Chip
+                                      variant="outlined"
+                                      label={coluna.chipLabel
+                                        ? coluna.chipLabel((row as any)[coluna.campo], row)
+                                        : (row as any)[coluna.campo]
+                                      }
+                                      color={coluna.chipColor((row as any)[coluna.campo], row)}
+                                      size="small"
+                                      sx={{
+                                        fontWeight: 'bold',
+                                        ...chipStyle((row as any)[coluna.campo])
+                                      }}
+                                    />
+                                  )
+                                  : coluna.format
+                                    ? coluna.format((row as any)[coluna.campo], row)
+                                    : (row as any)[coluna.campo]
+                            }                          </StyledTableCell>
                         )
                       })
                     }

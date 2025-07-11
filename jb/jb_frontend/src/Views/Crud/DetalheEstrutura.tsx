@@ -12,9 +12,9 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { DetalheEstruturaInterface, EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
+import { DetalheEstruturaInterface, EstruturaInterface } from '../../Interfaces/estruturaInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
+import { CorInterface } from '../../Interfaces/corInteface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 
@@ -37,6 +37,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     idProduto: 0,
     idCor: null,
     qtd: 0,
+    nivel: 'nível1',
     produto: {
       nome: '',
       idUnidade: 0,
@@ -82,6 +83,31 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
       campo: 'qtd',
       format: (qtd) => clsFormatacao.currency(qtd)
     },
+    {
+      cabecalho: 'Nível',
+      alinhamento: 'left',
+      campo: 'nivel',
+      //format: (qtd) => clsFormatacao.currency(qtd)
+    },
+  ]
+
+  const nivelTypes = [
+    {
+      idNivel: 'nível1',
+      descricao: 'Nível 1'
+    },
+    {
+      idNivel: 'nível2',
+      descricao: 'Nível 2'
+    },
+    {
+      idNivel: 'nível3',
+      descricao: 'Nível 3'
+    },
+    {
+      idNivel: 'nível4',
+      descricao: 'Nível 4'
+    },
   ]
 
   const validarDados = (): boolean => {
@@ -93,6 +119,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     }
     retorno = validaCampo.naoVazio('idProduto', detalheEstrutura, erros, retorno, 'Escolha um produto')
     retorno = validaCampo.naoVazio('qtd', detalheEstrutura, erros, retorno, 'Valor maior que 0')
+    retorno = validaCampo.naoVazio('nivel', detalheEstrutura, erros, retorno, 'Escolha um nível')
     setErros(erros)
     return retorno
   }
@@ -116,7 +143,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
   }
 
   const btIncluir = () => {
-    if (rsMaster.idProduto !== 0 && rsMaster.idUnidade !== 0 && rsMaster.qtdBase !== 0) {
+    if (rsMaster.idProduto !== 0) {
       setIndiceEdicao(-1)
       setOpen(true)
       BuscarDados()
@@ -192,6 +219,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
               idProduto: detalheEstrutura.idProduto,
               idCor: detalheEstrutura.idCor,
               qtd: detalheEstrutura.qtd,
+              nivel: detalheEstrutura.nivel,
               produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheEstrutura.idProduto)] },
               cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalheEstrutura.idCor)] }
             }
@@ -279,7 +307,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
         <Condicional condicao={localState.action !== 'pesquisando'}>
           <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+              <Grid item xs={12} sm={5} sx={{ mt: 2 }}>
                 <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
                   <ComboBox
                     opcoes={rsProduto}
@@ -301,7 +329,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                 </Box>
               </Grid>
               <Condicional condicao={[2, 3, 6, 7, 10, 11].includes(tipo as number)}>
-                <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+                <Grid item xs={12} sm={3} sx={{ mt: 2 }}>
                   <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                     <ComboBox
                       opcoes={rsCor}
@@ -322,7 +350,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                   </Box>
                 </Grid>
               </Condicional>
-              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                   <InputText
                     tipo='currency'
@@ -334,7 +362,25 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                     disabled={localState.action === 'excluindo' ? true : false}
                     erros={erros}
                     onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                    onKeyDown={(event: any) => btPulaCampo(event, 3)}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+                <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                  <ComboBox
+                    opcoes={nivelTypes}
+                    campoDescricao="descricao"
+                    campoID="idNivel"
+                    dados={detalheEstrutura}
+                    mensagemPadraoCampoEmBranco="Escolha o nível"
+                    field="nivel"
+                    label="Nível"
+                    erros={erros}
+                    setState={setDetalheEstrutura}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(event) => btPulaCampo(event, 0)}
                   />
                 </Box>
               </Grid>

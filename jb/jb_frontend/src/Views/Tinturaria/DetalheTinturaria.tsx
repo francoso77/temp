@@ -9,17 +9,17 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheTinturariaInterface, TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
-import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface';
+import { DetalheTinturariaInterface, TinturariaInterface } from '../../Interfaces/tinturariaInterface';
+import { ProducaoMalhariaInterface } from '../../Interfaces/producaoMalhariaInterface';
 import ShowText from '../../Componentes/ShowText';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsApi from '../../Utils/ClsApi';
-import ClsRelatoriosProgramacao from '../../Utils/ClsRelatoriosProgramacao';
-import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
-import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface';
+import { DetalheEstruturaInterface } from '../../Interfaces/estruturaInterface';
+import { EstoqueInterface } from '../../Interfaces/estoqueInterface';
 import FactCheckTwoToneIcon from '@mui/icons-material/FactCheckTwoTone';
 import TabelaPecas from './TabelaPecas';
+//import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -42,7 +42,7 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
-  const clsRelatorios = new ClsRelatoriosProgramacao()
+  //const clsRelatorios = new ClsRelatorioProgramacao()
 
   const DadosPeca: DadosPecaInterface = {
     peca: ''
@@ -399,14 +399,15 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
 
 
   const btPesquisaPeca = async (peca: string = PesquisaPeca.peca) => {
+    if (peca === '') return
     auxPeca = peca
     clsCrud.pesquisar({
       entidade: "ProducaoMalharia",
       criterio: {
         peca: peca,
-        fechado: false
+        fechado: 0
       },
-      camposLike: ['peca', 'fechado'],
+      camposLike: ['peca'],
       select: [
         'idTinturaria',
         'idMalharia',

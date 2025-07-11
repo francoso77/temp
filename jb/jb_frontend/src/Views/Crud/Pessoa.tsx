@@ -14,7 +14,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
 import { THEME } from '../../app/Layout/Theme';
 import DialogPessoas from '../../Componentes/Dialog/DialogPessoas';

@@ -11,7 +11,6 @@ import MenuCls, { MenuOpcoesInterface } from '../Layout/ClsMenu';
 import { RespostaPadraoInterface } from '../../../../jb_backend/src/interfaces/respostaPadrao.interface';
 import { LoginInterface } from '../../../../jb_backend/src/interfaces/loginIterface';
 import { UsuarioType } from '../../types/usuarioTypes';
-import { PermissoesTypes } from "../../types/permissoesTypes"
 
 
 export default function Login() {
@@ -21,7 +20,6 @@ export default function Login() {
   const clsValidacao: ClsValidacao = new ClsValidacao()
   const { mensagemState, setMensagemState, layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
   const contextGlobal = useContext(GlobalContext) as GlobalContextInterface
-  const { usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const clsApi = new ClsApi()
   const navegar = useNavigate()
 

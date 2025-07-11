@@ -6,7 +6,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { UsuarioInterface } from '../../../../jb_backend/src/interfaces/sistema/usuarioInterface';
+import { UsuarioInterface } from '../../Interfaces/sistema/usuarioInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
@@ -42,7 +42,7 @@ export default function Usuario() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
 
-  const { mensagemState, setMensagemState, usuarioState, setLayoutState,layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, usuarioState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [usuario, setUsuario] = useState<UsuarioInterface>(ResetDados)
@@ -94,7 +94,8 @@ export default function Usuario() {
 
   const irPara = useNavigate()
   const btFechar = () => {
-    setLayoutState({...layoutState,
+    setLayoutState({
+      ...layoutState,
       titulo: '',
       tituloAnterior: 'Cadastro de Usuários',
       pathTitulo: '/',

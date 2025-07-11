@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusPedidoItemTypes = exports.StatusPedidoItemType = void 0;
 var StatusPedidoItemType;
 (function (StatusPedidoItemType) {
-    StatusPedidoItemType[StatusPedidoItemType["aberto"] = 1] = "aberto";
-    StatusPedidoItemType[StatusPedidoItemType["finalizado"] = 2] = "finalizado";
-    StatusPedidoItemType[StatusPedidoItemType["producao"] = 3] = "producao";
+    StatusPedidoItemType["aberto"] = "A";
+    StatusPedidoItemType["producao"] = "C";
+    StatusPedidoItemType["finalizado"] = "F";
+    StatusPedidoItemType["parcial"] = "P";
 })(StatusPedidoItemType || (exports.StatusPedidoItemType = StatusPedidoItemType = {}));
 exports.StatusPedidoItemTypes = [
     {
@@ -13,12 +14,16 @@ exports.StatusPedidoItemTypes = [
         descricao: 'Em aberto'
     },
     {
+        idStatusPedidoItem: StatusPedidoItemType.producao,
+        descricao: 'Em produção'
+    },
+    {
         idStatusPedidoItem: StatusPedidoItemType.finalizado,
         descricao: 'Finalizado'
     },
     {
-        idStatusPedidoItem: StatusPedidoItemType.producao,
-        descricao: 'Em produção'
+        idStatusPedidoItem: StatusPedidoItemType.parcial,
+        descricao: 'Parcial'
     },
 ];
 //# sourceMappingURL=statusPedidoItemTypes.js.map

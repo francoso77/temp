@@ -2,6 +2,8 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Update
 import { CorInterface } from '../interfaces/corInteface';
 
 @Entity({ name: 'cores' })
+@Index('IDX_NIVEL', ['nivel']) // índice simples no nível
+@Index('IDX_NIVEL_NOME', ['nivel', 'nome']) // índice composto
 export default class Cor implements CorInterface {
 
   @PrimaryGeneratedColumn()

@@ -35,14 +35,15 @@ var grupoUsuario_entity_1 = require("./entities/sistema/grupoUsuario.entity");
 var usuarioPermissao_entity_1 = require("./entities/sistema/usuarioPermissao.entity");
 var modulo_entity_1 = require("./entities/sistema/modulo.entity");
 var moduloPermissao_entity_1 = require("./entities/sistema/moduloPermissao.entity");
+var dotenv = require("dotenv");
+dotenv.config();
 exports.AppDataSource = new typeorm_1.DataSource({
-    type: "mysql",
-    host: "localhost",
-    port: 3306,
-    username: "root",
-    password: "Frk@071569#",
-    // password: "071569",
-    database: "jb",
+    type: process.env.DB_TYPE,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || "3306", 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     synchronize: true,
     logging: false,
     entities: [

@@ -35,7 +35,10 @@ var Cor = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Cor.prototype, "updateAt", void 0);
     Cor = __decorate([
-        (0, typeorm_1.Entity)({ name: 'cores' })
+        (0, typeorm_1.Entity)({ name: 'cores' }),
+        (0, typeorm_1.Index)('IDX_NIVEL', ['nivel']) // índice simples no nível
+        ,
+        (0, typeorm_1.Index)('IDX_NIVEL_NOME', ['nivel', 'nome']) // índice composto
     ], Cor);
     return Cor;
 }());

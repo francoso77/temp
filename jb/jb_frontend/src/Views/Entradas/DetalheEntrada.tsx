@@ -12,15 +12,15 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import InputCalc from '../../Componentes/InputCalc';
-import { DetalheEntradaInterface, EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface';
+import { DetalheEntradaInterface, EntradaInterface } from '../../Interfaces/entradaInterface';
 import { SomatorioEntradaInterface } from './Entrada';
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
+import { CorInterface } from '../../Interfaces/corInteface';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
+import { TinturariaInterface } from '../../Interfaces/tinturariaInterface';
 import { PessoaType } from '../../types/pessoaTypes';
 
 

@@ -35,6 +35,7 @@ var Entrada = /** @class */ (function () {
     ], Entrada.prototype, "observacao", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
+        (0, typeorm_1.Index)('IDX_FORNECEDOR'),
         __metadata("design:type", Number)
     ], Entrada.prototype, "idPessoa_fornecedor", void 0);
     __decorate([
@@ -56,7 +57,9 @@ var Entrada = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Entrada.prototype, "updateAt", void 0);
     Entrada = __decorate([
-        (0, typeorm_1.Entity)({ name: 'entradas' })
+        (0, typeorm_1.Entity)({ name: 'entradas' }),
+        (0, typeorm_1.Index)('IDX_FORNECEDOR_DATA', ['idPessoa_fornecedor', 'dataEmissao']),
+        (0, typeorm_1.Index)('IDX_FORNECEDOR_NOTA', ['idPessoa_fornecedor', 'notaFiscal'])
     ], Entrada);
     return Entrada;
 }());

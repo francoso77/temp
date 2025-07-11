@@ -18,6 +18,7 @@ import ProducaoDublagem from '../Views/ProducaoDublagem/ProducaoDublagem';
 import Dashboard from '../Views/DashBoard/Dashboard';
 import { ConsultaEstoque } from '../Views/Estoques/ConsultaEstoque';
 import ProgramacaoTinturaria from '../Views/ProgramacaoTinturaria/ProgramacaoTinturaria';
+import Home from '../Home';
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
       {
         path: "/Usuario",
         element: <Usuario />,
+      },
+      {
+        path: "/Home",
+        element: <Home />,
       },
       //Rotas protegidas
       {

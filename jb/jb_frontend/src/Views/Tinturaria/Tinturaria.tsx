@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface'
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
+import { TinturariaInterface } from '../../Interfaces/tinturariaInterface'
+import { PessoaInterface } from '../../Interfaces/pessoaInterface'
 import ClsCrud from '../../Utils/ClsCrudApi'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsValidacao from '../../Utils/ClsValidacao'
@@ -20,11 +20,11 @@ import ComboBox from '../../Componentes/ComboBox'
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface'
 import DetalheTinturaria from './DetalheTinturaria'
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState'
-import { ProducaoMalhariaInterface } from '../../../../jb_backend/src/interfaces/producaoMalhariaInterface'
-import { DetalheEstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface'
-import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
-import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao'
+import { ProducaoMalhariaInterface } from '../../Interfaces/producaoMalhariaInterface'
+import { DetalheEstruturaInterface } from '../../Interfaces/estruturaInterface'
+import { EstoqueInterface } from '../../Interfaces/estoqueInterface'
 import TableSelect from '../../Componentes/DataTable/tableSelect'
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao'
 
 
 
@@ -223,52 +223,63 @@ export function Tinturaria() {
     }
   }
 
+  const formatDateTimeForMySQL = (dateString: string): string => {
+    const [day, month, year] = dateString.split('/')
+    return `${year}-${month}-${day} 00:00:00`
+  }
   const btPesquisar = () => {
 
+    const relations = [
+      "cliente",
+      "fornecedor",
+      "detalheTinturarias",
+      "detalheTinturarias.malharia",
+    ];
+
+    const msg = 'Pesquisando dados ...'
+    const setMensagem = setMensagemState
+    const idsCli = rsCliente
+      .filter(cliente => cliente.nome.includes(pesquisa.itemPesquisa))
+      .map(cliente => cliente.idPessoa)
+
     let dadosPesquisa = {}
+    let criterio = {}
+    let camposLike = []
+    let comparador = "L"
+
     const temNumero = /\d/.test(pesquisa.itemPesquisa)
-    if (temNumero) {
-      dadosPesquisa = {
-        campoOrder: ['dataTinturaria'],
-        entidade: "Tinturaria",
-        relations: [
-          "cliente",
-          "fornecedor",
-          "detalheTinturarias",
-          "detalheTinturarias.malharia",
-        ],
-        criterio: {
-          dataTinturaria: "%".concat(pesquisa.itemPesquisa).concat("%"),
-        },
-        camposLike: ['dataTinturaria'],
 
-        msg: 'Pesquisando romaneios ...',
-        setMensagemState: setMensagemState
+    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
+
+      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
+      criterio = {
+        dataTinturaria: formattedDateTime
       }
+      camposLike = ['dataTinturaria']
+    } else if (temNumero) {
+
+      criterio = {
+        idTinturaria: pesquisa.itemPesquisa
+      }
+      camposLike = ['idTinturaria']
     } else {
-
-      const idsCli = rsCliente.filter(cliente =>
-        cliente.nome.includes(pesquisa.itemPesquisa)
-      ).map(cliente => cliente.idPessoa)
-
-      dadosPesquisa = {
-        campoOrder: ['dataTinturaria'],
-        entidade: "Tinturaria",
-        relations: [
-          "cliente",
-          "fornecedor",
-          "detalheTinturarias",
-          "detalheTinturarias.malharia",
-        ],
-        comparador: 'I',
-        criterio: {
-          idPessoa_cliente: idsCli,
-        },
-        camposLike: ['idPessoa_cliente'],
-        msg: 'Pesquisando romaneios ...',
-        setMensagemState: setMensagemState
+      criterio = {
+        idPessoa_cliente: idsCli,
       }
+      camposLike = ['idPessoa_cliente']
+      comparador = 'I'
     }
+
+    dadosPesquisa = {
+      entidade: "Tinturaria",
+      relations,
+      comparador,
+      criterio,
+      camposLike,
+      msg,
+      setMensagemState: setMensagem
+    }
+
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
@@ -511,7 +522,7 @@ export function Tinturaria() {
             <Condicional condicao={localState.action === 'pesquisando'}>
               <Grid item xs={10} md={11}>
                 <InputText
-                  label="Pesquisa"
+                  label="Buscar por romaneio, data ou cliente"
                   tipo="uppercase"
                   dados={pesquisa}
                   field="itemPesquisa"

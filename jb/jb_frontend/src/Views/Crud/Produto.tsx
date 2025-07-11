@@ -15,8 +15,8 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
+import { UnidadeMedidaInterface } from '../../Interfaces/unidadeMedidaInteface';
 import { TipoProdutoType, TipoProdutoTypes } from '../../types/tipoProdutoypes';
 
 

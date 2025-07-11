@@ -1,4 +1,4 @@
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Box, Chip, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -17,9 +17,9 @@ import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
-import { ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../Interfaces/producaoDublagemInterface';
 import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
@@ -129,8 +129,41 @@ export default function ProducaoDublagem() {
     {
       cabecalho: 'Status Pedido',
       alinhamento: 'center',
-      campo: 'statusPedido',
-      format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rs.statusPedido)?.descricao
+      campo: 'statusPedido', // O campo 'statusPedido' em sua 'row' deve conter o valor 'A', 'C', 'F', ou 'P'
+      render: (_valor: string, row: any) => {
+        // Encontra a descrição do status no array StatusPedidoTypes
+        const statusInfo = StatusPedidoTypes.find(
+          (status) => status.idStatusPedido === row.statusPedido
+        );
+
+        const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+        // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+        switch (row.statusPedido) {
+          case StatusPedidoType.aberto:
+            color = 'info'; // Exemplo: azul para aberto
+            break;
+          case StatusPedidoType.producao:
+            color = 'primary'; // Exemplo: roxo para produção
+            break;
+          case StatusPedidoType.finalizado:
+            color = 'success'; // Exemplo: verde para finalizado
+            break;
+
+          default:
+            color = 'default'; // Cor padrão para qualquer outro caso
+        }
+
+        return (
+          <Chip
+            label={descricaoStatus}
+            color={color}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
+      },
     },
     {
       cabecalho: 'Metros Pedido',
@@ -227,7 +260,9 @@ export default function ProducaoDublagem() {
   }
   const verificaStatusPedido = async (pedido: number) => {
 
-    let status: StatusPedidoType = StatusPedidoType.finalizado
+    let statusPedido: StatusPedidoType = StatusPedidoType.finalizado
+    let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
+
     try {
       const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
         entidade: "Pedido",
@@ -241,14 +276,32 @@ export default function ProducaoDublagem() {
         let tmpPedido: PedidoInterface = rsPedido[0]
         let tmpDetalhe: Array<DetalhePedidoInterface> = tmpPedido.detalhePedidos
 
-        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem !== StatusPedidoItemType.finalizado)
+        producaoDublagem.detalheProducaoDublagens.forEach((detalhe: DetalheProducaoDublagemInterface) => {
 
+          tmpDetalhe.forEach((detalhePedido: DetalhePedidoInterface) => {
+            if (detalhe.idProduto === detalhePedido.idProduto) {
+              detalhePedido.qtdAtendida = detalhePedido.qtdAtendida + detalhe.metrosTotal
+            }
+          })
+        })
+
+
+        tmpDetalhe.forEach((detalhe: DetalhePedidoInterface) => {
+          if (detalhe.qtdAtendida >= detalhe.qtdPedida) {
+            statusItem = StatusPedidoItemType.finalizado
+          } else if (detalhe.qtdAtendida < detalhe.qtdPedida && detalhe.qtdAtendida > 0) {
+            statusItem = StatusPedidoItemType.parcial
+          } else {
+            statusItem = StatusPedidoItemType.producao
+          }
+        })
+
+        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem !== StatusPedidoItemType.finalizado)
         if (temPedidoAberto > 0) {
 
-          tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao }
+          tmpPedido = { ...tmpPedido, statusPedido: statusPedido }
         } else {
-          tmpPedido = { ...tmpPedido, statusPedido: status }
-
+          tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao }
         }
         await clsCrud.incluir({
           entidade: "Pedido",
@@ -262,7 +315,9 @@ export default function ProducaoDublagem() {
   }
 
   const alterarStatusPedido = async (pedido: number) => {
-
+    if (pedido === 0) {
+      return
+    }
     try {
       const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
         entidade: "Pedido",
@@ -294,8 +349,66 @@ export default function ProducaoDublagem() {
     }
   }
 
+  // const alterarStatusItem = async () => {
+
+  //   console.log('alterarStatusItem')
+  //   let qtdAtendida: number = 0
+  //   let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
+
+  //   try {
+  //     const rsDetalhePedidos = await pesquisarPedidoItem(rsMaster.idPedido)
+  //     let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsDetalhePedidos]
+
+  //     if (tmpDetalhe) {
+  //       tmpDetalhe.forEach((detalhe) => {
+  //         rsMaster.detalheProducaoDublagens.forEach((item) => {
+  //           if (detalhe.idProduto === item.idProduto) {
+  //             item.detalhePecas.forEach((peca) => {
+  //               qtdAtendida += peca.metros
+  //             })
+  //             if (qtdAtendida <= 0) {
+  //               statusItem = StatusPedidoItemType.producao
+  //             } else {
+  //               console.log('qtdAtendida', qtdAtendida, detalhe.qtdAtendida)
+  //               statusItem = StatusPedidoItemType.finalizado
+  //             }
+  //           } else {
+  //             console.log("não achou o código")
+  //             statusItem = StatusPedidoItemType.producao
+  //             qtdAtendida = 0
+  //           }
+  //         })
+
+  //         tmpDetalhe = [
+  //           ...tmpDetalhe,
+  //           { ...detalhe, statusItem: statusItem, qtdAtendida: qtdAtendida },
+  //         ]
+  //       })
+
+  //       const rsPed = await clsCrud.incluir({
+  //         entidade: "DetalhePedido",
+  //         criterio: tmpDetalhe,
+  //         token: usuarioState.token,
+  //       })
+  //       if (!rsPed.ok) {
+  //         setMensagemState({
+  //           titulo: "Erro...",
+  //           exibir: true,
+  //           mensagem: "Status não foi atualizado - consulte o suporte",
+  //           tipo: MensagemTipo.Error,
+  //           exibirBotao: true,
+  //           cb: null,
+  //         })
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Erro ao alterar status do item:", error)
+  //   }
+  // }
+
   const btConfirmar = () => {
     if (validarDados()) {
+
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
           entidade: "ProducaoDublagem",
@@ -406,6 +519,10 @@ export default function ProducaoDublagem() {
     clsCrud
       .pesquisar({
         entidade: "Pedido",
+        criterio: {
+          statusPedido: StatusPedidoType.producao
+        },
+        camposLike: ['statusPedido'],
         campoOrder: ["idPedido"],
         relations: ["detalhePedidos"],
         select: ['idPedido', 'statusPedido']
@@ -416,6 +533,9 @@ export default function ProducaoDublagem() {
   }
 
   const btPesquisarQtd = (pedido: number) => {
+    if (pedido === 0) {
+      return
+    }
     clsCrud
       .pesquisar({
         entidade: "DetalhePedido",
@@ -461,7 +581,7 @@ export default function ProducaoDublagem() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
               <InputText
-                label="Pesquise por data ou cliente"
+                label="Buscar por data ou cliente"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"

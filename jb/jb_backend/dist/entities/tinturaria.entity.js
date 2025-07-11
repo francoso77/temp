@@ -55,7 +55,9 @@ var Tinturaria = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Tinturaria.prototype, "updateAt", void 0);
     Tinturaria = __decorate([
-        (0, typeorm_1.Entity)({ name: 'tinturarias' })
+        (0, typeorm_1.Entity)({ name: 'tinturarias' }),
+        (0, typeorm_1.Index)(["idPessoa_cliente"]),
+        (0, typeorm_1.Index)(["idPessoa_fornecedor"])
     ], Tinturaria);
     return Tinturaria;
 }());

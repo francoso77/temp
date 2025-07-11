@@ -1,4 +1,4 @@
-import { In, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Not } from 'typeorm';
+import { In, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Not, Raw } from 'typeorm';
 import { AppDataSource } from '../data-source';
 import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 
@@ -109,7 +109,7 @@ export default class ClsCrudController {
 
     camposLike.forEach((campo) => {
       if (comparador === "L") {
-        where[campo] = Like(where[campo])
+        where[campo] = Like(`%${where[campo]}%`)
       } else if (comparador === "N") {
         where[campo] = Not(where[campo])
       } else if (comparador === "I") {
@@ -124,8 +124,16 @@ export default class ClsCrudController {
         where[campo] = LessThan(where[campo])
       } else if (comparador === "<=") {
         where[campo] = LessThanOrEqual(where[campo])
+      } else if (comparador === "D") {
+        const dataParaComparar = where[campo];
+        if (dataParaComparar) {
+          where[campo] = Raw(alias => `DATE(${alias}) = '${dataParaComparar}'`);
+        } else {
+          delete where[campo]; // Remove a condição para evitar erros
+        }
       }
     })
+
 
     let order: Record<string, any> = {}
     campoOrder.forEach((campo) => {

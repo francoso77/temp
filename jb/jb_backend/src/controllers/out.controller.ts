@@ -128,7 +128,7 @@ export class OutController {
       INNER JOIN
         pessoas pv ON pv.idPessoa = ped.idPessoa_vendedor
       WHERE 
-        ped.statusPedido = 'F' AND
+        ped.statusPedido = 2 AND
         pd.idProgramacaoDublagem = ?
       ORDER BY
         ped.dataPedido ASC
@@ -202,7 +202,7 @@ export class OutController {
       INNER JOIN
         pessoas pe ON pe.idPessoa = p.idPessoa_cliente
       WHERE 
-        dp.statusItem = 3 AND
+        dp.statusItem = 'C' AND
         pd.dataProgramacao = ?
         ;
 
@@ -307,7 +307,7 @@ export class OutController {
     INNER JOIN
       pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
     WHERE 
-      statusPedido = 'C' AND
+      statusPedido = 3 AND
       ${campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?'}
   `
 
@@ -333,7 +333,7 @@ export class OutController {
     INNER JOIN
       pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
     WHERE 
-      statusPedido = 'A' AND
+      statusPedido = 1 AND
       ${campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?'}
   `
 
@@ -386,7 +386,7 @@ export class OutController {
 
       WHERE 
         pro2.tipoProduto IN (?) AND
-        dp.statusItem = 3 AND
+        dp.statusItem = 'C' AND
         pd.dataProgramacao = ?
       GROUP BY
         idProduto, materiaPrima, idCor, cor
@@ -434,8 +434,8 @@ export class OutController {
       INNER JOIN 
         programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem
       WHERE 
-        pro2.tipoProduto IN(2,10) AND
-        dp.statusItem = 3 AND
+        pro2.tipoProduto = 10 AND
+        dp.statusItem = 'C' AND
         pd.dataProgramacao = ?
       ORDER BY
         produto, corNivel
@@ -473,8 +473,8 @@ export class OutController {
     @Body('qtd') qtd: number,
   ): Promise<Array<Pedido>> {
 
-    let novoStatusPedido = 'F'
-    let novoStatusItem = 2
+    let novoStatusPedido = 2
+    let novoStatusItem = 'F'
 
     // console.log(tipoStatus)
     // console.log(pedido)
@@ -484,8 +484,8 @@ export class OutController {
     // console.log(novoStatusItem)
 
     if (tipoStatus === 'Excluir') {
-      novoStatusPedido = 'C'
-      novoStatusItem = 3
+      novoStatusPedido = 3
+      novoStatusItem = 'C'
     }
     const sql = `
       UPDATE 
@@ -509,7 +509,7 @@ export class OutController {
   @Post("produzirPedidos")
   async produzirPedidos(
     @Body("pedidos") pedidos: Array<number>,
-    @Body("tipoProducao") tipoProducao: 'C' | 'A',
+    @Body("tipoProducao") tipoProducao: 3 | 1,
   ): Promise<Array<Pedido>> {
 
     const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
@@ -519,7 +519,7 @@ export class OutController {
     JOIN detalhepedidos dp on dp.idPedido = p.idPedido 
     SET
       p.statusPedido = '${tipoProducao}',
-      dp.statusItem = '${tipoProducao === 'C' ? 3 : 1}'
+      dp.statusItem = '${tipoProducao === 3 ? 'C' : 'A'}'
     WHERE
       p.idPedido IN ${ped};
   `
@@ -600,25 +600,31 @@ export class OutController {
       pd.dataProgramacao,
       pd.qtdCola,
       pd.qtdFilme,
-      SUM(dp.qtdPedida) AS metros
+      IFNULL(SUM(dp.qtdPedida), 0) AS metros
     FROM 
       programacaodublagens pd
-    INNER JOIN
+    LEFT JOIN
       detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem
-    INNER JOIN 
+    LEFT JOIN 
       pedidos p ON p.idPedido = dpd.idPedido
-    INNER JOIN
+    LEFT JOIN
       detalhepedidos dp ON dp.idPedido = p.idPedido
     WHERE
-      (pd.dataProgramacao = IFNULL(?, pd.dataProgramacao))
+      (? IS NULL OR pd.dataProgramacao = ?)
     GROUP BY
       pd.idProgramacaoDublagem,
       pd.dataProgramacao,
       pd.qtdCola,
       pd.qtdFilme;
-      `
-    return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, [itemPesquisa || null])
+  `;
+
+
+    // Trata valor vazio ou string em branco como null
+    const dataParam = itemPesquisa?.trim() || null;
+
+    return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, [dataParam, dataParam]);
   }
+
 
   @Post("romaneiosTinturaria")
   async romaneiosTinturaria(

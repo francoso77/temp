@@ -1,7 +1,8 @@
 export enum StatusPedidoItemType {
-  aberto = 1,
-  finalizado = 2,
-  producao = 3
+  aberto = 'A',
+  producao = 'C',
+  finalizado = 'F',
+  parcial = 'P',
 }
 
 export const StatusPedidoItemTypes = [
@@ -10,11 +11,15 @@ export const StatusPedidoItemTypes = [
     descricao: 'Em aberto'
   },
   {
+    idStatusPedidoItem: StatusPedidoItemType.producao,
+    descricao: 'Em produção'
+  },
+  {
     idStatusPedidoItem: StatusPedidoItemType.finalizado,
     descricao: 'Finalizado'
   },
   {
-    idStatusPedidoItem: StatusPedidoItemType.producao,
-    descricao: 'Em produção'
+    idStatusPedidoItem: StatusPedidoItemType.parcial,
+    descricao: 'Parcial'
   },
 ]

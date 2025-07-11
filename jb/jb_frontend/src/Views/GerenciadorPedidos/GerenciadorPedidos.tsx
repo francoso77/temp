@@ -15,8 +15,8 @@ import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
-import { DetalheProgramacaoDublagemInterface } from '../../../../jb_backend/src/interfaces/programacaoDublagemInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { DetalheProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
 
 interface PropsInterface {
   detalhe: Array<DetalheProgramacaoDublagemInterface>
@@ -52,7 +52,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     statusItem: StatusPedidoItemType.aberto,
   }
 
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
@@ -158,27 +158,28 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       }
     }).then((rs: Array<PedidoInterface>) => {
       const qtdItens = rs[0].detalhePedidos.length
-      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoInterface) => det.statusItem === 3).length
+      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoInterface) => det.statusItem === StatusPedidoItemType.producao).length
 
       if (qtdItens === emProducao) {
         rs[0].statusPedido = StatusPedidoType.producao
-      } else if (emProducao > 0 && emProducao < qtdItens) {
-        rs[0].statusPedido = StatusPedidoType.parcial
       } else {
         rs[0].statusPedido = StatusPedidoType.aberto
       }
       clsCrud.incluir({
         entidade: "Pedido",
         criterio: rs[0],
+        token: usuarioState.token
       })
     })
   }
 
   const btConfirmar = () => {
+
     if (validarDados()) {
       clsCrud.incluir({
         entidade: "DetalhePedido",
         criterio: detalhePedido,
+        token: usuarioState.token,
         cb: () => BuscaDados(),
         setMensagemState: setMensagemState
       })
@@ -242,14 +243,14 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       url: 'produzirPedidos',
       method: 'post',
       pedidos,
-      tipoProducao: 'C',
+      tipoProducao: 3,
       mensagem: 'Alterando status dos pedidos ...',
       setMensagemState: setMensagemState
     })
   }
   async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
 
-    const tmpPedidoNaoAberto = selecao.filter((item: any) => rsPesquisa[item].statusPedido !== "A")
+    const tmpPedidoNaoAberto = selecao.filter((item: any) => rsPesquisa[item].statusPedido !== StatusPedidoType.aberto)
 
     if (tmpPedidoNaoAberto.length > 0) {
       setMensagemState({
@@ -263,7 +264,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     } else {
       let tmp: Array<number> = []
       selecao.forEach((sel: any) => {
-        if (rsPesquisa[sel].statusPedido === "A") {
+        if (rsPesquisa[sel].statusPedido === StatusPedidoType.aberto) {
           tmp.push(rsPesquisa[sel].idPedido)
           if (podeIncluirDetalhe()) {
             detalhe.push({
@@ -335,7 +336,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
             p: 0,
             backgroundColor: '#3c486b',
           }}>
-          <Typography sx={{ color: 'white', flexGrow: 1, textAlign: 'center' }}>
+          <Typography sx={{ color: 'white', flexGrow: 1, textAlign: 'center', mt: 1 }}>
             Status do Item
           </Typography>
           <Tooltip title={'Fechar'}>

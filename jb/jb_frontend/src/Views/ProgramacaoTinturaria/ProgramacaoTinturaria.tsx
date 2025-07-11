@@ -1,9 +1,9 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { ProgramacaoInterface } from '../../../../jb_backend/src/interfaces/programacaoInterface';
+import { ProgramacaoInterface } from '../../Interfaces/programacaoInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface';
-import { TinturariaInterface } from '../../../../jb_backend/src/interfaces/tinturariaInterface';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
+import { TinturariaInterface } from '../../Interfaces/tinturariaInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { Box, Container, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
@@ -20,9 +20,9 @@ import { useNavigate } from 'react-router-dom';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import DetalheProgramacao from './DetalheProgramacao';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import ClsRelatorioProgramacao from '../../Utils/ClsRelatoriosProgramacao';
+import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 
 
 
@@ -285,7 +285,7 @@ export default function ProgramacaoTinturaria() {
 
     const msg = 'Pesquisando programações ...'
     const setMensagem = setMensagemState
-    const idsClientes = rsClientes
+    const idsCli = rsClientes
       .filter(clientes => clientes.nome.includes(pesquisa.itemPesquisa))
       .map(clientes => clientes.idPessoa)
 
@@ -310,7 +310,7 @@ export default function ProgramacaoTinturaria() {
       camposLike = ['notaFiscal']
     } else {
       criterio = {
-        idPessoa_cliente: idsClientes,
+        idPessoa_cliente: idsCli,
       }
       camposLike = ['idPessoa_cliente']
       comparador = 'I'
@@ -468,7 +468,7 @@ export default function ProgramacaoTinturaria() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
               <InputText
-                label="Pesquisa"
+                label="Buscar por data, nota fiscal ou cliente"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"

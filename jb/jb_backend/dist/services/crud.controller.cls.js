@@ -158,7 +158,7 @@ var ClsCrudController = /** @class */ (function () {
                 //"N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=" | "!=" 
                 camposLike.forEach(function (campo) {
                     if (comparador === "L") {
-                        where[campo] = (0, typeorm_1.Like)(where[campo]);
+                        where[campo] = (0, typeorm_1.Like)("%".concat(where[campo], "%"));
                     }
                     else if (comparador === "N") {
                         where[campo] = (0, typeorm_1.Not)(where[campo]);
@@ -180,6 +180,15 @@ var ClsCrudController = /** @class */ (function () {
                     }
                     else if (comparador === "<=") {
                         where[campo] = (0, typeorm_1.LessThanOrEqual)(where[campo]);
+                    }
+                    else if (comparador === "D") {
+                        var dataParaComparar_1 = where[campo];
+                        if (dataParaComparar_1) {
+                            where[campo] = (0, typeorm_1.Raw)(function (alias) { return "DATE(".concat(alias, ") = '").concat(dataParaComparar_1, "'"); });
+                        }
+                        else {
+                            delete where[campo]; // Remove a condição para evitar erros
+                        }
                     }
                 });
                 order = {};

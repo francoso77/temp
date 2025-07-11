@@ -10,15 +10,14 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../Interfaces/producaoDublagemInterface';
 import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { DetalhePedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
+import { DetalhePedidoInterface } from '../../Interfaces/pedidoInterface';
 import ComboBox from '../../Componentes/ComboBox';
 import DetalhePeca from './DetalhePeca';
-import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 
 
 
@@ -124,7 +123,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       setMensagemState({
         titulo: 'Atenção',
         exibir: true,
-        mensagem: 'Informe os dados da Produção!',
+        mensagem: 'Informe todos os dados da Produção - (data, pedido e colagem).',
         tipo: MensagemTipo.Error,
         exibirBotao: true,
         cb: null
@@ -207,77 +206,23 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
   }
 
-  const pesquisarPedidoItem = async (pedido: number): Promise<Array<DetalhePedidoInterface> | []> => {
-    return await clsCrud
-      .pesquisar({
-        entidade: "DetalhePedido",
-        criterio: {
-          idPedido: pedido,
-        },
-      })
-      .then((rs: Array<DetalhePedidoInterface>) => {
+  // const pesquisarPedidoItem = async (pedido: number): Promise<Array<DetalhePedidoInterface> | []> => {
+  //   return await clsCrud
+  //     .pesquisar({
+  //       entidade: "DetalhePedido",
+  //       criterio: {
+  //         idPedido: pedido,
+  //       },
+  //     })
+  //     .then((rs: Array<DetalhePedidoInterface>) => {
 
-        if (rs.length > 0) {
-          return rs
-        } else {
-          return []
-        }
-      })
-  }
-  const alterarStatusItem = async () => {
-    let qtdAtendida: number = 0
-    let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
-
-    try {
-      const rsDetalhePedidos = await pesquisarPedidoItem(rsMaster.idPedido)
-      let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsDetalhePedidos]
-
-      if (tmpDetalhe) {
-        tmpDetalhe.forEach((detalhe) => {
-          rsMaster.detalheProducaoDublagens.forEach((item) => {
-            if (detalhe.idProduto === item.idProduto) {
-              item.detalhePecas.forEach((peca) => {
-                qtdAtendida += peca.metros
-              })
-              if (qtdAtendida <= 0) {
-                statusItem = StatusPedidoItemType.producao
-              } else {
-                statusItem = StatusPedidoItemType.finalizado
-              }
-            } else {
-              console.log("não achou o código")
-              statusItem = StatusPedidoItemType.producao
-              qtdAtendida = 0
-            }
-          })
-
-          tmpDetalhe = [
-            ...tmpDetalhe,
-            { ...detalhe, statusItem: statusItem, qtdAtendida: qtdAtendida },
-          ]
-        })
-
-        const rsPed = await clsCrud.incluir({
-          entidade: "DetalhePedido",
-          criterio: tmpDetalhe,
-          token: usuarioState.token,
-        })
-        if (!rsPed.ok) {
-          setMensagemState({
-            titulo: "Erro...",
-            exibir: true,
-            mensagem: "Status não foi atualizado - consulte o suporte",
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null,
-          })
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao alterar status do item:", error)
-    }
-  }
-
+  //       if (rs.length > 0) {
+  //         return rs
+  //       } else {
+  //         return []
+  //       }
+  //     })
+  // }
 
   const AtualizaSomatorio = (rs: Array<DetalheProducaoDublagemInterface>) => {
 
@@ -328,12 +273,6 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   useEffect(() => {
     buscarDados()
   }, [open])
-
-  useEffect(() => {
-    if (rsMaster) {
-      alterarStatusItem()
-    }
-  }, [rsMaster])
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))

@@ -4,6 +4,8 @@ import { EntradaInterface } from '../interfaces/entradaInterface';
 import DetalheEntrada from './detalheEntrada.entity';
 
 @Entity({ name: 'entradas' })
+@Index('IDX_FORNECEDOR_DATA', ['idPessoa_fornecedor', 'dataEmissao'])
+@Index('IDX_FORNECEDOR_NOTA', ['idPessoa_fornecedor', 'notaFiscal'])
 export default class Entrada implements EntradaInterface {
 
   @PrimaryGeneratedColumn()
@@ -21,6 +23,7 @@ export default class Entrada implements EntradaInterface {
   observacao: string
 
   @Column()
+  @Index('IDX_FORNECEDOR')
   idPessoa_fornecedor: number
 
   @JoinColumn({ name: 'idPessoa_fornecedor' })

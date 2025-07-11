@@ -16,12 +16,12 @@ var DatabaseModule = /** @class */ (function () {
         (0, common_1.Module)({
             imports: [
                 typeorm_1.TypeOrmModule.forRoot({
-                    type: process.env.DB_TYPE,
-                    host: process.env.DB_HOST,
-                    port: Number(process.env.DB_PORT),
-                    username: process.env.DB_USERNAME,
-                    password: process.env.DB_PASSWORD,
-                    database: process.env.DB_DATABASE,
+                    type: process.env.DB_TYPE || "mysql",
+                    host: process.env.DB_HOST || "localhost",
+                    port: parseInt(process.env.DB_PORT || "3306", 10),
+                    username: process.env.DB_USERNAME || "root",
+                    password: process.env.DB_PASSWORD || "Frk@071569#",
+                    database: process.env.DB_DATABASE || "finance",
                     synchronize: true,
                     autoLoadEntities: true,
                 }),

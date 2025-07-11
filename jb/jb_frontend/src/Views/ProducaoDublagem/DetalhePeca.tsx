@@ -9,7 +9,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalhePecaInterface, ProducaoDublagemInterface } from '../../../../jb_backend/src/interfaces/producaoDublagemInterface';
+import { DetalhePecaInterface, ProducaoDublagemInterface } from '../../Interfaces/producaoDublagemInterface';
 import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 
 
@@ -41,7 +41,7 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
       cabecalho: 'Metros',
-      alinhamento: 'right',
+      alinhamento: 'center',
       campo: 'metros',
       format: (qtd) => clsFormatacao.currency(qtd)
     },

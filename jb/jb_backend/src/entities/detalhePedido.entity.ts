@@ -1,11 +1,17 @@
-import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
-import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
 import Pedido from './pedido.entity';
 import Cor from './cor.entity';
+import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
 
 @Entity({ name: 'detalhepedidos' })
+@Index('IDX_PEDIDO', ['idPedido'])
+@Index('IDX_PRODUTO', ['idProduto'])
+@Index('IDX_COR', ['idCor'])
+@Index('IDX_STATUS_ITEM', ['statusItem'])
+@Index('IDX_PEDIDO_PRODUTO', ['idPedido', 'idProduto'])
+@Index('IDX_PRODUTO_STATUS', ['idProduto', 'statusItem'])
 export default class DetalhePedido implements DetalhePedidoInterface {
 
   @PrimaryGeneratedColumn()

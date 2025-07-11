@@ -12,11 +12,11 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
-import { DetalheProgramacaoInterface, ProgramacaoInterface } from '../../../../jb_backend/src/interfaces/programacaoInterface';
+import { CorInterface } from '../../Interfaces/corInteface';
+import { DetalheProgramacaoInterface, ProgramacaoInterface } from '../../Interfaces/programacaoInterface';
 import { RomaneioInterface, SomatorioProgramacaoInterface } from './ProgramacaoTinturaria';
 
 

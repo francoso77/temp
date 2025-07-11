@@ -9,6 +9,7 @@ export enum TipoProdutoType {
   palmilha = 8,
   tecidoCru = 9,
   tecidoTinto = 10,
+
 }
 
 export const TipoProdutoTypes = [

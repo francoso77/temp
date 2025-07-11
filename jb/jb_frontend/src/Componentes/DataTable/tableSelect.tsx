@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, Checkbox, Box, Toolbar, Typography, FormControlLabel, TableCell, SpeedDialAction, SpeedDial, TableRow, tableCellClasses } from '@mui/material'
+import { useTheme, Paper, Table, TableBody, TableContainer, TableHead, TableSortLabel, Tooltip, Icon, Checkbox, Box, Toolbar, Typography, FormControlLabel, TableCell, SpeedDialAction, SpeedDial, TableRow, tableCellClasses, Chip } from '@mui/material'
 import TablePagination from '@mui/material/TablePagination'
 import IconButton from '@mui/material/IconButton'
 import { visuallyHidden } from '@mui/utils';
@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { THEME } from '../../app/Layout/Theme';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
+import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 
 export const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -193,7 +194,7 @@ export default function TableSelect<T>({
                     ))}
                     <Condicional condicao={acoes.length > 0}>
                         <StyledTableCell align='center'>
-                            Opções
+                            Ações
                         </StyledTableCell>
                     </Condicional>
                 </StyledTableRow>
@@ -397,14 +398,50 @@ export default function TableSelect<T>({
                                                             return (
                                                                 <StyledTableCell
                                                                     key={indice}
-                                                                    sx={{
-                                                                        color: (row as any)[coluna.campo] === "A" ? 'green' :
-                                                                            (row as any)[coluna.campo] === "F" ? 'red' :
-                                                                                (row as any)[coluna.campo] === "C" ? 'orange' :
-                                                                                    (row as any)[coluna.campo] === "P" ? 'royalblue' : 'default'
-                                                                    }}
-                                                                    align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
-                                                                    {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
+                                                                    align={coluna.alinhamento ? coluna.alinhamento : 'left'}
+                                                                >
+                                                                    {/* Obtém o valor da célula atual */}
+                                                                    {(() => {
+                                                                        const valorDaCelula = (row as any)[coluna.campo];
+
+                                                                        // Verifica se o valor da célula é um dos códigos de status
+                                                                        if (Object.values(StatusPedidoType).includes(valorDaCelula)) {
+                                                                            const statusInfo = StatusPedidoTypes.find(
+                                                                                (status) => status.idStatusPedido === valorDaCelula
+                                                                            );
+
+                                                                            const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+                                                                            let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+
+                                                                            switch (valorDaCelula) {
+                                                                                case StatusPedidoType.aberto:
+                                                                                    color = 'info'; // Azul para aberto
+                                                                                    break;
+                                                                                case StatusPedidoType.finalizado:
+                                                                                    color = 'success'; // Verde para finalizado
+                                                                                    break;
+                                                                                case StatusPedidoType.producao:
+                                                                                    color = 'warning'; // Laranja para produção
+                                                                                    break;
+                                                                                default:
+                                                                                    color = 'default';
+                                                                                    break;
+                                                                            }
+
+                                                                            return (
+                                                                                <Chip
+                                                                                    label={descricaoStatus}
+                                                                                    color={color}
+                                                                                    size="small"
+                                                                                    sx={{ fontWeight: 'bold' }}
+                                                                                />
+                                                                            );
+                                                                        } else {
+                                                                            // Se não for um código de status, renderiza o conteúdo normalmente
+                                                                            return coluna.format ? coluna.format(valorDaCelula, row) : valorDaCelula;
+                                                                        }
+                                                                    })()}
                                                                 </StyledTableCell>
                                                             )
                                                         })

@@ -15,10 +15,9 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
-import { UnidadeMedidaInterface } from '../../../../jb_backend/src/interfaces/unidadeMedidaInteface';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
-import { SqlEstruturaInterface } from '../../../../jb_backend/src/interfaces/sqlEstruturaInterface';
+import { EstruturaInterface } from '../../Interfaces/estruturaInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
+import { SqlEstruturaInterface } from '../../Interfaces/sqlEstruturaInterface';
 import DetalheEstrutura from './DetalheEstrutura';
 
 
@@ -28,9 +27,7 @@ export default function Estrutura() {
   const clsCrud = new ClsCrud()
 
   const ResetDados: EstruturaInterface = {
-    idUnidade: 0,
     idProduto: 0,
-    qtdBase: 0,
     detalheEstruturas: []
   }
   interface PesquisaInterface {
@@ -42,27 +39,15 @@ export default function Estrutura() {
   const [rsPesquisa, setRsPesquisa] = useState<Array<SqlEstruturaInterface>>([])
   const [erros, setErros] = useState({})
   const [estrutura, setEstrutura] = useState<EstruturaInterface>(ResetDados)
-  const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
   const [rsProduto, setRsProduto] = useState<Array<ProdutoInterface>>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
       cabecalho: 'Produto',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'idProduto',
       format: (_v, rs: any) => rs.produto.nome
-    },
-    {
-      cabecalho: 'Unidade',
-      alinhamento: 'left',
-      campo: 'idUnidade',
-      format: (_v, rs: any) => rs.unidadeMedida.sigla
-    },
-    {
-      cabecalho: 'Qtd Base',
-      alinhamento: 'left',
-      campo: 'qtdBase',
     },
   ]
 
@@ -72,7 +57,6 @@ export default function Estrutura() {
         entidade: "Estrutura",
         relations: [
           "produto",
-          "unidadeMedida",
           "detalheEstruturas",
           "detalheEstruturas.produto",
           "detalheEstruturas.cor"
@@ -112,37 +96,10 @@ export default function Estrutura() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('qtdBase', estrutura, erros, retorno, 'Informe uma quantidade Base')
-    retorno = validaCampo.naoVazio('idUnidade', estrutura, erros, retorno, 'Informe uma Unidade')
     retorno = validaCampo.naoVazio('idProduto', estrutura, erros, retorno, 'Informe o Produto')
 
     setErros(erros)
     return retorno
-  }
-
-  const testaSoma = (): boolean => {
-    let somaQtd: number = 0
-    estrutura.detalheEstruturas.forEach((i) => {
-      somaQtd = somaQtd + i.qtd
-    }
-    )
-
-    if (somaQtd === 0) {
-      return true
-    } else {
-
-      if (somaQtd > estrutura.qtdBase || somaQtd < estrutura.qtdBase) {
-        setMensagemState({
-          titulo: 'Aviso',
-          exibir: true,
-          mensagem: 'A soma das quantidades informadas deve ser igual Qtd Base.',
-          tipo: MensagemTipo.Error,
-          exibirBotao: true,
-          cb: null
-        })
-      }
-    }
-    return somaQtd * 1.0 === estrutura.qtdBase * 1.0;
   }
 
   const btConfirmar = () => {
@@ -169,7 +126,7 @@ export default function Estrutura() {
         } else {
 
           if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-            if (validarDados() && testaSoma()) {
+            if (validarDados()) {
 
               clsCrud.incluir({
                 entidade: "Estrutura",
@@ -186,7 +143,7 @@ export default function Estrutura() {
                     setMensagemState({
                       titulo: 'Erro...',
                       exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
+                      mensagem: 'Erro no cadastro - (Atenção ao NÍVEL, ele não pode ser repetir) - Consulte Suporte',
                       tipo: MensagemTipo.Error,
                       exibirBotao: true,
                       cb: null
@@ -229,7 +186,6 @@ export default function Estrutura() {
         entidade: "Estrutura",
         relations: [
           "produto",
-          "unidadeMedida",
           "detalheEstruturas",
           "detalheEstruturas.produto",
           "detalheEstruturas.cor"
@@ -261,24 +217,12 @@ export default function Estrutura() {
   const BuscarDados = () => {
     clsCrud
       .pesquisar({
-        entidade: "UnidadeMedida",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-        campoOrder: ['nome'],
-      })
-      .then((rs: Array<UnidadeMedidaInterface>) => {
-        setRsUnidade(rs)
-      })
-
-    clsCrud
-      .pesquisar({
         entidade: "Produto",
         criterio: {
-          nome: "%".concat("%"),
+          tipoProduto: [7, 8],
         },
-        camposLike: ["nome"],
+        camposLike: ["tipoProduto"],
+        comparador: 'I',
         campoOrder: ['nome'],
       })
       .then((rs: Array<ProdutoInterface>) => {
@@ -348,43 +292,18 @@ export default function Estrutura() {
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
               <ComboBox
                 opcoes={rsProduto}
                 campoDescricao="nome"
                 campoID="idProduto"
                 dados={estrutura}
-                mensagemPadraoCampoEmBranco="Escolha um Tipo"
+                mensagemPadraoCampoEmBranco="Escolha um produto"
                 field="idProduto"
                 label="Produto"
                 erros={erros}
                 disabled={localState.action === 'excluindo' ? true : false}
                 setState={setEstrutura}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsUnidade}
-                campoDescricao="sigla"
-                campoID="idUnidade"
-                dados={estrutura}
-                mensagemPadraoCampoEmBranco="Escolha uma unidade de medida"
-                field="idUnidade"
-                label="Unidade"
-                erros={erros}
-                disabled={localState.action === 'excluindo' ? true : false}
-                setState={setEstrutura}
-              />
-            </Grid>
-            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                type='number'
-                label="Qtd Base"
-                dados={estrutura}
-                field="qtdBase"
-                setState={setEstrutura}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
               />
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>

@@ -12,15 +12,15 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { ProdutoInterface } from '../../../../jb_backend/src/interfaces/produtoInterface';
+import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import InputCalc from '../../Componentes/InputCalc';
 import { SomatorioPedidoInterface } from './Pedido';
-import { EstruturaInterface } from '../../../../jb_backend/src/interfaces/estruturaInterface';
-import { DetalhePedidoInterface, PedidoInterface } from '../../../../jb_backend/src/interfaces/pedidoInterface';
-import { CorInterface } from '../../../../jb_backend/src/interfaces/corInteface';
+import { EstruturaInterface } from '../../Interfaces/estruturaInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { CorInterface } from '../../Interfaces/corInteface';
 
 
 interface PropsInterface {
@@ -62,7 +62,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
 
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
   const [open, setOpen] = useState(false);
-  const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
+  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
   const [erros, setErros] = useState({});
   const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados);
@@ -128,7 +128,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
 
   const onEditar = (rs: DetalhePedidoInterface, indice: number) => {
 
-    if (rs.statusItem === 1) {
+    if (rs.statusItem === StatusPedidoItemType.aberto) {
       setLocalState({ action: actionTypes.editando })
       setIndiceEdicao(indice)
       setDetalhePedido(rs)
@@ -146,7 +146,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
   }
 
   const onExcluir = (rs: DetalhePedidoInterface) => {
-    if (rs.statusItem === 1) {
+    if (rs.statusItem === StatusPedidoItemType.aberto) {
 
       let tmpDetalhe: Array<DetalhePedidoInterface> = []
       rsMaster.detalhePedidos.forEach(det => {
@@ -239,8 +239,9 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
         camposLike: ['idProduto']
       })
 
-      if (produtosComEstrutura.length === 0) {
+      if (produtosComEstrutura) {
         const liberado = produtosComEstrutura.find(v => v.tipoProduto === 7 || v.tipoProduto === 8)?.idProduto
+
         const estrutura: EstruturaInterface[] = await clsCrud.pesquisar({
           entidade: "Estrutura",
           criterio: { idProduto: liberado },
@@ -249,7 +250,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
           setMensagemState({
             titulo: 'Erro',
             exibir: true,
-            mensagem: 'Produto sem Estrutura definida!',
+            mensagem: 'Produto sem Estrutura definida! Vá ao cadastro de estruturas e crie uma estutura para o produto.',
             tipo: MensagemTipo.Error,
             exibirBotao: true,
             cb: null
@@ -267,6 +268,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
     }
   }
   const btConfirmaInclusao = async () => {
+
     const estrutura = await temEstrutura(detalhePedido.idProduto)
     if (validarDados() && podeIncluirDetalhe() && estrutura) {
       let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsMaster.detalhePedidos]
@@ -482,7 +484,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
                 <InputCalc
                   label='Total Item'
                   tipo='currency'
-                  scale={4}
+                  scale={2}
                   disabled={true}
                   value={(detalhePedido.qtdPedida * detalhePedido.vrUnitario).toString()}
                   textAlign='right'

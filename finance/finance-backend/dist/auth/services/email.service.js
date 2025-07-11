@@ -52,12 +52,12 @@ var nodemailer = require("nodemailer");
 var EmailService = /** @class */ (function () {
     function EmailService() {
         this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: Number(process.env.SMTP_PORT),
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: Number(process.env.SMTP_PORT) || 587,
             secure: false,
             auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
+                user: process.env.SMTP_USER || 'frank77invest@gmail.com',
+                pass: process.env.SMTP_PASS || 'bqmo jguq mnap jqjl',
             },
         });
     }

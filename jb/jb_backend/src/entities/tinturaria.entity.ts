@@ -4,6 +4,8 @@ import { TinturariaInterface } from '../interfaces/tinturariaInterface';
 import DetalheTinturaria from './detalheTinturaria.entity';
 
 @Entity({ name: 'tinturarias' })
+@Index(["idPessoa_cliente"])
+@Index(["idPessoa_fornecedor"])
 export default class Tinturaria implements TinturariaInterface {
 
   @PrimaryGeneratedColumn()

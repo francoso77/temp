@@ -14,12 +14,12 @@ var dotenv = require("dotenv");
 dotenv.config();
 var isCompiled = __dirname.includes('dist');
 exports.AppDataSource = new typeorm_1.DataSource({
-    type: process.env.DB_TYPE,
-    host: process.env.DB_HOST,
+    type: process.env.DB_TYPE || "mysql",
+    host: process.env.DB_HOST || "localhost",
     port: parseInt(process.env.DB_PORT || "3306", 10),
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
+    username: process.env.DB_USERNAME || "root",
+    password: process.env.DB_PASSWORD || "Frk@071569#",
+    database: process.env.DB_DATABASE || "finance",
     synchronize: true,
     logging: false,
     entities: [

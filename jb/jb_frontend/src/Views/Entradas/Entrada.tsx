@@ -15,11 +15,12 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
 import DeleteIcon from '@mui/icons-material/Delete'
 import InputText from '../../Componentes/InputText'
 import ComboBox from '../../Componentes/ComboBox'
-import { EntradaInterface } from '../../../../jb_backend/src/interfaces/entradaInterface'
-import { PessoaInterface } from '../../../../jb_backend/src/interfaces/pessoaInterface'
+import { EntradaInterface } from '../../Interfaces/entradaInterface'
+import { PessoaInterface } from '../../Interfaces/pessoaInterface'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import DetalhePedido from './DetalheEntrada'
-import { EstoqueInterface } from '../../../../jb_backend/src/interfaces/estoqueInterface'
+import { EstoqueInterface } from '../../Interfaces/estoqueInterface'
+import { UsuarioType } from '../../types/usuarioTypes'
 
 export interface SomatorioEntradaInterface {
   total: string
@@ -119,7 +120,7 @@ export default function Entrada() {
       })
   }
 
-  const onEditar = (id: string | number) => {
+  const onVisualizar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setEntrada(rs)
       AtualizaSomatorio(rs)
@@ -299,10 +300,10 @@ export default function Entrada() {
     return `${year}-${month}-${day} 00:00:00`
   }
 
-  const formatNumber = (numString: string): string => {
-    const paddedNum = numString.padStart(9, '0')
-    return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
-  }
+  // const formatNumber = (numString: string): string => {
+  //   const paddedNum = numString.padStart(9, '0')
+  //   return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+  // }
 
   const btPesquisar = () => {
     const relations = [
@@ -314,7 +315,7 @@ export default function Entrada() {
       "detalheEntradas.romaneio",
     ];
 
-    const msg = 'Pesquisando notas ...'
+    const msg = 'Pesquisando dados ...'
     const setMensagem = setMensagemState
     const idsFor = rsFornecedor
       .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
@@ -327,6 +328,7 @@ export default function Entrada() {
     const temNumero = /\d/.test(pesquisa.itemPesquisa)
 
     if (temNumero && pesquisa.itemPesquisa.includes('/')) {
+
       const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
       criterio = {
         dataEmissao: formattedDateTime
@@ -334,9 +336,9 @@ export default function Entrada() {
       camposLike = ['dataEmissao']
     } else if (temNumero) {
 
-      const formattedNumber = formatNumber(pesquisa.itemPesquisa);
+      //const formattedNumber = formatNumber(pesquisa.itemPesquisa);
       criterio = {
-        notaFiscal: formattedNumber
+        notaFiscal: pesquisa.itemPesquisa
       }
       camposLike = ['notaFiscal']
     } else {
@@ -411,7 +413,7 @@ export default function Entrada() {
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
               <InputText
-                label="Pesquisa"
+                label='Buscar por Fornecedor, Nota Fiscal ou Data de Emissão'
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"
@@ -437,11 +439,11 @@ export default function Entrada() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "find_in_page_two_tone",
                     onAcionador: (rs: EntradaInterface) =>
-                      onEditar(rs.idEntrada as number),
+                      onVisualizar(rs.idEntrada as number),
                     toolTip: "Visualizar",
                   },
                   {
@@ -449,6 +451,13 @@ export default function Entrada() {
                     onAcionador: (rs: EntradaInterface) =>
                       onExcluir(rs.idEntrada as number),
                     toolTip: "Excluir",
+                  },
+                ] : [
+                  {
+                    icone: "find_in_page_two_tone",
+                    onAcionador: (rs: EntradaInterface) =>
+                      onVisualizar(rs.idEntrada as number),
+                    toolTip: "Visualizar",
                   },
                 ]}
               />
