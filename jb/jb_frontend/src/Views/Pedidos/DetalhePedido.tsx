@@ -1,4 +1,4 @@
-import { Box, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Chip, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
@@ -15,12 +15,12 @@ import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
 import InputCalc from '../../Componentes/InputCalc';
 import { SomatorioPedidoInterface } from './Pedido';
 import { EstruturaInterface } from '../../Interfaces/estruturaInterface';
 import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
 import { CorInterface } from '../../Interfaces/corInteface';
+import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 
 interface PropsInterface {
@@ -57,7 +57,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
     qtdPedida: 0,
     vrUnitario: 0,
     qtdAtendida: 0,
-    statusItem: StatusPedidoItemType.aberto,
+    statusItem: StatusType.aberto,
   }
 
   const [indiceEdicao, setIndiceEdicao] = useState<number>(-1)
@@ -106,6 +106,49 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       format: (_v, rs: any) => rs.qtdPedida ?
         clsFormatacao.currency(rs.qtdPedida * rs.vrUnitario) : ""
     },
+    {
+      cabecalho: 'Status Item',
+      alinhamento: 'center',
+      campo: 'statusItem',
+      render: (_valor: any, row: any) => {
+
+
+        const statusInfo = StatusTypes.find(
+          (status) => status.idStatus === row.statusItem
+        );
+
+        const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+        switch (row.statusItem) {
+          case StatusType.aberto:
+            color = 'success'; // Exemplo: azul para aberto
+            break;
+          case StatusType.producao:
+            color = 'info'; // Exemplo: roxo para produção
+            break;
+          case StatusType.parcial:
+            color = 'warning'; // Exemplo: laranja para parcial
+            break;
+          case StatusType.finalizado:
+            color = 'error'; // Exemplo: verde para finalizado
+            break;
+          default:
+            color = 'default'; // Cor padrão para qualquer outro caso
+            break;
+        }
+
+        // 4. Retornar o componente Chip
+        return (
+          <Chip
+            label={descricaoStatus}
+            color={color}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
+      },
+    },
   ]
 
   const pegaTipo = () => {
@@ -128,7 +171,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
 
   const onEditar = (rs: DetalhePedidoInterface, indice: number) => {
 
-    if (rs.statusItem === StatusPedidoItemType.aberto) {
+    if (rs.statusItem === StatusType.aberto) {
       setLocalState({ action: actionTypes.editando })
       setIndiceEdicao(indice)
       setDetalhePedido(rs)
@@ -146,7 +189,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
   }
 
   const onExcluir = (rs: DetalhePedidoInterface) => {
-    if (rs.statusItem === StatusPedidoItemType.aberto) {
+    if (rs.statusItem === StatusType.aberto) {
 
       let tmpDetalhe: Array<DetalhePedidoInterface> = []
       rsMaster.detalhePedidos.forEach(det => {
@@ -160,7 +203,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
       setMensagemState({
         titulo: 'Atenção',
         exibir: true,
-        mensagem: 'Item em produção, não pode ser alterado!',
+        mensagem: 'Item em produção, não pode ser excluído!',
         tipo: MensagemTipo.Error,
         exibirBotao: true,
         cb: null
@@ -279,7 +322,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
         qtdPedida: detalhePedido.qtdPedida,
         qtdAtendida: 0,
         vrUnitario: detalhePedido.vrUnitario,
-        statusItem: StatusPedidoItemType.aberto,
+        statusItem: StatusType.aberto,
         produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
         cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalhePedido.idCor)] },
       })
@@ -295,7 +338,7 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
               qtdPedida: detalhePedido.qtdPedida,
               qtdAtendida: 0,
               vrUnitario: detalhePedido.vrUnitario,
-              statusItem: StatusPedidoItemType.aberto,
+              statusItem: StatusType.aberto,
               produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalhePedido.idProduto)] },
               cor: { ...rsCor[rsCor.findIndex(v => v.idCor === detalhePedido.idCor)] },
             }

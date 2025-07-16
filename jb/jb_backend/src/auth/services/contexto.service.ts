@@ -4,7 +4,7 @@ import { Injectable } from "@nestjs/common";
 export class ContextoService {
 
   public constructor() {
-    console.log('Constructor do Contexto Service....')
+    //console.log('Constructor do Contexto Service....')
   }
 
   public usuarioContexto: string = 'Usuário Contexto Inicial'

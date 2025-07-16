@@ -8,7 +8,6 @@ import { Box, Container, Grid, IconButton, Paper, Tooltip, useMediaQuery, useThe
 import Condicional from '../../Componentes/Condicional/Condicional';
 import InputText from '../../Componentes/InputText';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
-import AddCircleIcon from "@mui/icons-material/AddCircle"
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded"
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -21,6 +20,8 @@ import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import ClsApi from '../../Utils/ClsApi';
 import EtiquetasPedido from './EtiquetasPedido';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+
 
 
 export default function ProgramacaoDublagem() {
@@ -244,7 +245,7 @@ export default function ProgramacaoDublagem() {
             idProgramacaoDublagem: programacaoDublagem.idProgramacaoDublagem
           },
           token: usuarioState.token,
-          cb: btPesquisar,
+          cb: () => btPesquisar(),
           setMensagemState: setMensagemState
         })
           .then((rs) => {

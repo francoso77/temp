@@ -86,7 +86,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pd.idProgramacaoDublagem AS idProgramacaoDublagem,\n        ped.idPedido AS idPedido,\n        ped.dataPedido as dataPedido,\n        ped.statusPedido AS statusPedido,\n        pc.idPessoa AS idPessoa_cliente,\n        pv.idPessoa AS idPessoa_vendedor\n      FROM\n        programacaodublagens pd\n      INNER JOIN\n        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n        pedidos ped ON ped.idPedido = dpd.idPedido\n      INNER JOIN\n        detalhepedidos dp ON dp.idPedido = ped.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      INNER JOIN\n        pessoas pv ON pv.idPessoa = ped.idPessoa_vendedor\n      WHERE \n        ped.statusPedido = 2 AND\n        pd.idProgramacaoDublagem = ?\n      ORDER BY\n        ped.dataPedido ASC\n;\n    ";
+                sql = "\n      SELECT \n        pd.idProgramacaoDublagem AS idProgramacaoDublagem,\n        ped.idPedido AS idPedido,\n        ped.dataPedido as dataPedido,\n        ped.statusPedido AS statusPedido,\n        pc.idPessoa AS idPessoa_cliente,\n        pv.idPessoa AS idPessoa_vendedor\n      FROM\n        programacaodublagens pd\n      INNER JOIN\n        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n        pedidos ped ON ped.idPedido = dpd.idPedido\n      INNER JOIN\n        detalhepedidos dp ON dp.idPedido = ped.idPedido\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = ped.idPessoa_cliente\n      INNER JOIN\n        pessoas pv ON pv.idPessoa = ped.idPessoa_vendedor\n      WHERE \n        ped.statusPedido = 4 AND\n        pd.idProgramacaoDublagem = ?\n      ORDER BY\n        ped.dataPedido ASC\n;\n    ";
                 params = [id];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
@@ -107,7 +107,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n        pd.dataProgramacao,\n        p.idPedido AS pedido,\n        pe.nome AS cliente,\n        pro.nome AS produto,\n        dp.qtdPedida AS metros\n      FROM\n        programacaodublagens pd\n      INNER JOIN\n        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n        pedidos p ON p.idPedido = dpd.idPedido\n      INNER JOIN\n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro ON pro.idProduto = dp.idProduto\n      INNER JOIN\n        pessoas pe ON pe.idPessoa = p.idPessoa_cliente\n      WHERE \n        dp.statusItem = 'C' AND\n        pd.dataProgramacao = ?\n        ;\n\n    ";
+                sql = "\n      SELECT \n        pd.dataProgramacao,\n        p.idPedido AS pedido,\n        pe.nome AS cliente,\n        pro.nome AS produto,\n        dp.qtdPedida AS metros\n      FROM\n        programacaodublagens pd\n      INNER JOIN\n        detalheprogramacaodublagens dpd ON dpd.idProgramacaoDublagem = pd.idProgramacaoDublagem\n      INNER JOIN\n        pedidos p ON p.idPedido = dpd.idPedido\n      INNER JOIN\n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro ON pro.idProduto = dp.idProduto\n      INNER JOIN\n        pessoas pe ON pe.idPessoa = p.idPessoa_cliente\n      WHERE \n        dp.statusItem IN (2,3) AND\n        pd.dataProgramacao = ?\n        ;\n\n    ";
                 params = [itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(programacaoDublagem_entity_1.default).query(sql, params)];
             });
@@ -136,7 +136,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n    SELECT\n      p.*,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    WHERE \n      statusPedido = 3 AND\n      ".concat(campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?', "\n  ");
+                sql = "\n    SELECT\n      p.*,\n      pc.nome AS nomeCliente,\n      pv.nome AS nomeVendedor\n    FROM \n      pedidos p\n    INNER JOIN\n      pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n    INNER JOIN\n      pessoas pv ON pv.idPessoa = p.idPessoa_vendedor\n    WHERE \n      statusPedido IN (2,3) AND\n      ".concat(campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?', "\n  ");
                 params = [campo === 'data' ? itemPesquisa : "%".concat(itemPesquisa, "%")];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
@@ -167,7 +167,7 @@ var OutController = /** @class */ (function () {
                 else {
                     tp = '(' + tipos.map(function (v) { return v; }).join(", ") + ')';
                 }
-                sql = "\n      SELECT \n        pro2.idProduto AS idProduto,\n        SUM(dp.qtdPedida * de.qtd) AS qtdTotal,\n        pro2.nome AS materiaPrima,\n        c.idCor AS idCor,\n        c.nome AS cor\n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n\n      WHERE \n        pro2.tipoProduto IN (?) AND\n        dp.statusItem = 'C' AND\n        pd.dataProgramacao = ?\n      GROUP BY\n        idProduto, materiaPrima, idCor, cor\n      ORDER BY\n        materiaPrima, cor\n        ;\n      ";
+                sql = "\n      SELECT \n        pro2.idProduto AS idProduto,\n        SUM(dp.qtdPedida * de.qtd) AS qtdTotal,\n        pro2.nome AS materiaPrima,\n        c.idCor AS idCor,\n        c.nome AS cor,\n        p.idPedido AS idPedido\n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n\n      WHERE \n        pro2.tipoProduto IN (?) AND\n        dp.statusItem IN (2,3) AND\n        pd.dataProgramacao = ?\n      GROUP BY\n        idProduto, materiaPrima, idCor, cor, idPedido\n      ORDER BY\n        materiaPrima, cor\n        ;\n      ";
                 params = [tp, itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
@@ -177,7 +177,7 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var sql, params;
             return __generator(this, function (_a) {
-                sql = "\n      SELECT \n      pro2.idProduto AS idProduto,\n     \tp.idPedido AS idPedido,\n      pc.nome AS cliente,\n      pro2.nome AS produto,\n      pro2.tipoProduto AS tipoProduto,\n      c.nome AS cor,\n      c.nivel AS corNivel,\n      (de.qtd * dp.qtdPedida) AS metros\n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n      WHERE \n        pro2.tipoProduto = 10 AND\n        dp.statusItem = 'C' AND\n        pd.dataProgramacao = ?\n      ORDER BY\n        produto, corNivel\n        ;       \n      ";
+                sql = "\n      SELECT \n      pro2.idProduto AS idProduto,\n     \tp.idPedido AS idPedido,\n      pc.nome AS cliente,\n      pro2.nome AS produto,\n      pro2.tipoProduto AS tipoProduto,\n      c.nome AS cor,\n      c.nivel AS corNivel,\n      (de.qtd * dp.qtdPedida) AS metros\n      FROM\n        pedidos p\n      INNER JOIN \n        detalhepedidos dp ON dp.idPedido = p.idPedido\n      INNER JOIN\n        produtos pro1 ON pro1.idProduto = dp.idProduto\n      INNER JOIN\n        estruturas e ON e.idProduto = dp.idProduto\n      INNER JOIN\n        detalheestruturas de ON de.idEstrutura = e.idEstrutura\n      INNER JOIN\n        produtos pro2 ON pro2.idProduto = de.idProduto\n      INNER JOIN \n        cores c ON c.idCor = de.idCor\n      INNER JOIN\n        pessoas pc ON pc.idPessoa = p.idPessoa_cliente\n      INNER JOIN \n        detalheprogramacaodublagens dpd ON dpd.idPedido = p.idPedido\n      INNER JOIN \n        programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem\n      WHERE \n        pro2.tipoProduto = 10 AND\n        dp.statusItem IN (2,3) AND\n        pd.dataProgramacao = ?\n      ORDER BY\n        produto, corNivel\n        ;       \n      ";
                 params = [itemPesquisa];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });
@@ -197,8 +197,8 @@ var OutController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var novoStatusPedido, novoStatusItem, sql, params;
             return __generator(this, function (_a) {
-                novoStatusPedido = 2;
-                novoStatusItem = 'F';
+                novoStatusPedido = 4;
+                novoStatusItem = 4;
                 // console.log(tipoStatus)
                 // console.log(pedido)
                 // console.log(produto)
@@ -206,8 +206,8 @@ var OutController = /** @class */ (function () {
                 // console.log(novoStatusPedido)
                 // console.log(novoStatusItem)
                 if (tipoStatus === 'Excluir') {
-                    novoStatusPedido = 3;
-                    novoStatusItem = 'C';
+                    novoStatusPedido = 2;
+                    novoStatusItem = 2;
                 }
                 sql = "\n      UPDATE \n          pedidos p\n      INNER JOIN \n          detalhepedidos dp ON dp.idPedido = p.idPedido\n      SET \n          p.statusPedido = ?,\n          dp.statusItem = ?,\n          dp.qtdAtendida = ?\n      WHERE \n          p.idPedido = ? \n          AND dp.idProduto = ?\n    ;\n\n  ";
                 params = [novoStatusPedido, novoStatusItem, qtd, pedido, produto];
@@ -220,7 +220,7 @@ var OutController = /** @class */ (function () {
             var ped, sql, params;
             return __generator(this, function (_a) {
                 ped = '(' + pedidos.map(function (v) { return v; }).join(", ") + ')';
-                sql = "\n    UPDATE\n      pedidos p\n    JOIN detalhepedidos dp on dp.idPedido = p.idPedido \n    SET\n      p.statusPedido = '".concat(tipoProducao, "',\n      dp.statusItem = '").concat(tipoProducao === 3 ? 'C' : 'A', "'\n    WHERE\n      p.idPedido IN ").concat(ped, ";\n  ");
+                sql = "\n    UPDATE\n      pedidos p\n    JOIN detalhepedidos dp on dp.idPedido = p.idPedido \n    SET\n      p.statusPedido = '".concat(tipoProducao, "',\n      dp.statusItem = '").concat(tipoProducao === 2 ? 2 : 1, "'\n    WHERE\n      p.idPedido IN ").concat(ped, ";\n  ");
                 params = [ped, tipoProducao];
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(pedido_entity_1.default).query(sql, params)];
             });

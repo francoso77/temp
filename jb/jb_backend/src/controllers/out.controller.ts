@@ -128,7 +128,7 @@ export class OutController {
       INNER JOIN
         pessoas pv ON pv.idPessoa = ped.idPessoa_vendedor
       WHERE 
-        ped.statusPedido = 2 AND
+        ped.statusPedido = 4 AND
         pd.idProgramacaoDublagem = ?
       ORDER BY
         ped.dataPedido ASC
@@ -202,7 +202,7 @@ export class OutController {
       INNER JOIN
         pessoas pe ON pe.idPessoa = p.idPessoa_cliente
       WHERE 
-        dp.statusItem = 'C' AND
+        dp.statusItem IN (2,3) AND
         pd.dataProgramacao = ?
         ;
 
@@ -307,7 +307,7 @@ export class OutController {
     INNER JOIN
       pessoas pv ON pv.idPessoa = p.idPessoa_vendedor
     WHERE 
-      statusPedido = 3 AND
+      statusPedido IN (2,3) AND
       ${campo === 'data' ? 'dataPedido = ?' : 'pc.nome LIKE ?'}
   `
 
@@ -362,7 +362,8 @@ export class OutController {
         SUM(dp.qtdPedida * de.qtd) AS qtdTotal,
         pro2.nome AS materiaPrima,
         c.idCor AS idCor,
-        c.nome AS cor
+        c.nome AS cor,
+        p.idPedido AS idPedido
       FROM
         pedidos p
       INNER JOIN 
@@ -386,10 +387,10 @@ export class OutController {
 
       WHERE 
         pro2.tipoProduto IN (?) AND
-        dp.statusItem = 'C' AND
+        dp.statusItem IN (2,3) AND
         pd.dataProgramacao = ?
       GROUP BY
-        idProduto, materiaPrima, idCor, cor
+        idProduto, materiaPrima, idCor, cor, idPedido
       ORDER BY
         materiaPrima, cor
         ;
@@ -435,7 +436,7 @@ export class OutController {
         programacaodublagens pd ON pd.idProgramacaoDublagem = dpd.idProgramacaoDublagem
       WHERE 
         pro2.tipoProduto = 10 AND
-        dp.statusItem = 'C' AND
+        dp.statusItem IN (2,3) AND
         pd.dataProgramacao = ?
       ORDER BY
         produto, corNivel
@@ -473,8 +474,8 @@ export class OutController {
     @Body('qtd') qtd: number,
   ): Promise<Array<Pedido>> {
 
-    let novoStatusPedido = 2
-    let novoStatusItem = 'F'
+    let novoStatusPedido = 4
+    let novoStatusItem = 4
 
     // console.log(tipoStatus)
     // console.log(pedido)
@@ -484,8 +485,8 @@ export class OutController {
     // console.log(novoStatusItem)
 
     if (tipoStatus === 'Excluir') {
-      novoStatusPedido = 3
-      novoStatusItem = 'C'
+      novoStatusPedido = 2
+      novoStatusItem = 2
     }
     const sql = `
       UPDATE 
@@ -509,7 +510,7 @@ export class OutController {
   @Post("produzirPedidos")
   async produzirPedidos(
     @Body("pedidos") pedidos: Array<number>,
-    @Body("tipoProducao") tipoProducao: 3 | 1,
+    @Body("tipoProducao") tipoProducao: 2 | 1,
   ): Promise<Array<Pedido>> {
 
     const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
@@ -519,7 +520,7 @@ export class OutController {
     JOIN detalhepedidos dp on dp.idPedido = p.idPedido 
     SET
       p.statusPedido = '${tipoProducao}',
-      dp.statusItem = '${tipoProducao === 3 ? 'C' : 'A'}'
+      dp.statusItem = '${tipoProducao === 2 ? 2 : 1}'
     WHERE
       p.idPedido IN ${ped};
   `

@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { THEME } from '../../app/Layout/Theme';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
+import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 export const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -405,9 +405,9 @@ export default function TableSelect<T>({
                                                                         const valorDaCelula = (row as any)[coluna.campo];
 
                                                                         // Verifica se o valor da célula é um dos códigos de status
-                                                                        if (Object.values(StatusPedidoType).includes(valorDaCelula)) {
-                                                                            const statusInfo = StatusPedidoTypes.find(
-                                                                                (status) => status.idStatusPedido === valorDaCelula
+                                                                        if (Object.values(StatusType).includes(valorDaCelula)) {
+                                                                            const statusInfo = StatusTypes.find(
+                                                                                (status) => status.idStatus === valorDaCelula
                                                                             );
 
                                                                             const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
@@ -415,17 +415,20 @@ export default function TableSelect<T>({
                                                                             let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
 
                                                                             switch (valorDaCelula) {
-                                                                                case StatusPedidoType.aberto:
-                                                                                    color = 'info'; // Azul para aberto
+                                                                                case StatusType.aberto:
+                                                                                    color = 'success'; // Exemplo: azul para aberto
                                                                                     break;
-                                                                                case StatusPedidoType.finalizado:
-                                                                                    color = 'success'; // Verde para finalizado
+                                                                                case StatusType.producao:
+                                                                                    color = 'info'; // Exemplo: roxo para produção
                                                                                     break;
-                                                                                case StatusPedidoType.producao:
-                                                                                    color = 'warning'; // Laranja para produção
+                                                                                case StatusType.parcial:
+                                                                                    color = 'warning'; // Exemplo: laranja para parcial
+                                                                                    break;
+                                                                                case StatusType.finalizado:
+                                                                                    color = 'error'; // Exemplo: verde para finalizado
                                                                                     break;
                                                                                 default:
-                                                                                    color = 'default';
+                                                                                    color = 'default'; // Cor padrão para qualquer outro caso
                                                                                     break;
                                                                             }
 

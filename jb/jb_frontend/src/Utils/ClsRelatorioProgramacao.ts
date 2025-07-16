@@ -46,6 +46,7 @@ interface Dados {
   qtdTotal: number;
   materiaPrima: string;
   cor: string;
+  pedido: number;
 }
 
 interface DadosFilter {
@@ -169,8 +170,14 @@ class ClsRelatorioProgramacao {
     }
   }
 
-  private renderDetalhes = (row: Dados): Array<{ metros: string; produto: string; cor: string; pedido: number; cliente: string }> => {
-    const detalhesFiltrados = this.tecidos.filter(tecido => tecido.idProduto === row.idProduto && tecido.cor === row.cor);
+  private renderDetalhes = (dados: any): Array<{ metros: string; produto: string; cor: string; pedido: number; cliente: string }> => {
+
+
+    const detalhesFiltrados = this.tecidos.filter(tecido => tecido.idPedido === dados.idPedido);
+
+    console.log('detalhesFiltrados', detalhesFiltrados);
+    console.log('pedido', dados);
+
     const itensFiltrados = this.tecidos.filter(item =>
       detalhesFiltrados.some(detalhe => detalhe.idPedido === item.idPedido) && item.tipoProduto === 10
     );
@@ -197,7 +204,7 @@ class ClsRelatorioProgramacao {
 
     let startY = 20; // Início da primeira linha do conteúdo
 
-    this.espumas.forEach((espuma) => {
+    this.espumas.forEach((espuma: any) => {
       this.forros.forEach((forro) => {
         // Verifica e gera o texto com ou sem forro
         const texto = (forro.qtdTotal !== espuma.qtdTotal)
@@ -206,43 +213,49 @@ class ClsRelatorioProgramacao {
 
         doc.setFontSize(13);
         doc.text(texto, 20, startY);
-
-        // Renderiza os detalhes da espuma
-        const detalhes = this.renderDetalhes(espuma);
-
-        if (detalhes.length > 0) {
-          autoTable(doc, {
-            startY: startY + 10, // Ajusta para iniciar a tabela logo após o texto
-            head: [['Metros', 'Produto', 'Cor', 'Pedido', 'Cliente']],
-            body: detalhes.map(item => [item.metros, item.produto, item.cor, item.pedido, item.cliente]),
-            headStyles: {
-              fillColor: [220, 220, 220], // Cor de fundo (cinza claro)
-              textColor: [0, 0, 0], // Cor do texto (preto)
-              fontSize: 11, // Tamanho da fonte dos cabeçalhos
-            },
-            columnStyles: {
-              0: { halign: 'right', cellWidth: 20 },
-              1: { halign: 'left', cellWidth: 30 },
-              2: { halign: 'left', cellWidth: 20 },
-              3: { halign: 'right', cellWidth: 20 },
-              4: { halign: 'left', cellWidth: 60 },
-            },
-            bodyStyles: {
-              fontSize: 9, // Tamanho da fonte do corpo da tabela
-            },
-            styles: {
-              lineColor: [0, 0, 0], // Cor das linhas (preto)
-              fillColor: [255, 255, 255], // Cor de fundo das células (branco)
-            },
-          });
-
-          // Atualiza o startY para a próxima iteração
-          startY = (doc as any).lastAutoTable.finalY + 10;
-        } else {
-          // Caso não tenha tabela, apenas aumenta o espaçamento entre os blocos
-          startY += 30;
-        }
       });
+
+      // Renderiza os detalhes da espuma
+
+
+      const detalhes = this.renderDetalhes(espuma);
+
+      console.log('detalhes', detalhes);
+      console.log('espuma', espuma);
+
+      if (detalhes.length > 0) {
+        autoTable(doc, {
+          startY: startY + 10, // Ajusta para iniciar a tabela logo após o texto
+          head: [['Metros', 'Produto', 'Cor', 'Pedido', 'Cliente']],
+          body: detalhes.map(item => [item.metros, item.produto, item.cor, item.pedido, item.cliente]),
+          headStyles: {
+            fillColor: [220, 220, 220], // Cor de fundo (cinza claro)
+            textColor: [0, 0, 0], // Cor do texto (preto)
+            fontSize: 11, // Tamanho da fonte dos cabeçalhos
+          },
+          columnStyles: {
+            0: { halign: 'right', cellWidth: 20 },
+            1: { halign: 'left', cellWidth: 30 },
+            2: { halign: 'left', cellWidth: 20 },
+            3: { halign: 'right', cellWidth: 20 },
+            4: { halign: 'left', cellWidth: 60 },
+          },
+          bodyStyles: {
+            fontSize: 9, // Tamanho da fonte do corpo da tabela
+          },
+          styles: {
+            lineColor: [0, 0, 0], // Cor das linhas (preto)
+            fillColor: [255, 255, 255], // Cor de fundo das células (branco)
+          },
+        });
+
+        // Atualiza o startY para a próxima iteração
+        startY = (doc as any).lastAutoTable.finalY + 10;
+      } else {
+        // Caso não tenha tabela, apenas aumenta o espaçamento entre os blocos
+        startY += 30;
+      }
+
     });
 
     doc.save('programacao_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');

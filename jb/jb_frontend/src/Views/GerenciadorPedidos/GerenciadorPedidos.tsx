@@ -12,11 +12,10 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
 import DataTableSelect from '../../Componentes/DataTable/tableSelectNivel';
 import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
-import { StatusPedidoItemType, StatusPedidoItemTypes } from '../../types/statusPedidoItemTypes';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
 import { DetalheProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
+import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 interface PropsInterface {
   detalhe: Array<DetalheProgramacaoDublagemInterface>
@@ -49,7 +48,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     qtdPedida: 0,
     vrUnitario: 0,
     qtdAtendida: 0,
-    statusItem: StatusPedidoItemType.aberto,
+    statusItem: StatusType.aberto,
   }
 
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
@@ -87,7 +86,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       cabecalho: 'Status Pedido',
       alinhamento: 'center',
       campo: 'statusPedido',
-      format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rs.statusPedido)?.descricao
+      //format: (_v, rs: any) => StatusTypes.find(v => v.idStatus === rs.statusPedido)?.descricao
     },
   ]
 
@@ -109,7 +108,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       cabecalho: 'Status Item',
       alinhamento: 'center',
       campo: 'status',
-      format: (_v, rs: any) => StatusPedidoItemTypes.find(v => v.idStatusPedidoItem === rs.status)?.descricao
+      //format: (_v, rs: any) => StatusTypes.find(v => v.idStatus === rs.status)?.descricao
     },
   ]
 
@@ -158,12 +157,12 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       }
     }).then((rs: Array<PedidoInterface>) => {
       const qtdItens = rs[0].detalhePedidos.length
-      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoInterface) => det.statusItem === StatusPedidoItemType.producao).length
+      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoInterface) => det.statusItem === StatusType.producao).length
 
       if (qtdItens === emProducao) {
-        rs[0].statusPedido = StatusPedidoType.producao
+        rs[0].statusPedido = StatusType.producao
       } else {
-        rs[0].statusPedido = StatusPedidoType.aberto
+        rs[0].statusPedido = StatusType.aberto
       }
       clsCrud.incluir({
         entidade: "Pedido",
@@ -243,14 +242,14 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       url: 'produzirPedidos',
       method: 'post',
       pedidos,
-      tipoProducao: 3,
+      tipoProducao: 2,
       mensagem: 'Alterando status dos pedidos ...',
       setMensagemState: setMensagemState
     })
   }
   async function onStatus(selecao: any, setSelected: React.Dispatch<React.SetStateAction<readonly number[]>>) {
 
-    const tmpPedidoNaoAberto = selecao.filter((item: any) => rsPesquisa[item].statusPedido !== StatusPedidoType.aberto)
+    const tmpPedidoNaoAberto = selecao.filter((item: any) => rsPesquisa[item].statusPedido !== StatusType.aberto)
 
     if (tmpPedidoNaoAberto.length > 0) {
       setMensagemState({
@@ -264,7 +263,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     } else {
       let tmp: Array<number> = []
       selecao.forEach((sel: any) => {
-        if (rsPesquisa[sel].statusPedido === StatusPedidoType.aberto) {
+        if (rsPesquisa[sel].statusPedido === StatusType.aberto) {
           tmp.push(rsPesquisa[sel].idPedido)
           if (podeIncluirDetalhe()) {
             detalhe.push({
@@ -354,9 +353,9 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
           <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
               <ComboBox
-                opcoes={StatusPedidoItemTypes}
+                opcoes={StatusTypes}
                 campoDescricao="descricao"
-                campoID="idStatusPedidoItem"
+                campoID="idStatus"
                 dados={detalhePedido}
                 mensagemPadraoCampoEmBranco="Status do pedido"
                 field="statusItem"

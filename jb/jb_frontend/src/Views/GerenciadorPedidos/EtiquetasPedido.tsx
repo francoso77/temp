@@ -5,7 +5,6 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalheProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
-import { StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import ClsApi from '../../Utils/ClsApi';
 import { PedidoInterface } from '../../Interfaces/pedidoInterface';
@@ -14,6 +13,7 @@ import TableSelect from '../../Componentes/DataTable/tableSelect';
 import ArticleTwoToneIcon from '@mui/icons-material/ArticleTwoTone';
 import SellTwoToneIcon from '@mui/icons-material/SellTwoTone';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
+import { StatusTypes } from '../../types/statusTypes';
 
 interface PropsInterface {
   programacao: number,
@@ -66,7 +66,7 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
       cabecalho: 'Status',
       alinhamento: 'center',
       campo: 'statusPedido',
-      format: (_v, rs: any) => StatusPedidoTypes.find(v => v.idStatusPedido === rsPedido.find(v => v.idPedido === rs.idPedido)?.statusPedido)?.descricao
+      format: (_v, rs: any) => StatusTypes.find(v => v.idStatus === rsPedido.find(v => v.idPedido === rs.idPedido)?.statusPedido)?.descricao
     }
 
   ]

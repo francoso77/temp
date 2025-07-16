@@ -14,7 +14,7 @@ var common_1 = require("@nestjs/common");
 var ContextoService = /** @class */ (function () {
     function ContextoService() {
         this.usuarioContexto = 'Usuário Contexto Inicial';
-        console.log('Constructor do Contexto Service....');
+        //console.log('Constructor do Contexto Service....')
     }
     ContextoService = __decorate([
         (0, common_1.Injectable)(),

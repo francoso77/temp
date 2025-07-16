@@ -13,7 +13,7 @@ interface PropsInterface {
   campo?: 'data' | 'nome'
   tinturaria?: number
   pedidos?: Array<number>
-  tipoProducao?: 3 | 1
+  tipoProducao?: 2 | 1
   tipo?: 'Espuma' | 'Forro'
   dtInicial?: string
   dtFinal?: string

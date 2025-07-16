@@ -13,7 +13,7 @@ var typeorm_1 = require("typeorm");
 var produto_entity_1 = require("./produto.entity");
 var pedido_entity_1 = require("./pedido.entity");
 var cor_entity_1 = require("./cor.entity");
-var statusPedidoItemTypes_1 = require("../types/statusPedidoItemTypes");
+var statusTypes_1 = require("../types/statusTypes");
 var DetalhePedido = /** @class */ (function () {
     function DetalhePedido() {
     }
@@ -66,7 +66,7 @@ var DetalhePedido = /** @class */ (function () {
     ], DetalhePedido.prototype, "qtdAtendida", void 0);
     __decorate([
         (0, typeorm_1.Column)(),
-        __metadata("design:type", String)
+        __metadata("design:type", Number)
     ], DetalhePedido.prototype, "statusItem", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),

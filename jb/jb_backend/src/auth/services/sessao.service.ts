@@ -5,7 +5,7 @@ import { Injectable, Scope } from "@nestjs/common";
 export class SessaoService {
 
   public constructor() {
-    console.log('Constructor do Sessao Service....')
+    //console.log('Constructor do Sessao Service....')
   }
 
   public usuarioSessao: number = 0

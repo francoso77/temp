@@ -15,7 +15,7 @@ var common_1 = require("@nestjs/common");
 var SessaoService = /** @class */ (function () {
     function SessaoService() {
         this.usuarioSessao = 0;
-        console.log('Constructor do Sessao Service....');
+        //console.log('Constructor do Sessao Service....')
     }
     SessaoService = __decorate([
         (0, common_1.Injectable)({ scope: common_1.Scope.REQUEST }),

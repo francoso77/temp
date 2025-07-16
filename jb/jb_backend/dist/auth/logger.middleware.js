@@ -17,11 +17,11 @@ var LoggerMiddleware = /** @class */ (function () {
     function LoggerMiddleware(contexto, sessao) {
         this.contexto = contexto;
         this.sessao = sessao;
-        console.log('Constructor do Logger Middleware....');
+        //console.log('Constructor do Logger Middleware....')
     }
     LoggerMiddleware.prototype.use = function (req, res, next) {
-        console.log("[logger.middleware] - usuarioContexto ", this.contexto.usuarioContexto);
-        console.log("[logger.middleware] - usuarioSessao ", this.sessao.usuarioSessao);
+        //console.log("[logger.middleware] - usuarioContexto ", this.contexto.usuarioContexto)
+        //console.log("[logger.middleware] - usuarioSessao ", this.sessao.usuarioSessao)
         this.contexto.usuarioContexto = req.body.nomeUsuario || "Usuário/cpf [contexto] Alterado dentro do Middleware";
         this.sessao.usuarioSessao = req.body.nomeUsuario || "Usuário/cpf [sessao] Alterado dentro do Middleware";
         if (req.body.tempo) {

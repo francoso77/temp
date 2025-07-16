@@ -1,5 +1,4 @@
-import { StatusPedidoItemType } from '../types/statusPedidoItemTypes'
-import { StatusPedidoType } from '../types/statusPedidoTypes'
+import { StatusType } from '../types/statusTypes'
 import { CorInterface } from './corInteface'
 import { ProdutoInterface } from './produtoInterface'
 
@@ -10,7 +9,7 @@ export interface PedidoInterface {
   idPessoa_cliente: number
   idPessoa_vendedor: number
   idPrazoEntrega: number
-  statusPedido: StatusPedidoType
+  statusPedido: StatusType
   detalhePedidos: DetalhePedidoInterface[]
 }
 
@@ -22,7 +21,7 @@ export interface DetalhePedidoInterface {
   qtdPedida: number
   vrUnitario: number
   qtdAtendida: number
-  statusItem: StatusPedidoItemType
+  statusItem: StatusType
   produto: ProdutoInterface
   cor: CorInterface
 }

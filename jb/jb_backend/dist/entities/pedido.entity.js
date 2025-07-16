@@ -13,7 +13,7 @@ var typeorm_1 = require("typeorm");
 var prazoEntrega_entity_1 = require("./prazoEntrega.entity");
 var detalhePedido_entity_1 = require("./detalhePedido.entity");
 var pessoa_entity_1 = require("./pessoa.entity");
-var statusPedidoTypes_1 = require("../types/statusPedidoTypes");
+var statusTypes_1 = require("../types/statusTypes");
 var Pedido = /** @class */ (function () {
     function Pedido() {
     }

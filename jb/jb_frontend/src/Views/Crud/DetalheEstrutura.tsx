@@ -366,7 +366,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} sm={2} sx={{ mt: 2 }}>
+              <Grid item xs={12} sm={[2, 3, 6, 7, 10, 11].includes(tipo as number) ? 2 : 3} sx={{ mt: 2 }}>
                 <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                   <ComboBox
                     opcoes={nivelTypes}

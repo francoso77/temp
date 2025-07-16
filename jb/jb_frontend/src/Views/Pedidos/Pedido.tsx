@@ -1,4 +1,4 @@
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Box, Chip, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -15,13 +15,13 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ComboBox from '../../Componentes/ComboBox';
-import { StatusPedidoType } from '../../types/statusPedidoTypes';
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../Interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalhePedido from './DetalhePedido';
 import { UsuarioType } from '../../types/usuarioTypes';
+import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -40,7 +40,7 @@ export default function Pedido() {
     idPessoa_cliente: 0,
     idPessoa_vendedor: 0,
     idPrazoEntrega: 0,
-    statusPedido: StatusPedidoType.aberto,
+    statusPedido: StatusType.aberto,
     detalhePedidos: []
   }
 
@@ -93,6 +93,55 @@ export default function Pedido() {
       //campo: 'nomeVendedor'
       campo: 'idPessoa_vendedor',
       format: (_v, rs: any) => rs.vendedor.nome
+    },
+    {
+      cabecalho: 'Status',
+      alinhamento: 'center',
+      campo: 'statusPedido', // O 'campo' ainda pode apontar para onde o status *deveria* estar para identificação
+      render: (_valor: any, row: any) => { // O _valor aqui seria o que 'campo' aponta, mas não usaremos diretamente
+        // 1. Encontrar o statusPedido real dentro de rsPedido
+        const pedidoCorrespondente = rsPesquisa.find((p: any) => p.idPedido === row.idPedido);
+        const statusCode = pedidoCorrespondente ? pedidoCorrespondente.statusPedido : undefined;
+
+        // 2. Encontrar as informações completas do status (descrição e id)
+        const statusInfo = StatusTypes.find(
+          (status) => status.idStatus === statusCode
+        );
+
+        const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+        // 3. Definir a cor do Chip com base no statusCode
+
+        // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+        switch (statusCode) {
+          case StatusType.aberto:
+            color = 'success'; // Exemplo: azul para aberto
+            break;
+          case StatusType.producao:
+            color = 'info'; // Exemplo: roxo para produção
+            break;
+          case StatusType.parcial:
+            color = 'warning'; // Exemplo: laranja para parcial
+            break;
+          case StatusType.finalizado:
+            color = 'error'; // Exemplo: verde para finalizado
+            break;
+          default:
+            color = 'default'; // Cor padrão para qualquer outro caso
+            break;
+        }
+
+        // 4. Retornar o componente Chip
+        return (
+          <Chip
+            label={descricaoStatus}
+            color={color}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
+      },
     },
   ]
 
@@ -261,7 +310,7 @@ export default function Pedido() {
       const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
       criterio = {
         dataPedido: formattedDateTime,
-        statusPedido: 1,
+        //statusPedido: 1,
       }
       camposLike = ['dataPedido']
     } else if (temNumero) {
@@ -274,7 +323,7 @@ export default function Pedido() {
 
       criterio = {
         idPessoa_cliente: idCliente,
-        statusPedido: 1,
+        //statusPedido: 1,
       }
       camposLike = ['idPessoa_cliente']
       comparador = 'I'

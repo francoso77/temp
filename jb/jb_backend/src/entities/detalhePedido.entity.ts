@@ -3,7 +3,7 @@ import Produto from './produto.entity';
 import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
 import Pedido from './pedido.entity';
 import Cor from './cor.entity';
-import { StatusPedidoItemType } from '../types/statusPedidoItemTypes';
+import { StatusType } from '../types/statusTypes';
 
 @Entity({ name: 'detalhepedidos' })
 @Index('IDX_PEDIDO', ['idPedido'])
@@ -52,7 +52,7 @@ export default class DetalhePedido implements DetalhePedidoInterface {
   qtdAtendida: number
 
   @Column()
-  statusItem: StatusPedidoItemType
+  statusItem: StatusType
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

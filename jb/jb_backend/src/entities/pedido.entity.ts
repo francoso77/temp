@@ -3,7 +3,7 @@ import { PedidoInterface } from '../interfaces/pedidoInterface';
 import PrazoEntrega from './prazoEntrega.entity';
 import DetalhePedido from './detalhePedido.entity';
 import Pessoa from './pessoa.entity';
-import { StatusPedidoType } from '../types/statusPedidoTypes';
+import { StatusType } from '../types/statusTypes';
 
 @Entity({ name: 'pedidos' })
 @Index('IDX_CLIENTE', ['idPessoa_cliente'])
@@ -50,7 +50,7 @@ export default class Pedido implements PedidoInterface {
   detalhePedidos: DetalhePedido[]
 
   @Column({})
-  statusPedido: StatusPedidoType
+  statusPedido: StatusType
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

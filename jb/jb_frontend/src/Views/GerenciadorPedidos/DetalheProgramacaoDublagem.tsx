@@ -6,14 +6,14 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import ClsCrud from '../../Utils/ClsCrudApi';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } from '../../Interfaces//programacaoDublagemInterface';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import GerenciadorPedido from './GerenciadorPedidos';
 import ClsApi from '../../Utils/ClsApi';
 import { PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { StatusType, StatusTypes } from '../../types/statusTypes';
+import EditCalendarTwoToneIcon from '@mui/icons-material/EditCalendarTwoTone';
 
 
 interface PropsInterface {
@@ -78,27 +78,31 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
         const statusCode = pedidoCorrespondente ? pedidoCorrespondente.statusPedido : undefined;
 
         // 2. Encontrar as informações completas do status (descrição e id)
-        const statusInfo = StatusPedidoTypes.find(
-          (status) => status.idStatusPedido === statusCode
+        const statusInfo = StatusTypes.find(
+          (status) => status.idStatus === statusCode
         );
 
         const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
 
         // 3. Definir a cor do Chip com base no statusCode
-        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
 
+        // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
         switch (statusCode) {
-          case StatusPedidoType.aberto:
-            color = 'info'; // Azul para aberto
+          case StatusType.aberto:
+            color = 'success'; // Exemplo: azul para aberto
             break;
-          case StatusPedidoType.finalizado:
-            color = 'success'; // Verde para finalizado
+          case StatusType.producao:
+            color = 'info'; // Exemplo: roxo para produção
             break;
-          case StatusPedidoType.producao:
-            color = 'warning'; // Laranja para produção
+          case StatusType.parcial:
+            color = 'warning'; // Exemplo: laranja para parcial
+            break;
+          case StatusType.finalizado:
+            color = 'error'; // Exemplo: verde para finalizado
             break;
           default:
-            color = 'default'; // Cor padrão para status não reconhecido
+            color = 'default'; // Cor padrão para qualquer outro caso
             break;
         }
 
@@ -213,13 +217,13 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
       <Paper sx={{ m: 0, p: 1 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
           <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
-            <Tooltip title={'Incluir'}>
+            <Tooltip title={'Lista de Pedidos'}>
               <IconButton
                 color="secondary"
                 sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}
                 onClick={() => btIncluir()}
               >
-                <AddCircleIcon sx={{ fontSize: 50 }} />
+                <EditCalendarTwoToneIcon sx={{ fontSize: 50 }} />
               </IconButton>
             </Tooltip>
           </Condicional>

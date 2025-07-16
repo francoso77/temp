@@ -21,55 +21,12 @@ import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../
 import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
 import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
-import { StatusPedidoType, StatusPedidoTypes } from '../../types/statusPedidoTypes';
-import { StatusPedidoItemType } from '../../types/statusPedidoItemTypes';
+import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
 }
 
-// {
-//   "entidade": "ProducaoDublagem",
-//     "criterio": {
-//     "dataProducao": "2024-10-15",
-//       "tipoColagem": 1,
-//         "idPedido": 13,
-//           "detalheProducaoDublagens": [
-//             {
-//               "idDublagem": null,
-//               "idProduto": 18,
-//               "metrosTotal": 1000,
-//               "pecasTotal": 22,
-//               "produto": {
-//                 "idProduto": 18,
-//                 "nome": "NYLON RODEIO PTO D40/3 TNT 120",
-//                 "idUnidade": 2,
-//                 "localizacao": "",
-//                 "largura": 1.45,
-//                 "gm2": 0,
-//                 "ativo": 1,
-//                 "tipoProduto": 7
-//               },
-//               "detalhePecas": [
-//                 {
-//                   "idDetalheProducaoDublagem": null,
-//                   "metros": 40
-//                 },
-//                 {
-
-//                   "idDetalheProducaoDublagem": null,
-//                   "metros": 41
-//                 },
-//                 {
-
-//                   "idDetalheProducaoDublagem": null,
-//                   "metros": 42
-//                 }
-//               ]
-//             }
-//           ]
-//   }
-// }
 export default function ProducaoDublagem() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -132,8 +89,8 @@ export default function ProducaoDublagem() {
       campo: 'statusPedido', // O campo 'statusPedido' em sua 'row' deve conter o valor 'A', 'C', 'F', ou 'P'
       render: (_valor: string, row: any) => {
         // Encontra a descrição do status no array StatusPedidoTypes
-        const statusInfo = StatusPedidoTypes.find(
-          (status) => status.idStatusPedido === row.statusPedido
+        const statusInfo = StatusTypes.find(
+          (status) => status.idStatus === row.statusPedido
         );
 
         const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
@@ -141,16 +98,18 @@ export default function ProducaoDublagem() {
         // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
         let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
         switch (row.statusPedido) {
-          case StatusPedidoType.aberto:
-            color = 'info'; // Exemplo: azul para aberto
+          case StatusType.aberto:
+            color = 'success'; // Exemplo: azul para aberto
             break;
-          case StatusPedidoType.producao:
-            color = 'primary'; // Exemplo: roxo para produção
+          case StatusType.producao:
+            color = 'info'; // Exemplo: roxo para produção
             break;
-          case StatusPedidoType.finalizado:
-            color = 'success'; // Exemplo: verde para finalizado
+          case StatusType.finalizado:
+            color = 'error'; // Exemplo: verde para finalizado
             break;
-
+          case StatusType.parcial:
+            color = 'warning'; // Exemplo: laranja para parcial
+            break;
           default:
             color = 'default'; // Cor padrão para qualquer outro caso
         }
@@ -260,10 +219,10 @@ export default function ProducaoDublagem() {
   }
   const verificaStatusPedido = async (pedido: number) => {
 
-    let statusPedido: StatusPedidoType = StatusPedidoType.finalizado
-    let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
 
     try {
+      let statusPedido: StatusType = StatusType.finalizado
+
       const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
         entidade: "Pedido",
         relations: ["detalhePedidos"],
@@ -280,29 +239,31 @@ export default function ProducaoDublagem() {
 
           tmpDetalhe.forEach((detalhePedido: DetalhePedidoInterface) => {
             if (detalhe.idProduto === detalhePedido.idProduto) {
-              detalhePedido.qtdAtendida = detalhePedido.qtdAtendida + detalhe.metrosTotal
+              detalhePedido.qtdAtendida = detalhe.metrosTotal
+              if (detalhePedido.qtdAtendida >= detalhePedido.qtdPedida) {
+                detalhePedido.statusItem = StatusType.finalizado
+              } else if (detalhePedido.qtdAtendida < detalhePedido.qtdPedida && detalhePedido.qtdAtendida > 0) {
+                detalhePedido.statusItem = StatusType.parcial
+              } else {
+                detalhePedido.statusItem = StatusType.producao
+              }
+
             }
           })
         })
 
+        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem !== StatusType.finalizado)
+        const temProducao = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem === StatusType.parcial)
 
-        tmpDetalhe.forEach((detalhe: DetalhePedidoInterface) => {
-          if (detalhe.qtdAtendida >= detalhe.qtdPedida) {
-            statusItem = StatusPedidoItemType.finalizado
-          } else if (detalhe.qtdAtendida < detalhe.qtdPedida && detalhe.qtdAtendida > 0) {
-            statusItem = StatusPedidoItemType.parcial
-          } else {
-            statusItem = StatusPedidoItemType.producao
-          }
-        })
-
-        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem !== StatusPedidoItemType.finalizado)
-        if (temPedidoAberto > 0) {
+        if (temPedidoAberto < 0) {
 
           tmpPedido = { ...tmpPedido, statusPedido: statusPedido }
+        } else if (temProducao === 0) {
+          tmpPedido = { ...tmpPedido, statusPedido: StatusType.parcial }
         } else {
-          tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao }
+          tmpPedido = { ...tmpPedido, statusPedido: StatusType.producao }
         }
+
         await clsCrud.incluir({
           entidade: "Pedido",
           criterio: tmpPedido,
@@ -333,10 +294,10 @@ export default function ProducaoDublagem() {
 
         tmpDetalhe.map((detalhe) => {
 
-          detalhe.statusItem = StatusPedidoItemType.producao
+          detalhe.statusItem = StatusType.producao
           detalhe.qtdAtendida = 0
         })
-        tmpPedido = { ...tmpPedido, statusPedido: StatusPedidoType.producao, detalhePedidos: tmpDetalhe }
+        tmpPedido = { ...tmpPedido, statusPedido: StatusType.producao, detalhePedidos: tmpDetalhe }
 
         await clsCrud.incluir({
           entidade: "Pedido",
@@ -348,63 +309,6 @@ export default function ProducaoDublagem() {
       console.error("Erro ao verificar status do pedido:", error);
     }
   }
-
-  // const alterarStatusItem = async () => {
-
-  //   console.log('alterarStatusItem')
-  //   let qtdAtendida: number = 0
-  //   let statusItem: StatusPedidoItemType = StatusPedidoItemType.finalizado
-
-  //   try {
-  //     const rsDetalhePedidos = await pesquisarPedidoItem(rsMaster.idPedido)
-  //     let tmpDetalhe: Array<DetalhePedidoInterface> = [...rsDetalhePedidos]
-
-  //     if (tmpDetalhe) {
-  //       tmpDetalhe.forEach((detalhe) => {
-  //         rsMaster.detalheProducaoDublagens.forEach((item) => {
-  //           if (detalhe.idProduto === item.idProduto) {
-  //             item.detalhePecas.forEach((peca) => {
-  //               qtdAtendida += peca.metros
-  //             })
-  //             if (qtdAtendida <= 0) {
-  //               statusItem = StatusPedidoItemType.producao
-  //             } else {
-  //               console.log('qtdAtendida', qtdAtendida, detalhe.qtdAtendida)
-  //               statusItem = StatusPedidoItemType.finalizado
-  //             }
-  //           } else {
-  //             console.log("não achou o código")
-  //             statusItem = StatusPedidoItemType.producao
-  //             qtdAtendida = 0
-  //           }
-  //         })
-
-  //         tmpDetalhe = [
-  //           ...tmpDetalhe,
-  //           { ...detalhe, statusItem: statusItem, qtdAtendida: qtdAtendida },
-  //         ]
-  //       })
-
-  //       const rsPed = await clsCrud.incluir({
-  //         entidade: "DetalhePedido",
-  //         criterio: tmpDetalhe,
-  //         token: usuarioState.token,
-  //       })
-  //       if (!rsPed.ok) {
-  //         setMensagemState({
-  //           titulo: "Erro...",
-  //           exibir: true,
-  //           mensagem: "Status não foi atualizado - consulte o suporte",
-  //           tipo: MensagemTipo.Error,
-  //           exibirBotao: true,
-  //           cb: null,
-  //         })
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Erro ao alterar status do item:", error)
-  //   }
-  // }
 
   const btConfirmar = () => {
     if (validarDados()) {
@@ -515,22 +419,36 @@ export default function ProducaoDublagem() {
       }
     }
   }
-  const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
+
+  const BuscarDados = async () => {
+    try {
+      const detalhes: Array<DetalhePedidoInterface> = await clsCrud.pesquisar({
+        entidade: "ProducaoDublagem",
+        select: ["idPedido"]
+      });
+
+      const ids = new Set(detalhes.map(d => d.idPedido));
+
+      const rsPedidos: Array<PedidoInterface> = await clsCrud.pesquisar({
         entidade: "Pedido",
         criterio: {
-          statusPedido: StatusPedidoType.producao
+          statusPedido: StatusType.producao
         },
-        camposLike: ['statusPedido'],
+        camposLike: ["statusPedido"],
         campoOrder: ["idPedido"],
         relations: ["detalhePedidos"],
-        select: ['idPedido', 'statusPedido']
-      })
-      .then((rsPedidos: Array<PedidoInterface>) => {
-        setRsPedido(rsPedidos)
-      })
-  }
+        select: ["idPedido", "statusPedido"]
+      });
+
+      const dadosFiltrados = rsPedidos.filter(p => !ids.has(p.idPedido ?? null));
+      setRsPedido(dadosFiltrados);
+
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error);
+      setRsPedido([]); // opcional: limpa os dados se erro
+    }
+  };
+
 
   const btPesquisarQtd = (pedido: number) => {
     if (pedido === 0) {

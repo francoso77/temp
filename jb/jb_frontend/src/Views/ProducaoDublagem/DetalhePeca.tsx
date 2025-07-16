@@ -1,5 +1,5 @@
 import { Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
@@ -37,6 +37,7 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [detalhePeca, setDetalhePeca] = useState<DetalhePecaInterface>(ResetDados)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -65,7 +66,6 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
   }
 
   const onExcluir = (rs: DetalhePecaInterface, indice: number) => {
-    console.log(indice, rs, rsMaster.detalheProducaoDublagens[indiceEdicao], "delete")
     let tmpDetalhe: Array<DetalhePecaInterface> = []
 
     rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.forEach((det, i) => {
@@ -81,7 +81,6 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
           : item
       )
     })
-    console.log(tmpDetalhe, "depois delete")
   }
 
   const btIncluir = () => {
@@ -148,6 +147,9 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
     }
   }
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
@@ -186,6 +188,8 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
                 onFocus={(e) => e.target.select()}
                 textAlign='center'
                 labelAlign='center'
+                inputRef={inputRef}
+                autoFocus
               />
             </Grid>
             <Condicional condicao={localState.action !== 'pesquisando'}>

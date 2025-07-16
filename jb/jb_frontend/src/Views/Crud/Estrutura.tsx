@@ -224,6 +224,7 @@ export default function Estrutura() {
         camposLike: ["tipoProduto"],
         comparador: 'I',
         campoOrder: ['nome'],
+        tipoOrder: 'ASC',
       })
       .then((rs: Array<ProdutoInterface>) => {
         setRsProduto(rs)

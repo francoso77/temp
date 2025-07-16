@@ -5,4 +5,4 @@
 // 	process.env.REACT_APP_BACKEND_PORTA ? `:${process.env.REACT_APP_BACKEND_PORTA}` : ''
 // );
 
-export const URL_BACKEND: string = 'http://api.jbtextil.ind.br';
+export const URL_BACKEND: string = 'https://api.jbtextil.ind.br';
