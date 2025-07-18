@@ -14,9 +14,9 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
 import TermoDeUsoModal from './TermoDeUsoModal';
 import TitleBar from '../../Componentes/BarraDeTitulo';
-import { URL_BACKEND } from '../../Utils/Servidor';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import { deepPurple } from '@mui/material/colors';
+import { URL_BACKEND_FOTO } from '../../Utils/Servidor';
 
 export default function Registrar() {
 
@@ -75,7 +75,7 @@ export default function Registrar() {
     isFile(usuario.profilePicture)
       ? URL.createObjectURL(usuario.profilePicture)
       : usuario.profilePicture
-        ? `${URL_BACKEND}/uploads/users/${usuario.profilePicture}`
+        ? `${URL_BACKEND_FOTO}/uploads/users/${usuario.profilePicture}`
         : null;
 
 
@@ -200,8 +200,8 @@ export default function Registrar() {
 
       const endpoint =
         acao === "incluir"
-          ? `${URL_BACKEND}/auth/upload-profile`
-          : `${URL_BACKEND}/auth/${usuario.id}`;
+          ? `${URL_BACKEND_FOTO}/auth/upload-profile`
+          : `${URL_BACKEND_FOTO}/auth/${usuario.id}`;
 
       const method = acao === "incluir" ? "POST" : "PATCH";
 
@@ -227,7 +227,7 @@ export default function Registrar() {
             nomeUsuario: usuario.name,
             emailUsuario: usuario.email,
             fotoUsuario: novaFoto
-              ? `${URL_BACKEND}/uploads/users/${novaFoto}`
+              ? `${URL_BACKEND_FOTO}/uploads/users/${novaFoto}`
               : usuarioState.fotoUsuario,
             fotoUsuarioVersao: Date.now(), // Adicionado
           });
