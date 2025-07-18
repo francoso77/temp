@@ -39,31 +39,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
 var data_source_1 = require("./data-source");
-//import * as dotenv from 'dotenv';
+var dotenv = require("dotenv");
 var path_1 = require("path");
 var express = require("express");
-//dotenv.config();
+//import * as fs from 'node:fs';
+dotenv.config();
 function iniciandoBD() {
     return __awaiter(this, void 0, void 0, function () {
-        var app;
+        var corsOrigin, app;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
+                case 0:
+                    corsOrigin = process.env.CORS_ORIGIN || '*';
+                    return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule, {
+                        //opção usada em produção
+                        // httpsOptions: {
+                        //   key: fs.readFileSync(process.env.SSL_KEY),
+                        //   cert: fs.readFileSync(process.env.SSL_CERT)
+                        // }
+                        })];
                 case 1:
                     app = _a.sent();
-                    // Libera acesso CORS
-                    // app.enableCors({
-                    //   origin: corsOrigin, // Permite requisições apenas desta origem
-                    //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
-                    //   allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
-                    //   credentials: true, // Se você usa cookies ou cabeçalhos de autorização
-                    // });
+                    //Libera acesso CORS para desenvolimento
+                    app.enableCors({
+                        origin: corsOrigin, // Permite requisições apenas desta origem
+                        // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
+                        // allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
+                        // credentials: true, // Se você usa cookies ou cabeçalhos de autorização
+                    });
                     // ✅ Expõe a pasta de uploads como pública
                     app.use('/uploads', express.static((0, path_1.join)(__dirname, '..', 'uploads')));
                     return [4 /*yield*/, data_source_1.AppDataSource.initialize()];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, app.listen(4000)];
+                    return [4 /*yield*/, app.listen(process.env.REACT_APP_BACKEND_PORTA || 4000)];
                 case 3:
                     _a.sent();
                     return [2 /*return*/];

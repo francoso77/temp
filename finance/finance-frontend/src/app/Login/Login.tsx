@@ -13,8 +13,8 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import CustomButton from '../../Componentes/Button';
 import LoginIcon from '@mui/icons-material/Login';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { URL_BACKEND } from '../../Utils/Servidor';
 import { LoginInterface } from '../../Interfaces/login';
+import { URL_BACKEND_FOTO } from '../../Utils/Servidor';
 
 
 
@@ -69,7 +69,7 @@ export default function Login() {
               logado: true,
               token: rs.dados.token,
               emailUsuario: rs.dados.emailUsuario,
-              fotoUsuario: rs.dados.fotoUsuario ? URL_BACKEND.concat('/uploads/users/') + rs.dados.fotoUsuario : '',
+              fotoUsuario: rs.dados.fotoUsuario ? URL_BACKEND_FOTO.concat('/uploads/users/') + rs.dados.fotoUsuario : '',
             })
 
             const MENU: Array<MenuOpcoesInterface> = [

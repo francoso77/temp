@@ -180,7 +180,8 @@ export function Contas() {
           const saldo = await ApuraSaldo(conta.id as string);
           return {
             ...conta,
-            saldoAtual: conta.initialBalance + saldo,
+            saldoAtual: Number(conta.initialBalance) + saldo,
+            initialBalance: Number(conta.initialBalance),
           };
         })
       );
@@ -212,9 +213,9 @@ export function Contas() {
 
     rs?.forEach((item) => {
       if (item.category?.type === 'Receita') {
-        receitas += item.amount;
+        receitas += Number(item.amount);
       } else {
-        despesas += item.amount;
+        despesas += Number(item.amount);
       }
     });
 

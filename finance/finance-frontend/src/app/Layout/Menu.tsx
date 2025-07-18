@@ -12,6 +12,8 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import { TipoTransactionType, TipoTransactionTypes } from '../../types/tipoTransactionTypes';
 import { SectorInterface } from '../../Interfaces/sector';
 import { AccountInterface } from '../../Interfaces/account';
+import CustomButton from '../../Componentes/Button';
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -104,7 +106,6 @@ export default function Menu() {
         updateLayoutState("type", selected?.descricao ?? null);
         setDadosPesquisa({ ...dadosPesquisa, tipo: selected?.descricao ?? "" })
     };
-
     const BuscarDados = () => {
         clsCrud
             .pesquisar({

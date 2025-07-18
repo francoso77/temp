@@ -195,7 +195,7 @@ export function TransacoesFicha(
 
       setDados(prev => ({
         ...prev,
-        amount: amount
+        amount: Number(amount)
       }));
     }
   }, [dados.qtd, dados.price, temReceita]);

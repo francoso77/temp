@@ -89,6 +89,11 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
     onConfirm(formatOutputDate(dataInicio), formatOutputDate(dataFim));
     onClose();
   };
+
+  const handleClear = () => {
+    onConfirm('', '');
+    onClose();
+  }
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ bgcolor: '#010108', color: '#fff', textAlign: 'center', border: '1px solid #3a3a3a' }}>Selecionar Intervalo de Datas</DialogTitle>
@@ -255,6 +260,14 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
           sx={{ mr: '10px' }}
         >
           Aplicar
+        </CustomButton>
+        <CustomButton
+          onClick={handleClear}
+          bgColor='#1976d2'
+          textColor='black'
+          sx={{ mr: '10px' }}
+        >
+          Limpar
         </CustomButton>
       </DialogActions>
     </Dialog>

@@ -11,9 +11,15 @@ type InfoCardProps = {
   corFundo?: string;
   corBorda?: string;
   espessuraBorda?: number;
+  decimalPlaces?: number; // Nova propriedade
 };
 
 function ajustarCorFundo(cor: string, fator: number = 0.2): string {
+  // Simples verificação para garantir que a cor seja hexadecimal para esta função
+  if (!cor.startsWith('#') || cor.length !== 7) {
+    console.warn("ajustarCorFundo espera uma cor hexadecimal no formato '#RRGGBB'.");
+    return cor; // Retorna a cor original em caso de formato inválido
+  }
   const hex = cor.replace('#', '');
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
@@ -31,11 +37,15 @@ const InfoCard: React.FC<InfoCardProps> = ({
   corFundo = '#81d4fa',
   corBorda = '#ffffff',
   espessuraBorda = 1,
+  decimalPlaces = 2, // Valor padrão de 2 casas decimais para números
 }) => {
   const valorFormatado =
     formatoValor === 'moeda'
       ? valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-      : valor.toLocaleString('pt-BR');
+      : valor.toLocaleString('pt-BR', {
+        minimumFractionDigits: decimalPlaces,
+        maximumFractionDigits: decimalPlaces,
+      });
 
   const corIcone = ajustarCorFundo(corFundo, 0.3);
 

@@ -69,7 +69,11 @@ export default function Dashboard() {
       cabecalho: 'Data',
       alinhamento: 'left',
       campo: 'date',
-      format: (data) => clsFormatacao.dataISOtoUser(data)
+      format: (valor: any) => {
+        if (!valor) return '';
+        const data = new Date(valor);
+        return data.toLocaleDateString('pt-BR'); // formato dd/mm/yyyy
+      },
     },
     {
       cabecalho: 'Descrição',
@@ -147,7 +151,14 @@ export default function Dashboard() {
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
-      setTransacoes(rs)
+      const transacaoConvertida = {
+        ...rs,
+        amount: Number(rs.amount),
+        price: Number(rs.price),
+        qtd: Number(rs.qtd),
+      };
+
+      setTransacoes(transacaoConvertida);
       setLocalState({ action: actionTypes.editando })
       buscarDados()
     })
@@ -196,12 +207,15 @@ export default function Dashboard() {
       })
       .then((rs: Array<TransactionInterface>) => {
         let dt: string = clsFormatacao.dataISOtoUser(rs[0].date)
+        let vr: number = rs[0].amount
         return {
           ...rs[0],
-          date: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+          date: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3"),
+          amount: vr
         }
       })
   }
+
 
   const buscarDados = async () => {
 
@@ -234,7 +248,7 @@ export default function Dashboard() {
         let somaDespesas = 0;
 
         rs.forEach((x) => {
-          const amount = x.amount ?? 0;
+          const amount = Number(x.amount) || 0;
           const type = x.category?.type ?? '';
 
           if (type === 'Receita') {
@@ -244,11 +258,12 @@ export default function Dashboard() {
           }
         });
 
-        const quantidadeTransacoes = rs[0].amount === null ? 0 : rs.length;
-        const saldoInicial = rs[0]?.account?.initialBalance ?? 0;
+        const quantidadeTransacoes: number = rs[0].amount === null ? 0 : rs.length;
+        const saldoInicial = Number(rs[0]?.account?.initialBalance) || 0;
+        const saldoFinal = saldoInicial + (somaReceitas - somaDespesas);
 
         setDadosCard({
-          saldo: saldoInicial + somaReceitas - somaDespesas,
+          saldo: saldoFinal,
           receitas: somaReceitas,
           despesas: somaDespesas,
           transacoes: quantidadeTransacoes,
@@ -263,7 +278,7 @@ export default function Dashboard() {
       }
 
       rs.forEach((x) => {
-        const amount = x.amount ?? 0;
+        const amount = Number(x.amount) || 0;
         const type = x.category?.type;
         const category = x.category;
         const date = x.date;
@@ -320,7 +335,7 @@ export default function Dashboard() {
           <InfoCard
             titulo="Saldo Atual"
             icone={<AttachMoneyIcon />}
-            valor={dadosCard.saldo}
+            valor={Number(dadosCard.saldo)}
             formatoValor="moeda"
             texto="Atualização do saldo em tempo real"
             corFundo="#1309aa"

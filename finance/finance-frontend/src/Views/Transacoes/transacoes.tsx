@@ -120,13 +120,19 @@ export function Transacoes() {
   ]
 
   const onEditar = (id: string | number) => {
-
     pesquisarID(id).then((rs) => {
-      setTransacoes(rs)
-      setLocalState({ action: actionTypes.editando })
-      setOpen(true)
-    })
-  }
+      const transacaoConvertida = {
+        ...rs,
+        amount: Number(rs.amount),
+        price: Number(rs.price),
+        qtd: Number(rs.qtd),
+      };
+
+      setTransacoes(transacaoConvertida);
+      setLocalState({ action: actionTypes.editando });
+      setOpen(true);
+    });
+  };
 
   const onDuplicar = (id: string | number) => {
 

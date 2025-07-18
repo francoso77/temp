@@ -94,7 +94,7 @@ export function Relatorios() {
         let somaDespesas = 0;
 
         rs.forEach((x) => {
-          const amount = x.amount ?? 0;
+          const amount = Number(x.amount) || 0;
           const type = x.category?.type ?? '';
 
           if (type === 'Receita') {
@@ -104,7 +104,7 @@ export function Relatorios() {
           }
         });
 
-        const saldoInicial = rs[0]?.account?.initialBalance ?? 0;
+        const saldoInicial = Number(rs[0]?.account?.initialBalance) || 0;
 
         setDadosCard({
           saldo: saldoInicial + somaReceitas - somaDespesas,
@@ -121,7 +121,7 @@ export function Relatorios() {
       }
 
       rs.forEach((x) => {
-        const amount = x.amount ?? 0;
+        const amount = Number(x.amount) || 0;
         const type = x.category?.type;
         const category = x.category;
         const date = x.date;
