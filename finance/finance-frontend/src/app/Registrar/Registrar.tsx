@@ -42,7 +42,7 @@ export default function Registrar() {
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud: ClsCrud = new ClsCrud()
 
-  const { mensagemState, setMensagemState, setUsuarioState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, setUsuarioState, usuarioState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const [usuario, setUsuario] = useState<PropsInterface>(ResetDados)
@@ -97,6 +97,7 @@ export default function Registrar() {
       irPara('/')
     } else {
       irPara('/dashboard')
+      setLayoutState({ ...layoutState, titulo: 'Dashboard', pathTitulo: '/dashboard' })
     }
   }
 

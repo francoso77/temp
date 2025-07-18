@@ -137,8 +137,16 @@ export function Transacoes() {
   const onDuplicar = (id: string | number) => {
 
     pesquisarID(id).then((rs) => {
-      setTransacoes(rs)
-      setTransacoes({ ...rs, description: rs.description.concat(' TRANSAÇÃO DUPLICADA'), id: undefined })
+      const transacaoConvertida = {
+        ...rs,
+        amount: Number(rs.amount),
+        price: Number(rs.price),
+        qtd: Number(rs.qtd),
+        description: rs.description.concat(' TRANSAÇÃO DUPLICADA'),
+        id: undefined
+      };
+
+      setTransacoes(transacaoConvertida);
       setLocalState({ action: actionTypes.duplicando })
       setOpen(true)
     })
@@ -237,6 +245,8 @@ export function Transacoes() {
           userId: usuarioState.idUsuario
         },
         camposLike: ["description"],
+        campoOrder: ['date'],
+        tipoOrder: 'DESC',
         select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
         msg: 'Pesquisando transação ...',
         setMensagemState: setMensagemState
