@@ -285,7 +285,7 @@ export function Contas() {
               textColor='#000'
               iconPosition='start'
               icon={<i className="material-icons">add</i>}
-              sx={{ mt: 2, ml: 1, textAlign: 'right' }}
+              sx={{ mt: 1, ml: 1, textAlign: 'right' }}
             >
               Nova Conta
             </CustomButton>
