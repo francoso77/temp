@@ -1,13 +1,13 @@
 {
-  "short_name": "JB TEXTIL",
-  "name": "APP JB TEXTIL",
+  "short_name": "Finance Control",
+  "name": "App Finance Control",
   "id": "/?source=pwa",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "theme_color": "#0E5E53",
   "background_color": "#0E5E53",
-  "icons": [
+    "icons": [
     {
       "src": "windows11/SmallTile.scale-100.png",
       "sizes": "71x71"

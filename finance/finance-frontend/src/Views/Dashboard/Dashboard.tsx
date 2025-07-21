@@ -77,7 +77,7 @@ export default function Dashboard() {
     },
     {
       cabecalho: 'Descrição',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'description',
     },
     {

@@ -157,9 +157,9 @@ export default function HeaderMenu() {
               iconPosition='start'
               icon={<MonetizationOnIcon />}
               sx={{
-                fontSize: isMobile ? '0.6rem' : '0.875rem',
-                py: isMobile ? 0.3 : 0.75,
-                px: isMobile ? 0.3 : 0.75
+                fontSize: isMobile ? 10 : 16,
+                py: isMobile ? 0.3 : 0.65,
+                px: isMobile ? 0.3 : 0.65
               }}
 
             >

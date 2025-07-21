@@ -69,7 +69,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
       </Box>
 
       {/* Valor principal */}
-      <Typography sx={{ fontSize: 24, mt: 1, fontWeight: 'bold' }}>
+      <Typography sx={{ fontSize: 20, mt: 1, fontWeight: 'bold' }}>
         {valorFormatado}
       </Typography>
 

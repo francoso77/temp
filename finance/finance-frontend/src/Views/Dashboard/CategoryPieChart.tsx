@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'; // Icon for Receitas
 import MoneyOffIcon from '@mui/icons-material/MoneyOff'; // Icon for Despesas
 import { CategoryPieChartProps } from '../../types/graficoTypes';
+import { useTheme, useMediaQuery } from '@mui/material';
 
 /**
  * Componente CategoryPieChart
@@ -16,6 +17,12 @@ import { CategoryPieChartProps } from '../../types/graficoTypes';
  */
 const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, title = "Distribuição por Categoria" }) => {
   const [dataType, setDataType] = useState<'receita' | 'despesa'>('despesa'); // Default to despesas
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // celulares
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); // tablets
+
+  const pieCy = isSmallScreen ? '67%' : isTablet ? '55%' : '50%';
 
   const handleDataTypeChange = (
     event: React.MouseEvent<HTMLElement>,
@@ -161,20 +168,21 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, title = "Dist
           <Pie
             data={filteredData}
             cx="50%"
-            cy="45%" // Adjusted cy for bottom legend
+            cy={pieCy} // dinâmica conforme o tamanho da tela
             labelLine={false}
-            label={renderCustomizedLabel} // Use the updated custom label renderer
-            outerRadius={120} // Adjusted radius slightly
-            innerRadius={40} // Keep donut effect
-            fill="#8884d8" // Default fill, overridden by Cell
+            label={renderCustomizedLabel}
+            outerRadius={120}
+            innerRadius={40}
+            fill="#8884d8"
             dataKey="value"
             nameKey="name"
-            stroke="none" // No border between slices
+            stroke="none"
           >
             {filteredData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} /> // Use category color
+              <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
+
         </PieChart>
       </ResponsiveContainer>
     </Paper>
