@@ -231,6 +231,7 @@ export default function Dashboard() {
     const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
+    const empresa = layoutState.companyId ? layoutState.companyId : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
     const setor = layoutState.sectorId ? layoutState.sectorId : undefined
     const groupedLinCol = new Map<string, DataPoint>()
@@ -248,19 +249,23 @@ export default function Dashboard() {
       categoria,
       tipo,
       setor,
+      empresa,
       idUsuario: usuarioState.idUsuario
     }).then((rs: Array<TransactionInterface>) => {
 
       if (rs.length > 0) {
         let somaReceitas = 0;
         let somaDespesas = 0;
+        let somaQtds = 0;
 
         rs.forEach((x) => {
           const amount = Number(x.amount) || 0;
+          const qtd = Number(x.qtd) || 0;
           const type = x.category?.type ?? '';
 
           if (type === 'Receita') {
             somaReceitas += amount;
+            somaQtds += qtd;
           } else if (type === 'Despesa') {
             somaDespesas += amount;
           }
@@ -280,30 +285,36 @@ export default function Dashboard() {
         if (rs[0].amount !== null) {
           setRsPesquisa(rs)
         }
+
       } else {
 
         setDadosCard({ saldo: 0, receitas: 0, despesas: 0, transacoes: 0 });
       }
 
+
       rs.forEach((x) => {
         const amount = Number(x.amount) || 0;
+        const qtd = Number(x.qtd) || 0;
         const type = x.category?.type;
         const category = x.category;
         const date = x.date;
+
 
         if (!type || !category || !date) return; // pula itens inválidos
 
         const month = new Date(date).toISOString().slice(0, 7);
 
         if (!groupedLinCol.has(month)) {
-          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0 });
+          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0, qtd: 0 });
         }
 
         const currentLinCol = groupedLinCol.get(month)!;
         if (type === 'Receita') {
           currentLinCol.receitas += amount;
+          currentLinCol.qtd += qtd;
         } else if (type === 'Despesa') {
           currentLinCol.despesas += amount;
+
         }
         groupedLinCol.set(month, currentLinCol);
 
@@ -322,8 +333,9 @@ export default function Dashboard() {
         groupedCategory.set(key, current);
       });
 
-      const resultData: DataPoint[] = Array.from(groupedLinCol.values());
-      const resultCategory: CategoryDataPoint[] = Array.from(groupedCategory.values());
+      const resultData: DataPoint[] = Array.from(groupedLinCol.values()).sort((a, b) => a.date.localeCompare(b.date));
+      const resultCategory: CategoryDataPoint[] = Array.from(groupedCategory.values()).sort((a, b) => a.name.localeCompare(b.name));
+
       setDataPoints(resultData);
       setCategoryData(resultCategory);
     });
@@ -387,7 +399,7 @@ export default function Dashboard() {
             espessuraBorda={2}
           />
         </Grid>
-        <Grid item xs={12} sm={6} sx={{ p: 1 }}>
+        <Grid item xs={12} sm={12} sx={{ p: 1 }}>
           <FinancialChart
             title='Receitas e Despesas'
             data={dataPoints}
@@ -395,7 +407,7 @@ export default function Dashboard() {
             borderColor="#3a3a3a"    // Exemplo: borda cinza
           />
         </Grid>
-        <Grid item xs={12} sm={6} sx={{ p: 1 }}>
+        <Grid item xs={12} sm={12} sx={{ p: 1 }}>
           <CategoryPieChart data={categoryData} />
         </Grid>
         <Grid item xs={12} sm={12} sx={{ p: 1 }}>

@@ -26,6 +26,7 @@ interface PropsInterface {
   categoria?: string
   setor?: string
   tipo?: string
+  empresa?: string
   email?: string
   newPassword?: string
 }
@@ -101,6 +102,7 @@ export default class ClsApi {
     categoria,
     setor,
     tipo,
+    empresa,
     email,
     newPassword,
 
@@ -124,6 +126,7 @@ export default class ClsApi {
       categoria,
       setor,
       tipo,
+      empresa,
       email,
       newPassword
     };
@@ -152,7 +155,7 @@ export default class ClsApi {
         requestData,
         ClsApi.defaultConfig
       );
-
+      console.log('url', `${URL_BACKEND}/${url}`)
       return await ClsApi.handleResponse(response.data, setMensagemState);
     } catch (error) {
       return await ClsApi.handleError(error, setMensagemState);

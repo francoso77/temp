@@ -33,7 +33,8 @@ export class OutController {
     @Body('dtInicial') dtInicial?: string,
     @Body('dtFinal') dtFinal?: string,
     @Body('idUsuario') idUsuario?: string,
-    @Body('tipo') tipo?: string
+    @Body('tipo') tipo?: string,
+    @Body('empresa') empresa?: string
   ): Promise<any[]> {
 
 
@@ -49,6 +50,7 @@ export class OutController {
         't.amount',
         't.description',
         't.userId',
+        't.qtd',
         'category.id',
         'category.name',
         'category.color',
@@ -67,6 +69,10 @@ export class OutController {
         start: dtInicial,
         end: dtFinal,
       });
+    }
+
+    if (empresa) {
+      query.andWhere('company.id = :empresaParam', { empresaParam: empresa });
     }
 
     if (tipo) {

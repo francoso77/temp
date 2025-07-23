@@ -58,16 +58,24 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
   const renderChartElements = () => {
     const commonPropsReceitas = { type: 'monotone' as const, dataKey: 'receitas', stroke: '#4caf50', fill: '#4caf50', name: 'Receitas' };
     const commonPropsDespesas = { type: 'monotone' as const, dataKey: 'despesas', stroke: '#f44336', fill: '#f44336', name: 'Despesas' };
+    const qtdProps = { type: 'monotone' as const, dataKey: 'qtd', stroke: '#2196f3', fill: '#2196f3', name: 'Produção' };
     const lineProps = { strokeWidth: 2, dot: false, activeDot: { r: 6 } };
     const barProps = { barSize: 20 };
 
     return (
       <>
-        {(dataFilter === 'all' || dataFilter === 'receitas') && (
-          chartType === 'line' ? <Line {...commonPropsReceitas} {...lineProps} /> : <Bar {...commonPropsReceitas} {...barProps} />
-        )}
-        {(dataFilter === 'all' || dataFilter === 'despesas') && (
-          chartType === 'line' ? <Line {...commonPropsDespesas} {...lineProps} /> : <Bar {...commonPropsDespesas} {...barProps} />
+        {chartType === 'line' ? (
+          <>
+            {(dataFilter === 'all' || dataFilter === 'receitas') && <Line {...commonPropsReceitas} {...lineProps} />}
+            {(dataFilter === 'all' || dataFilter === 'despesas') && <Line {...commonPropsDespesas} {...lineProps} />}
+            {dataFilter === 'receitas' && <Line {...qtdProps} {...lineProps} />}
+          </>
+        ) : (
+          <>
+            {(dataFilter === 'all' || dataFilter === 'receitas') && <Bar {...commonPropsReceitas} {...barProps} />}
+            {(dataFilter === 'all' || dataFilter === 'despesas') && <Bar {...commonPropsDespesas} {...barProps} />}
+            {dataFilter === 'receitas' && <Bar {...qtdProps} {...barProps} />}
+          </>
         )}
       </>
     );
@@ -87,7 +95,11 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
             itemStyle={{ color: '#fff', fontSize: '0.9rem' }}
             labelStyle={{ color: '#ddd', marginBottom: '5px', fontWeight: 'bold' }}
             cursor={{ fill: 'rgba(204, 204, 204, 0.2)' }}
-            formatter={(value: number, name: string) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
+            formatter={(value: number, name: string) => {
+              if (name === 'Qtd') return [`${value}`, 'Produção'];
+              return [`${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name];
+            }}
+
           />
           <Legend wrapperStyle={{ paddingTop: '10px' }} />
           {renderChartElements()}

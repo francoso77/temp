@@ -28,6 +28,7 @@ export interface DataPoint {
   date: string; // Ou Date, dependendo de como os dados são processados
   receitas: number;
   despesas: number;
+  qtd: number;
 }
 
 export interface FinancialChartProps {

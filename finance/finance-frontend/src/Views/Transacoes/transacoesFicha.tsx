@@ -108,7 +108,7 @@ export function TransacoesFicha(
           localState?.action === actionTypes.editando
             ? 'Alteração realizada com sucesso'
             : 'Cadastro realizado com sucesso',
-        tipo: transacao ? MensagemTipo.Info : MensagemTipo.Ok,
+        tipo: localState?.action === actionTypes.editando ? MensagemTipo.Info : MensagemTipo.Ok,
         exibirBotao: true,
         cb: null,
       });

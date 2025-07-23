@@ -181,7 +181,7 @@ export default class ClsCrud {
       setMensagemState({
         titulo: 'Aviso...',
         exibir: true,
-        mensagem: localState?.action === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
+        mensagem: localState?.action === actionTypes.incluindo || localState?.action === actionTypes.duplicando ? 'Incluindo...' : 'Alterando...',
         tipo: MensagemTipo.Info,
         exibirBotao: false,
         cb: null

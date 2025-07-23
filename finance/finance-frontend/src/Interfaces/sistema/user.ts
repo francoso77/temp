@@ -10,7 +10,7 @@ export interface UserInterface {
   resetTokenExpires: Date;
   termsAccepted: boolean;
   termsAcceptedAt: Date;
-  profilePicture: string;
+  profilePicture: string | File | null;
 }
 export interface UserSectionInterface {
   id?: string;

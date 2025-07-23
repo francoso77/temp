@@ -1,5 +1,5 @@
 import { Chip, Grid, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import CustomButton from '../../Componentes/Button';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import InputText from '../../Componentes/InputText';
@@ -13,6 +13,7 @@ import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { TransacoesFicha } from './transacoesFicha';
 import FileCopyTwoToneIcon from '@mui/icons-material/FileCopyTwoTone';
+import ClsApi from '../../Utils/ClsApi';
 
 
 interface PesquisaInterface {
@@ -22,7 +23,9 @@ interface PesquisaInterface {
 
 export function Transacoes() {
 
-  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const clsCrud = new ClsCrud()
+  const clsApi = useMemo(() => new ClsApi(), []);
+  const clsFormatacao = new ClsFormatacao();
 
   const ResetTransaction: TransactionInterface = {
 
@@ -38,14 +41,13 @@ export function Transacoes() {
     sectorId: '',
   }
 
+  const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [open, setOpen] = useState(false);
-  const clsFormatacao = new ClsFormatacao();
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
   const [transacoes, setTransacoes] = React.useState<TransactionInterface>();
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ description: '' });
   const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
-  const clsCrud = new ClsCrud()
   const [debouncedValue, setDebouncedValue] = useState("")
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -57,7 +59,7 @@ export function Transacoes() {
     },
     {
       cabecalho: 'Descrição',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'description',
     },
     {
@@ -234,26 +236,47 @@ export function Transacoes() {
         setRsPesquisa(rs)
       })
   }
-  const btPesquisar = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "Transaction",
-        relations: ['company', 'category', 'sector', 'account'],
-        token: usuarioState.token,
-        criterio: {
-          description: "%".concat(pesquisa.description).concat("%"),
-          userId: usuarioState.idUsuario
-        },
-        camposLike: ["description"],
-        campoOrder: ['date'],
-        tipoOrder: 'DESC',
-        select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
-        msg: 'Pesquisando transação ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
-      })
+  const btPesquisar = async () => {
+    const dtInicial = layoutState.dataInicio ? clsFormatacao.dataISOtoDatetime(layoutState.dataInicio) : undefined
+    const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
+    const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
+    const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
+    const tipo = layoutState.type ? layoutState.type : undefined
+    const setor = layoutState.sectorId ? layoutState.sectorId : undefined
+
+    await clsApi.execute<Array<TransactionInterface>>({
+      url: 'selecaoTransacoes',
+      method: 'post',
+      token: usuarioState.token,
+      dtInicial,
+      dtFinal,
+      conta,
+      categoria,
+      tipo,
+      setor,
+      idUsuario: usuarioState.idUsuario
+    }).then((rs: Array<TransactionInterface>) => {
+      setRsPesquisa(rs)
+    })
+    // clsCrud
+    //   .pesquisar({
+    //     entidade: "Transaction",
+    //     relations: ['company', 'category', 'sector', 'account'],
+    //     token: usuarioState.token,
+    //     criterio: {
+    //       description: "%".concat(pesquisa.description).concat("%"),
+    //       userId: usuarioState.idUsuario
+    //     },
+    //     camposLike: ["description"],
+    //     campoOrder: ['date'],
+    //     tipoOrder: 'DESC',
+    //     select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
+    //     msg: 'Pesquisando transação ...',
+    //     setMensagemState: setMensagemState
+    //   })
+    //   .then((rs: Array<any>) => {
+    //     setRsPesquisa(rs)
+    //   })
   }
 
   const handleOpen = () => {

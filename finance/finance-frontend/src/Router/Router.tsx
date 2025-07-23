@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Layout from '../app/Layout/Layout';
 import { Welcome } from '../app/Layout/Welcome';
-import Registrar from '../app/Registrar/Registrar';
 import Login from '../app/Login/Login';
 import { Categorias } from '../Views/Categorias/categorias';
 import { Contas } from '../Views/Contas/contas';
@@ -14,6 +13,7 @@ import { ForgotPassword } from "../app/Registrar/ForgotPassword";
 import { ResetPassword } from '../app/Registrar/ResetPassword';
 import { Relatorios } from '../Views/Relatorios/relatorios';
 import { Setores } from '../Views/Setores/setores';
+import Registrar from '../app/Registrar/Registrar';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +24,14 @@ export const router = createBrowserRouter([
       {
         path: "/welcome",
         element: <Welcome />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
       },
       //Rotas protegidas
       {
@@ -57,14 +65,6 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
-      },
-      {
-        path: "/forgot-password",
-        element: <ForgotPassword />,
-      },
-      {
-        path: "/reset-password",
-        element: <ResetPassword />,
       },
       {
         path: "/relatorios",

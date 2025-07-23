@@ -42,7 +42,8 @@ var data_source_1 = require("./data-source");
 var dotenv = require("dotenv");
 var path_1 = require("path");
 var express = require("express");
-//import * as fs from 'node:fs';
+//Uso em produção
+var fs = require("node:fs");
 dotenv.config();
 function iniciandoBD() {
     return __awaiter(this, void 0, void 0, function () {
@@ -50,22 +51,22 @@ function iniciandoBD() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    corsOrigin = process.env.CORS_ORIGIN || '*';
+                    corsOrigin = 'https://finance.jbtextil.ind.br';
                     return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule, {
-                        //opção usada em produção
-                        // httpsOptions: {
-                        //   key: fs.readFileSync(process.env.SSL_KEY),
-                        //   cert: fs.readFileSync(process.env.SSL_CERT)
-                        // }
+                            //opção usada em produção
+                            httpsOptions: {
+                                key: fs.readFileSync(process.env.SSL_KEY),
+                                cert: fs.readFileSync(process.env.SSL_CERT)
+                            }
                         })];
                 case 1:
                     app = _a.sent();
-                    //Libera acesso CORS para desenvolimento
+                    //Libera acesso CORS
                     app.enableCors({
                         origin: corsOrigin, // Permite requisições apenas desta origem
-                        // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
-                        // allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
-                        // credentials: true, // Se você usa cookies ou cabeçalhos de autorização
+                        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
+                        allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
+                        credentials: true, // Se você usa cookies ou cabeçalhos de autorização
                     });
                     // ✅ Expõe a pasta de uploads como pública
                     app.use('/uploads', express.static((0, path_1.join)(__dirname, '..', 'uploads')));

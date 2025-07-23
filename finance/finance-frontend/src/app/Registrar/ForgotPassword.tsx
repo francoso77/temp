@@ -14,6 +14,7 @@ import ClsValidacao from '../../Utils/ClsValidacao';
 import { useNavigate } from 'react-router-dom';
 
 export function ForgotPassword() {
+
     const [dados, setDados] = useState({ email: '' });
     const clsApi: ClsApi = new ClsApi();
     const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
@@ -104,7 +105,7 @@ export function ForgotPassword() {
                             dados={dados}
                             setState={setDados}
                             erros={erros}
-                        //autocomplete='email'
+                            autocomplete='email'
                         />
                     </Box>
                 </Paper>

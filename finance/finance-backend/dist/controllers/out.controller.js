@@ -77,7 +77,7 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario, tipo) {
+    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario, tipo, empresa) {
         return __awaiter(this, void 0, void 0, function () {
             var query, transacoes, accountRepo, account;
             return __generator(this, function (_a) {
@@ -95,6 +95,7 @@ var OutController = /** @class */ (function () {
                             't.amount',
                             't.description',
                             't.userId',
+                            't.qtd',
                             'category.id',
                             'category.name',
                             'category.color',
@@ -112,6 +113,9 @@ var OutController = /** @class */ (function () {
                                 start: dtInicial,
                                 end: dtFinal,
                             });
+                        }
+                        if (empresa) {
+                            query.andWhere('company.id = :empresaParam', { empresaParam: empresa });
                         }
                         if (tipo) {
                             query.andWhere('category.type = :tipoParam', { tipoParam: tipo });
@@ -176,8 +180,9 @@ var OutController = /** @class */ (function () {
         __param(4, (0, common_1.Body)('dtFinal')),
         __param(5, (0, common_1.Body)('idUsuario')),
         __param(6, (0, common_1.Body)('tipo')),
+        __param(7, (0, common_1.Body)('empresa')),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String, String, String, String, String, String, String]),
+        __metadata("design:paramtypes", [String, String, String, String, String, String, String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "selecaoTransacoes", null);
     OutController = __decorate([

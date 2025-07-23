@@ -13,6 +13,7 @@ export interface LayoutStateInterface {
   categoryId?: string | null
   type?: string | null;
   sectorId?: string | null
+  companyId?: string | null
 }
 
 export default function useLayoutState() {
@@ -27,7 +28,8 @@ export default function useLayoutState() {
     categoryId: null,
     accountId: null,
     type: null,
-    sectorId: null
+    sectorId: null,
+    companyId: null
   })
 
   return { layoutState, setLayoutState }

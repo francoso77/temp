@@ -12,8 +12,7 @@ import ClsCrud from '../../Utils/ClsCrudApi';
 import { TipoTransactionType, TipoTransactionTypes } from '../../types/tipoTransactionTypes';
 import { SectorInterface } from '../../Interfaces/sector';
 import { AccountInterface } from '../../Interfaces/account';
-import CustomButton from '../../Componentes/Button';
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import { CompanyInterface } from '../../Interfaces/company';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -25,13 +24,14 @@ export interface DadosPesquisa {
     categoria: string;
     conta: string;
     setor: string;
-    tipo: string
+    tipo: string;
+    empresa: string
 }
 
 export default function Menu() {
 
     const { layoutState, setLayoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
-    const dadosIniciais: DadosPesquisa = { dataInicio: '', dataFim: '', categoria: '', conta: layoutState.contaPadrao ?? '', setor: '', tipo: '' }
+    const dadosIniciais: DadosPesquisa = { dataInicio: '', dataFim: '', categoria: '', conta: layoutState.contaPadrao ?? '', setor: '', tipo: '', empresa: '' }
     const [modalOpen, setModalOpen] = useState(false);
     const [dataInicio, setDataInicio] = useState<string>('');
     const [dataFim, setDataFim] = useState<string>('');
@@ -39,6 +39,7 @@ export default function Menu() {
     const [rsContas, setRsContas] = useState<Array<AccountInterface>>([])
     const [rsCategorias, setRsCategorias] = useState<Array<CategoryInterface>>([])
     const [rsSetores, setRsSetores] = useState<Array<SectorInterface>>([])
+    const [rsEmpresas, setRsEmpresas] = useState<Array<CompanyInterface>>([])
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [contaPadrao, setContaPadrao] = useState<string | null>(null)
     const clsCrud = new ClsCrud()
@@ -65,6 +66,7 @@ export default function Menu() {
                 categoryId: null,
                 type: null,
                 sectorId: null,
+                companyId: null
             }));
         } else {
             setLayoutState(prev => ({ ...prev, [key]: value }));
@@ -94,6 +96,11 @@ export default function Menu() {
     const handleItemChangeSetor = (selected: SectorInterface | null) => {
         updateLayoutState("sectorId", selected?.id ?? null);
         setDadosPesquisa({ ...dadosPesquisa, setor: selected?.id ?? "" })
+    };
+
+    const handleItemChangeEmpresa = (selected: CompanyInterface | null) => {
+        updateLayoutState("companyId", selected?.id ?? null);
+        setDadosPesquisa({ ...dadosPesquisa, empresa: selected?.id ?? "" })
     };
 
     interface TipoTransactionOption {
@@ -159,6 +166,15 @@ export default function Menu() {
                 }
             })
 
+        clsCrud
+            .pesquisar({
+                entidade: "Company",
+                criterio: { userId: usuarioState.idUsuario },
+                campoOrder: ['name'],
+            })
+            .then((rs: Array<CompanyInterface>) => {
+                setRsEmpresas(rs)
+            })
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -292,6 +308,22 @@ export default function Menu() {
                         mensagemPadraoCampoEmBranco='Escolha o setor'
                         onFocus={(e) => e.target.select()}
                         onChange={handleItemChangeSetor}
+                    />
+                </Box>
+                <Box sx={{ mt: 2, mr: 5, ml: 1 }}>
+                    <ComboBox
+                        label='Empresa'
+                        corFundo='#010108'
+                        corFonte={"#fff"}
+                        opcoes={rsEmpresas}
+                        field='empresa'
+                        setState={setDadosPesquisa}
+                        dados={dadosPesquisa}
+                        campoID='id'
+                        campoDescricao='name'
+                        mensagemPadraoCampoEmBranco='Escolha a empresa'
+                        onFocus={(e) => e.target.select()}
+                        onChange={handleItemChangeEmpresa}
                     />
                 </Box>
                 <Offset />

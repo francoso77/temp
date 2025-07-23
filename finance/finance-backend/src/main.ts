@@ -5,27 +5,32 @@ import * as dotenv from 'dotenv';
 import { join } from 'path';
 import * as express from 'express';
 
-//import * as fs from 'node:fs';
+//Uso em produção
+import * as fs from 'node:fs';
 
 dotenv.config();
 
 async function iniciandoBD() {
-  const corsOrigin = process.env.CORS_ORIGIN || '*';
-  //const corsOrigin = 'https://finance.jbtextil.ind.br';//'http://localhost:3000';
+  //uso da variavel de ambiente
+  //Desenvolvimento local
+  //const corsOrigin = process.env.CORS_ORIGIN || '*';
+
+  //Produção
+  const corsOrigin = 'https://finance.jbtextil.ind.br';//'http://localhost:3000';
   const app = await NestFactory.create(AppModule, {
     //opção usada em produção
-    // httpsOptions: {
-    //   key: fs.readFileSync(process.env.SSL_KEY),
-    //   cert: fs.readFileSync(process.env.SSL_CERT)
-    // }
+    httpsOptions: {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT)
+    }
   });
 
-  //Libera acesso CORS para desenvolimento
+  //Libera acesso CORS
   app.enableCors({
     origin: corsOrigin, // Permite requisições apenas desta origem
-    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
-    // allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
-    // credentials: true, // Se você usa cookies ou cabeçalhos de autorização
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos HTTP permitidos
+    allowedHeaders: 'Content-Type, Accept, Authorization', // Cabeçalhos permitidos
+    credentials: true, // Se você usa cookies ou cabeçalhos de autorização
   });
 
   // ✅ Expõe a pasta de uploads como pública

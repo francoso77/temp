@@ -94,7 +94,6 @@ export class UserController {
       }),
     }),
   )
-
   async updateUser(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,

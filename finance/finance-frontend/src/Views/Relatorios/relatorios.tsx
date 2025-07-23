@@ -27,6 +27,7 @@ interface DadosCardInterface {
 export interface TransactionSelectInterface {
   date: string | Date; // Pode ser string se vier do banco como ISO ou Date se já for convertido
   amount: number;
+  qtd: number;
   description: string;
   userId: string;
   category: {
@@ -73,6 +74,7 @@ export function Relatorios() {
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
+    const empresa = layoutState.companyId ? layoutState.companyId : undefined
     const groupedLinCol = new Map<string, DataPoint>()
     const groupedCategory = new Map<string, CategoryDataPoint>()
 
@@ -87,6 +89,7 @@ export function Relatorios() {
       conta,
       categoria,
       tipo,
+      empresa,
       idUsuario: usuarioState.idUsuario
     }).then((rs: Array<TransactionSelectInterface>) => {
       if (rs.length > 0) {
@@ -122,6 +125,7 @@ export function Relatorios() {
 
       rs.forEach((x) => {
         const amount = Number(x.amount) || 0;
+        const qtd = Number(x.qtd) || 0;
         const type = x.category?.type;
         const category = x.category;
         const date = x.date;
@@ -131,12 +135,13 @@ export function Relatorios() {
         const month = new Date(date).toISOString().slice(0, 7);
 
         if (!groupedLinCol.has(month)) {
-          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0 });
+          groupedLinCol.set(month, { date: month, receitas: 0, despesas: 0, qtd: 0 });
         }
 
         const currentLinCol = groupedLinCol.get(month)!;
         if (type === 'Receita') {
           currentLinCol.receitas += amount;
+          currentLinCol.qtd += qtd;
         } else if (type === 'Despesa') {
           currentLinCol.despesas += amount;
         }
@@ -157,8 +162,8 @@ export function Relatorios() {
         groupedCategory.set(key, current);
       });
 
-      const resultData: DataPoint[] = Array.from(groupedLinCol.values());
-      const resultCategory: CategoryDataPoint[] = Array.from(groupedCategory.values());
+      const resultData: DataPoint[] = Array.from(groupedLinCol.values()).sort((a, b) => a.date.localeCompare(b.date));
+      const resultCategory: CategoryDataPoint[] = Array.from(groupedCategory.values()).sort((a, b) => a.name.localeCompare(b.name));
       setDataPoints(resultData);
       setCategoryData(resultCategory);
     });

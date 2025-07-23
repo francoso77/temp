@@ -16,7 +16,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
  * @param {CategoryDataPoint[]} data - Array de objetos contendo os dados das categorias (name, value, color, type).
  */
 const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, title = "Distribuição por Categoria" }) => {
-  const [dataType, setDataType] = useState<'receita' | 'despesa'>('despesa'); // Default to despesas
+  const [dataType, setDataType] = useState<'receita' | 'despesa'>('receita'); // Default to despesas
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // celulares
@@ -145,7 +145,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, title = "Dist
 
       {/* Adjust height to accommodate legend */}
       <ResponsiveContainer width="100%" height={400}>
-        <PieChart margin={{ top: 5, right: 5, bottom: 40, left: 5 }}> {/* Add bottom margin for legend */}
+        <PieChart margin={{ top: 10, right: 5, bottom: 40, left: 5 }}> {/* Add bottom margin for legend */}
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(204, 204, 204, 0.1)' }} />
           <Legend
             layout="horizontal" // Horizontal layout
