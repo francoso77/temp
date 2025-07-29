@@ -231,6 +231,7 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
                   erros={erros}
                   dados={dados}
                 />
+
               </Box>
             </Grid>
             <Grid item xs={12} >

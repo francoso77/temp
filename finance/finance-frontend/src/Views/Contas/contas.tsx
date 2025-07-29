@@ -100,7 +100,7 @@ export function Contas() {
     pesquisarID(id).then((rs) => {
       const contaConvertida = {
         ...rs,
-        inititalBalance: Number(rs.initialBalance),
+        initialBalance: Number(rs.initialBalance),
       };
       setContas(contaConvertida)
       setLocalState({ action: actionTypes.editando })
