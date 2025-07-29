@@ -24,7 +24,7 @@ interface PropsInterface {
 export function EmpresasFicha({ open, setOpen, btPesquisar, empresa, localState }: PropsInterface) {
 
   const clsCrud = new ClsCrud()
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<CompanyInterface>(ResetCompany);
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -60,14 +60,16 @@ export function EmpresasFicha({ open, setOpen, btPesquisar, empresa, localState 
       token: usuarioState.token
     }).then((rs) => {
       if (rs.ok) {
-        setMensagemState({
-          titulo: 'Cadastro',
-          exibir: true,
-          mensagem: localState?.action === actionTypes.editando ? 'Alteração realizada com sucesso' : 'Cadastro realizado com sucesso',
-          tipo: empresa ? MensagemTipo.Info : MensagemTipo.Ok,
-          exibirBotao: true,
-          cb: null
-        })
+        setMensagemState({ ...mensagemState, exibir: false })
+
+        // setMensagemState({
+        //   titulo: 'Cadastro',
+        //   exibir: true,
+        //   mensagem: localState?.action === actionTypes.editando ? 'Alteração realizada com sucesso' : 'Cadastro realizado com sucesso',
+        //   tipo: empresa ? MensagemTipo.Info : MensagemTipo.Ok,
+        //   exibirBotao: true,
+        //   cb: null
+        // })
       }
       handleClose()
     })

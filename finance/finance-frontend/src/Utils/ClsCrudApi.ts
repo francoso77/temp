@@ -182,7 +182,7 @@ export default class ClsCrud {
         titulo: 'Aviso...',
         exibir: true,
         mensagem: localState?.action === actionTypes.incluindo || localState?.action === actionTypes.duplicando ? 'Incluindo...' : 'Alterando...',
-        tipo: MensagemTipo.Info,
+        tipo: MensagemTipo.Ok,
         exibirBotao: false,
         cb: null
       })
@@ -195,14 +195,14 @@ export default class ClsCrud {
       )
       .then((rs) => {
         if (rs.data.ok && setMensagemState) {
-          setMensagemState({
-            titulo: 'Cadastro...',
-            exibir: true,
-            mensagem: localState?.action === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
-            tipo: localState?.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
-            exibirBotao: true,
-            cb: cb ? cb : null
-          })
+          // setMensagemState({
+          //   titulo: 'Cadastro...',
+          //   exibir: true,
+          //   mensagem: localState?.action === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
+          //   tipo: localState?.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
+          //   exibirBotao: true,
+          //   cb: cb ? cb : null
+          // })
         } else if (!rs.data.ok && setMensagemState) {
           setMensagemState({
             titulo: 'Erro...',
@@ -246,7 +246,7 @@ export default class ClsCrud {
         titulo: '',
         exibir: true,
         mensagem: localState?.action === actionTypes.incluindo ? 'Incluindo...' : 'Alterando...',
-        tipo: MensagemTipo.Info,
+        tipo: MensagemTipo.Ok,
         exibirBotao: false,
         cb: null
       })
@@ -259,14 +259,14 @@ export default class ClsCrud {
       )
       .then((rs) => {
         if (rs.data.ok && setMensagemState) {
-          setMensagemState({
-            titulo: 'Cadastro...',
-            exibir: true,
-            mensagem: localState?.action === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
-            tipo: localState?.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
-            exibirBotao: true,
-            cb: cb ? cb : null
-          })
+          // setMensagemState({
+          //   titulo: 'Cadastro...',
+          //   exibir: true,
+          //   mensagem: localState?.action === actionTypes.incluindo ? 'Inclusão realizada!' : 'Alteração realizada!',
+          //   tipo: localState?.action === actionTypes.incluindo ? MensagemTipo.Ok : MensagemTipo.Info,
+          //   exibirBotao: true,
+          //   cb: cb ? cb : null
+          // })
         } else if (!rs.data.ok && setMensagemState) {
           setMensagemState({
             titulo: 'Erro...',
@@ -304,7 +304,7 @@ export default class ClsCrud {
         titulo: '',
         exibir: true,
         mensagem: 'Excluindo...',
-        tipo: MensagemTipo.Info,
+        tipo: MensagemTipo.Error,
         exibirBotao: false,
         cb: null
       })
@@ -317,14 +317,14 @@ export default class ClsCrud {
       )
       .then((rs) => {
         if (rs.data.ok && setMensagemState) {
-          setMensagemState({
-            titulo: 'Cadastro...',
-            exibir: true,
-            mensagem: 'Exclusão realizada!',
-            tipo: MensagemTipo.Ok,
-            exibirBotao: true,
-            cb: cb ? cb : null
-          })
+          // setMensagemState({
+          //   titulo: 'Cadastro...',
+          //   exibir: true,
+          //   mensagem: 'Exclusão realizada!',
+          //   tipo: MensagemTipo.Error,
+          //   exibirBotao: true,
+          //   cb: cb ? cb : null
+          // })
         } else if (!rs.data.ok && setMensagemState) {
           setMensagemState({
             titulo: 'Erro...',

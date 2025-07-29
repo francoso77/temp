@@ -30,7 +30,7 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
 
   const clsCrud = new ClsCrud()
   const clsApi = new ClsApi()
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<AccountInterface>(ResetAccount);
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -144,17 +144,19 @@ export function ContasFicha({ open, setOpen, btPesquisar, conta, localState }: P
         }));
       }
 
-      setMensagemState({
-        titulo: 'Cadastro',
-        exibir: true,
-        mensagem:
-          localState?.action === actionTypes.editando
-            ? 'Alteração realizada com sucesso'
-            : 'Cadastro realizado com sucesso',
-        tipo: conta ? MensagemTipo.Info : MensagemTipo.Ok,
-        exibirBotao: true,
-        cb: null,
-      });
+      setMensagemState({ ...mensagemState, exibir: false })
+
+      // setMensagemState({
+      //   titulo: 'Cadastro',
+      //   exibir: true,
+      //   mensagem:
+      //     localState?.action === actionTypes.editando
+      //       ? 'Alteração realizada com sucesso'
+      //       : 'Cadastro realizado com sucesso',
+      //   tipo: conta ? MensagemTipo.Info : MensagemTipo.Ok,
+      //   exibirBotao: true,
+      //   cb: null,
+      // });
 
       if (localState?.action === actionTypes.editando) {
         setLayoutState(prev => ({

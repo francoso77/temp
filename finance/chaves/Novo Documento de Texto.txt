@@ -1,0 +1,6 @@
+ssh -p 8022 root@%IP% /scripts/%NOME_SCRIPT_PUBLICACAO%
+
+ssh -p 8022 root@%IP% rm -rf /clientes/compilados/new-%NOME_APP%-frontend
+
+start /d \Windows\System32\OpenSSH scp -r -P 8022 %CAMINHO%\unithal-frontend\build root@%IP%:/clientes/compilados/new-%NOME_APP%-frontend
+

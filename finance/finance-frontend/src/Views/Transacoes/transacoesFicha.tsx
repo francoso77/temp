@@ -52,7 +52,7 @@ export function TransacoesFicha(
   }
 
   const clsCrud = new ClsCrud()
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { mensagemState, setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [erros, setErros] = useState({});
   const [dados, setDados] = useState<TransactionInterface>(ResetTransaction)
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -101,17 +101,18 @@ export function TransacoesFicha(
     });
 
     if (rs.ok) {
-      setMensagemState({
-        titulo: 'Cadastro',
-        exibir: true,
-        mensagem:
-          localState?.action === actionTypes.editando
-            ? 'Alteração realizada com sucesso'
-            : 'Cadastro realizado com sucesso',
-        tipo: localState?.action === actionTypes.editando ? MensagemTipo.Info : MensagemTipo.Ok,
-        exibirBotao: true,
-        cb: null,
-      });
+      setMensagemState({ ...mensagemState, exibir: false })
+      // setMensagemState({
+      //   titulo: 'Cadastro',
+      //   exibir: true,
+      //   mensagem:
+      //     localState?.action === actionTypes.editando
+      //       ? 'Alteração realizada com sucesso'
+      //       : 'Cadastro realizado com sucesso',
+      //   tipo: localState?.action === actionTypes.editando ? MensagemTipo.Info : MensagemTipo.Ok,
+      //   exibirBotao: true,
+      //   cb: null,
+      // });
       handleClose();
     }
   };
