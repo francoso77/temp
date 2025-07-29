@@ -96,11 +96,17 @@ export function Contas() {
   ]
 
   const onEditar = (id: string | number) => {
+
     pesquisarID(id).then((rs) => {
-      setContas(rs)
+      const contaConvertida = {
+        ...rs,
+        inititalBalance: Number(rs.initialBalance),
+      };
+      setContas(contaConvertida)
       setLocalState({ action: actionTypes.editando })
       setOpen(true)
     })
+
   }
   const onExcluir = (id: string | number) => {
 
