@@ -35,7 +35,7 @@ export function Contas() {
 
   const [open, setOpen] = useState(false);
 
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [contas, setContas] = React.useState<AccountInterface>(ResetAccount)
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<SomatorioInterface>>([])
@@ -145,6 +145,8 @@ export function Contas() {
               msg: 'Excluindo conta ...',
             }).then((rs) => {
               if (rs.ok) {
+                setMensagemState({ ...mensagemState, exibir: false })
+
                 btPesquisar()
               }
             })

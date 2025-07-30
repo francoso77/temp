@@ -16,6 +16,7 @@ import autoTable from "jspdf-autotable";
 import { CompanyInterface } from '../../Interfaces/company';
 import { AccountInterface } from '../../Interfaces/account';
 import { CategoryInterface } from '../../Interfaces/category';
+import { SectorInterface } from '../../Interfaces/sector';
 
 
 interface DadosCardInterface {
@@ -66,6 +67,7 @@ export function Relatorios() {
   const [categorys, setCategorys] = useState<Array<CategoryInterface>>([]);
   const [companys, setCompanys] = useState<Array<CompanyInterface>>([]);
   const [accounts, setAccounts] = useState<Array<AccountInterface>>([]);
+  const [sectors, setSectors] = useState<Array<SectorInterface>>([]);
 
   const buscarDados = async () => {
 
@@ -75,6 +77,7 @@ export function Relatorios() {
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
     const empresa = layoutState.companyId ? layoutState.companyId : undefined
+    const setor = layoutState.sectorId ? layoutState.sectorId : undefined
     const groupedLinCol = new Map<string, DataPoint>()
     const groupedCategory = new Map<string, CategoryDataPoint>()
 
@@ -90,6 +93,7 @@ export function Relatorios() {
       categoria,
       tipo,
       empresa,
+      setor,
       idUsuario: usuarioState.idUsuario
     }).then((rs: Array<TransactionSelectInterface>) => {
       if (rs.length > 0) {
@@ -167,6 +171,16 @@ export function Relatorios() {
       setDataPoints(resultData);
       setCategoryData(resultCategory);
     });
+
+    const rsSectors = await clsCrud.pesquisar({
+      entidade: 'Sector',
+      criterio: {
+        userId: usuarioState.idUsuario
+      },
+      campoOrder: ['name'],
+    })
+
+    setSectors(rsSectors)
 
     const rsCategorys = await clsCrud.pesquisar({
       entidade: 'Category',
@@ -247,14 +261,15 @@ export function Relatorios() {
     const rows = rsPesquisa.map((t) => {
       const date = new Date(t.date).toLocaleDateString("pt-BR");
       const category = categorys.find((c) => c.id === t.category.id)?.name || "Sem categoria";
+      const sector = sectors.find((c) => c.id === t.sector.id)?.name || "Sem setor";
       const type = t.category?.type;
       const valor = formatCurrency(t.amount);
-      return [date, t.description, category, type, valor];
+      return [date, t.description, sector, category, type, valor];
     });
 
     autoTable(doc, {
       startY: 60,
-      head: [["Data", "Descrição", "Categoria", "Tipo", "Valor"]],
+      head: [["Data", "Descrição", "Setor", "Categoria", "Tipo", "Valor"]],
       body: rows,
       styles: {
         fontSize: 10,

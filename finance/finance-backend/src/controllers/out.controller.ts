@@ -25,6 +25,7 @@ export class OutController {
       return { success: false, error };
     }
   }
+
   @Post('selecaoTransacoes')
   async selecaoTransacoes(
     @Body('setor') setor?: string,
@@ -62,7 +63,9 @@ export class OutController {
         'company.name',
         'sector.id',
         'sector.name'
-      ]);
+      ])
+      .orderBy('t.date', 'ASC')
+      .addOrderBy('t.description', 'ASC');
 
     if (dtInicial && dtFinal) {
       query.andWhere('t.date BETWEEN :start AND :end', {

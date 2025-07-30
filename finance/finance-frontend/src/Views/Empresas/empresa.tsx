@@ -25,7 +25,7 @@ export const ResetCompany: CompanyInterface = {
 export function Empresas() {
 
   const [open, setOpen] = useState(false);
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [empresas, setEmpresas] = React.useState<CompanyInterface>(ResetCompany);
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<CompanyInterface>>([])
@@ -71,6 +71,8 @@ export function Empresas() {
               msg: 'Excluindo empresa ...',
             }).then((rs) => {
               if (rs.ok) {
+                setMensagemState({ ...mensagemState, exibir: false })
+
                 btPesquisar()
               }
             })

@@ -26,7 +26,7 @@ export function Setores() {
 
   const [open, setOpen] = useState(false);
 
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [setores, setSetores] = React.useState<SectorInterface>(ResetSetor);
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<SectorInterface>>([])
@@ -72,6 +72,8 @@ export function Setores() {
               msg: 'Excluindo setor ...',
             }).then((rs) => {
               if (rs.ok) {
+                setMensagemState({ ...mensagemState, exibir: false })
+
                 btPesquisar()
               }
             })

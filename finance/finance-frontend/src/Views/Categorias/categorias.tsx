@@ -28,7 +28,7 @@ export function Categorias() {
 
   const [open, setOpen] = useState(false);
 
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [categorias, setCategorias] = React.useState<CategoryInterface>(ResetCategory);
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ name: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<CategoryInterface>>([])
@@ -107,6 +107,8 @@ export function Categorias() {
               msg: 'Excluindo categoria ...',
             }).then((rs) => {
               if (rs.ok) {
+                setMensagemState({ ...mensagemState, exibir: false })
+
                 btPesquisar()
               }
             })

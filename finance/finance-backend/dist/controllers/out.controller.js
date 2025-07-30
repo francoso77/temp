@@ -107,7 +107,9 @@ var OutController = /** @class */ (function () {
                             'company.name',
                             'sector.id',
                             'sector.name'
-                        ]);
+                        ])
+                            .orderBy('t.date', 'ASC')
+                            .addOrderBy('t.description', 'ASC');
                         if (dtInicial && dtFinal) {
                             query.andWhere('t.date BETWEEN :start AND :end', {
                                 start: dtInicial,

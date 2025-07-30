@@ -43,7 +43,7 @@ export function Transacoes() {
 
   const { layoutState } = useContext(GlobalContext) as GlobalContextInterface
   const [open, setOpen] = useState(false);
-  const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
+  const { setMensagemState, mensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
   const [transacoes, setTransacoes] = React.useState<TransactionInterface>();
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ description: '' });
   const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
@@ -177,6 +177,8 @@ export function Transacoes() {
               msg: 'Excluindo transação ...',
             }).then((rs) => {
               if (rs.ok) {
+
+                setMensagemState({ ...mensagemState, exibir: false })
                 btPesquisar()
               }
             })
