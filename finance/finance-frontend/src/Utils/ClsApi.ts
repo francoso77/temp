@@ -27,6 +27,7 @@ interface PropsInterface {
   setor?: string
   tipo?: string
   empresa?: string
+  descricao?: string
   email?: string
   newPassword?: string
 }
@@ -103,6 +104,7 @@ export default class ClsApi {
     setor,
     tipo,
     empresa,
+    descricao,
     email,
     newPassword,
 
@@ -127,6 +129,7 @@ export default class ClsApi {
       setor,
       tipo,
       empresa,
+      descricao,
       email,
       newPassword
     };

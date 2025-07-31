@@ -35,16 +35,16 @@ export class OutController {
     @Body('dtFinal') dtFinal?: string,
     @Body('idUsuario') idUsuario?: string,
     @Body('tipo') tipo?: string,
-    @Body('empresa') empresa?: string
+    @Body('empresa') empresa?: string,
+    @Body('descricao') descricao?: string
   ): Promise<any[]> {
-
 
     const query = AppDataSource.getRepository(Transaction)
       .createQueryBuilder('t')
       .leftJoinAndSelect('t.account', 'account')
       .leftJoinAndSelect('t.category', 'category')
       .leftJoinAndSelect('t.company', 'company')
-      .leftJoinAndSelect('t.sector', 'sector') // novo join com a tabela setor
+      .leftJoinAndSelect('t.sector', 'sector')
       .select([
         't.id',
         't.date',
@@ -98,9 +98,14 @@ export class OutController {
       query.andWhere('t.userId = :idUsuarioParam', { idUsuarioParam: idUsuario });
     }
 
+    if (descricao) {
+      query.andWhere('LOWER(t.description) LIKE :descricaoParam', {
+        descricaoParam: `%${descricao.toLowerCase()}%`,
+      });
+    }
+
     const transacoes = await query.getMany();
 
-    // Retornar saldo inicial da conta caso não haja transações
     if (transacoes.length === 0 && conta) {
       const accountRepo = AppDataSource.getRepository('Account');
       const account = await accountRepo.findOne({

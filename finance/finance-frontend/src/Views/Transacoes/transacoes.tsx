@@ -58,9 +58,17 @@ export function Transacoes() {
       format: (data) => clsFormatacao.dataISOtoUser(data)
     },
     {
-      cabecalho: 'Descrição',
+      cabecalho: 'Descrição',
       alinhamento: 'center',
       campo: 'description',
+      render: (valor: string) => {
+        const valorLimpo = valor.trim();
+        const isSomenteNumero = /^\d+$/.test(valorLimpo);
+        if (isSomenteNumero) {
+          return new Intl.NumberFormat('pt-BR').format(Number(valorLimpo));
+        }
+        return valor;
+      },
     },
     {
       cabecalho: 'Setor',
@@ -218,33 +226,34 @@ export function Transacoes() {
 
   };
 
-  const onSearch = async (e: string) => {
+  // const onSearch = async (e: string) => {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Transaction",
-        relations: ['company', 'category', 'sector', 'account'],
-        token: usuarioState.token,
-        criterio: {
-          description: "%".concat(e).concat("%"),
-          userId: usuarioState.idUsuario
-        },
-        camposLike: ["description"],
-        select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
-        msg: 'Pesquisando transação ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
-      })
-  }
-  const btPesquisar = async () => {
+  //   clsCrud
+  //     .pesquisar({
+  //       entidade: "Transaction",
+  //       relations: ['company', 'category', 'sector', 'account'],
+  //       token: usuarioState.token,
+  //       criterio: {
+  //         description: "%".concat(e).concat("%"),
+  //         userId: usuarioState.idUsuario
+  //       },
+  //       camposLike: ["description"],
+  //       select: ["id", "description", "amount", "companyId", "categoryId", "sectorId", "date", "userId", "category.type"],
+  //       msg: 'Pesquisando transação ...',
+  //       setMensagemState: setMensagemState
+  //     })
+  //     .then((rs: Array<any>) => {
+  //       setRsPesquisa(rs)
+  //     })
+  // }
+  const btPesquisar = async (e: string | null = null) => {
     const dtInicial = layoutState.dataInicio ? clsFormatacao.dataISOtoDatetime(layoutState.dataInicio) : undefined
     const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
     const setor = layoutState.sectorId ? layoutState.sectorId : undefined
+    const descricao = e === null ? pesquisa.description : e
 
     await clsApi.execute<Array<TransactionInterface>>({
       url: 'selecaoTransacoes',
@@ -256,6 +265,7 @@ export function Transacoes() {
       categoria,
       tipo,
       setor,
+      descricao,
       idUsuario: usuarioState.idUsuario
     }).then((rs: Array<TransactionInterface>) => {
       setRsPesquisa(rs)
@@ -303,9 +313,9 @@ export function Transacoes() {
 
   useEffect(() => {
     if (debouncedValue) {
-      onSearch(debouncedValue);
+      btPesquisar(debouncedValue);
     }
-  }, [debouncedValue, onSearch]);
+  }, [debouncedValue, btPesquisar]);
 
   return (
     <>

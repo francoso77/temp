@@ -72,7 +72,7 @@ export default function Registrar() {
 
 
   const fotoUrl =
-    isFile(usuario.profilePicture)
+    isFile(usuario.profilePicture) && localState.action === actionTypes.incluindo
       ? URL.createObjectURL(usuario.profilePicture)
       : usuario.profilePicture
         ? `${URL_BACKEND}/uploads/users/${usuario.profilePicture}`
@@ -93,12 +93,13 @@ export default function Registrar() {
 
   const irPara = useNavigate()
   const btFechar = async () => {
-    irPara('/')
-    // if (!usuarioState.logado) {
-    // } else {
-    //   irPara('/dashboard')
-    //   setLayoutState({ ...layoutState, titulo: 'Dashboard', pathTitulo: '/dashboard' })
-    // }
+    if (!usuarioState.logado) {
+      irPara('/login')
+      setLayoutState({ ...layoutState, titulo: 'Login', pathTitulo: '/login' })
+    } else {
+      irPara('/dashboard')
+      setLayoutState({ ...layoutState, titulo: 'Dashboard', pathTitulo: '/dashboard' })
+    }
   }
 
   const btCancelar = () => {
@@ -278,12 +279,6 @@ export default function Registrar() {
       pesquisarID(usuarioState.idUsuario).then((rs) => {
         setLocalState({ action: actionTypes.editando })
         setUsuario(rs)
-        setUsuario({
-          ...rs,
-          confirmePassword: '',
-          password: '',
-          //profilePicture: rs.profilePicture,
-        });
       })
     }
   }, [usuarioState])
@@ -386,65 +381,67 @@ export default function Registrar() {
                     />
                   </Box>
                 </Grid>
-                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-                    <Text
-                      field="password"
-                      label="Senha"
-                      dados={usuario}
-                      type='password'
-                      setState={setUsuario}
-                      tipo='pass'
-                      erros={erros}
-                      onKeyDown={(event: any) => btPulaCampo(event, 5)}
-                      corFonte='#fff'
-                      autocomplete='password'
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                  <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-                    <Text
-                      field="confirmePassword"
-                      label="Confirme a Senha"
-                      dados={usuario}
-                      type='password'
-                      setState={setUsuario}
-                      tipo='pass'
-                      erros={erros}
-                      onKeyDown={(event: any) => btPulaCampo(event, 1)}
-                      corFonte='#fff'
-                      autocomplete='confirmePassword'
-                    />
-                  </Box>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  sx={{
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start', // mantém os itens colados à esquerda
-                    gap: 1, // adiciona espaço entre InputText e o Modal
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <InputText
-                      label="Aceito"
-                      tipo="checkbox"
-                      dados={usuario}
-                      field="termsAccepted"
-                      setState={setUsuario}
-                      onKeyDown={(event: any) => btPulaCampo(event, 1)}
-                      erros={erros}
-                    />
-                    <TermoDeUsoModal />
-                  </Box>
-                </Grid>
+                <Condicional condicao={localState.action !== 'editando'}>
+                  <Grid item xs={12} md={12} sx={{ mt: 0 }}>
+                    <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                      <Text
+                        field="password"
+                        label="Senha"
+                        dados={usuario}
+                        type='password'
+                        setState={setUsuario}
+                        tipo='pass'
+                        erros={erros}
+                        onKeyDown={(event: any) => btPulaCampo(event, 5)}
+                        corFonte='#fff'
+                        autocomplete='password'
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={12} sx={{ mt: 0 }}>
+                    <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                      <Text
+                        field="confirmePassword"
+                        label="Confirme a Senha"
+                        dados={usuario}
+                        type='password'
+                        setState={setUsuario}
+                        tipo='pass'
+                        erros={erros}
+                        onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                        corFonte='#fff'
+                        autocomplete='confirmePassword'
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    sx={{
+                      color: '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start', // mantém os itens colados à esquerda
+                      gap: 1, // adiciona espaço entre InputText e o Modal
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <InputText
+                        label="Aceito"
+                        tipo="checkbox"
+                        dados={usuario}
+                        field="termsAccepted"
+                        setState={setUsuario}
+                        onKeyDown={(event: any) => btPulaCampo(event, 1)}
+                        erros={erros}
+                      />
+                      <TermoDeUsoModal />
+                    </Box>
+                  </Grid>
+                </Condicional>
 
                 <Grid item xs={12} sx={{ mt: 1, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>

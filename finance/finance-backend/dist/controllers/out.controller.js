@@ -77,7 +77,7 @@ var OutController = /** @class */ (function () {
             });
         });
     };
-    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario, tipo, empresa) {
+    OutController.prototype.selecaoTransacoes = function (setor, categoria, conta, dtInicial, dtFinal, idUsuario, tipo, empresa, descricao) {
         return __awaiter(this, void 0, void 0, function () {
             var query, transacoes, accountRepo, account;
             return __generator(this, function (_a) {
@@ -88,7 +88,7 @@ var OutController = /** @class */ (function () {
                             .leftJoinAndSelect('t.account', 'account')
                             .leftJoinAndSelect('t.category', 'category')
                             .leftJoinAndSelect('t.company', 'company')
-                            .leftJoinAndSelect('t.sector', 'sector') // novo join com a tabela setor
+                            .leftJoinAndSelect('t.sector', 'sector')
                             .select([
                             't.id',
                             't.date',
@@ -133,6 +133,11 @@ var OutController = /** @class */ (function () {
                         }
                         if (idUsuario) {
                             query.andWhere('t.userId = :idUsuarioParam', { idUsuarioParam: idUsuario });
+                        }
+                        if (descricao) {
+                            query.andWhere('LOWER(t.description) LIKE :descricaoParam', {
+                                descricaoParam: "%".concat(descricao.toLowerCase(), "%"),
+                            });
                         }
                         return [4 /*yield*/, query.getMany()];
                     case 1:
@@ -183,8 +188,9 @@ var OutController = /** @class */ (function () {
         __param(5, (0, common_1.Body)('idUsuario')),
         __param(6, (0, common_1.Body)('tipo')),
         __param(7, (0, common_1.Body)('empresa')),
+        __param(8, (0, common_1.Body)('descricao')),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String, String, String, String, String, String, String, String]),
+        __metadata("design:paramtypes", [String, String, String, String, String, String, String, String, String]),
         __metadata("design:returntype", Promise)
     ], OutController.prototype, "selecaoTransacoes", null);
     OutController = __decorate([

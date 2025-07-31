@@ -18,7 +18,7 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
-  parse
+  parse,
 } from 'date-fns';
 import CustomButton from '../Button';
 
@@ -29,7 +29,8 @@ interface DateRangeSelectorModalProps {
 }
 
 const formatInputDate = (date: Date): string =>
-  date.toISOString().split('T')[0]; // yyyy-MM-dd para input type="date"
+  //date.toISOString().split('T')[0];
+  format(date, 'yyyy-MM-dd');
 
 const formatOutputDate = (date: Date): string =>
   format(date, 'dd/MM/yyyy');
@@ -38,10 +39,21 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
   const [startDate, setStartDate] = useState<string>(formatInputDate(new Date()));
   const [endDate, setEndDate] = useState<string>(formatInputDate(new Date()));
   const [selectedOption, setSelectedOption] = useState<string>('hoje');
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
   useEffect(() => {
-    handleOptionChange('hoje'); // padrão
+    handleOptionChange('hoje');
   }, []);
+
+  useEffect(() => {
+    if (selectedOption === 'mesAno') {
+      const start = startOfMonth(new Date(selectedYear, selectedMonth));
+      const end = endOfMonth(new Date(selectedYear, selectedMonth));
+      setStartDate(formatInputDate(start));
+      setEndDate(formatInputDate(end));
+    }
+  }, [selectedMonth, selectedYear, selectedOption]);
 
   const handleOptionChange = (option: string) => {
     setSelectedOption(option);
@@ -73,8 +85,10 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
         start = startOfYear(today);
         end = endOfYear(today);
         break;
+      case 'mesAno':
+        return; // lida no useEffect
       case 'personalizado':
-        return; // mantém o que já está
+        return;
       default:
         start = end = today;
     }
@@ -84,8 +98,8 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
   };
 
   const handleConfirm = () => {
-    const dataInicio = parse(startDate, 'yyyy-MM-dd', new Date()); // new Date(startDate);
-    const dataFim = parse(endDate, 'yyyy-MM-dd', new Date()); // new Date(endDate);
+    const dataInicio = parse(startDate, 'yyyy-MM-dd', new Date());
+    const dataFim = parse(endDate, 'yyyy-MM-dd', new Date());
     onConfirm(formatOutputDate(dataInicio), formatOutputDate(dataFim));
     onClose();
   };
@@ -93,10 +107,29 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
   const handleClear = () => {
     onConfirm('', '');
     onClose();
-  }
+  };
+
+  const selectStyle = {
+    mb: 2,
+    '& .MuiSelect-icon': { color: '#fff' },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#3a3a3a',
+      borderWidth: '2px',
+      borderRadius: '4px',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#3a3a3a',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#3a3a3a',
+    },
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ bgcolor: '#010108', color: '#fff', textAlign: 'center', border: '1px solid #3a3a3a' }}>Selecionar Intervalo de Datas</DialogTitle>
+      <DialogTitle sx={{ bgcolor: '#010108', color: '#fff', textAlign: 'center', border: '1px solid #3a3a3a' }}>
+        Selecionar Intervalo de Datas
+      </DialogTitle>
       <DialogContent sx={{ bgcolor: '#010108', color: '#fff', textAlign: 'center', borderRight: '1px solid #3a3a3a', borderLeft: '1px solid #3a3a3a' }}>
         <Grid container spacing={2} mt={1}>
           <Grid item xs={12}>
@@ -106,43 +139,25 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
                 value={selectedOption}
                 onChange={(e) => handleOptionChange(e.target.value)}
                 label="Intervalo Rápido"
-                sx={{
-                  mb: 2,
-                  '& .MuiSelect-icon': {
-                    color: '#fff', // cor personalizada
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3a3a3a',
-                    borderWidth: '2px',
-                    borderRadius: '4px',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3a3a3a',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3a3a3a',
-                  },
-                }}
+                sx={selectStyle}
                 MenuProps={{
                   PaperProps: {
                     sx: {
-                      backgroundColor: '#010108', // fundo da lista suspensa
+                      backgroundColor: '#010108',
                       borderRadius: '4px',
                       border: '1px solid #3a3a3a',
+                      mt: 1,
                       '& .MuiMenuItem-root': {
-                        color: '#fff', // cor dos itens da lista suspensa
-                        '&:hover': {
-                          backgroundColor: '#bbdefb', // hover no item
-                        },
+                        color: '#fff',
+                        '&:hover': { backgroundColor: '#bbdefb' },
                         '&.Mui-selected': {
-                          backgroundColor: '#90caf9', // item selecionado
+                          backgroundColor: '#90caf9',
                           color: '#0d47a1',
                         },
                         '&.Mui-selected:hover': {
                           backgroundColor: '#64b5f6',
                         },
                       },
-                      mt: 1,
                     },
                   },
                 }}
@@ -153,14 +168,51 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
                 <MenuItem value="ultimos15">Últimos 15 dias</MenuItem>
                 <MenuItem value="mesAtual">Mês atual</MenuItem>
                 <MenuItem value="anoAtual">Ano atual</MenuItem>
+                <MenuItem value="mesAno">Selecionar Mês e Ano</MenuItem>
                 <MenuItem value="personalizado">Personalizado</MenuItem>
               </Select>
             </FormControl>
           </Grid>
 
+          {selectedOption === 'mesAno' && (
+            <>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: '#fff' }}>Mês</InputLabel>
+                  <Select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                    sx={selectStyle}
+                  >
+                    {[
+                      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                    ].map((month, index) => (
+                      <MenuItem key={index} value={index}>{month}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: '#fff' }}>Ano</InputLabel>
+                  <Select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(Number(e.target.value))}
+                    sx={selectStyle}
+                  >
+                    {Array.from({ length: 10 }, (_, i) => {
+                      const year = new Date().getFullYear() - i;
+                      return <MenuItem key={year} value={year}>{year}</MenuItem>;
+                    })}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </>
+          )}
+
           <Grid item xs={6}>
             <InputLabel sx={{ color: '#fff' }}>Data Inicial</InputLabel>
-
             <TextField
               type="date"
               value={startDate}
@@ -173,29 +225,15 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
               sx={{
                 mb: 2,
                 '& input::-webkit-calendar-picker-indicator': {
-                  filter: 'brightness(0) invert(1)', // deixa branco
+                  filter: 'brightness(0) invert(1)',
                 },
-                '& label': {
-                  color: '#fff',
-                },
-                '& label.Mui-focused': {
-                  color: '#fff',
-                },
+                '& label': { color: '#fff' },
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: '#3a3a3a',
-                    borderRadius: '4px',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#3a3a3a',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#3a3a3a',
-                  },
+                  '& fieldset': { borderColor: '#3a3a3a', borderRadius: '4px' },
+                  '&:hover fieldset': { borderColor: '#3a3a3a' },
+                  '&.Mui-focused fieldset': { borderColor: '#3a3a3a' },
                 },
-                input: {
-                  color: '#fff',
-                },
+                input: { color: '#fff' },
               }}
             />
           </Grid>
@@ -203,7 +241,6 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
           <Grid item xs={6}>
             <InputLabel sx={{ color: '#fff' }}>Data Final</InputLabel>
             <TextField
-
               type="date"
               value={endDate}
               onChange={(e) => {
@@ -215,29 +252,15 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
               sx={{
                 mb: 2,
                 '& input::-webkit-calendar-picker-indicator': {
-                  filter: 'brightness(0) invert(1)', // deixa branco
+                  filter: 'brightness(0) invert(1)',
                 },
-                '& label': {
-                  color: '#fff',
-                },
-                '& label.Mui-focused': {
-                  color: '#fff',
-                },
+                '& label': { color: '#fff' },
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: '#3a3a3a',
-                    borderRadius: '4px',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#3a3a3a',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#3a3a3a',
-                  },
+                  '& fieldset': { borderColor: '#3a3a3a', borderRadius: '4px' },
+                  '&:hover fieldset': { borderColor: '#3a3a3a' },
+                  '&.Mui-focused fieldset': { borderColor: '#3a3a3a' },
                 },
-                input: {
-                  color: '#fff',
-                },
+                input: { color: '#fff' },
               }}
             />
           </Grid>
@@ -245,28 +268,13 @@ const DateRangeSelectorModal: React.FC<DateRangeSelectorModalProps> = ({ open, o
       </DialogContent>
 
       <DialogActions sx={{ bgcolor: '#010108', color: '#fff', textAlign: 'center', border: '1px solid #3a3a3a' }}>
-        <CustomButton
-          onClick={onClose}
-          bgColor='#0c3055'
-          textColor='black'
-          sx={{ mr: '10px' }}
-        >
+        <CustomButton onClick={onClose} bgColor='#0c3055' textColor='black' sx={{ mr: '10px' }}>
           Cancelar
         </CustomButton>
-        <CustomButton
-          onClick={handleConfirm}
-          bgColor='#1976d2'
-          textColor='black'
-          sx={{ mr: '10px' }}
-        >
+        <CustomButton onClick={handleConfirm} bgColor='#1976d2' textColor='black' sx={{ mr: '10px' }}>
           Aplicar
         </CustomButton>
-        <CustomButton
-          onClick={handleClear}
-          bgColor='#1976d2'
-          textColor='black'
-          sx={{ mr: '10px' }}
-        >
+        <CustomButton onClick={handleClear} bgColor='#1976d2' textColor='black' sx={{ mr: '10px' }}>
           Limpar
         </CustomButton>
       </DialogActions>

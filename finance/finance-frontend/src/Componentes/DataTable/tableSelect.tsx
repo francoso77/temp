@@ -7,7 +7,7 @@ import { alpha } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import { DataTableInterface, getComparator, Order, stableSort } from '.';
+import { DataTableInterface, Order, stableSort } from '.';
 import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { THEME } from '../../app/Layout/Theme';
@@ -204,6 +204,23 @@ export default function TableSelect<T>({
     interface EnhancedTableToolbarProps {
         numSelected: number;
     }
+
+    // Funções auxiliares de ordenação
+    function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+        if (b[orderBy] < a[orderBy]) return -1;
+        if (b[orderBy] > a[orderBy]) return 1;
+        return 0;
+    }
+
+    function getComparator<Key extends keyof any>(
+        order: 'asc' | 'desc',
+        orderBy: Key
+    ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
+        return order === 'desc'
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
 
     function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         const { numSelected } = props;

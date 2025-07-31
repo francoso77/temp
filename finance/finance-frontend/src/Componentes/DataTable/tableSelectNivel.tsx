@@ -8,7 +8,7 @@ import Switch from '@mui/material/Switch';
 import Condicional from '../Condicional/Condicional'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import { DataTableInterface, getComparator, Order, stableSort, sumColumns } from '.';
+import { DataTableInterface, Order, stableSort, sumColumns } from '.';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
 import { StyledTableCell, StyledTableRow } from './tableSelect';
 
@@ -83,6 +83,22 @@ export default function DataTableSelect<T>({
     }
 
     const totalColunas = sumColumns(dados, colunaSoma)
+
+    // Funções auxiliares de ordenação
+    function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+        if (b[orderBy] < a[orderBy]) return -1;
+        if (b[orderBy] > a[orderBy]) return 1;
+        return 0;
+    }
+
+    function getComparator<Key extends keyof any>(
+        order: 'asc' | 'desc',
+        orderBy: Key
+    ): (a: { [key in Key]: any }, b: { [key in Key]: any }) => number {
+        return order === 'desc'
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
 
 
     function EnhancedTableHead(props: EnhancedTableProps) {
