@@ -39,6 +39,7 @@ export function ResetPassword() {
     }
 
     const handleSubmit = async () => {
+
         setMensagemState({
             titulo: 'Redefinindo senha...',
             exibir: true,
@@ -58,8 +59,8 @@ export function ResetPassword() {
         });
         if (rsForgotPassword.ok) {
 
-            setMensagemState({ ...mensagemState, exibir: false })
-            console.log(rsForgotPassword.mensagem)
+            //setMensagemState({ ...mensagemState, exibir: false })
+            //console.log(rsForgotPassword.mensagem)
 
             setMensagemState({
                 titulo: 'Redefinição de senha',
