@@ -18,34 +18,29 @@ import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import { deepPurple } from '@mui/material/colors';
 import { URL_BACKEND } from '../../Utils/Servidor';
 
-export default function Registrar() {
+export default function Perfil() {
 
-
-  interface PropsInterface extends UserInterface {
-    confirmePassword: string
+  interface PropsInterface {
+    id: string,
+    name: string,
+    email: string,
+    whatsapp: string,
+    profilePicture: string
   }
 
   const ResetDados: PropsInterface = {
+    id: '',
     name: '',
     email: '',
-    password: '',
     whatsapp: '',
-    confirmePassword: '',
-    isActive: true,
-    tentativasLogin: 0,
-    resetToken: '',
-    resetTokenExpires: new Date(),
-    termsAccepted: false,
-    termsAcceptedAt: new Date(),
     profilePicture: ''
   }
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud: ClsCrud = new ClsCrud()
 
   const { mensagemState, setMensagemState, setUsuarioState, usuarioState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
-  const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
-  const [usuario, setUsuario] = useState<PropsInterface>(ResetDados)
+  const [perfil, setPerfil] = useState<PropsInterface>(ResetDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -56,7 +51,7 @@ export default function Registrar() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setUsuario((prev: any) => ({
+      setPerfil((prev: any) => ({
         ...prev,
         profilePicture: file,
       }))
@@ -72,35 +67,41 @@ export default function Registrar() {
 
 
   const fotoUrl =
-    isFile(usuario.profilePicture) && localState.action === actionTypes.incluindo
-      ? URL.createObjectURL(usuario.profilePicture)
-      : usuario.profilePicture
-        ? `${URL_BACKEND}/uploads/users/${usuario.profilePicture}`
+    isFile(perfil.profilePicture)
+      ? URL.createObjectURL(perfil.profilePicture)
+      : perfil.profilePicture
+        ? `${URL_BACKEND}/uploads/users/${perfil.profilePicture}`
         : null;
 
+
+  const pesquisarID = async (id: string | number): Promise<PropsInterface> => {
+
+    const rs = await clsCrud
+      .pesquisar({
+        entidade: "User",
+        criterio: {
+          id: id,
+        },
+      });
+    return rs[0];
+  }
 
   const irPara = useNavigate()
   const btFechar = async () => {
     setErros({})
-    setUsuario(ResetDados)
-    irPara('/welcome')
+    setPerfil(ResetDados)
+    irPara('/dashboard')
+    setLayoutState({ ...layoutState, titulo: 'Dashboard', pathTitulo: '/dashboard' })
   }
 
   const validarDados = (): boolean => {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
 
-    retorno = validaCampo.naoVazio('name', usuario, erros, retorno, 'Digite um nome para o usuário')
-    retorno = validaCampo.naoVazio('password', usuario, erros, retorno, 'A senha não pode ser vázio')
-    retorno = validaCampo.eEmail('email', usuario, erros, retorno, false)
-    retorno = validaCampo.eTelefone('whatsapp', usuario, erros, retorno, false)
-    retorno = validaCampo.eTrue('termsAccepted', usuario, erros, retorno, true)
-    retorno = validaCampo.naoVazio('confirmePassword', usuario, erros, retorno, 'Confirme a senha')
+    retorno = validaCampo.naoVazio('name', perfil, erros, retorno, 'Digite um nome para o usuário')
+    retorno = validaCampo.eEmail('email', perfil, erros, retorno, false)
+    retorno = validaCampo.eTelefone('whatsapp', perfil, erros, retorno, false)
 
-    if (usuario.password !== usuario.confirmePassword) {
-      erros['confirmePassword'] = 'As senhas devem ser iguais'
-      retorno = false
-    }
 
     setErros(erros)
     return retorno
@@ -111,7 +112,7 @@ export default function Registrar() {
     try {
       const rs = await clsCrud.pesquisar({
         entidade: "User",
-        criterio: { email: usuario.email },
+        criterio: { email: perfil.email },
         camposLike: ["email"],
       });
 
@@ -167,40 +168,41 @@ export default function Registrar() {
 
     try {
       const formData = new FormData();
-      formData.append("name", usuario.name);
-      formData.append("email", usuario.email);
-      formData.append("password", usuario.password);
-      formData.append("whatsapp", usuario.whatsapp);
-      formData.append("termsAccepted", usuario.termsAccepted.toString());
+      formData.append("name", perfil.name);
+      formData.append("email", perfil.email);
+      formData.append("whatsapp", perfil.whatsapp);
 
       if (
-        usuario.profilePicture &&
-        typeof usuario.profilePicture === "object" &&
-        "name" in usuario.profilePicture &&
-        "type" in usuario.profilePicture
+        perfil.profilePicture &&
+        typeof perfil.profilePicture === "object" &&
+        "name" in perfil.profilePicture &&
+        "type" in perfil.profilePicture
       ) {
         // É um File (ou parecido com File)
-        formData.append("file", usuario.profilePicture as File);
-      } else if (typeof usuario.profilePicture === "string") {
+        formData.append("file", perfil.profilePicture as File);
+      } else if (typeof perfil.profilePicture === "string") {
         // É um nome de arquivo (string)
-        formData.append("profilePicture", usuario.profilePicture);
+        formData.append("profilePicture", perfil.profilePicture);
       }
 
 
-      const endpoint = `${URL_BACKEND}/auth/upload-profile`
-      const method = "POST"
+      const endpoint = `${URL_BACKEND}/auth/${perfil.id}`;
+      const method = "PATCH";
+
       const response = await fetch(endpoint, {
         method,
         body: formData,
       });
 
       const rs = await response.json();
+      console.log('rs', rs);
 
       if (rs.ok || response.ok) {
         setMensagemState({
           ...mensagemState,
-          exibir: true,
+          exibir: false,
         })
+
         btFechar();
       }
 
@@ -212,6 +214,7 @@ export default function Registrar() {
   const btConfirmar = async () => {
     if (!validarDados() && (await TemEmail())) return;
     await executarAcao();
+    irPara('/dashboard')
   }
 
   const btPulaCampo = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -226,6 +229,23 @@ export default function Registrar() {
     }
   }
 
+  useEffect(() => {
+
+    pesquisarID(usuarioState.idUsuario).then((rs) => {
+      if (rs) {
+        setPerfil((prev: any) => ({
+          ...prev,
+          id: rs.id,
+          name: rs.name,
+          email: rs.email,
+          whatsapp: rs.whatsapp,
+          profilePicture: rs.profilePicture
+        }))
+      }
+
+    })
+  }, [usuarioState])
+
   return (
     <>
       <Form method='post' action='/User' >
@@ -237,7 +257,7 @@ export default function Registrar() {
 
               <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <TitleBar
-                  title="Cadastro de Usuário"
+                  title="Perfil de Usuário"
                   onClose={() => btFechar()}
                   textColor='#fff'
                   backgroundColor='#050516'
@@ -283,8 +303,8 @@ export default function Registrar() {
                 <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                   <InputText
                     label="Nome"
-                    setState={setUsuario}
-                    dados={usuario}
+                    setState={setPerfil}
+                    dados={perfil}
                     field="name"
                     erros={erros}
                     type="text"
@@ -297,8 +317,8 @@ export default function Registrar() {
                 <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
                   <InputText
                     label="E-mail"
-                    setState={setUsuario}
-                    dados={usuario}
+                    setState={setPerfil}
+                    dados={perfil}
                     field="email"
                     erros={erros}
                     type="email"
@@ -312,8 +332,8 @@ export default function Registrar() {
                 <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                   <InputText
                     label="Whatsapp"
-                    setState={setUsuario}
-                    dados={usuario}
+                    setState={setPerfil}
+                    dados={perfil}
                     field="whatsapp"
                     erros={erros}
                     type="tel"
@@ -321,65 +341,6 @@ export default function Registrar() {
                     onKeyDown={(event: any) => btPulaCampo(event, 4)}
                     corFonte='#fff'
                   />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-                  <Text
-                    field="password"
-                    label="Senha"
-                    dados={usuario}
-                    type='password'
-                    setState={setUsuario}
-                    tipo='pass'
-                    erros={erros}
-                    onKeyDown={(event: any) => btPulaCampo(event, 5)}
-                    corFonte='#fff'
-                    autocomplete='password'
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={12} sx={{ mt: 0 }}>
-                <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-                  <Text
-                    field="confirmePassword"
-                    label="Confirme a Senha"
-                    dados={usuario}
-                    type='password'
-                    setState={setUsuario}
-                    tipo='pass'
-                    erros={erros}
-                    onKeyDown={(event: any) => btPulaCampo(event, 1)}
-                    corFonte='#fff'
-                    autocomplete='confirmePassword'
-                  />
-                </Box>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                sx={{
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start', // mantém os itens colados à esquerda
-                  gap: 1, // adiciona espaço entre InputText e o Modal
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <InputText
-                    label="Aceito"
-                    tipo="checkbox"
-                    dados={usuario}
-                    field="termsAccepted"
-                    setState={setUsuario}
-                    onKeyDown={(event: any) => btPulaCampo(event, 1)}
-                    erros={erros}
-                  />
-                  <TermoDeUsoModal />
                 </Box>
               </Grid>
               <Grid item xs={12} sx={{ mt: 1, textAlign: 'right' }}>
@@ -392,7 +353,7 @@ export default function Registrar() {
                     <CancelRoundedIcon sx={{ fontSize: 50 }} />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={'Confirmar'}>
+                <Tooltip title={'Alterar'}>
                   <IconButton
                     color="secondary"
                     sx={{ mt: 1, ml: 2 }}

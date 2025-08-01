@@ -83,6 +83,26 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
+  // async updateUser(id: string, data: Partial<User>): Promise<User> {
+  //   const user = await this.userRepository.findOne({ where: { id } });
+
+  //   if (!user) {
+  //     throw new NotFoundException('Usuário não encontrado');
+  //   }
+
+  //   // Separa o campo password dos demais
+  //   const { password, ...rest } = data;
+
+  //   // Atribui os demais campos normalmente
+  //   Object.assign(user, rest);
+
+  //   // Se a senha foi enviada, atualiza e deixa o hook cuidar do hash
+  //   if (password) {
+  //     user.password = password;
+  //   }
+
+  //   return this.userRepository.save(user);
+  // }
   async updateUser(id: string, data: Partial<User>): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
 
@@ -90,15 +110,17 @@ export class UserService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    // Separa o campo password dos demais
-    const { password, ...rest } = data;
+    // Atualiza apenas os campos permitidos
+    if (data.name !== undefined) {
+      user.name = data.name;
+    }
 
-    // Atribui os demais campos normalmente
-    Object.assign(user, rest);
+    if (data.email !== undefined) {
+      user.email = data.email;
+    }
 
-    // Se a senha foi enviada, atualiza e deixa o hook cuidar do hash
-    if (password) {
-      user.password = password;
+    if (data.whatsapp !== undefined) {
+      user.whatsapp = data.whatsapp;
     }
 
     return this.userRepository.save(user);

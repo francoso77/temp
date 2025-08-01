@@ -14,6 +14,7 @@ import { ResetPassword } from '../app/Registrar/ResetPassword';
 import { Relatorios } from '../Views/Relatorios/relatorios';
 import { Setores } from '../Views/Setores/setores';
 import Registrar from '../app/Registrar/Registrar';
+import Perfil from '../app/Registrar/Perfil';
 
 export const router = createBrowserRouter([
   {
@@ -73,11 +74,11 @@ export const router = createBrowserRouter([
       {
         path: "/setores",
         element: <Setores />,
-      }
-      // {
-      //   path: "/Testes",
-      //   element: <Home />,
-      // },
+      },
+      {
+        path: "/perfil",
+        element: <Perfil />,
+      },
     ]
   },
 ]);

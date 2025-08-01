@@ -14,7 +14,7 @@ import { Form, useNavigate, useSearchParams } from 'react-router-dom';
 export function ResetPassword() {
     const [dados, setDados] = useState({ newPassword: '', confirmPassword: '' });
     const clsApi: ClsApi = new ClsApi();
-    const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface;
+    const { setMensagemState, mensagemState } = useContext(GlobalContext) as GlobalContextInterface;
     const [erros, setErros] = useState({});
     const validaCampo: ClsValidacao = new ClsValidacao();
     const irPara = useNavigate();
@@ -39,6 +39,14 @@ export function ResetPassword() {
     }
 
     const handleSubmit = async () => {
+        setMensagemState({
+            titulo: 'Redefinindo senha...',
+            exibir: true,
+            mensagem: '',
+            tipo: MensagemTipo.Loading,
+            exibirBotao: false,
+            cb: null,
+        });
 
         if (!validarDados()) return
 
@@ -50,6 +58,7 @@ export function ResetPassword() {
         });
         if (rsForgotPassword.ok) {
 
+            setMensagemState({ ...mensagemState, exibir: false })
             console.log(rsForgotPassword.mensagem)
 
             setMensagemState({

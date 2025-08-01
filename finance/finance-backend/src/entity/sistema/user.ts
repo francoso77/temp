@@ -51,10 +51,14 @@ export class User implements UserInterface {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.password) {
-      const salt = await bcrypt.genSalt();
-      this.password = await bcrypt.hash(this.password, salt);
-    }
+    if (!this.password) return;
+
+    // Evita re-hash se a senha já está com hash (bcrypt sempre começa com $2)
+    if (this.password.startsWith('$2')) return;
+
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
   }
+
 
 }

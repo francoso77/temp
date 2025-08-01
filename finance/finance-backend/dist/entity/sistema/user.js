@@ -58,7 +58,11 @@ var User = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        if (!this.password) return [3 /*break*/, 3];
+                        if (!this.password)
+                            return [2 /*return*/];
+                        // Evita re-hash se a senha já está com hash (bcrypt sempre começa com $2)
+                        if (this.password.startsWith('$2'))
+                            return [2 /*return*/];
                         return [4 /*yield*/, bcrypt.genSalt()];
                     case 1:
                         salt = _b.sent();
@@ -66,8 +70,7 @@ var User = /** @class */ (function () {
                         return [4 /*yield*/, bcrypt.hash(this.password, salt)];
                     case 2:
                         _a.password = _b.sent();
-                        _b.label = 3;
-                    case 3: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });

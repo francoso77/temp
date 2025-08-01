@@ -159,11 +159,11 @@ class ClsRelatorioProgramacao {
       this.tecidos = tecidos;
       this.etiquetas = etiquetas;
 
-      console.log('tecidos', this.tecidos);
-      console.log('pedidos', this.pedidos);
-      console.log('forros', this.forros);
-      console.log('espumas', this.espumas);
-      console.log('etiquetas', this.etiquetas);
+      // console.log('tecidos', this.tecidos);
+      // console.log('pedidos', this.pedidos);
+      // console.log('forros', this.forros);
+      // console.log('espumas', this.espumas);
+      // console.log('etiquetas', this.etiquetas);
 
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
@@ -258,7 +258,15 @@ class ClsRelatorioProgramacao {
 
     });
 
-    doc.save('programacao_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    //doc.save('programacao_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    const blob = doc.output("blob");
+    const blobUrl = URL.createObjectURL(blob);
+
+    window.open(blobUrl, "_blank");
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 10000);
   };
 
   private gerarFicha = () => {
@@ -346,7 +354,15 @@ class ClsRelatorioProgramacao {
       });
     })
 
-    doc.save('ficha_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    //doc.save('ficha_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    const blob = doc.output("blob");
+    const blobUrl = URL.createObjectURL(blob);
+
+    window.open(blobUrl, "_blank");
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 10000);
 
   }
 
@@ -373,13 +389,21 @@ class ClsRelatorioProgramacao {
       doc.text(this.clsFormatacao.dataISOtoUser(item.dataProducao), startX + 30, startY + lineHeight * 2);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(55);
-      doc.text(item.metros.toString(), startX + 70, 40);
+      doc.text(item.metros.toString(), startX + 60, 40);
       if (i < this.etiquetas.length - 1) {
         doc.addPage();
       }
     })
 
-    doc.save('Etiqueta_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    //doc.save('Etiqueta_dublagem - ' + this.clsFormatacao.dataISOtoUser(new Date().toISOString()) + '.pdf');
+    const blob = doc.output("blob");
+    const blobUrl = URL.createObjectURL(blob);
+
+    window.open(blobUrl, "_blank");
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 10000);
 
   }
 
@@ -553,7 +577,15 @@ class ClsRelatorioProgramacao {
       });
 
       // Salva PDF individual por romaneio
-      doc.save(`Romaneio_Malharia-Romaneio-${item.romaneio}.pdf`);
+      //doc.save(`Romaneio_Malharia-Romaneio-${item.romaneio}.pdf`);
+      const blob = doc.output("blob");
+      const blobUrl = URL.createObjectURL(blob);
+
+      window.open(blobUrl, "_blank");
+
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 10000);
     });
   };
 
@@ -744,12 +776,28 @@ class ClsRelatorioProgramacao {
 
       if (this.tinturaria.length - 1 === 0) {
 
-        doc.save('Romaneio_Malharia-Romaneio-' + item.romaneio + '.pdf');
+        //doc.save('Romaneio_Malharia-Romaneio-' + item.romaneio + '.pdf');
+        const blob = doc.output("blob");
+        const blobUrl = URL.createObjectURL(blob);
+
+        window.open(blobUrl, "_blank");
+
+        setTimeout(() => {
+          URL.revokeObjectURL(blobUrl);
+        }, 10000);
 
       } else {
         addNewPage();
         if (this.tinturaria.length - 1 === i) {
-          doc.save('Romaneio_Malharia-Geral.pdf');
+          const blob = doc.output("blob");
+          const blobUrl = URL.createObjectURL(blob);
+
+          window.open(blobUrl, "_blank");
+
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+          }, 10000);
+          //doc.save('Romaneio_Malharia-Geral.pdf');
 
         }
       }

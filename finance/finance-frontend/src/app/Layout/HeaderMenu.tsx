@@ -99,8 +99,8 @@ export default function HeaderMenu() {
   }
 
   const handleUser = () => {
-    navegar('/registrar')
-    setLayoutState({ ...layoutState, titulo: 'Perfil', pathTitulo: '/registrar' })
+    navegar('/perfil')
+    setLayoutState({ ...layoutState, titulo: 'Perfil', pathTitulo: '/perfil' })
   }
 
 
