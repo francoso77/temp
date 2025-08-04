@@ -34,8 +34,8 @@ var AppModule = /** @class */ (function () {
         (0, common_1.Module)({
             imports: [
                 serve_static_1.ServeStaticModule.forRoot({
-                    rootPath: (0, path_1.join)(__dirname, '..', 'uploads'), // Caminho absoluto para a pasta 'uploads'
-                    serveRoot: '/uploads', // Caminho da URL pública
+                    rootPath: (0, path_1.join)(__dirname, '..', 'uploads'),
+                    serveRoot: '/uploads', // Isso serve a URL /uploads/*
                 }),
                 config_1.ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
                 global_module_1.GlobalModule,

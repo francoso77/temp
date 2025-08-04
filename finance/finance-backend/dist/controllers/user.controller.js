@@ -66,6 +66,7 @@ var user_service_1 = require("../auth/services/user.service");
 var platform_express_1 = require("@nestjs/platform-express");
 var multer_1 = require("multer");
 var path_1 = require("path");
+var path_2 = require("path");
 var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
@@ -182,7 +183,8 @@ var UserController = /** @class */ (function () {
         (0, common_1.Post)('upload-profile'),
         (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
             storage: (0, multer_1.diskStorage)({
-                destination: './uploads/users',
+                // Caminho de destino corrigido:
+                destination: (0, path_2.join)(__dirname, '..', '..', 'uploads', 'users'),
                 filename: function (req, file, cb) {
                     var uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     cb(null, "".concat(uniqueSuffix).concat((0, path_1.extname)(file.originalname)));
@@ -199,7 +201,7 @@ var UserController = /** @class */ (function () {
         (0, common_1.Patch)(':id'),
         (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
             storage: (0, multer_1.diskStorage)({
-                destination: './uploads/users', // pasta onde a imagem será salva
+                destination: (0, path_2.join)(__dirname, '..', '..', 'uploads', 'users'), // Caminho corrigido
                 filename: function (req, file, cb) {
                     var uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     cb(null, uniqueSuffix + (0, path_1.extname)(file.originalname));

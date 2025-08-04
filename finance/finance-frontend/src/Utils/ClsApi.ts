@@ -158,7 +158,7 @@ export default class ClsApi {
         requestData,
         ClsApi.defaultConfig
       );
-      console.log('url', `${URL_BACKEND}/${url}`)
+
       return await ClsApi.handleResponse(response.data, setMensagemState);
     } catch (error) {
       return await ClsApi.handleError(error, setMensagemState);

@@ -82,6 +82,7 @@ export default function HeaderMenu() {
       .then((rs: Array<AccountInterface>) => {
         setRsContas(rs)
       })
+
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -178,10 +179,9 @@ export default function HeaderMenu() {
                 {usuarioState.fotoUsuario ? (
                   <Avatar
                     alt={usuarioState.nomeUsuario}
-                    //src={usuarioState.fotoUsuario}
                     src={
                       usuarioState.fotoUsuario
-                        ? `${usuarioState.fotoUsuario}?v=${usuarioState.fotoUsuarioVersao || 0}`
+                        ? `${usuarioState.fotoUsuario}`
                         : undefined
                     }
                     sx={{ width: 32, height: 32 }}

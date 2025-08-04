@@ -40,8 +40,6 @@ var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
 var data_source_1 = require("./data-source");
 var dotenv = require("dotenv");
-var path_1 = require("path");
-var express = require("express");
 //Uso em produção
 var fs = require("node:fs");
 dotenv.config();
@@ -69,9 +67,11 @@ function iniciandoBD() {
                         credentials: true, // Se você usa cookies ou cabeçalhos de autorização
                     });
                     // ✅ Expõe a pasta de uploads como pública
-                    app.use('/uploads', express.static((0, path_1.join)(__dirname, '..', 'uploads')));
+                    //app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
                     return [4 /*yield*/, data_source_1.AppDataSource.initialize()];
                 case 2:
+                    // ✅ Expõe a pasta de uploads como pública
+                    //app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
                     _a.sent();
                     return [4 /*yield*/, app.listen(process.env.REACT_APP_BACKEND_PORTA || 4000)];
                 case 3:

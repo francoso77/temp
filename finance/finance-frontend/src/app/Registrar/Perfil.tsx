@@ -1,18 +1,13 @@
-import { Container, Grid, IconButton, Paper, Tooltip, Box, Avatar, Typography } from '@mui/material';
-import Text from '../../Componentes/Text';
+import { Container, Grid, IconButton, Paper, Tooltip, Box, Avatar } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Form, useNavigate } from 'react-router-dom';
-import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import Condicional from '../../Componentes/Condicional/Condicional';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import { UserInterface } from '../../Interfaces/sistema/user';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
-import TermoDeUsoModal from './TermoDeUsoModal';
 import TitleBar from '../../Componentes/BarraDeTitulo';
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import { deepPurple } from '@mui/material/colors';
@@ -195,12 +190,33 @@ export default function Perfil() {
       });
 
       const rs = await response.json();
-      console.log('rs', rs);
 
       if (rs.ok || response.ok) {
         setMensagemState({
           ...mensagemState,
           exibir: false,
+        })
+
+        pesquisarID(perfil.id).then((rs) => {
+          if (rs) {
+            setPerfil((prev: any) => ({
+              ...prev,
+              id: rs.id,
+              name: rs.name,
+              email: rs.email,
+              whatsapp: rs.whatsapp,
+              profilePicture: rs.profilePicture,
+            }));
+
+            setUsuarioState((prev: any) => ({
+              ...prev,
+              idUsuario: rs.id,
+              nomeUsuario: rs.name,
+              emailUsuario: rs.email,
+              fotoUsuario: rs.profilePicture ? URL_BACKEND.concat('/uploads/users/') + rs.profilePicture : '',
+              fotoUsuarioVersao: Date.now(),
+            }));
+          }
         })
 
         btFechar();

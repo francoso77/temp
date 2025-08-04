@@ -4,6 +4,8 @@ import { UserService } from '../auth/services/user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { join } from 'path';
+
 
 @Controller('auth')
 export class UserController {
@@ -58,7 +60,8 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads/users',
+        // Caminho de destino corrigido:
+        destination: join(__dirname, '..', '..', 'uploads', 'users'),
         filename: (req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
@@ -86,7 +89,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads/users', // pasta onde a imagem será salva
+        destination: join(__dirname, '..', '..', 'uploads', 'users'), // Caminho corrigido
         filename: (req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, uniqueSuffix + extname(file.originalname));

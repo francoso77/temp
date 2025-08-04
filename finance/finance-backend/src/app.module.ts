@@ -18,9 +18,10 @@ import { join } from 'path';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'), // Caminho absoluto para a pasta 'uploads'
-      serveRoot: '/uploads', // Caminho da URL pública
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads', // Isso serve a URL /uploads/*
     }),
+
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     GlobalModule,
     DatabaseModule,

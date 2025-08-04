@@ -34,7 +34,7 @@ async function iniciandoBD() {
   });
 
   // ✅ Expõe a pasta de uploads como pública
-  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+  //app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   await AppDataSource.initialize();
   await app.listen(process.env.REACT_APP_BACKEND_PORTA || 4000);

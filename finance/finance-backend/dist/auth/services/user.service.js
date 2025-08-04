@@ -188,6 +188,9 @@ var UserService = /** @class */ (function () {
                         if (data.whatsapp !== undefined) {
                             user.whatsapp = data.whatsapp;
                         }
+                        if (data.profilePicture !== undefined) {
+                            user.profilePicture = data.profilePicture;
+                        }
                         return [2 /*return*/, this.userRepository.save(user)];
                 }
             });

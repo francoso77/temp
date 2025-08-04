@@ -122,6 +122,9 @@ export class UserService {
     if (data.whatsapp !== undefined) {
       user.whatsapp = data.whatsapp;
     }
+    if (data.profilePicture !== undefined) {
+      user.profilePicture = data.profilePicture;
+    }
 
     return this.userRepository.save(user);
   }
