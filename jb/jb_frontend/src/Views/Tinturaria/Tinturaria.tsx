@@ -60,6 +60,7 @@ export function Tinturaria() {
       cabecalho: 'Romaneio',
       alinhamento: 'left',
       campo: 'idTinturaria',
+      format: (_v, rs: any) => rs.idTinturaria.toString(),
     },
     {
       cabecalho: 'Data',
@@ -132,7 +133,16 @@ export function Tinturaria() {
     setSelected([])
   }
   const onRomaneio = (id: Array<number>) => {
-    clsRelatorios.renderTintuaria(id)
+    clsRelatorios.renderTintuaria(id, () => {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Nenhum romaneio foi gerado, verifique as estruturas ou se existem alguma peça lançada.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    })
   }
 
   const onDetalhes = (id: string | number) => {
@@ -283,6 +293,7 @@ export function Tinturaria() {
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
+
         setRsPesquisa(rs)
       })
   }
@@ -511,13 +522,15 @@ export function Tinturaria() {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ mt: 0 }}>
+      <Container maxWidth="xl" sx={{ mt: 0 }}>
         <Paper variant="outlined" sx={{ padding: 1 }}>
           <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Grid item xs={12} sx={{ textAlign: 'right', mt: 0.5 }}>
-              <IconButton onClick={() => btFechar()}>
-                <CloseIcon />
-              </IconButton>
+            <Grid item xs={12} sx={{ textAlign: 'right' }}>
+              <Tooltip title={'Fechar'}>
+                <IconButton onClick={() => btFechar()}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
             <Condicional condicao={localState.action === 'pesquisando'}>
               <Grid item xs={10} md={11}>

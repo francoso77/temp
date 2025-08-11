@@ -235,18 +235,18 @@ export default function DataTable<T>({
 
   const totalColunas = sumColumns(dados, colunaSoma)
 
-  const chipStyle = (valor: string) => {
-    switch (valor) {
-      case 'Receita':
-        return { backgroundColor: '#2e7d32', color: '#fff' }; // verde escuro
-      case 'Despesa':
-        return { backgroundColor: '#d32f2f', color: '#fff' }; // vermelho
-      case 'status':
-        return { backgroundColor: '#616161', color: '#fff' }; // cinza
-      default:
-        return { backgroundColor: '#616161', color: '#fff' }; // cinza
-    }
-  }
+  // const chipStyle = (valor: string) => {
+  //   switch (valor) {
+  //     case 'Receita':
+  //       return { backgroundColor: '#2e7d32', color: '#fff' }; // verde escuro
+  //     case 'Despesa':
+  //       return { backgroundColor: '#d32f2f', color: '#fff' }; // vermelho
+  //     case 'status':
+  //       return { backgroundColor: '#616161', color: '#fff' }; // cinza
+  //     default:
+  //       return { backgroundColor: '#616161', color: '#fff' }; // cinza
+  //   }
+  // }
 
   return (
     <>
@@ -308,14 +308,15 @@ export default function DataTable<T>({
                                       size="small"
                                       sx={{
                                         fontWeight: 'bold',
-                                        ...chipStyle((row as any)[coluna.campo])
+                                        //...chipStyle((row as any)[coluna.campo])
                                       }}
                                     />
                                   )
                                   : coluna.format
                                     ? coluna.format((row as any)[coluna.campo], row)
                                     : (row as any)[coluna.campo]
-                            }                          </StyledTableCell>
+                            }
+                          </StyledTableCell>
                         )
                       })
                     }

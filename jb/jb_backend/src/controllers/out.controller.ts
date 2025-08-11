@@ -634,6 +634,8 @@ export class OutController {
 
     const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
 
+    console.log(ped)
+
     const sql = `
     SELECT 
         t.idTinturaria AS romaneio,

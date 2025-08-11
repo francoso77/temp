@@ -284,7 +284,7 @@ export default function ProgramacaoDublagem() {
 
   return (
     <>
-      <Container maxWidth="md" sx={{ mt: 0 }}>
+      <Container maxWidth="xl" sx={{ mt: 0 }}>
         <Paper variant="outlined" sx={{ padding: 1 }}>
           <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>

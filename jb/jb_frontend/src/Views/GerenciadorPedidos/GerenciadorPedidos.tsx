@@ -1,4 +1,4 @@
-import { Container, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Chip, Container, Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import ClsValidacao from '../../Utils/ClsValidacao';
@@ -85,8 +85,51 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     {
       cabecalho: 'Status Pedido',
       alinhamento: 'center',
-      campo: 'statusPedido',
-      //format: (_v, rs: any) => StatusTypes.find(v => v.idStatus === rs.statusPedido)?.descricao
+      campo: 'statusPedido', // O 'campo' ainda pode apontar para onde o status *deveria* estar para identificação
+      render: (_valor: any, row: any) => { // O _valor aqui seria o que 'campo' aponta, mas não usaremos diretamente
+        // 1. Encontrar o statusPedido real dentro de rsPedido
+        const pedidoCorrespondente = rsPedido.find((p: any) => p.idPedido === row.idPedido);
+        const statusCode = pedidoCorrespondente ? pedidoCorrespondente.statusPedido : undefined;
+
+        // 2. Encontrar as informações completas do status (descrição e id)
+        const statusInfo = StatusTypes.find(
+          (status) => status.idStatus === statusCode
+        );
+
+        const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+        // 3. Definir a cor do Chip com base no statusCode
+
+        // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+        switch (statusCode) {
+          case StatusType.aberto:
+            color = 'success'; // Exemplo: azul para aberto
+            break;
+          case StatusType.producao:
+            color = 'info'; // Exemplo: roxo para produção
+            break;
+          case StatusType.parcial:
+            color = 'warning'; // Exemplo: laranja para parcial
+            break;
+          case StatusType.finalizado:
+            color = 'error'; // Exemplo: verde para finalizado
+            break;
+          default:
+            color = 'default'; // Cor padrão para qualquer outro caso
+            break;
+        }
+
+        // 4. Retornar o componente Chip
+        return (
+          <Chip
+            label={descricaoStatus}
+            color={color}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
+      },
     },
   ]
 
@@ -107,8 +150,51 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     {
       cabecalho: 'Status Item',
       alinhamento: 'center',
-      campo: 'status',
-      //format: (_v, rs: any) => StatusTypes.find(v => v.idStatus === rs.status)?.descricao
+      campo: 'status', // O 'campo' ainda pode apontar para onde o status *deveria* estar para identificação
+      render: (_valor: any, row: any) => { // O _valor aqui seria o que 'campo' aponta, mas não usaremos diretamente
+        // 1. Encontrar o statusPedido real dentro de rsPedido
+        const pedidoCorrespondente = rsPedido.find((p: any) => p.idPedido === row.idPedido);
+        const statusCode = pedidoCorrespondente ? pedidoCorrespondente.statusPedido : undefined;
+
+        // 2. Encontrar as informações completas do status (descrição e id)
+        const statusInfo = StatusTypes.find(
+          (status) => status.idStatus === statusCode
+        );
+
+        const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+        // 3. Definir a cor do Chip com base no statusCode
+
+        // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
+        let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+        switch (statusCode) {
+          case StatusType.aberto:
+            color = 'success'; // Exemplo: azul para aberto
+            break;
+          case StatusType.producao:
+            color = 'info'; // Exemplo: roxo para produção
+            break;
+          case StatusType.parcial:
+            color = 'warning'; // Exemplo: laranja para parcial
+            break;
+          case StatusType.finalizado:
+            color = 'error'; // Exemplo: verde para finalizado
+            break;
+          default:
+            color = 'default'; // Cor padrão para qualquer outro caso
+            break;
+        }
+
+        // 4. Retornar o componente Chip
+        return (
+          <Chip
+            label={descricaoStatus}
+            color={color}
+            size="small"
+            sx={{ fontWeight: 'bold' }}
+          />
+        );
+      },
     },
   ]
 

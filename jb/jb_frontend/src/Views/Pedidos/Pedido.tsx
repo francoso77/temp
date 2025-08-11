@@ -145,7 +145,7 @@ export default function Pedido() {
     },
   ]
 
-  const pesquisarID = async (id: string | number): Promise<PedidoInterface> => {
+  const pesquisarID = async (id: string | number): Promise<PedidoInterface | null> => {
     const rs = await clsCrud
       .pesquisar({
         entidade: "Pedido",
@@ -161,15 +161,30 @@ export default function Pedido() {
           idPedido: id,
         },
       })
-    let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataPedido)
-    return {
-      ...rs[0],
-      dataPedido: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
-    };
+
+    if (rs[0].statusPedido === StatusType.aberto) {
+
+      let dt: string = clsFormatacao.dataISOtoUser(rs[0].dataPedido)
+      return {
+        ...rs[0],
+        dataPedido: dt.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$1$2$3")
+      };
+    } else {
+      setMensagemState({
+        titulo: "Atenção",
+        mensagem: "Pedido finalizado ou em produção, impossibilitando edição.",
+        tipo: MensagemTipo.Error,
+        exibir: true,
+        exibirBotao: true,
+        cb: null
+      })
+      return null
+    }
   }
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      if (rs === null) return
       setPedido(rs)
       AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.editando })
@@ -178,6 +193,7 @@ export default function Pedido() {
 
   const onExcluir = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      if (rs === null) return
       setPedido(rs)
       AtualizaSomatorio(rs)
       setLocalState({ action: actionTypes.excluindo })
@@ -418,13 +434,15 @@ export default function Pedido() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 0 }}>
+    <Container maxWidth="xl" sx={{ mt: 0 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+            <Tooltip title={'Fechar'}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
@@ -441,7 +459,7 @@ export default function Pedido() {
               />
             </Grid>
             <Grid item xs={2} md={1}>
-              <Tooltip title={'Incluir'}>
+              <Tooltip title={'Novo pedido'}>
                 <IconButton
                   color="secondary"
                   sx={{ mt: 5, ml: { xs: 1, md: 2 } }}

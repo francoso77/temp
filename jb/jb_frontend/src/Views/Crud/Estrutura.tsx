@@ -219,7 +219,7 @@ export default function Estrutura() {
       .pesquisar({
         entidade: "Produto",
         criterio: {
-          tipoProduto: [7, 8],
+          tipoProduto: [7, 8, 9],
         },
         camposLike: ["tipoProduto"],
         comparador: 'I',
@@ -237,13 +237,15 @@ export default function Estrutura() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 2 }}>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+            <Tooltip title={'Fechar'}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
@@ -260,7 +262,7 @@ export default function Estrutura() {
               />
             </Grid>
             <Grid item xs={2} md={1}>
-              <Tooltip title={'Incluir'}>
+              <Tooltip title={'Nova Estrutura'}>
                 <IconButton
                   color="secondary"
                   sx={{ mt: 5, ml: { xs: 1, md: 2 } }}

@@ -616,9 +616,11 @@ export function ProducaoMalharia() {
         <Paper variant="outlined" sx={{ padding: 1, m: 1, borderRadius: 2 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: 1 }}>
-              <IconButton onClick={() => btFechar()}>
-                <CloseIcon />
-              </IconButton>
+              <Tooltip title="Fechar lançamento">
+                <IconButton onClick={() => btFechar()}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
             <Grid item xs={12} sm={2} >
               <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
@@ -893,9 +895,11 @@ export function ProducaoMalharia() {
         <Paper variant="outlined" sx={{ p: 0.5, m: 1 }}>
           <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
             <Grid item xs={12} sx={{ textAlign: 'right', mt: 1, mr: -5, mb: -5 }}>
-              <IconButton onClick={() => btFechar()}>
-                <CloseIcon />
-              </IconButton>
+              <Tooltip title={'Fechar'}>
+                <IconButton onClick={() => btFechar()}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
             <Grid item xs={10} md={11}>
               <InputText
@@ -911,7 +915,7 @@ export function ProducaoMalharia() {
               />
             </Grid>
             <Grid item xs={2} md={1}>
-              <Tooltip title={'Incluir'}>
+              <Tooltip title={'Nova peça'}>
                 <IconButton
                   color="secondary"
                   sx={{ mt: 5, ml: { xs: 1, md: 2 } }}

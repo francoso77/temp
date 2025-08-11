@@ -644,8 +644,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
       </Dialog >
       <Paper sx={{ m: 0, p: 1 }}>
         <Grid item xs={12} sx={{ mb: 1, textAlign: 'center' }}>
-          <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
-            <Tooltip title={'Incluir'}>
+          <Condicional condicao={masterLocalState.action === actionTypes.incluindo}>
+            <Tooltip title={'Incluir item'}>
               <IconButton
                 color="secondary"
                 sx={{ mt: -1, ml: { xs: 1, md: 0.5 } }}

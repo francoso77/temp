@@ -220,8 +220,8 @@ class ClsRelatorioProgramacao {
 
       const detalhes = this.renderDetalhes(espuma);
 
-      console.log('detalhes', detalhes);
-      console.log('espuma', espuma);
+      // console.log('detalhes', detalhes);
+      // console.log('espuma', espuma);
 
       if (detalhes.length > 0) {
         autoTable(doc, {
@@ -816,16 +816,29 @@ class ClsRelatorioProgramacao {
     this.gerarProgramacaoTintuaria()
   }
 
-  public renderTintuaria = async (ids: Array<number>) => {
+  public renderTintuaria = async (ids: Array<number>, onSemDados?: () => void) => {
 
-    await this.clsApi.execute<Array<DadosTinturaria>>({
-      url: 'romaneiosTinturaria',
-      method: 'post',
-      pedidos: ids,
-    }).then((res: Array<DadosTinturaria>) => {
+    try {
+      const res = await this.clsApi.execute<Array<DadosTinturaria>>({
+        url: 'romaneiosTinturaria',
+        method: 'post',
+        pedidos: ids,
+      })
+
+      if (!res || res.length === 0) {
+
+        this.tinturaria = []
+        if (onSemDados) onSemDados()
+        return
+
+      }
+
       this.tinturaria = res
-    })
-    this.gerarTintuaria()
+      this.gerarTintuaria()
+
+    } catch (error) {
+      this.tinturaria = []
+    }
   }
 
   public renderRelacao = async (dt: string) => {

@@ -402,13 +402,15 @@ export default function Entrada() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 0 }}>
+    <Container maxWidth="xl" sx={{ mt: 0 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+            <Tooltip title={'Fechar'}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
@@ -425,7 +427,7 @@ export default function Entrada() {
               />
             </Grid>
             <Grid item xs={2} md={1}>
-              <Tooltip title={'Incluir'}>
+              <Tooltip title={'Nova entrada'}>
                 <IconButton
                   color="secondary"
                   sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
@@ -569,6 +571,7 @@ export default function Entrada() {
                 tamanhoFonte={30}
               />
             </Grid>
+
             <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton

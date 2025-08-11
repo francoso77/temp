@@ -345,55 +345,82 @@ export default function DataTableSelect<T>({
                                                                 //     align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
                                                                 //     {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
                                                                 // </StyledTableCell>
+                                                                // <StyledTableCell
+                                                                //     key={indice}
+                                                                //     align={coluna.alinhamento ? coluna.alinhamento : 'left'}
+                                                                // >
+                                                                //     {/* Obtém o valor da célula atual */}
+                                                                //     {(() => {
+                                                                //         const valorDaCelula = (row as any)[coluna.campo];
+
+                                                                //         // Verifica se o valor da célula é um dos códigos de status
+                                                                //         if (Object.values(StatusType).includes(valorDaCelula)) {
+                                                                //             const statusInfo = StatusTypes.find(
+                                                                //                 (status) => status.idStatus === valorDaCelula
+                                                                //             );
+
+                                                                //             const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+                                                                //             let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+
+                                                                //             switch (valorDaCelula) {
+                                                                //                 case StatusType.aberto:
+                                                                //                     color = 'success'; // Exemplo: azul para aberto
+                                                                //                     break;
+                                                                //                 case StatusType.producao:
+                                                                //                     color = 'info'; // Exemplo: roxo para produção
+                                                                //                     break;
+                                                                //                 case StatusType.parcial:
+                                                                //                     color = 'warning'; // Exemplo: laranja para parcial
+                                                                //                     break;
+                                                                //                 case StatusType.finalizado:
+                                                                //                     color = 'error'; // Exemplo: verde para finalizado
+                                                                //                     break;
+                                                                //                 default:
+                                                                //                     color = 'default'; // Cor padrão para qualquer outro caso
+                                                                //                     break;
+                                                                //             }
+
+                                                                //             return (
+                                                                //                 <Chip
+                                                                //                     label={descricaoStatus}
+                                                                //                     color={color}
+                                                                //                     size="small"
+                                                                //                     sx={{ fontWeight: 'bold' }}
+                                                                //                 />
+                                                                //             );
+                                                                //         } else {
+                                                                //             // Se não for um código de status, renderiza o conteúdo normalmente
+                                                                //             return coluna.format ? coluna.format(valorDaCelula, row) : valorDaCelula;
+                                                                //         }
+                                                                //     })()}
+                                                                // </StyledTableCell>
                                                                 <StyledTableCell
                                                                     key={indice}
-                                                                    align={coluna.alinhamento ? coluna.alinhamento : 'left'}
-                                                                >
-                                                                    {/* Obtém o valor da célula atual */}
-                                                                    {(() => {
-                                                                        const valorDaCelula = (row as any)[coluna.campo];
-
-                                                                        // Verifica se o valor da célula é um dos códigos de status
-                                                                        if (Object.values(StatusType).includes(valorDaCelula)) {
-                                                                            const statusInfo = StatusTypes.find(
-                                                                                (status) => status.idStatus === valorDaCelula
-                                                                            );
-
-                                                                            const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
-
-                                                                            let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
-
-                                                                            switch (valorDaCelula) {
-                                                                                case StatusType.aberto:
-                                                                                    color = 'success'; // Exemplo: azul para aberto
-                                                                                    break;
-                                                                                case StatusType.producao:
-                                                                                    color = 'info'; // Exemplo: roxo para produção
-                                                                                    break;
-                                                                                case StatusType.parcial:
-                                                                                    color = 'warning'; // Exemplo: laranja para parcial
-                                                                                    break;
-                                                                                case StatusType.finalizado:
-                                                                                    color = 'error'; // Exemplo: verde para finalizado
-                                                                                    break;
-                                                                                default:
-                                                                                    color = 'default'; // Cor padrão para qualquer outro caso
-                                                                                    break;
-                                                                            }
-
-                                                                            return (
-                                                                                <Chip
-                                                                                    label={descricaoStatus}
-                                                                                    color={color}
-                                                                                    size="small"
-                                                                                    sx={{ fontWeight: 'bold' }}
-                                                                                />
-                                                                            );
-                                                                        } else {
-                                                                            // Se não for um código de status, renderiza o conteúdo normalmente
-                                                                            return coluna.format ? coluna.format(valorDaCelula, row) : valorDaCelula;
-                                                                        }
-                                                                    })()}
+                                                                    align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
+                                                                    {
+                                                                        coluna.render
+                                                                            ? coluna.render((row as any)[coluna.campo], row)
+                                                                            : coluna.chipColor
+                                                                                ? (
+                                                                                    <Chip
+                                                                                        variant="outlined"
+                                                                                        label={coluna.chipLabel
+                                                                                            ? coluna.chipLabel((row as any)[coluna.campo], row)
+                                                                                            : (row as any)[coluna.campo]
+                                                                                        }
+                                                                                        color={coluna.chipColor((row as any)[coluna.campo], row)}
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            fontWeight: 'bold',
+                                                                                            //...chipStyle((row as any)[coluna.campo])
+                                                                                        }}
+                                                                                    />
+                                                                                )
+                                                                                : coluna.format
+                                                                                    ? coluna.format((row as any)[coluna.campo], row)
+                                                                                    : (row as any)[coluna.campo]
+                                                                    }
                                                                 </StyledTableCell>
                                                             )
                                                         })
@@ -485,55 +512,82 @@ export default function DataTableSelect<T>({
                                                                                                     //     align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
                                                                                                     //     {coluna.format ? coluna.format((row as any)[coluna.campo], row) : (row as any)[coluna.campo]}
                                                                                                     // </StyledTableCell>
+                                                                                                    // <StyledTableCell
+                                                                                                    //     key={indice}
+                                                                                                    //     align={coluna.alinhamento ? coluna.alinhamento : 'left'}
+                                                                                                    // >
+                                                                                                    //     {/* Obtém o valor da célula atual */}
+                                                                                                    //     {(() => {
+                                                                                                    //         const valorDaCelula = (row as any)[coluna.campo];
+
+                                                                                                    //         // Verifica se o valor da célula é um dos códigos de status
+                                                                                                    //         if (Object.values(StatusType).includes(valorDaCelula)) {
+                                                                                                    //             const statusInfo = StatusTypes.find(
+                                                                                                    //                 (status) => status.idStatus === valorDaCelula
+                                                                                                    //             );
+
+                                                                                                    //             const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
+
+                                                                                                    //             let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
+
+                                                                                                    //             switch (valorDaCelula) {
+                                                                                                    //                 case StatusType.aberto:
+                                                                                                    //                     color = 'success'; // Exemplo: azul para aberto
+                                                                                                    //                     break;
+                                                                                                    //                 case StatusType.producao:
+                                                                                                    //                     color = 'info'; // Exemplo: roxo para produção
+                                                                                                    //                     break;
+                                                                                                    //                 case StatusType.parcial:
+                                                                                                    //                     color = 'warning'; // Exemplo: laranja para parcial
+                                                                                                    //                     break;
+                                                                                                    //                 case StatusType.finalizado:
+                                                                                                    //                     color = 'error'; // Exemplo: verde para finalizado
+                                                                                                    //                     break;
+                                                                                                    //                 default:
+                                                                                                    //                     color = 'default'; // Cor padrão para qualquer outro caso
+                                                                                                    //                     break;
+                                                                                                    //             }
+
+                                                                                                    //             return (
+                                                                                                    //                 <Chip
+                                                                                                    //                     label={descricaoStatus}
+                                                                                                    //                     color={color}
+                                                                                                    //                     size="small"
+                                                                                                    //                     sx={{ fontWeight: 'bold' }}
+                                                                                                    //                 />
+                                                                                                    //             );
+                                                                                                    //         } else {
+                                                                                                    //             // Se não for um código de status, renderiza o conteúdo normalmente
+                                                                                                    //             return coluna.format ? coluna.format(valorDaCelula, row) : valorDaCelula;
+                                                                                                    //         }
+                                                                                                    //     })()}
+                                                                                                    // </StyledTableCell>
                                                                                                     <StyledTableCell
                                                                                                         key={indice}
-                                                                                                        align={coluna.alinhamento ? coluna.alinhamento : 'left'}
-                                                                                                    >
-                                                                                                        {/* Obtém o valor da célula atual */}
-                                                                                                        {(() => {
-                                                                                                            const valorDaCelula = (row as any)[coluna.campo];
-
-                                                                                                            // Verifica se o valor da célula é um dos códigos de status
-                                                                                                            if (Object.values(StatusType).includes(valorDaCelula)) {
-                                                                                                                const statusInfo = StatusTypes.find(
-                                                                                                                    (status) => status.idStatus === valorDaCelula
-                                                                                                                );
-
-                                                                                                                const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
-
-                                                                                                                let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
-
-                                                                                                                switch (valorDaCelula) {
-                                                                                                                    case StatusType.aberto:
-                                                                                                                        color = 'success'; // Exemplo: azul para aberto
-                                                                                                                        break;
-                                                                                                                    case StatusType.producao:
-                                                                                                                        color = 'info'; // Exemplo: roxo para produção
-                                                                                                                        break;
-                                                                                                                    case StatusType.parcial:
-                                                                                                                        color = 'warning'; // Exemplo: laranja para parcial
-                                                                                                                        break;
-                                                                                                                    case StatusType.finalizado:
-                                                                                                                        color = 'error'; // Exemplo: verde para finalizado
-                                                                                                                        break;
-                                                                                                                    default:
-                                                                                                                        color = 'default'; // Cor padrão para qualquer outro caso
-                                                                                                                        break;
-                                                                                                                }
-
-                                                                                                                return (
-                                                                                                                    <Chip
-                                                                                                                        label={descricaoStatus}
-                                                                                                                        color={color}
-                                                                                                                        size="small"
-                                                                                                                        sx={{ fontWeight: 'bold' }}
-                                                                                                                    />
-                                                                                                                );
-                                                                                                            } else {
-                                                                                                                // Se não for um código de status, renderiza o conteúdo normalmente
-                                                                                                                return coluna.format ? coluna.format(valorDaCelula, row) : valorDaCelula;
-                                                                                                            }
-                                                                                                        })()}
+                                                                                                        align={coluna.alinhamento ? coluna.alinhamento : 'left'}>
+                                                                                                        {
+                                                                                                            coluna.render
+                                                                                                                ? coluna.render((row as any)[coluna.campo], row)
+                                                                                                                : coluna.chipColor
+                                                                                                                    ? (
+                                                                                                                        <Chip
+                                                                                                                            variant="outlined"
+                                                                                                                            label={coluna.chipLabel
+                                                                                                                                ? coluna.chipLabel((row as any)[coluna.campo], row)
+                                                                                                                                : (row as any)[coluna.campo]
+                                                                                                                            }
+                                                                                                                            color={coluna.chipColor((row as any)[coluna.campo], row)}
+                                                                                                                            size="small"
+                                                                                                                            sx={{
+                                                                                                                                fontWeight: 'bold',
+                                                                                                                                //...chipStyle((row as any)[coluna.campo])
+                                                                                                                            }}
+                                                                                                                        />
+                                                                                                                    )
+                                                                                                                    : coluna.format
+                                                                                                                        ? coluna.format((row as any)[coluna.campo], row)
+                                                                                                                        : (row as any)[coluna.campo]
+                                                                                                        }
                                                                                                     </StyledTableCell>
                                                                                                 )
                                                                                             })

@@ -207,13 +207,15 @@ export default function PrazoEntrega() {
 
   return (
 
-    <Container maxWidth="md" sx={{ mt: 2 }}>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid item xs={12} sx={{ textAlign: 'right', mt: -1.5, mr: -5, mb: -5 }}>
-            <IconButton onClick={() => btFechar()}>
-              <CloseIcon />
-            </IconButton>
+            <Tooltip title={'Fechar'}>
+              <IconButton onClick={() => btFechar()}>
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
             <Grid item xs={10} md={11}>
