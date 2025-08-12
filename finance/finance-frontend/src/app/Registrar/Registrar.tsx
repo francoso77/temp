@@ -83,7 +83,7 @@ export default function Registrar() {
   const btFechar = async () => {
     setErros({})
     setUsuario(ResetDados)
-    irPara('/welcome')
+    irPara('/login')
   }
 
   const validarDados = (): boolean => {
@@ -197,10 +197,9 @@ export default function Registrar() {
       const rs = await response.json();
 
       if (rs.ok || response.ok) {
-        setMensagemState({
-          ...mensagemState,
-          exibir: true,
-        })
+        // encerra o loading
+        setMensagemState(prev => ({ ...prev, exibir: false }));
+
         btFechar();
       }
 
