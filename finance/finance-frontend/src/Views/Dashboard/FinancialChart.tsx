@@ -178,7 +178,7 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
           </ToggleButtonGroup>
         </Box>
         {/* Period Filter Buttons */}
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+        {/* <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Typography variant="caption" sx={{ color: lightTextColor, mr: 0.5 }}>Período:</Typography>
           <ToggleButtonGroup
             value={periodFilter}
@@ -204,7 +204,7 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
               </ToggleButton>
             </MuiTooltip>
           </ToggleButtonGroup>
-        </Box>
+        </Box> */}
 
         {/* Chart Type Buttons */}
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
