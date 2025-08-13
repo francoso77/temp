@@ -48,7 +48,7 @@ export function Transacoes() {
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ description: '' });
   const [rsPesquisa, setRsPesquisa] = useState<Array<TransactionInterface>>([]);
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando });
-  const [debouncedValue, setDebouncedValue] = useState("")
+  //const [debouncedValue, setDebouncedValue] = useState("")
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -214,17 +214,17 @@ export function Transacoes() {
       })
   }
 
-  const handleChange = (event: any) => {
+  // const handleChange = (event: any) => {
 
-    const value = pesquisa.description.concat(event)
-    if (pesquisa.description === '') {
-      setPesquisa({ description: value })
+  //   const value = pesquisa.description.concat(event)
+  //   if (pesquisa.description === '') {
+  //     setPesquisa({ description: value })
 
-    } else {
-      setPesquisa({ description: event })
-    }
+  //   } else {
+  //     setPesquisa({ description: event })
+  //   }
 
-  };
+  // };
 
   // const onSearch = async (e: string) => {
 
@@ -246,14 +246,14 @@ export function Transacoes() {
   //       setRsPesquisa(rs)
   //     })
   // }
-  const btPesquisar = async (e: string | null = null) => {
+  const btPesquisar = async () => {
     const dtInicial = layoutState.dataInicio ? clsFormatacao.dataISOtoDatetime(layoutState.dataInicio) : undefined
     const dtFinal = layoutState.dataFim ? clsFormatacao.dataISOtoDatetime(layoutState.dataFim) : undefined
     const conta = layoutState.contaPadrao ? layoutState.contaPadrao : undefined
     const categoria = layoutState.categoryId ? layoutState.categoryId : undefined
     const tipo = layoutState.type ? layoutState.type : undefined
     const setor = layoutState.sectorId ? layoutState.sectorId : undefined
-    const descricao = e === null ? pesquisa.description : e
+    const descricao = pesquisa.description ? pesquisa.description : undefined
 
     await clsApi.execute<Array<TransactionInterface>>({
       url: 'selecaoTransacoes',
@@ -301,21 +301,21 @@ export function Transacoes() {
     btPesquisar()
   }, [layoutState])
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(pesquisa.description);
-    }, 2); // Adicionando um atraso de 500ms
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     setDebouncedValue(pesquisa.description);
+  //   }, 2); // Adicionando um atraso de 500ms
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [pesquisa.description]);
+  //   return () => {
+  //     clearTimeout(handler);
+  //   };
+  // }, [pesquisa.description]);
 
-  useEffect(() => {
-    if (debouncedValue) {
-      btPesquisar(debouncedValue);
-    }
-  }, [debouncedValue, btPesquisar]);
+  // useEffect(() => {
+  //   if (debouncedValue) {
+  //     btPesquisar(debouncedValue);
+  //   }
+  // }, [debouncedValue, btPesquisar]);
 
   return (
     <>
@@ -326,7 +326,7 @@ export function Transacoes() {
         <Grid item xs={6} sx={{ ml: 2 }}>
           <InputText
             label=""
-            placeholder="Buscar transações..."
+            placeholder="Buscar por descrição..."
             dados={pesquisa}
             field="description"
             setState={setPesquisa}
@@ -335,7 +335,7 @@ export function Transacoes() {
             mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
             autoFocus
             width={'100%'}
-            onChange={(e) => handleChange(e)}
+          //onChange={(e) => handleChange(e)}
           />
         </Grid>
         <Grid item xs={5}>
