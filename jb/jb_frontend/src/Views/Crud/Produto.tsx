@@ -18,6 +18,7 @@ import ComboBox from '../../Componentes/ComboBox';
 import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { UnidadeMedidaInterface } from '../../Interfaces/unidadeMedidaInteface';
 import { TipoProdutoType, TipoProdutoTypes } from '../../types/tipoProdutoypes';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 
 export default function Produto() {
@@ -374,7 +375,7 @@ export default function Produto() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: ProdutoInterface) =>
@@ -387,7 +388,7 @@ export default function Produto() {
                       onExcluir(rs.idProduto as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>

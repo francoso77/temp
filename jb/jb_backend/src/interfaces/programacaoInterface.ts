@@ -7,7 +7,6 @@ export interface ProgramacaoInterface {
   notaFiscal: string
   idTinturaria: number
   msg: string
-  idPessoa_cliente: number
   detalheProgramacoes: DetalheProgramacaoInterface[]
 }
 

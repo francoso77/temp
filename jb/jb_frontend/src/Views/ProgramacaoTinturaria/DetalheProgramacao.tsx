@@ -137,12 +137,13 @@ export default function DetalheProgramacao({
 
   const onEditar = (rs: DetalheProgramacaoInterface, indice: number) => {
 
+    BuscarDados()
     editarSaldoRomaneio(rs)
     setLocalState({ action: actionTypes.editando })
     setIndiceEdicao(indice)
     setDetalheProgramacao(rs)
     setOpen(true)
-    setHeadTableStatus(false)
+    //setHeadTableStatus(false)
 
   }
 
@@ -157,7 +158,7 @@ export default function DetalheProgramacao({
     setRsMaster({ ...rsMaster, detalheProgramacoes: tmpDetalhe })
     AtualizaSomatorio(tmpDetalhe)
     AtualizaSaldoRomaneio(tmpDetalhe)
-    setHeadTableStatus(false)
+    //setHeadTableStatus(false)
   }
 
   const btIncluir = () => {
@@ -225,17 +226,21 @@ export default function DetalheProgramacao({
   const temSaldo = (): boolean => {
     const saldo = rsRomaneio.filter(v => v.idProduto === detalheProgramacao.idProduto)
       .reduce((a, b) => a + b.saldo, 0)
-    if (saldo < detalheProgramacao.peso) {
+
+    const pesoDetalhe = detalheProgramacao.peso
+
+
+    if (Number(saldo.toFixed(2)) < Number(pesoDetalhe.toFixed(2))) {
       setMensagemState({
-        titulo: 'Aviso',
+        titulo: 'Aviso...',
         exibir: true,
-        mensagem: 'Romaneio sem saldo suficiente - Saldo restante: ' + clsFormatacao.currency(saldo),
+        mensagem: 'Romaneio sem saldo suficiente - Saldo restante: ' + Number(saldo.toFixed(2)),
         tipo: MensagemTipo.Error,
         exibirBotao: true,
         cb: null
       })
     }
-    return saldo >= detalheProgramacao.peso
+    return Number(saldo.toFixed(2)) >= Number(pesoDetalhe.toFixed(2))
   }
   const btConfirmaInclusao = () => {
 
@@ -314,10 +319,10 @@ export default function DetalheProgramacao({
 
       //Testa a cor da tabela de acordo com a quantidade de peças e peso
 
-      if (total === Number(rsSomatorioTinturaria.total) &&
-        totalQtd === Number(rsSomatorioTinturaria.totalQtd)) {
-        setHeadTableStatus(!headTableStatus)
-      }
+      // if (total === Number(rsSomatorioTinturaria.total) &&
+      //   totalQtd === Number(rsSomatorioTinturaria.totalQtd)) {
+      //   setHeadTableStatus(!headTableStatus)
+      // }
 
       setRsSomatorio({ total: total.toString(), totalQtd: totalQtd.toString() })
     }
@@ -354,13 +359,18 @@ export default function DetalheProgramacao({
   }
 
   const BuscarDados = () => {
+
+    const idsProdutos: Array<number> = rsRomaneio.map((v) => v.idProduto)
+
     clsCrud
       .pesquisar({
         entidade: "Produto",
         campoOrder: ["nome"],
         criterio: {
-          tipoProduto: TipoProdutoType.tecidoCru
-        }
+          tipoProduto: TipoProdutoType.tecidoCru,
+          idProduto: idsProdutos
+        },
+        comparador: "I",
       })
       .then((rsProdutos: Array<ProdutoInterface>) => {
         setRsProduto(rsProdutos)
@@ -377,7 +387,10 @@ export default function DetalheProgramacao({
   }
 
   useEffect(() => {
-    BuscarDados()
+    const carregarDados = async () => {
+      await BuscarDados()
+    }
+    carregarDados()
   }, [])
 
   const theme = useTheme()

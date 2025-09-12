@@ -136,7 +136,7 @@ export function ProducaoMalharia() {
     },
     {
       cabecalho: 'Produto',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'idProduto',
       format: (idProduto) => rsProduto.find(x => x.idProduto === idProduto)?.nome
     },
@@ -150,6 +150,17 @@ export function ProducaoMalharia() {
 
   const onEditar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
+      if (usuarioState.tipoUsuario !== UsuarioType.admin && rs.fechado) {
+        setMensagemState({
+          titulo: 'Produção Fechada',
+          exibir: true,
+          mensagem: 'Produção fechada, não pode ser alterada!',
+          tipo: MensagemTipo.Error,
+          exibirBotao: true,
+          cb: null
+        })
+        return
+      }
       setProducaoMalharia(rs)
       setLocalState({ action: actionTypes.editando })
     })
@@ -172,11 +183,11 @@ export function ProducaoMalharia() {
     return clsCrud
       .pesquisar({
         entidade: "ProducaoMalharia",
-        relations: [
-          'tecelao',
-          'maquina',
-          'produto'
-        ],
+        // relations: [
+        //   'tecelao',
+        //   'maquina',
+        //   'produto'
+        // ],
         criterio: {
           idMalharia: id,
         },
@@ -271,17 +282,17 @@ export function ProducaoMalharia() {
 
     clsCrud.pesquisar({
       entidade: 'ProducaoMalharia',
-      relations: [
-        'tecelao',
-        'maquina',
-        'produto'
-      ],
+      // relations: [
+      //   'tecelao',
+      //   'maquina',
+      //   'produto'
+      // ],
       tipoOrder: 'DESC',
       campoOrder: ['dataProducao'],
-      criterio: {
-        fechado: 0
-      },
-      camposLike: ['fechado'],
+      // criterio: {
+      //   fechado: 0
+      // },
+      // camposLike: ['fechado'],
       select: ['idMalharia', 'dataProducao', 'peca', 'peso', 'idPessoa_tecelao', 'idMaquina', 'idProduto', 'fechado', 'turno']
     })
       .then((rs: Array<any>) => {
@@ -417,6 +428,7 @@ export function ProducaoMalharia() {
             tipo: MensagemTipo.Warning
           })
         } else {
+
           clsCrud
             .incluir({
               entidade: "ProducaoMalharia",
@@ -450,7 +462,7 @@ export function ProducaoMalharia() {
             }).catch((e) => {
               setMensagemState({
                 titulo: 'Error',
-                mensagem: 'Falha de comunicação lançamento não realizado!',
+                mensagem: 'Falha de comunicação lançamento não realizado - consulte suas permissões.',
                 exibir: true,
                 exibirBotao: true,
                 cb: null,
@@ -497,16 +509,14 @@ export function ProducaoMalharia() {
           }
         })
 
-    } else {
-
-      if (validarDados()) {
-        setRsDadosPeca({
-          nomeProduto: NomeProduto(producaoMalharia.idProduto, rsProduto),
-          peca: producaoMalharia.peca,
-          peso: producaoMalharia.peso.toString()
-        })
-        setOpen(true)
-      }
+    }
+    if (validarDados()) {
+      setRsDadosPeca({
+        nomeProduto: NomeProduto(producaoMalharia.idProduto, rsProduto),
+        peca: producaoMalharia.peca,
+        peso: producaoMalharia.peso.toString()
+      })
+      setOpen(true)
     }
   }
 
@@ -559,20 +569,20 @@ export function ProducaoMalharia() {
       const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
       criterio = {
         dataProducao: formattedDateTime,
-        fechado: 0
+        // fechado: 0
       }
       camposLike = ['dataProducao']
     } else if (temNumero && pesquisa.itemPesquisa.includes('-')) {
 
       criterio = {
         peca: pesquisa.itemPesquisa,
-        fechado: 0
+        // fechado: 0
       }
       camposLike = ['peca']
     } else {
       criterio = {
         idPessoa_tecelao: idsTec,
-        fechado: 0
+        // fechado: 0
       }
       camposLike = ['idPessoa_tecelao']
       comparador = 'I'
@@ -593,6 +603,7 @@ export function ProducaoMalharia() {
     clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
+
         setRsProducaoMalharia(rs);
       });
   }
@@ -950,7 +961,14 @@ export function ProducaoMalharia() {
                         onExcluir(rs.idMalharia as number),
                       toolTip: "Excluir",
                     },
-                  ] : []}
+                  ] : [
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: ProducaoMalhariaInterface) =>
+                        onEditar(rs.idMalharia as number),
+                      toolTip: "Editar",
+                    },
+                  ]}
               />
             </Grid>
           </Grid>

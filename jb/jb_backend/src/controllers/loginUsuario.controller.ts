@@ -3,6 +3,7 @@ import { RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface'
 import ClsLoginUsuarioController from '../services/loginUsuario.controller.cls';
 import { SessaoService } from '../auth/services/sessao.service';
 import { LoginInterface } from '../interfaces/loginIterface';
+import { PermissoesTypeInterface } from '../types/permissoesTypes';
 
 @Controller()
 export class LoginUsuarioController {
@@ -23,14 +24,22 @@ export class LoginUsuarioController {
   }
 
   // //verfica quais as permissoes do usuario logado
-  // @Post('permissoesUsuario')
-  // public permissoesUsuario(): Promise<PermissoesTypeInterface> {
-  //   if(this.sessao.usuarioSessao){
+  @Post('updatePermissoesUsuario')
+  public updatePermissoesUsuario(): Promise<PermissoesTypeInterface> {
+    if (this.sessao.usuarioSessao) {
 
-  //     return new ClsLoginUsuarioController().permissoesUsuario(this.sessao.usuarioSessao)
+      return new ClsLoginUsuarioController().updatePermissoesUsuario(this.sessao.usuarioSessao)
 
-  //   } else{
-  //     return Promise.reject(null)
-  //   }
-  // }
+    } else {
+      return Promise.reject(null)
+    }
+  }
+
+  @Post('logoutUsuario')
+  public logoutUsuario(
+    @Body('email') email: string,
+  ): Promise<RespostaPadraoInterface<LoginInterface>> {
+
+    return new ClsLoginUsuarioController().logout(email);
+  }
 }

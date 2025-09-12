@@ -34,6 +34,31 @@ const SQL_PERMISSAO_POR_USUARIO = `
 `
 
 export default class ClsLoginUsuarioController {
+
+  public async logout(cpf: string): Promise<RespostaPadraoInterface<LoginInterface>> {
+
+    return this.fecharSessoesEmAberto(cpf).then(async (rsUsuarioExistente) => {
+
+      if (rsUsuarioExistente) {
+
+        await AppDataSource.getRepository(Usuario).update({ cpf: cpf }, { ativo: false });
+        return {
+          ok: true,
+          mensagem: 'Usuário deslogado com sucesso.',
+          dados: {
+            idUsuario: 0,
+            nomeUsuario: '',
+            cpfUsuario: '',
+            tipoUsuario: UsuarioType.default,
+            permissoes: PermissoesTypes,
+            token: '',
+          }
+        };
+      }
+    })
+
+  }
+
   public async logar(cpf: string, senha: string): Promise<RespostaPadraoInterface<LoginInterface>> {
 
     let retorno: RespostaPadraoInterface<LoginInterface> = {
@@ -42,6 +67,7 @@ export default class ClsLoginUsuarioController {
       dados: {
         idUsuario: 0,
         nomeUsuario: '',
+        cpfUsuario: '',
         tipoUsuario: UsuarioType.default,
         token: '',
         permissoes: PermissoesTypes
@@ -73,6 +99,7 @@ export default class ClsLoginUsuarioController {
                     dados: {
                       idUsuario: rsUsuarioLogado.idUsuario,
                       nomeUsuario: rsUsuarioLogado.nome,
+                      cpfUsuario: rsUsuarioLogado.cpf,
                       tipoUsuario: rsUsuarioLogado.tipoUsuario,
                       token: token,
                       permissoes: rsPermissoes
@@ -99,28 +126,27 @@ export default class ClsLoginUsuarioController {
 
   }
 
-  private fecharSessoesEmAberto(cpf: string): Promise<boolean> {
+  private async fecharSessoesEmAberto(cpf: string): Promise<boolean> {
 
-    return AppDataSource.getRepository(Usuario).findOne({ where: { cpf: cpf } }).then((rsUsuarioExistente) => {
+    const rsUsuarioExistente = await AppDataSource.getRepository(Usuario).findOne({ where: { cpf: cpf } });
+    if (rsUsuarioExistente) {
 
-      if (rsUsuarioExistente) {
+      return AppDataSource.getRepository(UsuarioSessao).update({ idUsuario: rsUsuarioExistente.idUsuario }, { ativo: false }).then(() => {
+        return true;
+      });
 
-        return AppDataSource.getRepository(UsuarioSessao).update({ idUsuario: rsUsuarioExistente.idUsuario }, { ativo: false }).then(() => {
-          return true
-        })
+    } else {
 
-      } else {
+      return false;
 
-        return false
-
-      }
-
-    })
+    }
   }
 
-  private permissoesUsuario(idUsuario: number): Promise<PermissoesTypeInterface> {
+  public async updatePermissoesUsuario(idUsuario: number): Promise<PermissoesTypeInterface> {
 
     return AppDataSource.query<Array<rsSqlPermissaoPorUsuario>>(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then((rsPermissoes) => {
+
+      console.log(rsPermissoes)
 
       let retorno = JSON.parse(JSON.stringify(PermissoesTypes))
 
@@ -132,19 +158,42 @@ export default class ClsLoginUsuarioController {
 
           const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
 
-          console.log(modulo, permissao);
+          //console.log(modulo, permissao);
 
           if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
             retorno[keyModulo].PERMISSOES[keyPermissao] = ''
           }
 
         })
-
       })
-      console.log('permissoes encontradas pela pesquisa', rsPermissoes)
-      console.log('retorno obtido do teste', retorno)
       return retorno
     })
+  }
+
+  private async permissoesUsuario(idUsuario: number): Promise<PermissoesTypeInterface> {
+
+    const rsPermissoes = await AppDataSource.query<Array<rsSqlPermissaoPorUsuario>>(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]);
+    let retorno = JSON.parse(JSON.stringify(PermissoesTypes));
+    Object.keys(PermissoesTypes).forEach((keyModulo) => {
+
+      const modulo = PermissoesTypes[keyModulo].MODULO;
+
+      Object.keys(PermissoesTypes[keyModulo].PERMISSOES).forEach((keyPermissao) => {
+
+        const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
+
+        console.log(modulo, permissao);
+
+        if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
+          retorno[keyModulo].PERMISSOES[keyPermissao] = '';
+        }
+
+      });
+
+    });
+    console.log('permissoes encontradas pela pesquisa', rsPermissoes);
+    console.log('retorno obtido do teste', retorno);
+    return retorno;
 
     /** 
     const fechouSessoes = await this.fecharSessoesEmAberto(cpf)
@@ -220,35 +269,7 @@ export default class ClsLoginUsuarioController {
       return false
     }
   }
-
-  public async permissoesUsuario(idUsuario: number): Promise<PermissoesTypeInterface> {
-
-    return AppDataSource.query<Array<rsSqlPermissaoPorUsuario>>(SQL_PERMISSAO_POR_USUARIO, [idUsuario, idUsuario]).then((rsPermissoes) => {
-
-      console.log(rsPermissoes)
-
-      let retorno = JSON.parse(JSON.stringify(PermissoesTypes))
-
-      Object.keys(PermissoesTypes).forEach((keyModulo) => {
-
-        const modulo = PermissoesTypes[keyModulo].MODULO;
-
-        Object.keys(PermissoesTypes[keyModulo].PERMISSOES).forEach((keyPermissao) => {
-
-          const permissao = PermissoesTypes[keyModulo].PERMISSOES[keyPermissao];
-
-          //console.log(modulo, permissao);
-
-          if (rsPermissoes.findIndex((rs) => rs.modulo === modulo && rs.permissao === permissao) < 0) {
-            retorno[keyModulo].PERMISSOES[keyPermissao] = ''
-          }
-
-        })
-      })
-      return retorno
-    })
-
-    */
+   */
   }
 
 }

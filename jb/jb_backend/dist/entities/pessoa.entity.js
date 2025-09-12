@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var pessoaTypes_1 = require("../types/pessoaTypes");
 var class_validator_1 = require("class-validator");
-var programacao_entity_1 = require("./programacao.entity");
 var Pessoa = /** @class */ (function () {
     function Pessoa() {
     }
@@ -86,13 +85,6 @@ var Pessoa = /** @class */ (function () {
         (0, typeorm_1.Column)(),
         __metadata("design:type", Boolean)
     ], Pessoa.prototype, "ativo", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
-        (0, typeorm_1.OneToMany)(function () { return programacao_entity_1.default; }, function (programacao) {
-            return programacao.cliente;
-        }, { cascade: true }),
-        __metadata("design:type", Array)
-    ], Pessoa.prototype, "clienteProgramacoes", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)

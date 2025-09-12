@@ -52,6 +52,9 @@ var data_source_1 = require("../data-source");
 var ClsCrudController = /** @class */ (function () {
     function ClsCrudController() {
     }
+    // constructor(
+    //   private readonly sessao: SessaoService, // Injeta o SessaoService
+    // ) { }
     ClsCrudController.prototype.incluirComDetalhe = function (master, entidadeMaster, detalhes, entidadeDetalhe, id) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -84,6 +87,10 @@ var ClsCrudController = /** @class */ (function () {
     ClsCrudController.prototype.incluir = function (criterio, entidade) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
+                // const usuarioLogado = this.sessao.usuarioSessao
+                // const acesso: ClsAcesso = new ClsAcesso();
+                // const result = await acesso.checarAcesso(usuarioLogado, entidade, "incluir");
+                // { modulo: PermissoesTypes.MAQUINA.MODULO, permissao: PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO },
                 return [2 /*return*/, data_source_1.AppDataSource.getRepository(entidade)
                         .save(criterio)
                         .then(function (rs) {

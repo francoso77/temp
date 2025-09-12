@@ -104,14 +104,19 @@ exports.PermissoesTypes = {
     GRUPOS: {
         MODULO: 'Cadastro de Grupos de Usuários',
         PERMISSOES: {
-            MANUTENCAO: 'Manutenção de Grupos'
+            MANUTENCAO: 'Manutenção de Cadastro de Grupos'
         }
     },
     USUARIOS: {
-        MODULO: 'Cadastro de Usuário',
+        MODULO: 'Cadastro de Usuários',
         PERMISSOES: {
-            USUARIOS_GLOBAIS: 'Manutenção de Usuários Globais',
-            CADASTRO_USUARIO_UNIDADE: 'Manutenção de Usuários da Unidade'
+            MANUTENCAO: 'Manutenção de Cadastro de Usuários'
+        }
+    },
+    MODULOS: {
+        MODULO: 'Cadastro de Módulos',
+        PERMISSOES: {
+            MANUTENCAO: 'Manutenção de Cadastro de Módulos'
         }
     }
 };

@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,8 @@ import { EstruturaInterface } from '../../Interfaces/estruturaInterface';
 import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { SqlEstruturaInterface } from '../../Interfaces/sqlEstruturaInterface';
 import DetalheEstrutura from './DetalheEstrutura';
+import { UsuarioType } from '../../types/usuarioTypes';
+import { THEME } from '../../app/Layout/Theme';
 
 
 export default function Estrutura() {
@@ -214,25 +216,40 @@ export default function Estrutura() {
     irPara('/')
   }
 
-  const BuscarDados = () => {
-    clsCrud
+  const BuscarDados = async () => {
+
+    await clsCrud
       .pesquisar({
-        entidade: "Produto",
-        criterio: {
-          tipoProduto: [7, 8, 9],
-        },
-        camposLike: ["tipoProduto"],
-        comparador: 'I',
-        campoOrder: ['nome'],
-        tipoOrder: 'ASC',
+        entidade: "Estrutura",
       })
-      .then((rs: Array<ProdutoInterface>) => {
-        setRsProduto(rs)
+      .then((rs: Array<EstruturaInterface>) => {
+
+        const ids: number[] = rs.map((item: EstruturaInterface) => item.idProduto)
+
+        clsCrud
+          .pesquisar({
+            entidade: "Produto",
+            criterio: {
+              tipoProduto: [7, 8, 9],
+            },
+            camposLike: ["tipoProduto"],
+            comparador: 'I',
+            campoOrder: ['nome'],
+            tipoOrder: 'ASC',
+          })
+          .then((rs: Array<ProdutoInterface>) => {
+            const produtos = rs.filter((produto: ProdutoInterface) => !ids.includes(produto.idProduto as number))
+            setRsProduto(produtos)
+          })
       })
   }
 
   useEffect(() => {
-    BuscarDados()
+    const carregarDados = async () => {
+      BuscarDados()
+      btPesquisar()
+    }
+    carregarDados()
   }, [])
 
   return (
@@ -277,7 +294,7 @@ export default function Estrutura() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: EstruturaInterface) =>
@@ -290,24 +307,44 @@ export default function Estrutura() {
                       onExcluir(rs.idEstrutura as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
             <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
-              <ComboBox
-                opcoes={rsProduto}
-                campoDescricao="nome"
-                campoID="idProduto"
-                dados={estrutura}
-                mensagemPadraoCampoEmBranco="Escolha um produto"
-                field="idProduto"
-                label="Produto"
-                erros={erros}
-                disabled={localState.action === 'excluindo' ? true : false}
-                setState={setEstrutura}
-              />
+              <Box
+                sx={{
+                  mt: 3,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",   // alinha verticalmente
+                  justifyContent: "center", // ou "flex-start" se quiser colado
+                  backgroundColor: THEME.cores.cinzaFundo, // sua cor de fundo
+                  border: "1px solid",
+                  borderColor: THEME.cores.cinzaTexto, // cor da borda
+                  borderRadius: 2, // cantos arredondados
+                  p: 2.5 // padding interno
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "50%",
+                  }}>
+                  <ComboBox
+                    opcoes={rsProduto}
+                    campoDescricao="nome"
+                    campoID="idProduto"
+                    dados={estrutura}
+                    mensagemPadraoCampoEmBranco="Escolha um produto"
+                    field="idProduto"
+                    label="Produto"
+                    erros={erros}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    setState={setEstrutura}
+                  />
+                </Box>
+              </Box>
             </Grid>
             <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
               <DetalheEstrutura

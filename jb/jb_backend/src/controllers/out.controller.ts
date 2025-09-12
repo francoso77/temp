@@ -81,7 +81,7 @@ export class OutController {
       INNER JOIN 
           tinturarias tin ON tin.idTinturaria = prg.idTinturaria
       INNER JOIN 
-          pessoas pc ON pc.idPessoa = prg.idPessoa_cliente
+          pessoas pc ON pc.idPessoa = tin.idPessoa_cliente
       INNER JOIN 
           pessoas pf ON pf.idPessoa = tin.idPessoa_fornecedor
       INNER JOIN 

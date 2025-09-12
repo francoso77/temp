@@ -1,4 +1,4 @@
-import { Container, Grid, IconButton, Paper, Typography, Tooltip, Box } from '@mui/material';
+import { Container, Grid, IconButton, Paper, Typography, Tooltip, Box, Switch, Dialog, useTheme, useMediaQuery } from '@mui/material';
 import Text from '../../Componentes/Text';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Form, useNavigate } from 'react-router-dom';
@@ -17,8 +17,9 @@ import ComboBox from '../../Componentes/ComboBox';
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import CloseIcon from '@mui/icons-material/Close';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-
-
+import { PessoaType } from '../../types/pessoaTypes';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
+import UsuariosPermissoes from './UsuariosPermissoes';
 
 
 const ResetDados: UsuarioInterface = {
@@ -30,7 +31,8 @@ const ResetDados: UsuarioInterface = {
   tipoUsuario: UsuarioType.default,
   email: '',
   resetToken: '',
-  resetTokenExpires: new Date()
+  resetTokenExpires: new Date(),
+  idPessoa_vendedor: 0
 }
 
 export default function Usuario() {
@@ -49,6 +51,9 @@ export default function Usuario() {
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<UsuarioInterface>>([])
+  const [open, setOpen] = useState(false)
+  const [openPermissao, setOpenPermissao] = useState(false)
+  const [idUsuario, setIdUsuario] = useState(0)
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -77,9 +82,48 @@ export default function Usuario() {
       campo: 'tipoUsuario',
       format: (tipo) => UsuarioTypes.find(t => t.idUsuarioType === tipo)?.descricao.toUpperCase()
     },
+    {
+      cabecalho: 'Ativo',
+      alinhamento: 'center',
+      campo: 'ativo',
+      render: (valor: boolean, row: any) => {
+        return (
+          <Switch
+            checked={Boolean(valor)}
+            color="primary"
+            size="small"
+            onChange={async (event) => {
+              const novoValor = event.target.checked;
 
+              // Atualiza no estado principal (exemplo usando setRsPedido)
+              setRsPesquisa((prev) =>
+                prev.map((usuario) =>
+                  usuario.idUsuario === row.idUsuario
+                    ? { ...usuario, ativo: novoValor }
+                    : usuario,
+
+                  updateAtivo(row.idUsuario, novoValor)
+                )
+              );
+
+            }}
+          />
+        );
+      }
+    }
   ]
 
+  const updateAtivo = async (id: number, novoValor: boolean) => {
+
+    const user = rsPesquisa.filter((item) => item.idUsuario === id)
+    user[0].ativo = novoValor
+
+    await clsCrud.incluir({
+      entidade: "Usuario",
+      criterio: user[0],
+      token: usuarioState.token
+    });
+  }
   const pesquisarID = async (id: string | number): Promise<UsuarioInterface> => {
 
     const rs = await clsCrud
@@ -97,7 +141,7 @@ export default function Usuario() {
     setLayoutState({
       ...layoutState,
       titulo: '',
-      tituloAnterior: 'Cadastro de Usuários',
+      tituloAnterior: 'Cadastro de Usuário',
       pathTitulo: '/',
       pathTituloAnterior: '/Usuario'
     })
@@ -106,17 +150,15 @@ export default function Usuario() {
 
   }
 
-  const onEditar = (id: string | number) => {
-    pesquisarID(id).then((rs) => {
-      setUsuario(rs)
-      setLocalState({ action: actionTypes.editando })
-    })
+  const onPermissao = (id: number) => {
+    setIdUsuario(id)
+    setOpenPermissao(true)
   }
 
-  const onExcluir = (id: string | number) => {
+  const onTrocar = (id: string | number) => {
     pesquisarID(id).then((rs) => {
       setUsuario(rs)
-      setLocalState({ action: actionTypes.excluindo })
+      setOpen(true)
     })
   }
 
@@ -126,15 +168,15 @@ export default function Usuario() {
   }
 
   const btCancelar = () => {
-    if (verificarTipoUsuario()) {
+    setErros({})
+    setUsuario(ResetDados)
+    setLocalState({ action: actionTypes.pesquisando })
+    btFechar()
 
-      setErros({})
-      setUsuario(ResetDados)
-      setLocalState({ action: actionTypes.pesquisando })
+  }
 
-    } else {
-      btFechar()
-    }
+  const btCancelarTipo = () => {
+    setOpen(false)
   }
 
   const validarDados = (): boolean => {
@@ -198,31 +240,95 @@ export default function Usuario() {
     })
   }
 
-  const executarAcao = async (acao: "incluir" | "editar", mensagemSucesso: string) => {
+  const temVendedor = async (usuario: UsuarioInterface): Promise<number> => {
+
+    const rs = await clsCrud.pesquisar({
+      entidade: "Pessoa",
+      criterio: { cpf_cnpj: usuario.cpf },
+      camposLike: ["cpf_cnpj"],
+      token: usuarioState.token
+    })
+
+    if (rs.length === 0) {
+      const vendedor: PessoaInterface = {
+        nome: usuario.nome,
+        apelido: '',
+        cpf_cnpj: usuario.cpf,
+        email: usuario.email,
+        endereco: '',
+        numero: 0,
+        bairro: '',
+        cidade: '',
+        uf: '',
+        cep: '',
+        telefone: '',
+        whatsapp: '',
+        comissao: 0,
+        tipoPessoa: PessoaType.vendedor,
+        ativo: true,
+      }
+
+      await clsCrud.incluir({
+        entidade: "Pessoa",
+        criterio: vendedor,
+        token: usuarioState.token
+      })
+
+      const vendedorCadastrado = await clsCrud.pesquisar({
+        entidade: "Pessoa",
+        criterio: { cpf_cnpj: vendedor.cpf_cnpj },
+        camposLike: ["cpf_cnpj"],
+        token: usuarioState.token
+      })
+      return vendedorCadastrado[0].idPessoa
+
+    } else {
+
+      return rs[0].idPessoa
+    }
+  }
+
+  const btConfirmar = async () => {
+
+    if (!validarDados() && (await TemCPF())) return;
+    if (usuario.tipoUsuario === UsuarioType.vendedor) {
+
+      const idVendedor = await temVendedor(usuario)
+
+      usuario.idPessoa_vendedor = idVendedor
+    }
+
     try {
       const rs = await clsCrud.incluir({
         entidade: "Usuario",
         criterio: usuario,
+        token: usuarioState.token
       })
 
       if (rs.ok) {
-        exibirMensagem("Cadastro", mensagemSucesso, MensagemTipo.Ok)
-        if (!verificarTipoUsuario()) {
-          btFechar();
-        }
+        exibirMensagem("Cadastro", "Usuário cadastrado com sucesso!", MensagemTipo.Ok)
         setLocalState({ action: actionTypes.pesquisando })
+        btFechar();
       }
     } catch (error) {
       exibirMensagem("Erro de conexão", "Erro na conexão com banco de dados!", MensagemTipo.Error)
     }
-  }
-  const btConfirmar = async () => {
-    if (!validarDados()) return;
 
-    if (localState.action === actionTypes.incluindo && (await TemCPF())) {
-      await executarAcao("incluir", "Usuário incluído com sucesso!");
-    } else if (localState.action === actionTypes.editando) {
-      await executarAcao("editar", "Usuário alterado com sucesso!");
+  }
+
+  const btConfirmaAlteracao = async () => {
+
+    const rs = await clsCrud.incluir({
+      entidade: "Usuario",
+      criterio: usuario,
+      token: usuarioState.token,
+    })
+
+    if (rs.ok) {
+      await btPesquisar()
+      setOpen(false)
+    } else {
+      exibirMensagem("Erro de conexão", "Erro na conexão com banco de dados!", MensagemTipo.Error)
     }
   }
 
@@ -238,8 +344,8 @@ export default function Usuario() {
     }
   }
 
-  const btPesquisar = () => {
-    clsCrud
+  const btPesquisar = async () => {
+    await clsCrud
       .pesquisar({
         entidade: "Usuario",
         criterio: {
@@ -254,36 +360,20 @@ export default function Usuario() {
       })
   }
 
-  const verificarTipoUsuario = (): boolean => {
-    const tipoUsuario = Number(usuarioState.tipoUsuario)
-    return tipoUsuario === UsuarioType.admin
-  }
 
   useEffect(() => {
 
-    if (!usuarioState.logado) {
-      setLocalState({ action: actionTypes.incluindo })
-    } else {
+    btPesquisar()
+  }, [])
 
-      if (verificarTipoUsuario()) {
-        setLocalState({ action: actionTypes.pesquisando })
-      } else {
-        if (usuarioState.logado) {
-          pesquisarID(usuarioState.idUsuario).then((rs) => {
-            setLocalState({ action: actionTypes.editando })
-            setUsuario(rs)
-          })
-        }
-      }
-    }
-
-  }, [usuarioState, verificarTipoUsuario, pesquisarID])
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))
 
   return (
     <>
       <Form method='post' action='/Usuario'>
 
-        <Container maxWidth="md" sx={{ mt: 1.5 }}>
+        <Container maxWidth="md" sx={{ mt: 1 }}>
           <Paper variant="outlined" sx={{ padding: 1 }}>
 
             <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -292,14 +382,16 @@ export default function Usuario() {
                 <Typography component="h5" variant="h5" align="left">
                   Cadastro de Usuários
                 </Typography>
-                <IconButton onClick={() => btFechar()}>
-                  <CloseIcon />
-                </IconButton>
+                <Tooltip title={'Fechar'}>
+                  <IconButton onClick={() => btFechar()}>
+                    <CloseIcon />
+                  </IconButton>
+                </Tooltip>
               </Grid>
-              <Condicional condicao={localState.action === 'pesquisando' && !verificarTipoUsuario()}>
+              <Condicional condicao={localState.action === 'pesquisando'}>
                 <Grid item xs={10} md={11}>
                   <InputText
-                    label="Pesquisa"
+                    label="Buscar por nome"
                     tipo="uppercase"
                     dados={pesquisa}
                     field="itemPesquisa"
@@ -314,7 +406,7 @@ export default function Usuario() {
                   <Tooltip title={'Incluir'}>
                     <IconButton
                       color="secondary"
-                      sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
+                      sx={{ mt: 4, ml: { xs: 0, md: 1 } }}
                       onClick={() => btIncluir()}
                     >
                       <AddCircleIcon sx={{ fontSize: 50 }} />
@@ -327,16 +419,16 @@ export default function Usuario() {
                     dados={rsPesquisa}
                     acoes={[
                       {
-                        icone: 'edit',
+                        icone: "published_with_changes",
                         onAcionador: (rs: UsuarioInterface) =>
-                          onEditar(rs.idUsuario as number),
-                        toolTip: "Editar",
+                          onTrocar(rs.idUsuario as number),
+                        toolTip: "Alterar Tipo de usuário",
                       },
                       {
-                        icone: "delete",
+                        icone: "playlist_add_check_circle_twotone",
                         onAcionador: (rs: UsuarioInterface) =>
-                          onExcluir(rs.idUsuario as number),
-                        toolTip: "Excluir",
+                          onPermissao(rs.idUsuario as number),
+                        toolTip: "Configurar Permissões",
                       },
                     ]}
                   />
@@ -350,7 +442,7 @@ export default function Usuario() {
                     dados={usuario}
                     field="ativo"
                     setState={setUsuario}
-                    disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
+                    //disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                     onKeyDown={(event: any) => btPulaCampo(event, 1)}
                   />
                 </Grid>
@@ -359,13 +451,12 @@ export default function Usuario() {
                     <InputText
                       label="CPF"
                       mask="cpf"
-                      onBlur={() => TemCPF()}
                       setState={setUsuario}
                       dados={usuario}
                       field="cpf"
                       erros={erros}
                       type='tel'
-                      disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
+                      //disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                       min={14}
                       onKeyDown={(event: any) => btPulaCampo(event, 2)}
                       autoFocus
@@ -383,7 +474,7 @@ export default function Usuario() {
                       erros={erros}
                       type="text"
                       tipo='uppercase'
-                      disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
+                      //                      disabled={['excluindo', 'editando'].includes(localState.action) ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 3)}
                     />
                   </Box>
@@ -399,7 +490,7 @@ export default function Usuario() {
                       erros={erros}
                       type="email"
                       tipo="text"
-                      disabled={localState.action === 'excluindo' ? true : false}
+                      //                      disabled={localState.action === 'excluindo' ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 4)}
                     />
                   </Box>
@@ -415,42 +506,28 @@ export default function Usuario() {
                       setState={setUsuario}
                       tipo='pass'
                       erros={erros}
-                      disabled={localState.action === 'excluindo' ? true : false}
+                      //disabled={localState.action === 'excluindo' ? true : false}
                       onKeyDown={(event: any) => btPulaCampo(event, 5)}
                     />
                   </Box>
                 </Grid>
-                {/* <Grid item xs={12} md={12} sx={{ mt: 2 }}>
-                  <Text
-                    field="senha"
-                    label="Senha"
-                    dados={usuario}
-                    type='password'
-                    setState={setUsuario}
-                    tipo='pass'
-                    erros={erros}
-                    disabled={localState.action === 'excluindo' ? true : false}
-                  />
-                </Grid> */}
-                <Condicional condicao={verificarTipoUsuario()}>
-                  <Grid item xs={12} sm={12} sx={{ mt: 0 }}>
-                    <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-                      <ComboBox
-                        opcoes={UsuarioTypes}
-                        campoDescricao="descricao"
-                        campoID="idUsuarioType"
-                        dados={usuario}
-                        mensagemPadraoCampoEmBranco="Escolha um tipo de usuário"
-                        field="tipoUsuario"
-                        label="Tipo de Usuário"
-                        disabled={localState.action === 'excluindo' ? true : false}
-                        erros={erros}
-                        setState={setUsuario}
-                        onFocus={(e) => e.target.select()}
-                      />
-                    </Box>
-                  </Grid>
-                </Condicional>
+                <Grid item xs={12} sm={12} sx={{ mt: 0 }}>
+                  <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                    <ComboBox
+                      opcoes={UsuarioTypes}
+                      campoDescricao="descricao"
+                      campoID="idUsuarioType"
+                      dados={usuario}
+                      mensagemPadraoCampoEmBranco="Escolha um tipo de usuário"
+                      field="tipoUsuario"
+                      label="Tipo de Usuário"
+                      //                      disabled={localState.action === 'excluindo' ? true : false}
+                      erros={erros}
+                      setState={setUsuario}
+                      onFocus={(e) => e.target.select()}
+                    />
+                  </Box>
+                </Grid>
                 <Grid item xs={12} sx={{ mt: 1, textAlign: 'right' }}>
                   <Tooltip title={'Cancelar'}>
                     <IconButton
@@ -461,20 +538,95 @@ export default function Usuario() {
                       <CancelRoundedIcon sx={{ fontSize: 50 }} />
                     </IconButton>
                   </Tooltip>
-                  <Condicional condicao={['incluindo', 'editando'].includes(localState.action)}>
-                    <Tooltip title={'Confirmar'}>
+                  <Tooltip title={'Confirmar'}>
+                    <IconButton
+                      color="secondary"
+                      sx={{ mt: 1, ml: 2 }}
+                      onClick={() => btConfirmar()}
+                    >
+                      <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Condicional>
+              <Dialog
+                open={open}
+                fullScreen={fullScreen}
+                fullWidth
+                maxWidth='sm'>
+                <Paper variant="outlined"
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    m: 1,
+                    p: 1.5,
+                    backgroundColor: '#3c486b'
+                  }}>
+                  <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                    <Typography sx={{ color: 'white', fontSize: 25, mt: 1, textAlign: 'center' }}>
+                      Trocar Tipo de Usuário
+                    </Typography>
+                  </Grid>
+                </Paper>
+                <Paper variant="outlined" sx={{ padding: 1.5, m: 1 }}>
+                  <Grid container spacing={1.2} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Grid item xs={12} sm={12}>
+                      <Text
+                        field="nome"
+                        label="Usuário"
+                        dados={usuario}
+                        setState={setUsuario}
+                        erros={erros}
+                        disabled={true}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+                      <ComboBox
+                        opcoes={UsuarioTypes}
+                        campoDescricao="descricao"
+                        campoID="idUsuarioType"
+                        dados={usuario}
+                        mensagemPadraoCampoEmBranco="Escolha um tipo de usuário"
+                        field="tipoUsuario"
+                        label="Tipo de Usuário"
+                        erros={erros}
+                        setState={setUsuario}
+                        onFocus={(e) => e.target.select()}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+                    <Tooltip title={'Cancelar'}>
                       <IconButton
                         color="secondary"
-                        sx={{ mt: 1, ml: 2 }}
-                        onClick={() => btConfirmar()}
+                        sx={{ mt: 3 }}
+                        onClick={() => btCancelarTipo()}
+                      >
+                        <CancelRoundedIcon sx={{ fontSize: 50 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={'Alterar'}>
+                      <IconButton
+                        color="secondary"
+                        sx={{ mt: 3 }}
+                        onClick={() => btConfirmaAlteracao()}
                       >
                         <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
                       </IconButton>
                     </Tooltip>
-                  </Condicional>
-                </Grid>
-              </Condicional>
+                  </Grid>
+                </Paper >
+              </Dialog >
             </Grid>
+            <Condicional condicao={openPermissao}>
+              <Grid item xs={12} sm={12} sx={{ mt: 1, textAlign: 'right' }}>
+                <UsuariosPermissoes
+                  idUsuario={idUsuario}
+                  openPermissao={openPermissao}
+                  setOpenPermissao={setOpenPermissao}
+                />
+              </Grid>
+            </Condicional>
           </Paper >
         </Container >
       </Form >

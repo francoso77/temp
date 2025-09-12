@@ -22,6 +22,7 @@ import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalhePedido from './DetalhePedido';
 import { UsuarioType } from '../../types/usuarioTypes';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
+import { PessoaType } from '../../types/pessoaTypes';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -35,6 +36,23 @@ export default function Pedido() {
   const clsFormatacao = new ClsFormatacao()
 
   const ResetDados: PedidoInterface = {
+    cliente: {
+      nome: '',
+      apelido: '',
+      cpf_cnpj: '',
+      endereco: '',
+      numero: 0,
+      bairro: '',
+      cidade: '',
+      uf: '',
+      cep: '',
+      telefone: '',
+      whatsapp: '',
+      email: '',
+      comissao: 0,
+      tipoPessoa: PessoaType.clienteJuridica,
+      ativo: true,
+    },
     dataPedido: '',
     observacao: '',
     idPessoa_cliente: 0,
@@ -297,7 +315,7 @@ export default function Pedido() {
     return `${year}-${month}-${day} 00:00:00`
   }
 
-  const btPesquisar = () => {
+  const btPesquisar = async () => {
 
     const idCliente = rsCliente
       .filter(cliente => cliente.nome.includes(pesquisa.itemPesquisa))
@@ -319,6 +337,8 @@ export default function Pedido() {
     let criterio = {}
     let camposLike = []
     let comparador = "L"
+    let tipoOrder = 'DESC'
+    let campoOrder = ['dataPedido']
 
     const temNumero = /\d/.test(pesquisa.itemPesquisa)
 
@@ -345,17 +365,29 @@ export default function Pedido() {
       comparador = 'I'
     }
 
+    if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+      const vendedor = await clsCrud.pesquisar({
+        entidade: "Usuario",
+        criterio: { idUsuario: usuarioState.idUsuario },
+        camposLike: ["idUsuario"],
+        token: usuarioState.token
+      })
+      criterio = { ...criterio, idPessoa_vendedor: vendedor.filter((item) => item.idPessoa_vendedor)[0].idPessoa_vendedor }
+    }
+
     dadosPesquisa = {
       entidade: "Pedido",
       relations,
       criterio,
       comparador,
       camposLike,
+      campoOrder,
+      tipoOrder,
       msg,
       setMensagemState: setMensagem
     }
 
-    clsCrud
+    await clsCrud
       .pesquisar(dadosPesquisa)
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
@@ -386,8 +418,9 @@ export default function Pedido() {
       }
     }
   }
-  const BuscarDados = () => {
-    clsCrud
+  const BuscarDados = async () => {
+
+    await clsCrud
       .pesquisar({
         entidade: "PrazoEntrega",
         campoOrder: ["nome"],
@@ -400,7 +433,7 @@ export default function Pedido() {
         setRsPrazo(rs)
       })
 
-    clsCrud
+    await clsCrud
       .pesquisar({
         entidade: "Pessoa",
         campoOrder: ['nome'],
@@ -414,23 +447,58 @@ export default function Pedido() {
         setRsCliente(rsClientes)
       })
 
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        campoOrder: ['nome'],
-        criterio: {
-          tipoPessoa: "V",
-        },
-        camposLike: ["tipoPessoa"],
+    if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+
+      const usuario = await clsCrud.pesquisar({
+        entidade: "Usuario",
+        criterio: { idUsuario: usuarioState.idUsuario },
+        camposLike: ["idUsuario"],
+        token: usuarioState.token
       })
-      .then((rsVendedores: Array<PessoaInterface>) => {
-        setRsVendedor(rsVendedores)
-      })
+      const vendedor = usuario.filter((item) => item.idPessoa_vendedor)[0].idPessoa_vendedor
+
+      await clsCrud
+        .pesquisar({
+          entidade: "Pessoa",
+          campoOrder: ['nome'],
+          criterio: {
+            tipoPessoa: "V",
+            idPessoa: vendedor
+          },
+          camposLike: ["tipoPessoa"],
+        })
+        .then((rsVendedores: Array<PessoaInterface>) => {
+          setRsVendedor(rsVendedores)
+        })
+    } else {
+      await clsCrud
+        .pesquisar({
+          entidade: "Pessoa",
+          campoOrder: ['nome'],
+          criterio: {
+            tipoPessoa: "V",
+          },
+          camposLike: ["tipoPessoa"],
+        })
+        .then((rsVendedores: Array<PessoaInterface>) => {
+          setRsVendedor(rsVendedores)
+        })
+    }
+
   }
 
   useEffect(() => {
-    BuscarDados()
+    const carregarDados = async () => {
+      await BuscarDados()
+    }
+    carregarDados()
   }, [])
+
+  useEffect(() => {
+    if (rsCliente.length > 0) {
+      btPesquisar()
+    }
+  }, [rsCliente])
 
   return (
 
@@ -486,7 +554,14 @@ export default function Pedido() {
                       onExcluir(rs.idPedido as number),
                     toolTip: "Excluir",
                   },
-                ] : []}
+                ] : [
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: PedidoInterface) =>
+                      onEditar(rs.idPedido as number),
+                    toolTip: "Editar",
+                  },
+                ]}
               />
             </Grid>
           </Condicional>

@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
-var pessoa_entity_1 = require("./pessoa.entity");
 var tinturaria_entity_1 = require("./tinturaria.entity");
 var detalheProgramacao_entity_1 = require("./detalheProgramacao.entity");
 var Programacao = /** @class */ (function () {
@@ -41,17 +40,14 @@ var Programacao = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idTinturaria' }),
         (0, typeorm_1.ManyToOne)(function () { return tinturaria_entity_1.default; }),
-        __metadata("design:type", tinturaria_entity_1.default)
+        __metadata("design:type", tinturaria_entity_1.default
+        // @Column()
+        // idPessoa_cliente: number
+        // @JoinColumn({ name: 'idPessoa_cliente' })
+        // @ManyToOne(() => Pessoa)
+        // cliente: Pessoa
+        )
     ], Programacao.prototype, "romaneio", void 0);
-    __decorate([
-        (0, typeorm_1.Column)(),
-        __metadata("design:type", Number)
-    ], Programacao.prototype, "idPessoa_cliente", void 0);
-    __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idPessoa_cliente' }),
-        (0, typeorm_1.ManyToOne)(function () { return pessoa_entity_1.default; }),
-        __metadata("design:type", pessoa_entity_1.default)
-    ], Programacao.prototype, "cliente", void 0);
     __decorate([
         (0, typeorm_1.JoinColumn)({ name: 'idProgramacao' }),
         (0, typeorm_1.OneToMany)(function () { return detalheProgramacao_entity_1.default; }, function (detalheProgramacao) { return detalheProgramacao.programacao; }, { cascade: true }),

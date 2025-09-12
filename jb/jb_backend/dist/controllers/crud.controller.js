@@ -24,6 +24,7 @@ var CrudController = /** @class */ (function () {
         return new crud_controller_cls_1.default().incluirComDetalhe(master, entidadeMaster, detalhes, entidadeDetalhe, id);
     };
     CrudController.prototype.incluir = function (criterio, entidade) {
+        //testar a permissao da entidade e usuario logado pode incluir
         return new crud_controller_cls_1.default().incluir(criterio, entidade);
     };
     CrudController.prototype.atualizar = function (criterio, entidade) {
@@ -77,7 +78,9 @@ var CrudController = /** @class */ (function () {
     ], CrudController.prototype, "incluirComDetalhe", null);
     __decorate([
         (0, common_1.Post)("incluir"),
-        (0, roles_decorator_1.Roles)({ modulo: permissoesTypes_1.PermissoesTypes.COR.MODULO, permissao: permissoesTypes_1.PermissoesTypes.COR.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.UNIDADE_MEDIDA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.UNIDADE_MEDIDA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.ESTRUTURA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.ESTRUTURA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.MAQUINA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PESSOA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PESSOA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRAZO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRAZO.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRODUTO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO }),
+        (0, roles_decorator_1.Roles)({ modulo: permissoesTypes_1.PermissoesTypes.COR.MODULO, permissao: permissoesTypes_1.PermissoesTypes.COR.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.UNIDADE_MEDIDA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.UNIDADE_MEDIDA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.ESTRUTURA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.ESTRUTURA.PERMISSOES.MANUTENCAO }, 
+        // { modulo: PermissoesTypes.MAQUINA.MODULO, permissao: PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO },
+        { modulo: permissoesTypes_1.PermissoesTypes.PESSOA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PESSOA.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRAZO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRAZO.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRODUTO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO }, { modulo: permissoesTypes_1.PermissoesTypes.PEDIDO.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PEDIDO.PERMISSOES.INCLUSAO }, { modulo: permissoesTypes_1.PermissoesTypes.PRODUCAO_MALHARIA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUCAO_MALHARIA.PERMISSOES.LANCAR }, { modulo: permissoesTypes_1.PermissoesTypes.PRODUCAO_MALHARIA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUCAO_MALHARIA.PERMISSOES.GRAFICOS }, { modulo: permissoesTypes_1.PermissoesTypes.PRODUCAO_MALHARIA.MODULO, permissao: permissoesTypes_1.PermissoesTypes.PRODUCAO_MALHARIA.PERMISSOES.PERDAS }),
         __param(0, (0, common_1.Body)("criterio")),
         __param(1, (0, common_1.Body)("entidade")),
         __metadata("design:type", Function),

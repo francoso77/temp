@@ -15,6 +15,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 export default function UnidadeMedida() {
 
@@ -245,7 +246,7 @@ export default function UnidadeMedida() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: UnidadeMedidaInterface) =>
@@ -258,7 +259,7 @@ export default function UnidadeMedida() {
                       onExcluir(rs.idUnidade as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>

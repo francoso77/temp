@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
@@ -21,6 +21,7 @@ import ClsApi from '../../Utils/ClsApi';
 import EtiquetasPedido from './EtiquetasPedido';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { UsuarioType } from '../../types/usuarioTypes';
 
 
 
@@ -30,7 +31,7 @@ export default function ProgramacaoDublagem() {
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
-  const clsRelatorioProgramacao = new ClsRelatorioProgramacao()
+  const clsRelatorios = new ClsRelatorioProgramacao()
 
   const resetDados = {
     dataProgramacao: '',
@@ -116,13 +117,33 @@ export default function ProgramacaoDublagem() {
   const onProgramacao = async (id: string | number) => {
     const { dataProgramacao } = await pesquisarID(id);
     const dataPesquisa = formatarData(dataProgramacao);
-    clsRelatorioProgramacao.renderRelacao(dataPesquisa);
+    //clsRelatorios.renderRelacao(dataPesquisa);
+    clsRelatorios.renderRelacao(dataPesquisa, () => {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Nenhuma programação foi gerada.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    })
   }
 
   const onFicha = async (id: string | number) => {
     const { dataProgramacao } = await pesquisarID(id);
     const dataPesquisa = formatarData(dataProgramacao);
-    clsRelatorioProgramacao.renderFicha(dataPesquisa);
+    //clsRelatorios.renderFicha(dataPesquisa);
+    clsRelatorios.renderFicha(dataPesquisa, () => {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Nenhuma ficha foi gerada.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    })
   }
 
   const onEtiqueta = async (id: number) => {
@@ -279,6 +300,14 @@ export default function ProgramacaoDublagem() {
     }
   }
 
+  useEffect(() => {
+    const carregarDados = async () => {
+      await btPesquisar()
+    }
+    carregarDados()
+  }, [])
+
+
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -321,7 +350,7 @@ export default function ProgramacaoDublagem() {
                 <DataTable
                   cabecalho={cabecalhoForm}
                   dados={rsPesquisa}
-                  acoes={[
+                  acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                     {
                       icone: "find_in_page_two_tone",
                       onAcionador: (rs: ProgramacaoDublagemInterface) =>
@@ -352,6 +381,31 @@ export default function ProgramacaoDublagem() {
                         onExcluir(rs.idProgramacaoDublagem as number),
                       toolTip: "Excluir",
                     },
+                  ] : [
+                    {
+                      icone: "find_in_page_two_tone",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onProgramacao(rs.idProgramacaoDublagem as number),
+                      toolTip: "Programação",
+                    },
+                    {
+                      icone: "sell_two_tone",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onEtiqueta(rs.idProgramacaoDublagem as number),
+                      toolTip: "Etiqueta",
+                    },
+                    {
+                      icone: "receipt_long.two_tone",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onFicha(rs.idProgramacaoDublagem as number),
+                      toolTip: "Ficha de Corte",
+                    },
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: ProgramacaoDublagemInterface) =>
+                        onEditar(rs.idProgramacaoDublagem as number),
+                      toolTip: "Editar",
+                    }
                   ]}
                 />
               </Grid>

@@ -43,6 +43,14 @@ var Tinturaria = /** @class */ (function () {
         __metadata("design:type", pessoa_entity_1.default)
     ], Tinturaria.prototype, "fornecedor", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+        __metadata("design:type", Boolean)
+    ], Tinturaria.prototype, "programado", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+        __metadata("design:type", Boolean)
+    ], Tinturaria.prototype, "finalizado", void 0);
+    __decorate([
         (0, typeorm_1.OneToMany)(function () { return detalheTinturaria_entity_1.default; }, function (detalheTinturaria) { return detalheTinturaria.tinturaria; }),
         __metadata("design:type", Array)
     ], Tinturaria.prototype, "detalheTinturarias", void 0);

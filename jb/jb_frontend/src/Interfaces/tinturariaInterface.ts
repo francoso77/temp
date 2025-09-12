@@ -5,6 +5,8 @@ export interface TinturariaInterface {
   dataTinturaria: string
   idPessoa_cliente: number
   idPessoa_fornecedor: number
+  programado: boolean
+  finalizado: boolean
 }
 
 export interface DetalheTinturariaInterface {

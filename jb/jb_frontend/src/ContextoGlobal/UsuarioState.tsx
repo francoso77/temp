@@ -12,6 +12,7 @@ export default function useUsuarioState() {
   const [usuarioState, setUsuarioState] = useState<UsuarioStateInterface>({
     idUsuario: 0,
     nomeUsuario: '',
+    cpfUsuario: '',
     logado: false,
     token: '',
     tipoUsuario: UsuarioType.admin,

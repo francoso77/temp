@@ -52,13 +52,17 @@ export default function Login() {
         .then((rs) => {
           if (rs.ok && rs.dados) {
 
+            //console.log(rs.dados.permissoes)
+            // console.log('Teste', rs.dados.permissoes.COR.PERMISSOES.MANUTENCAO.length > 0)
+
             contextGlobal.setUsuarioState({
               idUsuario: rs.dados.idUsuario,
               nomeUsuario: rs.dados.nomeUsuario,
+              cpfUsuario: rs.dados.cpfUsuario,
               logado: true,
               token: rs.dados.token,
               tipoUsuario: rs.dados.tipoUsuario,
-              idsMenu: rs.dados.tipoUsuario === UsuarioType.default ? [7] :
+              idsMenu: rs.dados.tipoUsuario === UsuarioType.default ? [5] :
                 rs.dados.tipoUsuario === UsuarioType.vendedor ? [1, 5, 6, 10] :
                   rs.dados.tipoUsuario === UsuarioType.estoquistaMalharia ? [3, 4, 6, 10] :
                     rs.dados.tipoUsuario === UsuarioType.estoquistaDublagem ? [2, 6, 7, 9, 10] :
@@ -146,27 +150,51 @@ export default function Login() {
                 descricao: 'Sistema',
                 path: '',
                 icon: 'settings_outlined',
-                permitido: true,
+                //permitido: Object.entries(rs.dados.permissoes).some(([key, value]) => value.PERMISSOES.MANUTENCAO),
+                permitido: Object.entries(rs.dados.permissoes).some(
+                  ([, value]) =>
+                    ["Cadastro de Grupos de Usuários", "Cadastro de Usuários", "Cadastro de Módulos"].includes(value.MODULO) &&
+                    value.PERMISSOES.MANUTENCAO.length > 0
+                ),
                 filhos: []
               },
-              {
-                id: '10',
-                parentId: '9',
-                descricao: 'Grupos de Usuários',
-                path: '/GruposUsuarios',
-                icon: 'people_alt_outlined',
-                filhos: [],
-                permitido: true,
-              },
+              // {
+              //   id: '10',
+              //   parentId: '9',
+              //   descricao: 'Grupos de Usuários',
+              //   path: '/GruposUsuarios',
+              //   icon: 'people_alt_outlined',
+              //   filhos: [],
+              //   permitido: rs.dados.permissoes.GRUPOS.PERMISSOES.MANUTENCAO.length > 0,
+              // },
               {
                 id: '11',
                 parentId: '9',
                 descricao: 'Usuários',
-                path: '/Usuarios',
+                path: '/Usuario',
                 icon: 'person_outline_outlined',
                 filhos: [],
+                permitido: rs.dados.permissoes.USUARIOS.PERMISSOES.MANUTENCAO.length > 0,
+              },
+              {
+                id: '12',
+                parentId: '9',
+                descricao: 'Módulos',
+                path: '/Modulos',
+                icon: 'app_registration_twotone',
+                filhos: [],
+                permitido: rs.dados.permissoes.MODULOS.PERMISSOES.MANUTENCAO.length > 0,
+                //permitido: true
+              },
+              {
+                id: '13',
+                parentId: null,
+                descricao: 'Sair',
+                path: '',
+                icon: 'logout_outlined',
                 permitido: true,
-              }
+                filhos: []
+              },
             ]
 
             const clsMenu = new MenuCls(MENU)
@@ -332,11 +360,11 @@ export default function Login() {
                     } />
                   </Grid> */}
                   <Grid item xs={12}>
-                    <Button variant='contained' onClick={() => btEntrar()} sx={{ width: '100%', mt: 1.5 }}>Logar</Button>
+                    <Button variant='contained' onClick={() => btEntrar()} sx={{ width: '100%', mt: 1.5, mb: 2, textTransform: 'none', fontSize: '1.5rem' }}>Entrar</Button>
                   </Grid>
-                  <Grid item xs={12} sx={{ textAlign: "center", mt: 1.5, mb: 2 }}>
+                  {/* <Grid item xs={12} sx={{ textAlign: "center", mt: 1.5, mb: 2 }}>
                     <Link href="#">Esqueci a senha</Link>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
                 <Copyright />
               </Box>
@@ -347,92 +375,3 @@ export default function Login() {
     </>
   )
 }
-
-
-
-// <>
-//   <Form method='post' action='/Login'>
-//     <Grid
-//       container
-//       minHeight="100vh"
-//       justifyContent="center"
-//       alignContent="center"
-//     >
-//       <Grid item xs={12} sm={8} md={5} lg={4}>
-//         <Paper sx={{ padding: 3, margin: 3 }}>
-//           <Grid container>
-//             <Grid item xs={12} sx={{ textAlign: "center" }}>
-//               {/* <img src="./windows11/Wide310x150Logo.scale-400.png" style={{ maxWidth: "100px" }} /> */}
-//             </Grid>
-//             <Grid item xs={12} sx={{ mt: 3 }}>
-//               <Text
-//                 autofocus
-//                 label='CPF'
-//                 mask="000.000.000-00"
-//                 tipo='mask'
-//                 field='cpf'
-//                 dados={dados}
-//                 setState={setDados}
-//                 erros={erros}
-//               />
-//             </Grid>
-//             <Grid item xs={12} sx={{ mt: 3 }}>
-//               <Text
-//                 field="senha"
-//                 label="Senha"
-//                 tipo='pass'
-//                 type='password'
-//                 dados={dados}
-//                 setState={setDados}
-//                 erros={erros}
-//                 mapKeyPress={[{ key: 'Enter', onKey: btEntrar }]}
-//               />
-//             </Grid>
-//             <Grid container alignItems="center" justifyContent="space-between">
-//               <Grid item>
-//                 <FormControlLabel control={<Checkbox />} label={
-//                   <Typography variant="caption" display="block" gutterBottom>
-//                     Lembre-me
-//                   </Typography>
-//                 } />
-//               </Grid>
-//               <Grid item>
-//                 <FormControlLabel control={<Link href="#" />} onClick={() => navegar('/Usuario')} label={
-//                   <Typography variant="caption" display="block" gutterBottom>
-//                     Cadastrar
-//                   </Typography>
-//                 } />
-//               </Grid>
-//             </Grid>
-//             <Grid item xs={12} sx={{ mt: 3 }}>
-//               <Button
-//                 onClick={() => btEntrar()}
-//                 fullWidth
-//                 variant="contained"
-//               >
-//                 Entrar
-//               </Button>
-//             </Grid>
-//             <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
-//               <Link>Esqueci a Senha</Link>
-//             </Grid>
-//             <Grid item xs={12} sx={{ textAlign: "center", mt: 4.5 }}>
-//               <Button
-//                 startIcon={<img src={GOOGLE} alt="logotipo da Google" width="50" height="50" />}
-//               >
-//               </Button>
-//               <Button
-//                 startIcon={<img src={FACEBOOK} alt="logotipo do Facebook" width="50" height="50" />}
-//               >
-//               </Button>
-//               <Button
-//                 startIcon={<img src={APPLE} alt="logotipo da Apple" width="50" height="50" />}
-//               >
-//               </Button>
-//             </Grid>
-//           </Grid >
-//         </Paper>
-//       </Grid>
-//     </Grid>
-//   </Form>
-// </>

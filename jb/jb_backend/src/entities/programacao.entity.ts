@@ -1,5 +1,4 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import Pessoa from './pessoa.entity';
 import { ProgramacaoInterface } from '../interfaces/programacaoInterface';
 import Tinturaria from './tinturaria.entity';
 import DetalheProgramacao from './detalheProgramacao.entity';
@@ -28,12 +27,12 @@ export default class Programacao implements ProgramacaoInterface {
   @ManyToOne(() => Tinturaria)
   romaneio: Tinturaria
 
-  @Column()
-  idPessoa_cliente: number
+  // @Column()
+  // idPessoa_cliente: number
 
-  @JoinColumn({ name: 'idPessoa_cliente' })
-  @ManyToOne(() => Pessoa)
-  cliente: Pessoa
+  // @JoinColumn({ name: 'idPessoa_cliente' })
+  // @ManyToOne(() => Pessoa)
+  // cliente: Pessoa
 
   @JoinColumn({ name: 'idProgramacao' })
   @OneToMany(() => DetalheProgramacao,

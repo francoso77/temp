@@ -31,15 +31,21 @@ export class CrudController {
     { modulo: PermissoesTypes.COR.MODULO, permissao: PermissoesTypes.COR.PERMISSOES.MANUTENCAO },
     { modulo: PermissoesTypes.UNIDADE_MEDIDA.MODULO, permissao: PermissoesTypes.UNIDADE_MEDIDA.PERMISSOES.MANUTENCAO },
     { modulo: PermissoesTypes.ESTRUTURA.MODULO, permissao: PermissoesTypes.ESTRUTURA.PERMISSOES.MANUTENCAO },
-    { modulo: PermissoesTypes.MAQUINA.MODULO, permissao: PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO },
+    // { modulo: PermissoesTypes.MAQUINA.MODULO, permissao: PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO },
     { modulo: PermissoesTypes.PESSOA.MODULO, permissao: PermissoesTypes.PESSOA.PERMISSOES.MANUTENCAO },
     { modulo: PermissoesTypes.PRAZO.MODULO, permissao: PermissoesTypes.PRAZO.PERMISSOES.MANUTENCAO },
     { modulo: PermissoesTypes.PRODUTO.MODULO, permissao: PermissoesTypes.PRODUTO.PERMISSOES.MANUTENCAO },
+    { modulo: PermissoesTypes.PEDIDO.MODULO, permissao: PermissoesTypes.PEDIDO.PERMISSOES.INCLUSAO },
+    { modulo: PermissoesTypes.PRODUCAO_MALHARIA.MODULO, permissao: PermissoesTypes.PRODUCAO_MALHARIA.PERMISSOES.LANCAR },
+    { modulo: PermissoesTypes.PRODUCAO_MALHARIA.MODULO, permissao: PermissoesTypes.PRODUCAO_MALHARIA.PERMISSOES.GRAFICOS },
+    { modulo: PermissoesTypes.PRODUCAO_MALHARIA.MODULO, permissao: PermissoesTypes.PRODUCAO_MALHARIA.PERMISSOES.PERDAS },
+
   )
   incluir(
     @Body("criterio") criterio: Record<string, any>,
     @Body("entidade") entidade: string
   ): Promise<RespostaPadraoInterface<any>> {
+    //testar a permissao da entidade e usuario logado pode incluir
     return new ClsCrudController().incluir(criterio, entidade);
   }
 

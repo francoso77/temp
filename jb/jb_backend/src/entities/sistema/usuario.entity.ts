@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UsuarioInterface } from '../../interfaces/sistema/usuarioInterface';
 import { UsuarioType } from '../../types/usuarioTypes';
+import Pessoa from '../pessoa.entity';
 
 @Entity({ name: 'usuarios' })
 export class Usuario implements UsuarioInterface {
@@ -34,6 +35,9 @@ export class Usuario implements UsuarioInterface {
 
   @Column({ type: "timestamp", nullable: true })
   resetTokenExpires: Date;
+
+  @Column()
+  idPessoa_vendedor: number
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

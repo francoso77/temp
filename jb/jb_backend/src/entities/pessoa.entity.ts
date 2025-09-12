@@ -1,8 +1,7 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { PessoaInterface } from '../interfaces/pessoaInterface';
 import { PessoaType } from '../types/pessoaTypes';
 import { Length } from 'class-validator';
-import Programacao from './programacao.entity';
 
 @Entity({ name: 'pessoas' })
 export default class Pessoa implements PessoaInterface {
@@ -61,10 +60,10 @@ export default class Pessoa implements PessoaInterface {
   @Column()
   ativo: boolean
 
-  @JoinColumn({ name: 'idPessoa_cliente' })
-  @OneToMany(() => Programacao, (programacao) =>
-    programacao.cliente, { cascade: true })
-  clienteProgramacoes: Programacao[]
+  // @JoinColumn({ name: 'idPessoa_cliente' })
+  // @OneToMany(() => Programacao, (programacao) =>
+  //   programacao.cliente, { cascade: true })
+  // clienteProgramacoes: Programacao[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

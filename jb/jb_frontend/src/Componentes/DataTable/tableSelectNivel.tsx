@@ -11,7 +11,6 @@ import { KeyboardArrowDown, KeyboardArrowUp, ArrowDownward, ArrowUpward } from '
 import { DataTableInterface, getComparator, Order, stableSort, sumColumns } from '.';
 import AutorenewTwoToneIcon from '@mui/icons-material/AutorenewTwoTone';
 import { StyledTableCell, StyledTableRow } from './tableSelect';
-import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 interface ItemDetail {
     idDetalhePedido: number,

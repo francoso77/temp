@@ -1,8 +1,10 @@
 import { StatusType } from '../types/statusTypes'
 import { CorInterface } from './corInteface'
+import { PessoaInterface } from './pessoaInterface'
 import { ProdutoInterface } from './produtoInterface'
 
 export interface PedidoInterface {
+  cliente: PessoaInterface
   idPedido?: number
   dataPedido: string
   observacao: string

@@ -12,7 +12,6 @@ import styled from 'styled-components';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { THEME } from '../../app/Layout/Theme';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 export const StyledTableCell = styled(TableCell)(({ }) => ({
     [`&.${tableCellClasses.head}`]: {

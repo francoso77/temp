@@ -4,7 +4,7 @@ export enum PessoaType {
   fornecedor = 'F',
   vendedor = 'V',
   revisador = 'R',
-  tecelao = 'T'
+  tecelao = 'T',
 }
 
 export const PessoaTypes = [

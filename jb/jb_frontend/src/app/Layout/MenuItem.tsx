@@ -5,6 +5,11 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { GlobalContext, GlobalContextInterface } from "../../ContextoGlobal/ContextoGlobal";
 import { MenuOpcoesInterface } from './ClsMenu';
+import ClsApi from '../../Utils/ClsApi';
+import { RespostaPadraoInterface } from '../../Interfaces/respostaPadrao.interface';
+import { LoginInterface } from '../../Interfaces/loginIterface';
+import { UsuarioType } from '../../types/usuarioTypes';
+import { PermissoesTypes } from '../../types/permissoesTypes';
 
 
 interface PropsInterface {
@@ -16,9 +21,8 @@ interface PropsInterface {
 export default function MenuItem({ menu, deslocamento }: PropsInterface) {
 
   const navigate = useNavigate()
-
-  const { layoutState, setLayoutState } = useContext(GlobalContext) as GlobalContextInterface
-
+  const clsApi: ClsApi = new ClsApi()
+  const { layoutState, setLayoutState, usuarioState, setUsuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [openSubMenu, setOpenSubMenu] = useState(false)
 
   const handleClickSubMenu = (oque: any) => {
@@ -30,9 +34,38 @@ export default function MenuItem({ menu, deslocamento }: PropsInterface) {
     setLayoutState({ ...layoutState, exibirMenu: false, titulo: titulo })
   }
 
+  const handleLogout = async () => {
+
+    const Logout = await clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
+      method: 'post',
+      url: 'logoutUsuario',
+      token: usuarioState.token,
+      cpf: usuarioState.cpfUsuario
+    })
+
+    if (Logout.ok) {
+
+      localStorage.clear()
+
+      setUsuarioState({
+        idUsuario: 0,
+        nomeUsuario: '',
+        logado: false,
+        cpfUsuario: '',
+        token: '',
+        tipoUsuario: UsuarioType.default,
+        //idsMenu: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        idsMenu: [6, 10],
+        permissoes: PermissoesTypes
+      })
+
+      irPara('/', '')
+    }
+  }
+
   if (menu.filhos.length === 0) {
     return (
-      <ListItemButton onClick={() => irPara(menu.path, menu.descricao)}>
+      <ListItemButton onClick={() => menu.descricao === 'Sair' ? handleLogout() : irPara(menu.path, menu.descricao)}>
         <ListItemIcon>
           <Icon sx={{ textAlign: 'center', marginLeft: deslocamento }}>{menu.icon}</Icon>
         </ListItemIcon>

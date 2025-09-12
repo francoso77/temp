@@ -300,12 +300,8 @@ export default function Entrada() {
     return `${year}-${month}-${day} 00:00:00`
   }
 
-  // const formatNumber = (numString: string): string => {
-  //   const paddedNum = numString.padStart(9, '0')
-  //   return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
-  // }
-
   const btPesquisar = () => {
+
     const relations = [
       "fornecedor",
       "detalheEntradas",
@@ -397,8 +393,17 @@ export default function Entrada() {
   }
 
   useEffect(() => {
-    BuscarDados()
+    const carregarDados = async () => {
+      await BuscarDados()
+    }
+    carregarDados()
   }, [])
+
+  useEffect(() => {
+    if (rsFornecedor.length > 0) {
+      btPesquisar()
+    }
+  }, [rsFornecedor])
 
   return (
 

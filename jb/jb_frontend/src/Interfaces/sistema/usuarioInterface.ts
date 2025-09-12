@@ -11,6 +11,7 @@ export interface UsuarioInterface {
   tipoUsuario: UsuarioType;
   resetToken: string;
   resetTokenExpires: Date;
+  idPessoa_vendedor?: number
 }
 
 export interface UsuarioSessaoInterface {

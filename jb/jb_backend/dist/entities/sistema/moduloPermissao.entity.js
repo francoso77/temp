@@ -20,10 +20,14 @@ var ModuloPermissao = /** @class */ (function () {
         __metadata("design:type", Number)
     ], ModuloPermissao.prototype, "idModuloPermissao", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idModulo' }),
-        (0, typeorm_1.ManyToOne)(function () { return modulo_entity_1.Modulo; }),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], ModuloPermissao.prototype, "idModulo", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idModulo' }),
+        (0, typeorm_1.ManyToOne)(function () { return modulo_entity_1.Modulo; }, function (modulo) { return modulo.moduloPermissoes; }),
+        __metadata("design:type", modulo_entity_1.Modulo)
+    ], ModuloPermissao.prototype, "modulo", void 0);
     __decorate([
         (0, typeorm_1.Column)({ length: 255 }),
         __metadata("design:type", String)
@@ -37,7 +41,8 @@ var ModuloPermissao = /** @class */ (function () {
         __metadata("design:type", Date)
     ], ModuloPermissao.prototype, "updateAt", void 0);
     ModuloPermissao = __decorate([
-        (0, typeorm_1.Entity)({ name: 'modulospermissoes' })
+        (0, typeorm_1.Entity)({ name: 'modulospermissoes' }),
+        (0, typeorm_1.Unique)(['idModulo', 'permissao'])
     ], ModuloPermissao);
     return ModuloPermissao;
 }());

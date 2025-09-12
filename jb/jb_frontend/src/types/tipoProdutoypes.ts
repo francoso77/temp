@@ -53,3 +53,24 @@ export const TipoProdutoTypes = [
     descricao: "TECIDO TINTO"
   },
 ]
+
+export enum MiniTipoProdutoType {
+  nylon = 7,
+  palmilha = 8,
+  tecidoCru = 9,
+}
+
+export const MiniTipoProdutoTypes = [
+  {
+    idTipoProduto: MiniTipoProdutoType.nylon,
+    descricao: "NYLON"
+  },
+  {
+    idTipoProduto: MiniTipoProdutoType.palmilha,
+    descricao: "PALMILHA"
+  },
+  {
+    idTipoProduto: MiniTipoProdutoType.tecidoCru,
+    descricao: "TECIDO CRU"
+  },
+]

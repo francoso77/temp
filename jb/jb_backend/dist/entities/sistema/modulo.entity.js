@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Modulo = void 0;
 var typeorm_1 = require("typeorm");
+var moduloPermissao_entity_1 = require("./moduloPermissao.entity");
 var Modulo = /** @class */ (function () {
     function Modulo() {
     }
@@ -19,9 +20,13 @@ var Modulo = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Modulo.prototype, "idModulo", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ length: 255 }),
+        (0, typeorm_1.Column)({ length: 255, nullable: false }),
         __metadata("design:type", String)
     ], Modulo.prototype, "modulo", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return moduloPermissao_entity_1.ModuloPermissao; }, function (moduloPermissao) { return moduloPermissao.modulo; }),
+        __metadata("design:type", Array)
+    ], Modulo.prototype, "moduloPermissoes", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
@@ -31,7 +36,8 @@ var Modulo = /** @class */ (function () {
         __metadata("design:type", Date)
     ], Modulo.prototype, "updateAt", void 0);
     Modulo = __decorate([
-        (0, typeorm_1.Entity)({ name: 'modulos' })
+        (0, typeorm_1.Entity)({ name: 'modulos' }),
+        (0, typeorm_1.Unique)(['modulo'])
     ], Modulo);
     return Modulo;
 }());

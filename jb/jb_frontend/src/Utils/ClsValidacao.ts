@@ -1,4 +1,40 @@
 import { DateTime } from "luxon";
+import { PedidoInterface } from '../Interfaces/pedidoInterface';
+import { PeriodoType } from '../types/periodoTypes';
+
+interface IntervaloDatas {
+  inicio: Date;
+  fim: Date;
+}
+
+export interface ProductionData {
+  month: string;
+  nylon: number;
+  palmilha: number;
+  tecidoCru: number;
+}
+
+export interface TopProduto {
+  nomeProduto: string;
+  qtdTotal: number;
+  valorTotal: number;
+}
+
+export interface TopCliente {
+  nomeCliente: string;
+  qtdPedidos: number;
+  valorTotal: number;
+}
+
+interface ResultadoPeriodo {
+  periodoAtual: IntervaloDatas;
+  periodoAnterior: IntervaloDatas | null;
+  pedidosAtual: PedidoInterface[];
+  pedidosAnterior: PedidoInterface[];
+  productionData: ProductionData[];
+  topProdutos: TopProduto[];
+  topClientes: TopCliente[];
+}
 
 /**
  * Biblioteca de validação de dados para esquema CRUD React conforme padrões de projeto "Zanatta"
@@ -448,4 +484,250 @@ export default class ClsValidacao {
       }
     }
   }
+
+
+  // ==========================================================
+  // Função auxiliar para ProductionData
+  // ==========================================================
+  private formatMonthYear(date: Date): string {
+    const mes = String(date.getMonth() + 1).padStart(2, "0");
+    const ano = date.getFullYear();
+    return `${mes}/${ano}`;
+  }
+
+  private gerarProductionData(pedidos: PedidoInterface[]): ProductionData[] {
+    const mapa = new Map<string, ProductionData>();
+
+    pedidos.forEach((p) => {
+      const data = new Date(p.dataPedido);
+      const chaveMes = this.formatMonthYear(data);
+
+      if (!mapa.has(chaveMes)) {
+        mapa.set(chaveMes, {
+          month: chaveMes,
+          nylon: 0,
+          palmilha: 0,
+          tecidoCru: 0,
+        });
+      }
+
+      const registro = mapa.get(chaveMes)!;
+
+      (p.detalhePedidos || []).forEach((d) => {
+        const qtd = Number(d.qtdPedida) || 0;
+        const tipo = Number(d.produto?.tipoProduto);
+
+        switch (tipo) {
+          case 7:
+            registro.nylon += qtd;
+            break;
+          case 8:
+            registro.palmilha += qtd;
+            break;
+          case 9:
+            registro.tecidoCru += qtd;
+            break;
+        }
+      });
+    });
+
+    return Array.from(mapa.values());
+  }
+  public filtraPedidosPorPeriodo(
+    pedidos: PedidoInterface[],
+    idPeriodo: number,
+    idTipoProduto: number,
+    idCliente: number,
+    idVendedor: number
+  ): ResultadoPeriodo {
+
+    console.log('Pedidos recebidos: ', pedidos)
+    const hoje = new Date();
+
+    let atual: IntervaloDatas | null = null;
+    let anterior: IntervaloDatas | null = null;
+
+    // ==========================================================
+    // 1) Definir intervalo de datas se idPeriodo > 0
+    // ==========================================================
+    if (idPeriodo > 0) {
+      switch (idPeriodo) {
+        case PeriodoType.mes_atual: {
+          const inicioAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+          const fimAtual = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+          const inicioAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+          const fimAnterior = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+
+          atual = { inicio: inicioAtual, fim: fimAtual };
+          anterior = { inicio: inicioAnterior, fim: fimAnterior };
+          break;
+        }
+        case PeriodoType.ultimo_mes: {
+          const inicioAtual = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+          const fimAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+
+          const inicioAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
+          const fimAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 0);
+
+          atual = { inicio: inicioAtual, fim: fimAtual };
+          anterior = { inicio: inicioAnterior, fim: fimAnterior };
+          break;
+        }
+        case PeriodoType.ultimos_3_meses: {
+          const inicioAtual = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
+          const fimAtual = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+          const inicioAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1);
+          const fimAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 0);
+
+          atual = { inicio: inicioAtual, fim: fimAtual };
+          anterior = { inicio: inicioAnterior, fim: fimAnterior };
+          break;
+        }
+        case PeriodoType.ultimos_6_meses: {
+          const inicioAtual = new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1);
+          const fimAtual = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+          const inicioAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 11, 1);
+          const fimAnterior = new Date(hoje.getFullYear(), hoje.getMonth() - 5, 0);
+
+          atual = { inicio: inicioAtual, fim: fimAtual };
+          anterior = { inicio: inicioAnterior, fim: fimAnterior };
+          break;
+        }
+        case PeriodoType.ano_atual: {
+          const inicioAtual = new Date(hoje.getFullYear(), 0, 1);
+          const fimAtual = new Date(hoje.getFullYear(), 11, 31);
+
+          const inicioAnterior = new Date(hoje.getFullYear() - 1, 0, 1);
+          const fimAnterior = new Date(hoje.getFullYear() - 1, 11, 31);
+
+          atual = { inicio: inicioAtual, fim: fimAtual };
+          anterior = { inicio: inicioAnterior, fim: fimAnterior };
+          break;
+        }
+        default:
+          throw new Error("Período inválido");
+      }
+    }
+
+    // ==========================================================
+    // 2) Aplicar filtros (data, cliente, vendedor, produto)
+    // ==========================================================
+    const aplicarFiltros = (lista: PedidoInterface[], inicio?: Date, fim?: Date) => {
+      return lista.filter((p) => {
+        const dataPedido = new Date(p.dataPedido);
+
+        // período
+        if (inicio && fim) {
+          if (dataPedido < inicio || dataPedido > fim) return false;
+        }
+
+        // cliente
+        if (idCliente > 0 && p.idPessoa_cliente !== idCliente) return false;
+
+        // vendedor
+        if (idVendedor > 0 && p.idPessoa_vendedor !== idVendedor) return false;
+
+        // tipo produto
+        if (idTipoProduto > 0) {
+          const temProduto = (p.detalhePedidos || []).some(
+            (d) => Number(d.produto?.tipoProduto) === idTipoProduto
+          );
+          if (!temProduto) return false;
+        }
+
+        return true;
+      });
+    };
+
+    const pedidosAtual =
+      idPeriodo > 0 && atual
+        ? aplicarFiltros(pedidos, atual.inicio, atual.fim)
+        : aplicarFiltros(pedidos);
+
+    const pedidosAnterior =
+      idPeriodo > 0 && anterior
+        ? aplicarFiltros(pedidos, anterior.inicio, anterior.fim)
+        : [];
+
+    // ==========================================================
+    // 3) Montar ProductionData (agrupado por mês)
+    // ==========================================================
+    const productionData = this.gerarProductionData(pedidosAtual);
+
+    // ==========================================================
+    // 4) Montar TopProdutos (5 primeiros)
+    // ==========================================================
+    const produtoMap = new Map<string, { qtd: number; valor: number }>();
+
+    pedidosAtual.forEach(pedido => {
+      pedido.detalhePedidos.forEach((det: any) => {
+        const nomeProduto = det.produto.nome
+        const qtd = det.qtdPedida
+        const valor = det.qtdPedida * det.vrUnitario
+
+        if (!produtoMap.has(nomeProduto)) {
+          produtoMap.set(nomeProduto, { qtd: 0, valor: 0 })
+        }
+        const prod = produtoMap.get(nomeProduto)!
+        prod.qtd += qtd
+        prod.valor += valor
+      })
+    })
+
+    const topProdutos: TopProduto[] = Array.from(produtoMap.entries())
+      .map(([nomeProduto, { qtd, valor }]) => ({
+        nomeProduto,
+        qtdTotal: qtd,
+        valorTotal: valor,
+      }))
+      .sort((a, b) => b.qtdTotal - a.qtdTotal)
+      .slice(0, 5);
+
+    // ==========================================================
+    // 5) Montar TopClientes (5 primeiros)
+    // ==========================================================
+    const clienteMap = new Map<string, { qtdPedidos: number; valor: number }>();
+
+    pedidosAtual.forEach(pedido => {
+      const nomeCliente = pedido.cliente.nome
+      let valorPedido = 0
+
+      pedido.detalhePedidos.forEach((det: any) => {
+        valorPedido += det.qtdPedida * det.vrUnitario
+      })
+
+      if (!clienteMap.has(nomeCliente)) {
+        clienteMap.set(nomeCliente, { qtdPedidos: 0, valor: 0 })
+      }
+      const cliente = clienteMap.get(nomeCliente)!
+      cliente.qtdPedidos += 1
+      cliente.valor += valorPedido
+    })
+
+    const topClientes: TopCliente[] = Array.from(clienteMap.entries())
+      .map(([nomeCliente, { qtdPedidos, valor }]) => ({
+        nomeCliente,
+        qtdPedidos,
+        valorTotal: valor,
+      }))
+      .sort((a, b) => b.qtdPedidos - a.qtdPedidos)
+      .slice(0, 5);
+
+    // ==========================================================
+    // 6) Retorno final
+    // ==========================================================
+    return {
+      periodoAtual: atual ?? { inicio: hoje, fim: hoje },
+      periodoAnterior: anterior,
+      pedidosAtual,
+      pedidosAnterior,
+      productionData,
+      topProdutos,
+      topClientes,
+    };
+  }
+
 }

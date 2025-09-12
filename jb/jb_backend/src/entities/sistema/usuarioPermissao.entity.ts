@@ -1,7 +1,6 @@
-import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UsuarioPermissaoInterface } from '../../interfaces/sistema/usuarioInterface';
 import { Usuario } from './usuario.entity';
-import { Modulo } from './modulo.entity';
 import { ModuloPermissao } from './moduloPermissao.entity';
 
 @Entity({ name: 'usuariospermissoes' })
@@ -9,17 +8,19 @@ export class UsuarioPermissao implements UsuarioPermissaoInterface {
   @PrimaryGeneratedColumn()
   idUsuarioPermissao: number;
 
-  @JoinColumn({ name: 'idUsuario' })
-  @ManyToOne(() => Usuario)
+  @Column({ nullable: true })
   idUsuario: number;
 
-  // @JoinColumn({ name: 'idModulo' })
-  // @ManyToOne(() => Modulo)
-  // idModulo: number;
+  @JoinColumn({ name: 'idUsuario' })
+  @ManyToOne(() => Usuario)
+  usuario: Usuario;
+
+  @Column({ nullable: true })
+  idModuloPermissao: number;
 
   @JoinColumn({ name: 'idModuloPermissao' })
   @ManyToOne(() => ModuloPermissao)
-  idModuloPermissao: number;
+  moduloPermissao: ModuloPermissao;
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date;

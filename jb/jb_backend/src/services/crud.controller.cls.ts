@@ -3,6 +3,9 @@ import { AppDataSource } from '../data-source';
 import { PadraoPesquisaInterface, RespostaPadraoInterface } from '../interfaces/respostaPadrao.interface';
 
 export default class ClsCrudController {
+  // constructor(
+  //   private readonly sessao: SessaoService, // Injeta o SessaoService
+  // ) { }
 
   public async incluirComDetalhe(
     master: Record<string, any>,
@@ -33,6 +36,12 @@ export default class ClsCrudController {
   }
 
   public async incluir(criterio: Record<string, any>, entidade: string) {
+
+    // const usuarioLogado = this.sessao.usuarioSessao
+    // const acesso: ClsAcesso = new ClsAcesso();
+    // const result = await acesso.checarAcesso(usuarioLogado, entidade, "incluir");
+    // { modulo: PermissoesTypes.MAQUINA.MODULO, permissao: PermissoesTypes.MAQUINA.PERMISSOES.MANUTENCAO },
+
     return AppDataSource.getRepository(entidade)
       .save(criterio)
       .then((rs) => {
@@ -108,6 +117,7 @@ export default class ClsCrudController {
     //"N" | "L" | "I" | "=" | ">" | "<" | ">=" | "<=" | "!=" 
 
     camposLike.forEach((campo) => {
+
       if (comparador === "L") {
         where[campo] = Like(`%${where[campo]}%`)
       } else if (comparador === "N") {

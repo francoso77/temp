@@ -9,12 +9,12 @@ import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/Cont
 import { Tooltip, Typography } from '@mui/material';
 import Condicional from '../../Componentes/Condicional/Condicional';
 import LogoutIcon from '@mui/icons-material/Logout';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useNavigate } from 'react-router-dom';
 import { UsuarioType } from '../../types/usuarioTypes';
-
-
-
+import { PermissoesTypes } from '../../types/permissoesTypes';
+import { RespostaPadraoInterface } from '../../Interfaces/respostaPadrao.interface';
+import { LoginInterface } from '../../Interfaces/loginIterface';
+import ClsApi from '../../Utils/ClsApi';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -28,8 +28,14 @@ export default function HeaderMenu() {
     usuarioState,
     setUsuarioState
   } = React.useContext(GlobalContext) as GlobalContextInterface
-  const navegar = useNavigate()
 
+  const navigate = useNavigate()
+
+  const clsApi: ClsApi = new ClsApi()
+  const irPara = (url: string, titulo: string) => {
+    navigate(url)
+    setLayoutState({ ...layoutState, exibirMenu: false, titulo: titulo })
+  }
   const toggleDrawer = () => {
     setLayoutState({ ...layoutState, exibirMenu: !layoutState.exibirMenu })
   };
@@ -38,30 +44,43 @@ export default function HeaderMenu() {
     setMensagemState({ ...mensagemState, exibir: false })
   }
 
-  const handleClick = (tipo: boolean) => {
-    if (tipo) {
-      navegar(layoutState.pathTituloAnterior)
-      let _titulo: string = layoutState.titulo
-      let _pathTitulo: string = layoutState.pathTitulo
-      setLayoutState({
-        ...layoutState,
-        titulo: layoutState.tituloAnterior,
-        pathTitulo: layoutState.pathTituloAnterior,
-        tituloAnterior: _titulo,
-        pathTituloAnterior: _pathTitulo
+  const handleClick = async () => {
+
+    const Logout = await clsApi.execute<RespostaPadraoInterface<LoginInterface>>({
+      method: 'post',
+      url: 'logoutUsuario',
+      token: usuarioState.token,
+      cpf: usuarioState.cpfUsuario
+    })
+
+    if (Logout.ok) {
+
+      localStorage.clear()
+
+      setUsuarioState({
+        idUsuario: 0,
+        nomeUsuario: '',
+        logado: false,
+        cpfUsuario: '',
+        token: '',
+        tipoUsuario: UsuarioType.default,
+        //idsMenu: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        idsMenu: [6, 10],
+        permissoes: PermissoesTypes
       })
-    } else {
-      setUsuarioState({ ...usuarioState, logado: false })
-      navegar('/')
+
+      irPara('/', '')
     }
   }
 
   const verificarTipoUsuario = () => {
+    // o tipo de usuário determina se terá menu ou não 
     let tipoUsuario: any = usuarioState.tipoUsuario
-    const estoquista: number = UsuarioType.estoquistaMalharia
+    const estoquistaMalharia: number = UsuarioType.estoquistaMalharia
     const admin: number = UsuarioType.admin
+    const estoquistaDublagem: number = UsuarioType.estoquistaDublagem
     tipoUsuario = Number(tipoUsuario)
-    return tipoUsuario === admin || tipoUsuario === estoquista
+    return tipoUsuario === admin || tipoUsuario === estoquistaMalharia || tipoUsuario === estoquistaDublagem
   }
 
   React.useEffect(() => {
@@ -100,18 +119,9 @@ export default function HeaderMenu() {
         <Box sx={{ flexGrow: 1 }}>
           <AppBar onLoad={fecharLoading} color='primary' >
             <Toolbar>
-              <Tooltip title='Voltar'>
-                <IconButton
-                  size="large"
-                  edge="start"
-                  color="inherit"
-                  aria-label="open drawer"
-                  sx={{ mr: 2 }}
-                  onClick={() => handleClick(true)}
-                >
-                  <ChevronLeftIcon />
-                </IconButton>
-              </Tooltip>
+              <Box>
+                <img src="img/logomarca.png" width={55} alt="logo tipo da empresa JB Textl" />
+              </Box>
               <Box sx={{ flexGrow: 1 }} />
               <Box >
                 <Typography variant="body1" gutterBottom sx={{ margin: '20px' }}>
@@ -126,7 +136,7 @@ export default function HeaderMenu() {
                     edge="end"
                     color="inherit"
                     sx={{ mr: 1 }}
-                    onClick={() => handleClick(false)}
+                    onClick={() => handleClick()}
                   >
                     <LogoutIcon />
                   </IconButton>

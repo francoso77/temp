@@ -83,6 +83,8 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
       dataTinturaria: '',
       idPessoa_cliente: 0,
       idPessoa_fornecedor: 0,
+      programado: false,
+      finalizado: false
     },
     perdaMalharia: 0,
     perdaTinturaria: 0

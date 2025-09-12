@@ -25,6 +25,7 @@ import { DetalheEstruturaInterface } from '../../Interfaces/estruturaInterface'
 import { EstoqueInterface } from '../../Interfaces/estoqueInterface'
 import TableSelect from '../../Componentes/DataTable/tableSelect'
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao'
+import { UsuarioType } from '../../types/usuarioTypes'
 
 
 
@@ -39,6 +40,8 @@ export function Tinturaria() {
     dataTinturaria: '',
     idPessoa_cliente: 0,
     idPessoa_fornecedor: 0,
+    programado: false,
+    finalizado: false
   }
 
   interface PesquisaInterface {
@@ -389,7 +392,7 @@ export function Tinturaria() {
         }
         return true;
       } else {
-        MensagemErro('Nenhuma produção encontrada para alteração');
+        //MensagemErro('Nenhuma produção encontrada para alteração');
         return false;
       }
     } catch (e) {
@@ -455,12 +458,18 @@ export function Tinturaria() {
             criterio: tinturaria,
             localState: localState,
             token: usuarioState.token,
-            cb: () => btPesquisar(),
-            setMensagemState: setMensagemState
+
           })
           .then((rs) => {
             if (rs.ok) {
-              setLocalState({ action: actionTypes.pesquisando })
+              if (localState.action === actionTypes.incluindo) {
+
+                setTinturaria(rs.dados)
+                setLocalState({ action: actionTypes.detalhes })
+              } else {
+                setLocalState({ action: actionTypes.pesquisando })
+              }
+              btPesquisar()
             } else {
               setMensagemState({
                 titulo: 'Erro...',
@@ -475,6 +484,7 @@ export function Tinturaria() {
       } else {
 
         AtualizaProducao(tinturaria.idTinturaria as number).then((v) => {
+
           if (v) {
             clsCrud
               .excluir({
@@ -485,40 +495,49 @@ export function Tinturaria() {
                 if (!rs.ok) {
                   console.log('Não foi possível excluir os detalhes da tinturaria')
                   console.log(rs.mensagem)
-                } else {
-                  clsCrud
-                    .excluir({
-                      entidade: 'Tinturaria',
-                      criterio: tinturaria,
-                      localState: localState,
-                      cb: () => btPesquisar(),
-                      setMensagemState: setMensagemState
-                    })
-                    .then((rs) => {
-                      if (rs.ok) {
-                        setLocalState({ action: actionTypes.pesquisando })
-                      } else {
-                        setMensagemState({
-                          titulo: 'Erro...',
-                          exibir: true,
-                          mensagem: 'Erro no cadastro - Consulte Suporte',
-                          tipo: MensagemTipo.Error,
-                          exibirBotao: true,
-                          cb: null
-                        })
-                      }
-                    })
                 }
               })
           }
+          clsCrud
+            .excluir({
+              entidade: 'Tinturaria',
+              criterio: tinturaria,
+              localState: localState,
+              cb: () => btPesquisar(),
+              setMensagemState: setMensagemState
+            })
+            .then((rs) => {
+              if (rs.ok) {
+                setLocalState({ action: actionTypes.pesquisando })
+              } else {
+                setMensagemState({
+                  titulo: 'Erro...',
+                  exibir: true,
+                  mensagem: 'Erro no cadastro - Consulte Suporte',
+                  tipo: MensagemTipo.Error,
+                  exibirBotao: true,
+                  cb: null
+                })
+              }
+            })
         })
       }
     }
   }
 
   useEffect(() => {
-    BuscarDados()
+    const carregarDados = async () => {
+      await BuscarDados()
+    }
+    carregarDados()
   }, [])
+
+  useEffect(() => {
+    if (rsCliente.length > 0) {
+      btPesquisar()
+    }
+  }, [rsCliente])
+
 
   return (
     <>
@@ -564,7 +583,7 @@ export function Tinturaria() {
                   dados={rsPesquisa}
                   tituloTabela='Romaneios gerados'
                   onStatus={onStatus}
-                  acoes={[
+                  acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                     {
                       icone: 'edit',
                       onAcionador: (rs: TinturariaInterface) =>
@@ -576,6 +595,25 @@ export function Tinturaria() {
                       onAcionador: (rs: TinturariaInterface) =>
                         onExcluir(rs.idTinturaria as number),
                       toolTip: "Excluir",
+                    },
+                    {
+                      icone: "assignment_turned_in_two_tone",
+                      onAcionador: (rs: TinturariaInterface) =>
+                        onDetalhes(rs.idTinturaria as number),
+                      toolTip: "Romaneio",
+                    },
+                    {
+                      icone: "picture_as_pdf_rounded_icon",
+                      onAcionador: (rs: TinturariaInterface) =>
+                        onRomaneio([rs.idTinturaria as number]),
+                      toolTip: "Relação Peças",
+                    },
+                  ] : [
+                    {
+                      icone: 'edit',
+                      onAcionador: (rs: TinturariaInterface) =>
+                        onEditar(rs.idTinturaria as number),
+                      toolTip: "Editar",
                     },
                     {
                       icone: "assignment_turned_in_two_tone",

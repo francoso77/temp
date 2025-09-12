@@ -1,5 +1,5 @@
-import { Container, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
-import { useContext, useState } from 'react';
+import { Box, Container, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -18,6 +18,7 @@ import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
 import { THEME } from '../../app/Layout/Theme';
 import DialogPessoas from '../../Componentes/Dialog/DialogPessoas';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 
 export default function Pessoa() {
@@ -56,8 +57,9 @@ export default function Pessoa() {
     email: '',
     comissao: 0,
     tipoPessoa: PessoaType.clienteJuridica,
-    ativo: true
+    ativo: true,
   }
+
   interface PesquisaInterface {
     nome: string
   }
@@ -147,7 +149,6 @@ export default function Pessoa() {
     let retorno: boolean = true
     let erros: { [key: string]: string } = {}
     retorno = validaCampo.naoVazio('nome', pessoa, erros, retorno, 'Nome da pessoa não pode ser vázio')
-    retorno = validaCampo.eTelefone('telefone', pessoa, erros, retorno, false)
     retorno = validaCampo.eTelefone('whatsapp', pessoa, erros, retorno, false)
     if (['C', 'F', 'J'].includes(pessoa.tipoPessoa)) {
       if (pessoa.tipoPessoa === 'C') {
@@ -162,6 +163,7 @@ export default function Pessoa() {
       retorno = validaCampo.naoVazio('cidade', pessoa, erros, retorno, 'Informe a cidade')
       retorno = validaCampo.eUF('uf', pessoa, erros, retorno, false)
       retorno = validaCampo.eEmail('email', pessoa, erros, retorno)
+      retorno = validaCampo.eTelefone('telefone', pessoa, erros, retorno, false)
     }
     setErros(erros)
     return retorno
@@ -312,6 +314,13 @@ export default function Pessoa() {
     }
   }
 
+  useEffect(() => {
+    const carregarDados = async () => {
+      await btPesquisar()
+    }
+    carregarDados()
+  }, [])
+
   return (
 
     <Container maxWidth="xl" sx={{ mt: 2 }}>
@@ -353,7 +362,7 @@ export default function Pessoa() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: PessoaInterface) =>
@@ -366,7 +375,7 @@ export default function Pessoa() {
                       onExcluir(rs.idPessoa as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>
@@ -379,25 +388,67 @@ export default function Pessoa() {
             />
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={6} sm={6} md={6} sx={{ textAlign: 'left' }}>
-              <InputText
-                label="Ativo"
-                tipo="checkbox"
-                dados={pessoa}
-                field="ativo"
-                setState={setPessoa}
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
+            <Grid item xs={12} sm={3} md={3}  >
+              <Box
+                sx={{
+                  mt: 3,
+                  p: 2,
+                  pl: 15,
+                  //width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  backgroundColor: THEME.cores.cinzaFundo,
+                  border: "1px solid",
+                  borderColor: THEME.cores.cinzaTexto,
+                  borderRadius: 2,
+                  minWidth: 120 // largura mínima opcional, para não ficar apertado
+                }}
+              >
+                <InputText
+                  label="Ativo"
+                  tipo="checkbox"
+                  dados={pessoa}
+                  field="ativo"
+                  setState={setPessoa}
+                  disabled={localState.action === 'excluindo' ? true : false}
+
+                />
+              </Box>
             </Grid>
-            <Grid item xs={7} sm={6} md={6} sx={{ textAlign: 'left', ml: -5 }}>
-              <Typography variant="subtitle1" component="div">
-                Tipo de Pessoa:
-              </Typography>
-              <Typography sx={{ color: THEME.cores.cinzaTexto }}>
-                {PessoaTypes.map((p) => p.idPessoaType === selectedValue ? p.descricao : "")}
-              </Typography>
+            <Grid item xs={12} sm={9} md={9}>
+              <Box
+                sx={{
+                  mt: 3,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",   // alinha verticalmente
+                  justifyContent: "center", // ou "flex-start" se quiser colado
+                  backgroundColor: THEME.cores.cinzaFundo, // sua cor de fundo
+                  border: "1px solid",
+                  borderColor: THEME.cores.cinzaTexto, // cor da borda
+                  borderRadius: 2, // cantos arredondados
+                  p: 2.5 // padding interno
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  component="div"
+                  sx={{ fontSize: 22, fontWeight: "bold" }}
+                >
+                  Tipo de Pessoa:
+                </Typography>
+
+                <Typography
+                  sx={{ color: THEME.palette.primary.main, fontSize: 20, ml: 2, mt: 0.5 }}
+                >
+                  {PessoaTypes.find((p) => p.idPessoaType === selectedValue)?.descricao}
+                </Typography>
+              </Box>
             </Grid>
-            <Grid item xs={12} md={['C', 'F', 'J'].includes(pessoa.tipoPessoa) ? 6 : 4} sx={{ mt: 2, pl: { md: 1 } }}>
+
+            <Grid item xs={12} md={['C', 'F', 'J'].includes(pessoa.tipoPessoa) ? 4 : 3} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 label="Nome"
                 tipo="uppercase"
@@ -422,11 +473,12 @@ export default function Pessoa() {
                 maxLength={25}
               />
             </Grid>
-            <Condicional condicao={['C', 'F', 'J'].includes(pessoa.tipoPessoa)}>
-              <Grid item xs={12} md={3} sx={{ mt: 2 }}>
+            <Condicional condicao={['C', 'F', 'J', 'V'].includes(pessoa.tipoPessoa)}>
+
+              <Grid item xs={12} md={2} sx={{ mt: 2 }}>
                 <InputText
-                  label={pessoa.tipoPessoa === 'C' ? "CPF" : "CNPJ"}
-                  mask={pessoa.tipoPessoa === 'C' ? "cpf" : "cnpj"}
+                  label={pessoa.tipoPessoa === 'C' || pessoa.tipoPessoa === 'V' ? "CPF" : "CNPJ"}
+                  mask={pessoa.tipoPessoa === 'C' || pessoa.tipoPessoa === 'V' ? "cpf" : "cnpj"}
                   setState={setPessoa}
                   dados={pessoa}
                   field="cpf_cnpj"
@@ -441,6 +493,8 @@ export default function Pessoa() {
                   }
                 />
               </Grid>
+            </Condicional>
+            <Condicional condicao={['C', 'F', 'J'].includes(pessoa.tipoPessoa)}>
               <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="CEP"
@@ -460,7 +514,7 @@ export default function Pessoa() {
                   }
                 />
               </Grid>
-              <Grid item xs={12} md={9} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={12} md={10} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Endereço"
                   tipo="uppercase"
@@ -484,7 +538,7 @@ export default function Pessoa() {
                   erros={erros}
                 />
               </Grid>
-              <Grid item xs={9} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={9} md={5} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Bairro"
                   tipo="uppercase"
@@ -532,20 +586,20 @@ export default function Pessoa() {
                   disabled={localState.action === 'excluindo' ? true : false}
                 />
               </Grid>
+              <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+                <InputText
+                  label="Telefone"
+                  setState={setPessoa}
+                  dados={pessoa}
+                  field="telefone"
+                  erros={erros}
+                  type="tel"
+                  mask='tel'
+                  disabled={localState.action === 'excluindo' ? true : false}
+                />
+              </Grid>
             </Condicional>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
-              <InputText
-                label="Telefone"
-                setState={setPessoa}
-                dados={pessoa}
-                field="telefone"
-                erros={erros}
-                type="tel"
-                mask='tel'
-                disabled={localState.action === 'excluindo' ? true : false}
-              />
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <InputText
                 label="WhatsApp"
                 setState={setPessoa}
@@ -558,7 +612,7 @@ export default function Pessoa() {
               />
             </Grid>
             <Condicional condicao={pessoa.tipoPessoa === 'V'}>
-              <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Grid item xs={3} md={1} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Comissão"
                   tipo="number"
@@ -585,7 +639,7 @@ export default function Pessoa() {
                 <Tooltip title={'Confirmar'}>
                   <IconButton
                     color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
+                    sx={{ mt: 3 }}
                     onClick={() => btConfirmar()}
                   >
                     <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />

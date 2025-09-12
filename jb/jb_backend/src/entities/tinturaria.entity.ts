@@ -29,6 +29,12 @@ export default class Tinturaria implements TinturariaInterface {
   @ManyToOne(() => Pessoa)
   fornecedor: Pessoa
 
+  @Column({ type: 'boolean', default: false })
+  programado: boolean
+
+  @Column({ type: 'boolean', default: false })
+  finalizado: boolean
+
   @OneToMany(() => DetalheTinturaria, (detalheTinturaria) => detalheTinturaria.tinturaria)
   detalheTinturarias: DetalheTinturaria[]
 

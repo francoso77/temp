@@ -1,5 +1,5 @@
-import { Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useState } from 'react';
+import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -16,6 +16,8 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import HoverColorIntensityRating from '../../Componentes/Rating';
+import { UsuarioType } from '../../types/usuarioTypes';
+import { THEME } from '../../app/Layout/Theme';
 
 
 
@@ -204,6 +206,13 @@ export default function Cor() {
     irPara('/')
   }
 
+  useEffect(() => {
+    const carregarDados = async () => {
+      await btPesquisar()
+    }
+    carregarDados()
+  }, [])
+
   return (
 
     <Container maxWidth="xl" sx={{ mt: 2 }}>
@@ -245,7 +254,7 @@ export default function Cor() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: CorInterface) =>
@@ -258,49 +267,67 @@ export default function Cor() {
                       onExcluir(rs.idCor as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>
           <Condicional condicao={localState.action !== 'pesquisando'}>
-            <Grid item xs={6}>
-              <InputText
-                label="Nome"
-                tipo="uppercase"
-                dados={cor}
-                field="nome"
-                setState={setCor}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={35}
-                autoFocus
-              />
-            </Grid>
-            {/* <Grid item xs={6}>
-              <InputText
-                label="Nível de Cor"
-                tipo="number"
-                dados={cor}
-                field="nivel"
-                setState={setCor}
-                disabled={localState.action === 'excluindo' ? true : false}
-                erros={erros}
-                maxLength={2}
-              />
-            </Grid> */}
-            <Grid item xs={6}>
-              <HoverColorIntensityRating
-                color="#FF5733"
-                dados={cor}
-                field="nivel"
-                setState={setCor}
-              />
-            </Grid>
-            <Grid item xs={12} sx={{ mt: 3, textAlign: 'right' }}>
+            <Box sx={{
+              border: 1,
+              borderColor: THEME.palette.secondary.main,
+              borderRadius: 1,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              m: 2,
+              mt: 5,
+              p: 1,
+            }}>
+
+              <Grid item xs={6}>
+                <Box sx={{
+                  border: 1,
+                  borderColor: THEME.palette.secondary.main,
+                  borderRadius: 1,
+                  p: 6,
+                  m: 1,
+                }}>
+                  <InputText
+                    label="Nome"
+                    tipo="uppercase"
+                    dados={cor}
+                    field="nome"
+                    setState={setCor}
+                    disabled={localState.action === 'excluindo' ? true : false}
+                    erros={erros}
+                    maxLength={35}
+                    autoFocus
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box sx={{
+                  border: 1,
+                  borderColor: THEME.palette.secondary.main,
+                  borderRadius: 1,
+                  p: 1,
+                  m: 1,
+                }}>
+                  <HoverColorIntensityRating
+                    color="#FF5733"
+                    dados={cor}
+                    field="nivel"
+                    setState={setCor}
+                  />
+                </Box>
+              </Grid>
+            </Box>
+            <Grid item xs={12} sx={{ mt: 1, textAlign: 'right' }}>
               <Tooltip title={'Cancelar'}>
                 <IconButton
                   color="secondary"
-                  sx={{ mt: 3, ml: 2 }}
+                  sx={{ mt: 1 }}
                   onClick={() => btCancelar()}
                 >
                   <CancelRoundedIcon sx={{ fontSize: 50 }} />
@@ -310,7 +337,7 @@ export default function Cor() {
                 <Tooltip title={'Confirmar'}>
                   <IconButton
                     color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
+                    sx={{ mt: 1, }}
                     onClick={() => btConfirmar()}
                   >
                     <CheckCircleRoundedIcon sx={{ fontSize: 50 }} />
@@ -322,7 +349,7 @@ export default function Cor() {
                 <Tooltip title={'Excluir'}>
                   <IconButton
                     color="secondary"
-                    sx={{ mt: 3, ml: 2 }}
+                    sx={{ mt: 1 }}
                     onClick={() => btConfirmar()}
                   >
                     <DeleteIcon sx={{ fontSize: 60 }} />

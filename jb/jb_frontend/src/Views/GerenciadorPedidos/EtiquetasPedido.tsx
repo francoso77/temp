@@ -14,6 +14,7 @@ import ArticleTwoToneIcon from '@mui/icons-material/ArticleTwoTone';
 import SellTwoToneIcon from '@mui/icons-material/SellTwoTone';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 import { StatusTypes } from '../../types/statusTypes';
+import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 
 interface PropsInterface {
   programacao: number,
@@ -25,7 +26,7 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
-  const clsRelatorioProgramacao = new ClsRelatorioProgramacao()
+  const clsRelatorios = new ClsRelatorioProgramacao()
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
@@ -93,11 +94,31 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
 
 
   const onEtiqueta = async (ids: number[]) => {
-    clsRelatorioProgramacao.renderEtiqueta(ids)
+    //clsRelatorioProgramacao.renderEtiqueta(ids)
+    clsRelatorios.renderEtiqueta(ids, () => {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Nenhuma etiqueta foi gerada.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    })
   }
 
   const onRomaneio = async (ids: number[]) => {
-    clsRelatorioProgramacao.renderRomaneio(ids)
+    //clsRelatorios.renderRomaneio(ids)
+    clsRelatorios.renderRomaneio(ids, () => {
+      setMensagemState({
+        titulo: 'Aviso',
+        exibir: true,
+        mensagem: 'Nenhum romaneio foi gerado.',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+    })
   }
 
   const actions: Array<ItemSpeedDial> = [

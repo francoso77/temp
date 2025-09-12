@@ -15,6 +15,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 
 export default function PrazoEntrega() {
@@ -246,7 +247,7 @@ export default function PrazoEntrega() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: PrazoEntregaInterface) =>
@@ -259,7 +260,7 @@ export default function PrazoEntrega() {
                       onExcluir(rs.idPrazoEntrega as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>

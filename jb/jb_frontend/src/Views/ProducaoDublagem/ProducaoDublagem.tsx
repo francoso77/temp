@@ -22,6 +22,8 @@ import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes'
 import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
+import { UsuarioType } from '../../types/usuarioTypes';
+import StatusPedido from '../DashBoard/StatusPedido';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
@@ -159,13 +161,38 @@ export default function ProducaoDublagem() {
       })
   }
 
-  const onEditar = (pedido: number) => {
-    pesquisarID(pedido).then((rs) => {
-      setProducaoDublagem(rs)
-      AtualizaSomatorio(rs)
-      setLocalState({ action: actionTypes.editando })
+  const pedidoValido = async (pedido: number): Promise<boolean> => {
+
+    const rs: Array<PedidoInterface> = await clsCrud.pesquisar({
+      entidade: "Pedido",
+      criterio: { idPedido: pedido }
     })
-    btPesquisarQtd(pedido)
+
+    return rs.length > 0 && rs[0].statusPedido !== StatusType.finalizado
+  }
+
+
+  const onEditar = async (pedido: number) => {
+
+    if (await pedidoValido(pedido)) {
+
+      pesquisarID(pedido).then((rs) => {
+        setProducaoDublagem(rs)
+        AtualizaSomatorio(rs)
+        setLocalState({ action: actionTypes.editando })
+      })
+      btPesquisarQtd(pedido)
+    } else {
+      setMensagemState({
+        titulo: 'Aviso...',
+        exibir: true,
+        mensagem: 'Pedido já finalizado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      })
+
+    }
   }
 
   const onExcluir = (pedido: number) => {
@@ -525,20 +552,28 @@ export default function ProducaoDublagem() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
-                  {
-                    icone: "edit",
-                    onAcionador: (rs: any) =>
-                      onEditar(rs.pedido),
-                    toolTip: "Editar",
-                  },
-                  {
-                    icone: "delete",
-                    onAcionador: (rs: any) =>
-                      onExcluir(rs.pedido),
-                    toolTip: "Excluir",
-                  },
-                ]}
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ?
+                  [
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: any) =>
+                        onEditar(rs.pedido),
+                      toolTip: "Editar",
+                    },
+                    {
+                      icone: "delete",
+                      onAcionador: (rs: any) =>
+                        onExcluir(rs.pedido),
+                      toolTip: "Excluir",
+                    },
+                  ] : [
+                    {
+                      icone: "edit",
+                      onAcionador: (rs: any) =>
+                        onEditar(rs.pedido),
+                      toolTip: "Editar",
+                    },
+                  ]}
               />
             </Grid>
           </Condicional>

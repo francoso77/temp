@@ -1,5 +1,5 @@
 import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
@@ -16,6 +16,7 @@ import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
 import InputText from '../../Componentes/InputText';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 
 export default function Maquina() {
@@ -282,6 +283,13 @@ export default function Maquina() {
     irPara('/')
   }
 
+  useEffect(() => {
+    const carregarDados = async () => {
+      await btPesquisar()
+    }
+    carregarDados()
+  }, [])
+
   return (
 
     <Container maxWidth="xl" sx={{ mt: 2 }}>
@@ -323,7 +331,7 @@ export default function Maquina() {
               <DataTable
                 cabecalho={cabecalhoForm}
                 dados={rsPesquisa}
-                acoes={[
+                acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
                     onAcionador: (rs: MaquinaInterface) =>
@@ -336,7 +344,7 @@ export default function Maquina() {
                       onExcluir(rs.idMaquina as number),
                     toolTip: "Excluir",
                   },
-                ]}
+                ] : []}
               />
             </Grid>
           </Condicional>

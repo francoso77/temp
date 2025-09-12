@@ -100,8 +100,8 @@
   },
   {
     "id": 10,
-    "tooltipTitle": "Cadastro de Usuários",
-    "route": "/Usuario",
+    "tooltipTitle": "Perfil de Usuário",
+    "route": "/Perfil",
     "icon": "PersonOutlineTwoToneIcon",
     "color": "primary",
     "iconSize": {

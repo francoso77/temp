@@ -21,15 +21,23 @@ var UsuarioPermissao = /** @class */ (function () {
         __metadata("design:type", Number)
     ], UsuarioPermissao.prototype, "idUsuarioPermissao", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idUsuario' }),
-        (0, typeorm_1.ManyToOne)(function () { return usuario_entity_1.Usuario; }),
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], UsuarioPermissao.prototype, "idUsuario", void 0);
     __decorate([
-        (0, typeorm_1.JoinColumn)({ name: 'idModuloPermissao' }),
-        (0, typeorm_1.ManyToOne)(function () { return moduloPermissao_entity_1.ModuloPermissao; }),
+        (0, typeorm_1.JoinColumn)({ name: 'idUsuario' }),
+        (0, typeorm_1.ManyToOne)(function () { return usuario_entity_1.Usuario; }),
+        __metadata("design:type", usuario_entity_1.Usuario)
+    ], UsuarioPermissao.prototype, "usuario", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", Number)
     ], UsuarioPermissao.prototype, "idModuloPermissao", void 0);
+    __decorate([
+        (0, typeorm_1.JoinColumn)({ name: 'idModuloPermissao' }),
+        (0, typeorm_1.ManyToOne)(function () { return moduloPermissao_entity_1.ModuloPermissao; }),
+        __metadata("design:type", moduloPermissao_entity_1.ModuloPermissao)
+    ], UsuarioPermissao.prototype, "moduloPermissao", void 0);
     __decorate([
         (0, typeorm_1.CreateDateColumn)({ name: 'createdAt', type: 'timestamp', nullable: false }),
         __metadata("design:type", Date)
