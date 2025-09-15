@@ -1,9 +1,7 @@
 import { Box, Card, CardContent, Chip, Typography } from '@mui/material';
 import React from 'react';
 import Condicional from '../Condicional/Condicional';
-import { AttachMoney, TrendingDown } from '@mui/icons-material';
-import { Schedule, TrendingUp } from "@mui/icons-material";
-
+import { TrendingUp, TrendingDown } from '@mui/icons-material';
 
 interface CardDashProps {
   titulo: string;

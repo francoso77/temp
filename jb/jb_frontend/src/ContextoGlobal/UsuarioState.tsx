@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { UsuarioType } from '../types/usuarioTypes'
-import { LoginInterface } from '../../../jb_backend/src/interfaces/loginIterface'
 import { PermissoesTypes } from '../types/permissoesTypes'
+import { LoginInterface } from '../Interfaces/loginIterface'
 
 export interface UsuarioStateInterface extends LoginInterface {
   logado: boolean
@@ -18,7 +18,8 @@ export default function useUsuarioState() {
     tipoUsuario: UsuarioType.admin,
     //idsMenu: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     idsMenu: [6, 10],
-    permissoes: PermissoesTypes
+    permissoes: PermissoesTypes,
+    idVendedor: 0
   })
 
   return { usuarioState, setUsuarioState }

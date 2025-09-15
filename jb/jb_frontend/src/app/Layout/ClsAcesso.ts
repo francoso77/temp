@@ -1,19 +1,20 @@
-import { PermissoesInterface } from '../../../../jb_backend/src/interfaces/sistema/SistemaModuloPermissaoInterfaces';
-export default class ClsAcesso {
-  public chkAcesso ( permissoes: Array<PermissoesInterface>, modulo: string, permissao: string ): boolean {
+import { PermissoesInterface } from '../../Interfaces/sistema/SistemaModuloPermissaoInterfaces'
 
-    if ( modulo && permissao ) {
-      const retorno: boolean = permissoes.some( x => x.modulo === modulo && x.permissao === permissao )
+export default class ClsAcesso {
+  public chkAcesso(permissoes: Array<PermissoesInterface>, modulo: string, permissao: string): boolean {
+
+    if (modulo && permissao) {
+      const retorno: boolean = permissoes.some(x => x.modulo === modulo && x.permissao === permissao)
       return retorno
     } else {
       return true
     }
   }
 
-  public chkAcessoModulo ( permissoes: Array<PermissoesInterface>, modulo: string ): boolean {
+  public chkAcessoModulo(permissoes: Array<PermissoesInterface>, modulo: string): boolean {
 
-    if ( modulo ) {
-      const retorno: boolean = permissoes.some( x => x.modulo === modulo )
+    if (modulo) {
+      const retorno: boolean = permissoes.some(x => x.modulo === modulo)
       return retorno
     } else {
       return true

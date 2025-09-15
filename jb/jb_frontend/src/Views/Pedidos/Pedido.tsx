@@ -18,15 +18,25 @@ import ComboBox from '../../Componentes/ComboBox';
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import { PrazoEntregaInterface } from '../../Interfaces/prazoEntregaInterface';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
 import DetalhePedido from './DetalhePedido';
 import { UsuarioType } from '../../types/usuarioTypes';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
-import { PessoaType } from '../../types/pessoaTypes';
 
 export interface SomatorioPedidoInterface {
   total: string
   totalQtd: string
+}
+
+export interface PedidoBackInterface {
+  idPedido?: number
+  dataPedido: string
+  observacao: string
+  idPessoa_cliente: number
+  idPessoa_vendedor: number
+  idPrazoEntrega: number
+  statusPedido: StatusType
+  detalhePedidos: DetalhePedidoInterface[]
 }
 
 export default function Pedido() {
@@ -35,24 +45,7 @@ export default function Pedido() {
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
 
-  const ResetDados: PedidoInterface = {
-    cliente: {
-      nome: '',
-      apelido: '',
-      cpf_cnpj: '',
-      endereco: '',
-      numero: 0,
-      bairro: '',
-      cidade: '',
-      uf: '',
-      cep: '',
-      telefone: '',
-      whatsapp: '',
-      email: '',
-      comissao: 0,
-      tipoPessoa: PessoaType.clienteJuridica,
-      ativo: true,
-    },
+  const ResetDados: PedidoBackInterface = {
     dataPedido: '',
     observacao: '',
     idPessoa_cliente: 0,
@@ -75,7 +68,7 @@ export default function Pedido() {
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
-  const [pedido, setPedido] = useState<PedidoInterface>(ResetDados)
+  const [pedido, setPedido] = useState<PedidoBackInterface>(ResetDados)
   const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
@@ -259,6 +252,9 @@ export default function Pedido() {
 
   const btConfirmar = () => {
     if (validarDados()) {
+
+      console.log(pedido)
+
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
           entidade: "Pedido",
@@ -523,7 +519,6 @@ export default function Pedido() {
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
-                autoFocus
               />
             </Grid>
             <Grid item xs={2} md={1}>
@@ -544,20 +539,20 @@ export default function Pedido() {
                 acoes={usuarioState.tipoUsuario === UsuarioType.admin ? [
                   {
                     icone: "edit",
-                    onAcionador: (rs: PedidoInterface) =>
+                    onAcionador: (rs: PedidoBackInterface) =>
                       onEditar(rs.idPedido as number),
                     toolTip: "Editar",
                   },
                   {
                     icone: "delete",
-                    onAcionador: (rs: PedidoInterface) =>
+                    onAcionador: (rs: PedidoBackInterface) =>
                       onExcluir(rs.idPedido as number),
                     toolTip: "Excluir",
                   },
                 ] : [
                   {
                     icone: "edit",
-                    onAcionador: (rs: PedidoInterface) =>
+                    onAcionador: (rs: PedidoBackInterface) =>
                       onEditar(rs.idPedido as number),
                     toolTip: "Editar",
                   },

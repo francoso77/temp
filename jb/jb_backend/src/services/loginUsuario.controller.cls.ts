@@ -52,6 +52,7 @@ export default class ClsLoginUsuarioController {
             tipoUsuario: UsuarioType.default,
             permissoes: PermissoesTypes,
             token: '',
+            idVendedor: 0
           }
         };
       }
@@ -70,7 +71,8 @@ export default class ClsLoginUsuarioController {
         cpfUsuario: '',
         tipoUsuario: UsuarioType.default,
         token: '',
-        permissoes: PermissoesTypes
+        permissoes: PermissoesTypes,
+        idVendedor: 0
       }
     }
 
@@ -102,7 +104,8 @@ export default class ClsLoginUsuarioController {
                       cpfUsuario: rsUsuarioLogado.cpf,
                       tipoUsuario: rsUsuarioLogado.tipoUsuario,
                       token: token,
-                      permissoes: rsPermissoes
+                      permissoes: rsPermissoes,
+                      idVendedor: rsUsuarioLogado.idPessoa_vendedor
                     }
                   }
                 })

@@ -66,7 +66,8 @@ export default function HeaderMenu() {
         tipoUsuario: UsuarioType.default,
         //idsMenu: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         idsMenu: [6, 10],
-        permissoes: PermissoesTypes
+        permissoes: PermissoesTypes,
+        idVendedor: 0
       })
 
       irPara('/', '')

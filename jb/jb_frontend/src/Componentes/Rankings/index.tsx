@@ -1,30 +1,17 @@
 import React from 'react';
-import { Business, CheckCircleOutline, TrendingUp } from '@mui/icons-material';
+import { Business, CheckCircleOutline } from '@mui/icons-material';
 import { Avatar, Box, Card, CardContent, Grid, Paper, Stack, Typography } from '@mui/material';
 import { TopCliente, TopProduto } from '../../Utils/ClsValidacao';
-
-// const topProducts: any[] = [
-//   { name: "Produto 1", vendas: 100, valor: 100 },
-//   { name: "Produto 2", vendas: 80, valor: 90 },
-//   { name: "Produto 3", vendas: 60, valor: 80 },
-//   { name: "Produto 4", vendas: 40, valor: 70 },
-//   { name: "Produto 5", vendas: 20, valor: 60 },
-// ];
-
-// const topClients: any[] = [
-//   { name: "Cliente 1", vendas: 100, valor: 100 },
-//   { name: "Cliente 2", vendas: 80, valor: 90 },
-//   { name: "Cliente 3", vendas: 60, valor: 80 },
-//   { name: "Cliente 4", vendas: 40, valor: 70 },
-//   { name: "Cliente 5", vendas: 20, valor: 60 },
-// ]
-
+import ClsFormatacao from '../../Utils/ClsFormatacao';
 
 interface RankingsProps {
   topProducts: TopProduto[];
   topClients: TopCliente[];
 }
 export default function Rankings({ topProducts, topClients }: RankingsProps) {
+
+  const formatacao: ClsFormatacao = new ClsFormatacao();
+
   return (
     <>
       <Grid container spacing={3}>
@@ -66,25 +53,8 @@ export default function Rankings({ topProducts, topClients }: RankingsProps) {
                         <Grid item>
                           <Box textAlign="right">
                             <Typography variant="h6" fontWeight="bold">
-                              R$ {product.valorTotal.toLocaleString("pt-BR")}
+                              R$ {formatacao.currency(product.valorTotal)}
                             </Typography>
-                            {/* <Box display="flex" alignItems="center" gap={0.5}>
-                              <TrendingUp
-                                fontSize="small"
-                                color={product.crescimento > 0 ? "success" : "error"}
-                                sx={{
-                                  transform: product.crescimento < 0 ? "rotate(180deg)" : "none",
-                                }}
-                              />
-                              <Typography
-                                variant="body2"
-                                color={product.crescimento > 0 ? "success.main" : "error.main"}
-                                fontWeight="medium"
-                              >
-                                {product.crescimento > 0 ? "+" : ""}
-                                {product.crescimento}%
-                              </Typography>
-                            </Box> */}
                           </Box>
                         </Grid>
                       </Grid>
@@ -121,11 +91,8 @@ export default function Rankings({ topProducts, topClients }: RankingsProps) {
                         <Grid item>
                           <Box textAlign="right">
                             <Typography variant="h6" fontWeight="bold">
-                              R$ {client.valorTotal.toLocaleString("pt-BR")}
+                              R$ {formatacao.currency(client.valorTotal)}
                             </Typography>
-                            {/* <Typography variant="body2" color="text.secondary">
-                              Último: {client.ultimoPedido}
-                            </Typography> */}
                           </Box>
                         </Grid>
                       </Grid>

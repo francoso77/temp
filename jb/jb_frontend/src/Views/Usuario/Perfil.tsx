@@ -9,7 +9,6 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import InputText from '../../Componentes/InputText';
-import CloseIcon from '@mui/icons-material/Close';
 
 
 interface PerfilInterface {

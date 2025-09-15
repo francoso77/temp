@@ -5,7 +5,7 @@ import { PessoaInterface } from '../../Interfaces/pessoaInterface'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsApi from '../../Utils/ClsApi'
 import ClsCrud from '../../Utils/ClsCrudApi'
-import { Box, Grid, IconButton, Paper, SelectChangeEvent, Tooltip } from '@mui/material'
+import { Box, Collapse, Grid, IconButton, Paper, SelectChangeEvent, Stack, Tooltip, Typography } from '@mui/material'
 import ComboBox from '../../Componentes/ComboBox'
 import InputText from '../../Componentes/InputText'
 import CloseIcon from '@mui/icons-material/Close'
@@ -15,6 +15,7 @@ import ContentPasteSearchTwoToneIcon from '@mui/icons-material/ContentPasteSearc
 import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable'
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal'
+import { FilterList } from '@mui/icons-material'
 
 interface PesquisaInterface {
   idProduto: number
@@ -50,6 +51,8 @@ export const ConsultaEstoque = () => {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [dados, setDados] = useState(dadosInterface)
   const { setMensagemState, setLayoutState, layoutState } = useContext(GlobalContext) as GlobalContextInterface
+  const [showFilters, setShowFilters] = useState(false);
+
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -147,6 +150,7 @@ export const ConsultaEstoque = () => {
     })
       .then((rs: Array<any>) => {
         setRsPesquisa(rs)
+        setShowFilters(false)
       })
   }
 
@@ -186,115 +190,127 @@ export const ConsultaEstoque = () => {
             <IconButton onClick={() => btFechar()}>
               <CloseIcon />
             </IconButton>
-          </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: -5 }}>
-            <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
-              <ComboBox
-                opcoes={rsProdutos}
-                campoDescricao="nome"
-                campoID="idProduto"
-                dados={dados}
-                mensagemPadraoCampoEmBranco=""
-                field="idProduto"
-                label="Produtos"
-                setState={setDados}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event) => btPulaCampo(event, 1)}
-                tamanhoFonte={15}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: { xs: -3, sm: -5 } }}>
-            <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
-              <ComboBox
-                opcoes={rsCores}
-                campoDescricao="nome"
-                campoID="idCor"
-                dados={dados}
-                mensagemPadraoCampoEmBranco=""
-                field="idCor"
-                label="Cores"
-                setState={setDados}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event) => btPulaCampo(event, 2)}
-                tamanhoFonte={15}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: { xs: -3, sm: -5 } }}>
-            <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
-              <ComboBox
-                opcoes={TipoProdutoTypes}
-                campoDescricao="descricao"
-                campoID="idTipoProduto"
-                dados={dados}
-                mensagemPadraoCampoEmBranco=""
-                field="idTipoProduto"
-                label="Tipo Produto"
-                setState={setDados}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event) => btPulaCampo(event, 3)}
-                tamanhoFonte={15}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={4} sx={{ mt: { xs: -3, sm: -1 } }}>
-            <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
-              <ComboBox
-                opcoes={rsFornecedores}
-                campoDescricao="nome"
-                campoID="idPessoa"
-                dados={dados}
-                mensagemPadraoCampoEmBranco=""
-                field="idPessoa_fornecedor"
-                label="Fornecedor"
-                setState={setDados}
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(event: any) => btPulaCampo(event, 4)}
-                tamanhoFonte={15}
-              />
-            </Box>
-          </Grid>
-          <Paper sx={{ padding: 1, ml: 1, mt: 1, width: '55%' }} variant="outlined" >
-            <Grid container direction="row" spacing={2}>
-              <Grid item xs={12} md={6} sx={{ mt: -3 }}>
-                <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
-                  <OperatorSelect
-                    value={dados.operador}
-                    onChange={handleOperatorChange}
-                    label='Operador'
-                    tamanhoFonte={15}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={6} sx={{ mt: -3 }} >
-                <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
-                  <InputText
-                    tipo='uppercase'
-                    label="Quantidade"
-                    dados={dados}
-                    field="qtd"
-                    setState={setDados}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(event: any) => btPulaCampo(event, 0)}
-                    tamanhoFonte={15}
-                    onClickIconeEnd={() => btLimpar()}
-                    iconeEnd='close_icon'
-                  />
-                </Box>
-              </Grid>
-            </Grid>
-          </Paper>
-          <Grid item xs={2} md={1} >
-            <Tooltip title={'Pesquisar'}>
-              <IconButton
-                color="secondary"
-                sx={{ mt: 1.5, ml: 6, mb: 2 }}
-                onClick={() => btPesquisar()}
-              >
-                <ContentPasteSearchTwoToneIcon sx={{ fontSize: 60 }} />
-              </IconButton>
-            </Tooltip>
+            <Stack spacing={1}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <IconButton onClick={() => setShowFilters((prev) => !prev)}>
+                  <FilterList color='warning' />
+                </IconButton>
+                <Typography variant="h5">Filtros de Análise</Typography>
+                <Tooltip title={'Pesquisar'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 1.5, ml: 6 }}
+                    onClick={() => btPesquisar()}
+                  >
+                    <ContentPasteSearchTwoToneIcon sx={{ fontSize: 50 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Collapse in={showFilters}>
+                <Paper variant="outlined" sx={{ padding: 1, m: 1, borderRadius: 2 }}>
+                  <Grid container spacing={2} >
+                    <Grid item xs={12} sm={4} sx={{ mt: -2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
+                        <ComboBox
+                          opcoes={rsProdutos}
+                          campoDescricao="nome"
+                          campoID="idProduto"
+                          dados={dados}
+                          mensagemPadraoCampoEmBranco=""
+                          field="idProduto"
+                          label="Produtos"
+                          setState={setDados}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event) => btPulaCampo(event, 1)}
+                          tamanhoFonte={15}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={2} sx={{ mt: -2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
+                        <ComboBox
+                          opcoes={rsCores}
+                          campoDescricao="nome"
+                          campoID="idCor"
+                          dados={dados}
+                          mensagemPadraoCampoEmBranco=""
+                          field="idCor"
+                          label="Cores"
+                          setState={setDados}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event) => btPulaCampo(event, 2)}
+                          tamanhoFonte={15}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={2} sx={{ mt: -2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[2] = el)}>
+                        <ComboBox
+                          opcoes={TipoProdutoTypes}
+                          campoDescricao="descricao"
+                          campoID="idTipoProduto"
+                          dados={dados}
+                          mensagemPadraoCampoEmBranco=""
+                          field="idTipoProduto"
+                          label="Tipo Produto"
+                          setState={setDados}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event) => btPulaCampo(event, 3)}
+                          tamanhoFonte={15}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={4} sx={{ mt: -2 }}>
+                      <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
+                        <ComboBox
+                          opcoes={rsFornecedores}
+                          campoDescricao="nome"
+                          campoID="idPessoa"
+                          dados={dados}
+                          mensagemPadraoCampoEmBranco=""
+                          field="idPessoa_fornecedor"
+                          label="Fornecedor"
+                          setState={setDados}
+                          onFocus={(e) => e.target.select()}
+                          onKeyDown={(event: any) => btPulaCampo(event, 4)}
+                          tamanhoFonte={15}
+                        />
+                      </Box>
+                    </Grid>
+                    <Paper sx={{ padding: 1, ml: 2, mt: 1, width: '100%' }} variant="outlined" >
+                      <Grid container direction="row" spacing={2}>
+                        <Grid item xs={12} md={6} sx={{ mt: -1 }}>
+                          <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+                            <OperatorSelect
+                              value={dados.operador}
+                              onChange={handleOperatorChange}
+                              label='Operador'
+                              tamanhoFonte={15}
+                            />
+                          </Box>
+                        </Grid>
+                        <Grid item xs={12} md={6} sx={{ mt: -1 }} >
+                          <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
+                            <InputText
+                              tipo='uppercase'
+                              label="Quantidade"
+                              dados={dados}
+                              field="qtd"
+                              setState={setDados}
+                              onFocus={(e) => e.target.select()}
+                              onKeyDown={(event: any) => btPulaCampo(event, 0)}
+                              tamanhoFonte={15}
+                              onClickIconeEnd={() => btLimpar()}
+                              iconeEnd='close_icon'
+                            />
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Paper>
+                  </Grid>
+                </Paper>
+              </Collapse>
+            </Stack>
           </Grid>
           <Grid item xs={12} >
             <DataTable

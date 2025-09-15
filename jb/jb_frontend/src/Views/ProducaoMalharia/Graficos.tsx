@@ -16,17 +16,6 @@ interface MesesMapping {
     [index: number]: string
 }
 
-// interface GraficoColunaInterface {
-//     mes: MesesIndex
-//     pesoTotal: number
-//     qtdTotal: number
-// }
-
-// interface GraficoPizzaInterface {
-//     produto: string
-//     pesoTotal: number
-// }
-
 const meses: MesesMapping = {
     1: 'Janeiro',
     2: 'Fevereiro',

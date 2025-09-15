@@ -26,7 +26,7 @@ export interface TopCliente {
   valorTotal: number;
 }
 
-interface ResultadoPeriodo {
+export interface ResultadoPeriodo {
   periodoAtual: IntervaloDatas;
   periodoAnterior: IntervaloDatas | null;
   pedidosAtual: PedidoInterface[];
@@ -541,7 +541,7 @@ export default class ClsValidacao {
     idVendedor: number
   ): ResultadoPeriodo {
 
-    console.log('Pedidos recebidos: ', pedidos)
+
     const hoje = new Date();
 
     let atual: IntervaloDatas | null = null;

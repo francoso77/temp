@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Link, Paper, Typography } from '@mui/material';
+import { Box, Button, Grid, Paper, Typography } from '@mui/material';
 import { useContext, useState } from 'react';
 import ClsValidacao from '../../Utils/ClsValidacao';
 import Text from '../../Componentes/Text';
@@ -8,9 +8,9 @@ import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
 import ClsApi from '../../Utils/ClsApi';
 import Copyright from '../Layout/Copyright';
 import MenuCls, { MenuOpcoesInterface } from '../Layout/ClsMenu';
-import { RespostaPadraoInterface } from '../../../../jb_backend/src/interfaces/respostaPadrao.interface';
-import { LoginInterface } from '../../../../jb_backend/src/interfaces/loginIterface';
 import { UsuarioType } from '../../types/usuarioTypes';
+import { LoginInterface } from '../../Interfaces/loginIterface';
+import { RespostaPadraoInterface } from '../../Interfaces/respostaPadrao.interface';
 
 
 export default function Login() {
@@ -68,7 +68,8 @@ export default function Login() {
                     rs.dados.tipoUsuario === UsuarioType.estoquistaDublagem ? [2, 6, 7, 9, 10] :
                       rs.dados.tipoUsuario === UsuarioType.producaoDublagem ? [2, 7, 8, 10] :
                         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-              permissoes: rs.dados.permissoes
+              permissoes: rs.dados.permissoes,
+              idVendedor: rs.dados.idVendedor
             })
 
             const MENU: Array<MenuOpcoesInterface> = [
@@ -199,7 +200,12 @@ export default function Login() {
 
             const clsMenu = new MenuCls(MENU)
             setLayoutState({ ...layoutState, opcoesMenu: clsMenu.Menu })
-            navegar("/")
+            if (rs.dados.tipoUsuario === UsuarioType.vendedor || rs.dados.tipoUsuario === UsuarioType.default) {
+              navegar("/Dashboard")
+            } else {
+
+              navegar("/")
+            }
 
 
           } else {

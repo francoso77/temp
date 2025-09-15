@@ -69,6 +69,7 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                                                 tipoUsuario: usuarioTypes_1.UsuarioType.default,
                                                 permissoes: permissoesTypes_1.PermissoesTypes,
                                                 token: '',
+                                                idVendedor: 0
                                             }
                                         }];
                                 case 2: return [2 /*return*/];
@@ -92,7 +93,8 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                         cpfUsuario: '',
                         tipoUsuario: usuarioTypes_1.UsuarioType.default,
                         token: '',
-                        permissoes: permissoesTypes_1.PermissoesTypes
+                        permissoes: permissoesTypes_1.PermissoesTypes,
+                        idVendedor: 0
                     }
                 };
                 return [2 /*return*/, this.fecharSessoesEmAberto(cpf).then(function (rsUsuarioExistente) {
@@ -117,7 +119,8 @@ var ClsLoginUsuarioController = /** @class */ (function () {
                                                         cpfUsuario: rsUsuarioLogado.cpf,
                                                         tipoUsuario: rsUsuarioLogado.tipoUsuario,
                                                         token: token_1,
-                                                        permissoes: rsPermissoes
+                                                        permissoes: rsPermissoes,
+                                                        idVendedor: rsUsuarioLogado.idPessoa_vendedor
                                                     }
                                                 };
                                             });

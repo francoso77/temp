@@ -8,4 +8,5 @@ export interface LoginInterface {
   tipoUsuario: UsuarioType
   token: string
   permissoes: PermissoesTypeInterface
+  idVendedor: number
 }

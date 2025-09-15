@@ -1,7 +1,6 @@
 import { Container, Grid, IconButton, Paper, Tooltip, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import ClsValidacao from '../../Utils/ClsValidacao';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { ModuloPermissaoInterface } from '../../Interfaces/sistema/moduloInterface';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';

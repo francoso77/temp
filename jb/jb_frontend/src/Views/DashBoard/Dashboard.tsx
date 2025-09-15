@@ -1,15 +1,10 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Box, Paper, Grid, Container, Stack, Typography, useTheme, useMediaQuery, Card, CardContent, FormControl, InputLabel, Select, MenuItem, Collapse, IconButton, ButtonGroup, Button, Chip } from '@mui/material';
-import VelocimetroPedidos from './VelocimetroPedidos';
-import BarrasPedidosMensais from './BarrasPedidosMensais';
-import LinhasTipoProdutos from './LinhasTipoProdutos';
-import PedidoStatus from './StatusProgress';
-import LinhasTipoProdutos3D from './LinhasTipoProdutos3D';
 import {
   AttachMoney, BarChart, CheckCircle, FilterList, Inventory,
 } from '@mui/icons-material';
 import CardDash from '../../Componentes/CardDash';
-import { Schedule, TrendingUp } from "@mui/icons-material";
+import { Schedule } from "@mui/icons-material";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,7 +27,9 @@ import { MiniTipoProdutoTypes } from '../../types/tipoProdutoypes';
 import { PeriodoTypes } from '../../types/periodoTypes';
 import { PedidoInterface } from '../../Interfaces/pedidoInterface';
 import { StatusType } from '../../types/statusTypes';
-import ClsValidacao, { ProductionData, TopCliente, TopProduto } from '../../Utils/ClsValidacao';
+import ClsValidacao, { ProductionData, ResultadoPeriodo, TopCliente, TopProduto } from '../../Utils/ClsValidacao';
+import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
+import { UsuarioType } from '../../types/usuarioTypes';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend)
 
@@ -52,6 +49,8 @@ interface CriteriosInterface {
   grafico: ProductionData[];
   topClientes: TopCliente[];
   topProdutos: TopProduto[];
+  totalPedidos: number;
+  totalPedidosAnterior: number;
 }
 
 interface SmartAlert {
@@ -66,13 +65,13 @@ interface SmartAlert {
 
 const Dashboard: React.FC = () => {
 
-  const clsApi: ClsApi = new ClsApi();
+  const { usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const clsCrud: ClsCrud = new ClsCrud();
   const clsValidacao: ClsValidacao = new ClsValidacao();
 
   const [criterios, setCriterios] = useState<CriteriosInterface>({
     idCliente: 0,
-    idVendedor: 0,
+    idVendedor: usuarioState.tipoUsuario === UsuarioType.vendedor ? usuarioState.idVendedor : 0,
     idTipoProduto: 0,
     idPeriodo: 5,
     qtdPedidosAberto: 0,
@@ -85,6 +84,8 @@ const Dashboard: React.FC = () => {
     grafico: [],
     topClientes: [],
     topProdutos: [],
+    totalPedidos: 0,
+    totalPedidosAnterior: 0
   });
 
   // State
@@ -109,21 +110,43 @@ const Dashboard: React.FC = () => {
         },
         camposLike: ['tipoPessoa']
       }
-    )
 
-    const vendedores = await clsCrud.pesquisar(
-      {
-        entidade: "Pessoa",
-        campoOrder: ['nome'],
-        comparador: 'I',
-        criterio: { tipoPessoa: ['V'] },
-        camposLike: ['tipoPessoa']
-      }
     )
-
-    if (clientes && vendedores) {
+    if (clientes) {
       setSelectedClient(clientes)
-      setSelectedVendedor(vendedores)
+    }
+
+    if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+
+      const vendedores = await clsCrud.pesquisar(
+        {
+          entidade: "Pessoa",
+          criterio: {
+            idPessoa: usuarioState.idVendedor
+          },
+          camposLike: ['idPessoa']
+        }
+      )
+
+      if (vendedores) {
+        setSelectedVendedor(vendedores)
+      }
+    } else {
+      const vendedores = await clsCrud.pesquisar(
+        {
+          entidade: "Pessoa",
+          campoOrder: ['nome'],
+          comparador: 'I',
+          criterio: {
+            tipoPessoa: ['V'],
+          },
+          camposLike: ['tipoPessoa']
+        }
+      )
+      if (vendedores) {
+        setSelectedVendedor(vendedores)
+      }
+
     }
 
     const pedidos: PedidoInterface[] = await clsCrud.pesquisar({
@@ -141,7 +164,15 @@ const Dashboard: React.FC = () => {
       let vrTicketAtual = 0
       let vrTicketAnterior = 0
 
-      const pedidosFiltrados = clsValidacao.filtraPedidosPorPeriodo(pedidos, criterios.idPeriodo, criterios.idTipoProduto, criterios.idCliente, criterios.idVendedor);
+      let pedidosFiltrados: ResultadoPeriodo
+
+      if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+
+        pedidosFiltrados = clsValidacao.filtraPedidosPorPeriodo(pedidos, criterios.idPeriodo, criterios.idTipoProduto, criterios.idCliente, usuarioState.idVendedor);
+      } else {
+        pedidosFiltrados = clsValidacao.filtraPedidosPorPeriodo(pedidos, criterios.idPeriodo, criterios.idTipoProduto, criterios.idCliente, criterios.idVendedor);
+      }
+
       const qtdPedidosAberto = pedidosFiltrados.pedidosAtual.filter((pedido: any) => pedido.statusPedido === StatusType.aberto).length
       const qtdPedidosEmProducao = pedidosFiltrados.pedidosAtual.filter((pedido: any) => pedido.statusPedido === StatusType.producao && pedido.status === StatusType.parcial).length
       const qtdPedidosFechado = pedidosFiltrados.pedidosAtual.filter((pedido: any) => pedido.statusPedido === StatusType.finalizado).length
@@ -151,8 +182,6 @@ const Dashboard: React.FC = () => {
 
       const totalPedidosAnterior = pedidosFiltrados.pedidosAnterior.reduce((total, pedido) => total + pedido.detalhePedidos.reduce((totalDetalhe, detalhe) => totalDetalhe + detalhe.qtdPedida, 0), 0)
       const vrTotalAnterior = pedidosFiltrados.pedidosAnterior.reduce((total, pedido) => total + pedido.detalhePedidos.reduce((totalDetalhe, detalhe) => totalDetalhe + detalhe.qtdPedida * detalhe.vrUnitario, 0), 0)
-
-      console.log('FILTRO:', pedidosFiltrados)
 
       vrTicketAtual = totalPedidosAtual === 0 ? 0 : vrTotalAtual / totalPedidosAtual
       vrTicketAnterior = totalPedidosAnterior === 0 ? 0 : vrTotalAnterior / totalPedidosAnterior
@@ -168,7 +197,9 @@ const Dashboard: React.FC = () => {
         vrTicketAnterior: vrTicketAnterior,
         grafico: pedidosFiltrados.productionData,
         topClientes: pedidosFiltrados.topClientes,
-        topProdutos: pedidosFiltrados.topProdutos
+        topProdutos: pedidosFiltrados.topProdutos,
+        totalPedidos: totalPedidosAtual,
+        totalPedidosAnterior: totalPedidosAnterior
       })
     }
   };
@@ -209,6 +240,20 @@ const Dashboard: React.FC = () => {
                   <Grid container spacing={2} >
                     <Grid item xs={12} md={3}>
                       <ComboBox
+                        opcoes={PeriodoTypes}
+                        campoDescricao="descricao"
+                        campoID="idPeriodo"
+                        dados={criterios}
+                        mensagemPadraoCampoEmBranco="Selecione um Período"
+                        field="idPeriodo"
+                        label="Período"
+                        setState={setCriterios}
+                        onFocus={(e) => e.target.select()}
+                        onChange={(v: any) => setCriterios({ ...criterios, idPeriodo: v?.idPeriodo || 0 })}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                      <ComboBox
                         opcoes={selectedClient}
                         campoDescricao="nome"
                         campoID="idPessoa"
@@ -246,21 +291,8 @@ const Dashboard: React.FC = () => {
                         label="Vendedor"
                         setState={setCriterios}
                         onFocus={(e) => e.target.select()}
-                        onChange={(v: any) => setCriterios({ ...criterios, idVendedor: v?.idPessoa || 0 })}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <ComboBox
-                        opcoes={PeriodoTypes}
-                        campoDescricao="descricao"
-                        campoID="idPeriodo"
-                        dados={criterios}
-                        mensagemPadraoCampoEmBranco="Selecione um Período"
-                        field="idPeriodo"
-                        label="Período"
-                        setState={setCriterios}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(v: any) => setCriterios({ ...criterios, idPeriodo: v?.idPeriodo || 0 })}
+                        onChange={(v: any) => setCriterios({ ...criterios, idVendedor: v?.idVendedor || 0 })}
+                        disabled={usuarioState.tipoUsuario !== UsuarioType.admin}
                       />
                     </Grid>
                   </Grid>
@@ -306,7 +338,6 @@ const Dashboard: React.FC = () => {
                 IconePrinicipal={AttachMoney}
                 IconeSecundario={true}
                 corIcone='primary'
-              //msg='+12% vs período anterior'
               />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
@@ -318,7 +349,6 @@ const Dashboard: React.FC = () => {
                 IconePrinicipal={BarChart}
                 IconeSecundario={true}
                 corIcone='secondary'
-              //msg='+8% vs período anterior'
               />
             </Grid>
 
@@ -341,38 +371,16 @@ const Dashboard: React.FC = () => {
 
           <Paper sx={{ padding: 2, marginTop: 2 }}>
             {/* Comparation Section */}
-            <Comparation />
+            <Comparation
+              idPeriodo={criterios.idPeriodo}
+              totalVendas={criterios.vrTotalAtual}
+              totalVendasAnterior={criterios.vrTotalAnterior}
+              ticket={criterios.vrTicketAtual}
+              ticketAnterior={criterios.vrTicketAnterior}
+              totalPedidos={criterios.totalPedidos}
+              totalPedidosAnterior={criterios.totalPedidosAnterior}
+            />
           </Paper>
-
-
-          {/* <Paper sx={{ padding: 2, marginTop: 2 }}>
-            <VelocimetroPedidos />
-          </Paper>
-          <Paper sx={{ padding: 2, marginTop: 2 }}>
-            <BarrasPedidosMensais />
-          </Paper>
-
-          <Paper sx={{ padding: 2, marginTop: 2 }}>
-            <LinhasTipoProdutos />
-          </Paper>
-          <Paper sx={{ padding: 2, marginTop: 2 }}>
-
-            <LinhasTipoProdutos3D />
-          </Paper> 
-          <Paper sx={{ padding: 1, marginTop: 1 }}>
-            <Grid container spacing={2}>
-              {pedidos.map((pedido, index) => (
-                <Grid item key={index} xs={6} md={4}>
-                  <PedidoStatus
-                    status={pedido.status}
-                    numeroPedido={pedido.numeroPedido}
-                    dataPedido={pedido.dataPedido}
-                    nomeCliente={pedido.nomeCliente}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Paper>*/}
         </Stack>
       </Container>
     </Box>

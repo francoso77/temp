@@ -23,7 +23,6 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedido
 import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
 import { UsuarioType } from '../../types/usuarioTypes';
-import StatusPedido from '../DashBoard/StatusPedido';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string

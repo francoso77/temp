@@ -19,7 +19,6 @@ import { DetalheEstruturaInterface } from '../../Interfaces/estruturaInterface';
 import { EstoqueInterface } from '../../Interfaces/estoqueInterface';
 import FactCheckTwoToneIcon from '@mui/icons-material/FactCheckTwoTone';
 import TabelaPecas from './TabelaPecas';
-//import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 
 interface PropsInterface {
   rsMaster: TinturariaInterface
@@ -42,7 +41,6 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
-  //const clsRelatorios = new ClsRelatorioProgramacao()
 
   const DadosPeca: DadosPecaInterface = {
     peca: ''

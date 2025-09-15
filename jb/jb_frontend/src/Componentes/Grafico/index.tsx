@@ -5,7 +5,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Chip,
   Button,
   ButtonGroup,
   Stack,
@@ -53,10 +52,7 @@ export default function Grafico({
   }
 
 
-  // const toggleProduct = (product: string) => {
-  //   setSelectedProducts((prev) => (prev.includes(product) ? prev.filter((p) => p !== product) : [...prev, product]))
-  // }
-  const [chartType, setChartType] = useState<"line" | "bar">("line")
+  const [chartType, setChartType] = useState<"line" | "bar">("bar")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([
     "nylon",
     "palmilha",
@@ -140,7 +136,7 @@ export default function Grafico({
             <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
               <Box display="flex" alignItems="center" gap={2}>
                 <BarChartIcon color="primary" />
-                <Typography variant="h6">Produção Mensal por Produto</Typography>
+                <Typography variant="h6">Produção Mensal por Produto do Período Atual</Typography>
               </Box>
               <ButtonGroup>
                 <Button
@@ -157,29 +153,6 @@ export default function Grafico({
                 </Button>
               </ButtonGroup>
             </Box>
-
-            {/* <Box display="flex" flexWrap="wrap" gap={1}>
-              {Object.entries(productLabels).map(([key, label]) => (
-                <Chip
-                  key={key}
-                  label={label}
-                  onClick={() => toggleProduct(key)}
-                  color={selectedProducts.includes(key) ? "primary" : "default"}
-                  variant={selectedProducts.includes(key) ? "filled" : "outlined"}
-                  sx={{
-                    backgroundColor: selectedProducts.includes(key)
-                      ? productColors[key as keyof typeof productColors]
-                      : undefined,
-                    "&:hover": {
-                      backgroundColor: selectedProducts.includes(key)
-                        ? productColors[key as keyof typeof productColors]
-                        : undefined,
-                    },
-                  }}
-                />
-              ))}
-            </Box> */}
-
             <Box sx={{ height: 400, mt: 2 }}>
               {chartType === "line" ? (
                 <Line data={chartData} options={chartOptions} />

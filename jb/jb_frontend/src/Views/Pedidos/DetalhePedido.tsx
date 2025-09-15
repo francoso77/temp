@@ -16,16 +16,16 @@ import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 import InputCalc from '../../Componentes/InputCalc';
-import { SomatorioPedidoInterface } from './Pedido';
+import { PedidoBackInterface, SomatorioPedidoInterface } from './Pedido';
 import { EstruturaInterface } from '../../Interfaces/estruturaInterface';
-import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { DetalhePedidoInterface } from '../../Interfaces/pedidoInterface';
 import { CorInterface } from '../../Interfaces/corInteface';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
 
 
 interface PropsInterface {
-  rsMaster: PedidoInterface
-  setRsMaster: React.Dispatch<React.SetStateAction<PedidoInterface>>,
+  rsMaster: PedidoBackInterface
+  setRsMaster: React.Dispatch<React.SetStateAction<PedidoBackInterface>>,
   masterLocalState: ActionInterface,
   setRsSomatorio: React.Dispatch<React.SetStateAction<SomatorioPedidoInterface>>,
 }

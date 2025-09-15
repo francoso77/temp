@@ -1,14 +1,9 @@
 import { Dialog, Grid, IconButton, Paper, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { DataTableCabecalhoInterface, ItemSpeedDial } from '../../Componentes/DataTable';
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import ClsFormatacao from '../../Utils/ClsFormatacao';
-import TableSelect from '../../Componentes/DataTable/tableSelect';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import FactCheckTwoToneIcon from '@mui/icons-material/FactCheckTwoTone';
-import { ProducaoMalhariaInterface } from '../../Interfaces/producaoMalhariaInterface';
 import { ModuloPermissaoInterface } from '../../Interfaces/sistema/moduloInterface';
 import InputText from '../../Componentes/InputText';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
