@@ -5,7 +5,7 @@ import { GraficoType } from '../types/graficoTypes';
 
 
 interface PropsInterface {
-  method: 'get' | 'post' | 'put' | 'delete'
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch'
   url: string
   dados?: Record<any, any>
   mensagem?: string

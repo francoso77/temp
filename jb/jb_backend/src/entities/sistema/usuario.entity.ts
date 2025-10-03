@@ -1,7 +1,6 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UsuarioInterface } from '../../interfaces/sistema/usuarioInterface';
 import { UsuarioType } from '../../types/usuarioTypes';
-import Pessoa from '../pessoa.entity';
 
 @Entity({ name: 'usuarios' })
 export class Usuario implements UsuarioInterface {
@@ -44,4 +43,5 @@ export class Usuario implements UsuarioInterface {
 
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', nullable: false })
   updateAt: Date
+
 }

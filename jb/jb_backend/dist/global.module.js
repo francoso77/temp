@@ -18,7 +18,7 @@ var GlobalModule = /** @class */ (function () {
         (0, common_1.Module)({
             imports: [],
             controllers: [],
-            providers: [contexto_service_1.ContextoService, sessao_service_1.SessaoService],
+            providers: [contexto_service_1.ContextoService, sessao_service_1.SessaoService,],
             exports: [contexto_service_1.ContextoService, sessao_service_1.SessaoService],
         })
     ], GlobalModule);

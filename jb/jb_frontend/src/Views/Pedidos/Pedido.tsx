@@ -22,6 +22,8 @@ import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedido
 import DetalhePedido from './DetalhePedido';
 import { UsuarioType } from '../../types/usuarioTypes';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
+import ClsApi from '../../Utils/ClsApi';
+import { NotificationInterface } from '../../Interfaces/sistema/notificationInterface';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -41,15 +43,17 @@ export interface PedidoBackInterface {
 
 export default function Pedido() {
 
+  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const validaCampo: ClsValidacao = new ClsValidacao()
-  const clsCrud = new ClsCrud()
-  const clsFormatacao = new ClsFormatacao()
+  const clsCrud: ClsCrud = new ClsCrud()
+  const clsFormatacao: ClsFormatacao = new ClsFormatacao()
+  const clsApi: ClsApi = new ClsApi()
 
   const ResetDados: PedidoBackInterface = {
     dataPedido: '',
     observacao: '',
     idPessoa_cliente: 0,
-    idPessoa_vendedor: 0,
+    idPessoa_vendedor: usuarioState.tipoUsuario === UsuarioType.vendedor ? usuarioState.idVendedor : 0,
     idPrazoEntrega: 0,
     statusPedido: StatusType.aberto,
     detalhePedidos: []
@@ -64,7 +68,6 @@ export default function Pedido() {
     totalQtd: ''
   }
 
-  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
@@ -250,10 +253,32 @@ export default function Pedido() {
     }
   }
 
+  const criarNotification = async (cli: string, ped: string, ven: string, pedido: any) => {
+
+    const noti: NotificationInterface = {
+      color: 'info',
+      title: 'Novo Pedido',
+      //message: 'Pedido: ' + `${ped}` + ' - Cliente: ' + `${cli}` + ' - Vendedor: ' + `${ven}`,
+      message: `Data: ${clsFormatacao.dataISOtoUser(pedido.dataPedido)}   -   Pedido: ${ped}\nCliente: ${cli}\nVendedor: ${ven}`,
+      type: 'gerenciador',
+      read: false,
+      details: [pedido],
+      idUsuario: 0
+    }
+
+    const notifications = await clsApi.execute<NotificationInterface[]>({
+      method: 'post',
+      url: 'notifications/',
+      dados: noti,
+      token: usuarioState.token
+    })
+    if (notifications) {
+      console.log(notifications)
+    }
+  }
+
   const btConfirmar = () => {
     if (validarDados()) {
-
-      console.log(pedido)
 
       if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
         clsCrud.incluir({
@@ -265,8 +290,12 @@ export default function Pedido() {
           setMensagemState: setMensagemState
         })
           .then((rs) => {
+            const cli = rsCliente.find(c => c.idPessoa === pedido.idPessoa_cliente)?.nome || 'CLIENTE NÃO ENCONTRADO';
+            const ven = rsVendedor.find(c => c.idPessoa === pedido.idPessoa_vendedor)?.nome || 'VENDEDOR NÃO ENCONTRADO';
+
             if (rs.ok) {
               setLocalState({ action: actionTypes.pesquisando })
+              criarNotification(cli, String(rs.dados.idPedido), ven, rs.dados)
             } else {
               setMensagemState({
                 titulo: 'Erro...',
@@ -277,6 +306,15 @@ export default function Pedido() {
                 cb: null
               })
             }
+          }).catch((erro) => {
+            setMensagemState({
+              titulo: 'Erro...',
+              exibir: true,
+              mensagem: 'Usuário sem permissão - Consulte Suporte',
+              tipo: MensagemTipo.Error,
+              exibirBotao: true,
+              cb: null
+            })
           })
       } else if (localState.action === actionTypes.excluindo) {
         clsCrud.excluir({
@@ -451,6 +489,7 @@ export default function Pedido() {
         camposLike: ["idUsuario"],
         token: usuarioState.token
       })
+
       const vendedor = usuario.filter((item) => item.idPessoa_vendedor)[0].idPessoa_vendedor
 
       await clsCrud
@@ -608,7 +647,7 @@ export default function Pedido() {
                   label="Vendedor"
                   erros={erros}
                   setState={setPedido}
-                  disabled={localState.action === 'excluindo' ? true : false}
+                  disabled={localState.action === 'excluindo' || usuarioState.tipoUsuario === UsuarioType.vendedor ? true : false}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 3)}
                 />

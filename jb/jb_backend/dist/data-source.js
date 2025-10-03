@@ -36,6 +36,7 @@ var usuarioPermissao_entity_1 = require("./entities/sistema/usuarioPermissao.ent
 var modulo_entity_1 = require("./entities/sistema/modulo.entity");
 var moduloPermissao_entity_1 = require("./entities/sistema/moduloPermissao.entity");
 var dotenv = require("dotenv");
+var notification_entity_1 = require("./entities/sistema/notification.entity");
 dotenv.config();
 exports.AppDataSource = new typeorm_1.DataSource({
     type: process.env.DB_TYPE,
@@ -78,7 +79,8 @@ exports.AppDataSource = new typeorm_1.DataSource({
         unidadeMedida_entity_1.default,
         usuario_entity_1.Usuario,
         usuarioPermissao_entity_1.UsuarioPermissao,
-        usuarioSessao_entity_1.UsuarioSessao
+        usuarioSessao_entity_1.UsuarioSessao,
+        notification_entity_1.Notification,
     ],
     migrations: [],
     subscribers: [],

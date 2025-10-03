@@ -422,14 +422,14 @@ export default function DetalhePedido({ rsMaster, setRsMaster, masterLocalState,
   }, [])
 
   const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('lg'))
   return (
     <>
       <Dialog
         open={open}
         fullScreen={fullScreen}
         fullWidth
-        maxWidth='md'>
+        maxWidth='xl'>
         <Paper variant="outlined"
           sx={{
             display: 'flex',

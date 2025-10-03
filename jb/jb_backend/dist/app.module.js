@@ -18,6 +18,7 @@ var autenticacao_middleware_1 = require("./auth/autenticacao.middleware");
 var somar_controller_1 = require("./controllers/somar.controller");
 var sessao_service_1 = require("./auth/services/sessao.service");
 var config_1 = require("@nestjs/config");
+var notification_controller_1 = require("./controllers/notification.controller");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -28,11 +29,21 @@ var AppModule = /** @class */ (function () {
     };
     AppModule = __decorate([
         (0, common_1.Module)({
-            imports: [global_module_1.GlobalModule, config_1.ConfigModule.forRoot({
+            imports: [
+                config_1.ConfigModule.forRoot({
                     envFilePath: '.env',
-                })],
-            controllers: [crud_controller_1.CrudController, out_controller_1.OutController, loginUsuario_controller_1.LoginUsuarioController, somar_controller_1.SomarController],
-            providers: [sessao_service_1.SessaoService, {
+                }),
+                global_module_1.GlobalModule,
+            ],
+            controllers: [
+                crud_controller_1.CrudController,
+                out_controller_1.OutController,
+                loginUsuario_controller_1.LoginUsuarioController,
+                somar_controller_1.SomarController,
+                notification_controller_1.NotificationController,
+            ],
+            providers: [sessao_service_1.SessaoService,
+                {
                     provide: core_1.APP_GUARD,
                     useClass: roles_guard_1.RolesGuard,
                 }],

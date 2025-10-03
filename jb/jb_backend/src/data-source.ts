@@ -33,6 +33,7 @@ import { UsuarioPermissao } from './entities/sistema/usuarioPermissao.entity'
 import { Modulo } from './entities/sistema/modulo.entity'
 import { ModuloPermissao } from './entities/sistema/moduloPermissao.entity'
 import * as dotenv from "dotenv";
+import { Notification } from './entities/sistema/notification.entity'
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -76,7 +77,8 @@ export const AppDataSource = new DataSource({
     UnidadeMedida,
     Usuario,
     UsuarioPermissao,
-    UsuarioSessao
+    UsuarioSessao,
+    Notification,
   ],
   migrations: [],
   subscribers: [],

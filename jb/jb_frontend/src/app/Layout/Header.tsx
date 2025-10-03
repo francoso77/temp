@@ -9,7 +9,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
 import { useNavigate } from 'react-router-dom';
-import { Tooltip } from '@mui/material';
+import { Badge, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
 
@@ -17,6 +18,8 @@ export default function Header() {
   const { layoutState, setLayoutState } = React.useContext(GlobalContext) as GlobalContextInterface
   const { mensagemState, setMensagemState } = React.useContext(GlobalContext) as GlobalContextInterface
   const { usuarioState, setUsuarioState } = React.useContext(GlobalContext) as GlobalContextInterface
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [notifications, setNotifications] = React.useState<any[]>([]);
   const navegar = useNavigate()
   const fecharLoading = () => {
     setMensagemState({ ...mensagemState, exibir: false })
@@ -59,6 +62,28 @@ export default function Header() {
             <Typography variant="body1" gutterBottom sx={{ margin: '20px' }}>
               {layoutState.titulo}
             </Typography>
+          </Box>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ marginRight: -2 }}>
+            <IconButton onClick={(e) => alert(e.currentTarget)} color="inherit">
+              <Badge badgeContent={1} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <Menu open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)} anchorEl={anchorEl}>
+              {notifications.length === 0 ? (
+                <MenuItem>Nenhuma notificação</MenuItem>
+              ) : (
+                notifications.map((n) => (
+                  <MenuItem key={n.id}>
+                    <ListItemText
+                      primary={n.title}
+                      secondary={n.message}
+                    />
+                  </MenuItem>
+                ))
+              )}
+            </Menu>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ marginRight: -2 }}>

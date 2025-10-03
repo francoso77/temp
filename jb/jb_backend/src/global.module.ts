@@ -5,7 +5,7 @@ import { SessaoService } from './auth/services/sessao.service';
 @Module({
   imports: [],
   controllers: [],
-  providers: [ContextoService, SessaoService],
+  providers: [ContextoService, SessaoService,],
   exports: [ContextoService, SessaoService],
 })
 export class GlobalModule { }
