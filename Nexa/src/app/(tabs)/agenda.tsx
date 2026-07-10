@@ -1,4 +1,6 @@
-import { EmptyState, Screen, Typography } from "../../components";
+import { router } from "expo-router";
+
+import { Button, EmptyState, Screen, Typography } from "../../components";
 
 export default function AgendaScreen() {
   return (
@@ -12,6 +14,12 @@ export default function AgendaScreen() {
         title="Nenhum horário agendado"
         description="Organize seu dia criando seu primeiro atendimento."
       />
+
+      <Button
+        title="+ Novo Agendamento"
+        onPress={() => router.push("/appointment/new")}
+      />
     </Screen>
   );
 }
+

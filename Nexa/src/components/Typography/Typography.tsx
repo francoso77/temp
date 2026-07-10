@@ -1,18 +1,32 @@
 import { ReactNode } from "react";
-import { StyleSheet, Text } from "react-native";
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+} from "react-native";
+
 import { Colors, Typography as Font } from "../../theme";
 
 type Props = {
   children: ReactNode;
   variant?: "title" | "h1" | "h2" | "body" | "small";
+  style?: StyleProp<TextStyle>;
 };
 
 export function Typography({
   children,
   variant = "body",
+  style,
 }: Props) {
   return (
-    <Text style={[styles.base, styles[variant]]}>
+    <Text
+      style={[
+        styles.base,
+        styles[variant],
+        style,
+      ]}
+    >
       {children}
     </Text>
   );
