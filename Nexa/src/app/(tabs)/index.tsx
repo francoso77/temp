@@ -1,6 +1,5 @@
 import { View } from "react-native";
-
-import { Card, Screen, Typography } from "../../components";
+import { InfoCard, Screen, Typography } from "../../components";
 import { Spacing } from "../../theme";
 
 export default function Home() {
@@ -16,37 +15,28 @@ export default function Home() {
 
       <View style={{ height: Spacing.lg }} />
 
-      <Card>
-        <Typography variant="h2">
-          📅 Hoje
-        </Typography>
-
-        <View style={{ height: 10 }} />
-
+      <InfoCard
+        icon="📅"
+        title="Hoje"
+      >
         <Typography>
           Você ainda não possui atendimentos cadastrados.
         </Typography>
-      </Card>
+      </InfoCard>
 
-      <Card>
-        <Typography variant="h2">
-          💰 Receita Prevista
-        </Typography>
-
-        <View style={{ height: 10 }} />
-
+      <InfoCard
+        icon="💰"
+        title="Receita Prevista"
+      >
         <Typography variant="title">
           R$ 0,00
         </Typography>
-      </Card>
+      </InfoCard>
 
-      <Card>
-        <Typography variant="h2">
-          💬 Nexa
-        </Typography>
-
-        <View style={{ height: 10 }} />
-
+      <InfoCard
+        icon="💬"
+        title="Nexa"
+      >
         <Typography>
           Bem-vinda!
         </Typography>
@@ -54,7 +44,7 @@ export default function Home() {
         <Typography>
           Vamos organizar seu dia?
         </Typography>
-      </Card>
+      </InfoCard>
     </Screen>
   );
 }
