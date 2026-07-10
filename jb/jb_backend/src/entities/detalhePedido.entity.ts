@@ -1,9 +1,9 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import Produto from './produto.entity';
-import { DetalhePedidoInterface } from '../interfaces/pedidoInterface';
 import Pedido from './pedido.entity';
 import Cor from './cor.entity';
 import { StatusType } from '../types/statusTypes';
+import { DetalhePedidoDublagemInterface } from '../interfaces/pedidoDublagemInterface';
 
 @Entity({ name: 'detalhepedidos' })
 @Index('IDX_PEDIDO', ['idPedido'])
@@ -12,7 +12,7 @@ import { StatusType } from '../types/statusTypes';
 @Index('IDX_STATUS_ITEM', ['statusItem'])
 @Index('IDX_PEDIDO_PRODUTO', ['idPedido', 'idProduto'])
 @Index('IDX_PRODUTO_STATUS', ['idProduto', 'statusItem'])
-export default class DetalhePedido implements DetalhePedidoInterface {
+export default class DetalhePedido implements DetalhePedidoDublagemInterface {
 
   @PrimaryGeneratedColumn()
   idDetalhePedido: number

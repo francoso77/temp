@@ -23,7 +23,6 @@ export interface DataTableCabecalhoInterface {
   largura?: number
   format?: (arg: any, row: any) => string | number | undefined
   render?: (arg: any, row: any) => React.ReactNode
-  // 👇 Novas props opcionais para suporte ao Chip
   chipColor?: (valor: any, row?: any) => 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
   chipLabel?: (valor: any, row?: any) => string // caso queira customizar o texto do chip
 }
@@ -77,10 +76,6 @@ export function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 export function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
@@ -93,16 +88,6 @@ export function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => n
   return stabilizedThis.map((el) => el[0]);
 }
 
-// //formatando o valor somado
-// const formatNumber = (number: number, locale: string): string => {
-//   return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, }).format(number);
-// };
-
-// //Somando a coluna informada para totalizar na tabela
-// const sumColumn = (data: Array<any>, column: string): number => {
-//   return data.reduce((sum, row) => sum + row[column], 0);
-// };
-
 export const sumColumns = (data: Array<any>, columns: Array<string>): Record<string, number> => {
   return columns.reduce((result, column) => {
     result[column] = data.reduce((sum, row) => sum + row[column], 0);
@@ -110,14 +95,11 @@ export const sumColumns = (data: Array<any>, columns: Array<string>): Record<str
   }, {} as Record<string, number>);
 };
 
-
-
 export default function DataTable<T>({
   backgroundColorHead,
   dados = [],
   cabecalho = [],
   acoes = [],
-  onStatus = undefined,
   onSelecionarLinha = undefined,
   exibirPaginacao = true,
   temTotal = false,
@@ -234,19 +216,6 @@ export default function DataTable<T>({
   }
 
   const totalColunas = sumColumns(dados, colunaSoma)
-
-  // const chipStyle = (valor: string) => {
-  //   switch (valor) {
-  //     case 'Receita':
-  //       return { backgroundColor: '#2e7d32', color: '#fff' }; // verde escuro
-  //     case 'Despesa':
-  //       return { backgroundColor: '#d32f2f', color: '#fff' }; // vermelho
-  //     case 'status':
-  //       return { backgroundColor: '#616161', color: '#fff' }; // cinza
-  //     default:
-  //       return { backgroundColor: '#616161', color: '#fff' }; // cinza
-  //   }
-  // }
 
   return (
     <>

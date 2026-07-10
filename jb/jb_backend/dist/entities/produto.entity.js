@@ -46,6 +46,10 @@ var Produto = /** @class */ (function () {
         __metadata("design:type", Number)
     ], Produto.prototype, "gm2", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true, type: 'float', precision: 4 }),
+        __metadata("design:type", Number)
+    ], Produto.prototype, "preco", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ nullable: false }),
         __metadata("design:type", Boolean)
     ], Produto.prototype, "ativo", void 0);

@@ -7,7 +7,7 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 import { DetalheProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import ClsApi from '../../Utils/ClsApi';
-import { PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { PedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import CloseIcon from '@mui/icons-material/Close'
 import TableSelect from '../../Componentes/DataTable/tableSelect';
 import ArticleTwoToneIcon from '@mui/icons-material/ArticleTwoTone';
@@ -29,7 +29,7 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
   const clsRelatorios = new ClsRelatorioProgramacao()
 
   const { setMensagemState } = useContext(GlobalContext) as GlobalContextInterface
-  const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
+  const [rsPedido, setRsPedido] = useState<Array<PedidoDublagemInterface>>([])
   const [rsPessoa, setRsPessoa] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
 
@@ -136,7 +136,7 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
           "detalhePedidos",
         ],
       })
-      .then((rsPedidos: Array<PedidoInterface>) => {
+      .then((rsPedidos: Array<PedidoDublagemInterface>) => {
         setRsPedido(rsPedidos)
       })
 
@@ -149,7 +149,7 @@ export default function EtiquetasPedido({ programacao, setOpenMaster }: PropsInt
         setRsPessoa(rsPessoas)
       })
 
-    clsApi.execute<Array<PedidoInterface>>({
+    clsApi.execute<Array<PedidoDublagemInterface>>({
       url: 'pedidosFechados',
       method: 'post',
       id: programacao,

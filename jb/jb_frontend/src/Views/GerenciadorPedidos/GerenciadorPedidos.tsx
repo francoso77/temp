@@ -13,7 +13,7 @@ import ClsApi from '../../Utils/ClsApi';
 import DataTableSelect from '../../Componentes/DataTable/tableSelectNivel';
 import { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
-import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { DetalhePedidoDublagemInterface, PedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import { DetalheProgramacaoDublagemInterface } from '../../Interfaces/programacaoDublagemInterface';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
 
@@ -28,7 +28,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
   const clsFormatacao = new ClsFormatacao()
   const clsApi = new ClsApi()
 
-  const ResetDados: DetalhePedidoInterface = {
+  const ResetDados: DetalhePedidoDublagemInterface = {
     idPedido: null,
     idProduto: 0,
     produto: {
@@ -54,8 +54,8 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
-  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoInterface>(ResetDados)
-  const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
+  const [detalhePedido, setDetalhePedido] = useState<DetalhePedidoDublagemInterface>(ResetDados)
+  const [rsPedido, setRsPedido] = useState<Array<PedidoDublagemInterface>>([])
   const [open, setOpen] = useState<boolean>(false)
 
 
@@ -68,7 +68,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     },
     {
       cabecalho: 'Pedido',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'idPedido',
       format: (v) => clsFormatacao.numeroPadrao(v)
     },
@@ -199,7 +199,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
   ]
 
 
-  const pesquisarID = async (id: string | number): Promise<DetalhePedidoInterface> => {
+  const pesquisarID = async (id: string | number): Promise<DetalhePedidoDublagemInterface> => {
     const rs = await clsCrud
       .pesquisar({
         entidade: "DetalhePedido",
@@ -241,9 +241,9 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
       criterio: {
         idPedido: pedido
       }
-    }).then((rs: Array<PedidoInterface>) => {
+    }).then((rs: Array<PedidoDublagemInterface>) => {
       const qtdItens = rs[0].detalhePedidos.length
-      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoInterface) => det.statusItem === StatusType.producao).length
+      const emProducao = rs[0].detalhePedidos.filter((det: DetalhePedidoDublagemInterface) => det.statusItem === StatusType.producao).length
 
       if (qtdItens === emProducao) {
         rs[0].statusPedido = StatusType.producao
@@ -287,7 +287,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
   }
 
   const BuscaDados = () => {
-    clsApi.execute<Array<PedidoInterface>>({
+    clsApi.execute<Array<PedidoDublagemInterface>>({
       url: 'gerenciadorPedidosEmAberto',
       method: 'post',
       mensagem: 'Pesquisando pedidos ...',
@@ -300,7 +300,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     clsCrud.pesquisar({
       entidade: 'Pedido',
       relations: ['detalhePedidos'],
-    }).then((rs: Array<PedidoInterface>) => {
+    }).then((rs: Array<PedidoDublagemInterface>) => {
       setRsPedido(rs)
     })
   }
@@ -324,7 +324,7 @@ export default function GerenciadorPedido({ detalhe, setOpenDetalhe }: PropsInte
     return indice < 0;
   }
   const AlterarStatusPedido = async (pedidos: Array<number>) => {
-    await clsApi.execute<Array<PedidoInterface>>({
+    await clsApi.execute<Array<PedidoDublagemInterface>>({
       url: 'produzirPedidos',
       method: 'post',
       pedidos,

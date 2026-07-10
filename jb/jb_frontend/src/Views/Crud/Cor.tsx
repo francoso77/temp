@@ -267,7 +267,14 @@ export default function Cor() {
                       onExcluir(rs.idCor as number),
                     toolTip: "Excluir",
                   },
-                ] : []}
+                ] : [
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: CorInterface) =>
+                      onEditar(rs.idCor as number),
+                    toolTip: "Editar",
+                  },
+                ]}
               />
             </Grid>
           </Condicional>

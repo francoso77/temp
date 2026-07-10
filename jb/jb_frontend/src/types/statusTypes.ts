@@ -1,4 +1,5 @@
 export enum StatusType {
+  todos = 0,
   aberto = 1,
   producao = 2,
   parcial = 3,
@@ -6,6 +7,10 @@ export enum StatusType {
 }
 
 export const StatusTypes = [
+  {
+    idStatus: StatusType.todos,
+    descricao: 'Todos os Status'
+  },
   {
     idStatus: StatusType.aberto,
     descricao: 'Em aberto'

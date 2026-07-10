@@ -307,7 +307,14 @@ export default function Estrutura() {
                       onExcluir(rs.idEstrutura as number),
                     toolTip: "Excluir",
                   },
-                ] : []}
+                ] : [
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: EstruturaInterface) =>
+                      onEditar(rs.idEstrutura as number),
+                    toolTip: "Editar",
+                  },
+                ]}
               />
             </Grid>
           </Condicional>

@@ -6,7 +6,7 @@ export interface PessoaInterface {
   apelido?: string
   cpf_cnpj?: string
   endereco?: string
-  numero?: number
+  numero?: string
   bairro?: string
   cidade?: string
   uf?: string

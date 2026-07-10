@@ -161,10 +161,9 @@ export default function HeaderMenu() {
               </IconButton>
               <Menu open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)} anchorEl={anchorEl}>
                 {
-                  notifications.map((n) => (
-                    <Paper sx={{ my: 0.5, }} >
+                  notifications.map((n, i) => (
+                    <Paper key={n.id ?? i} sx={{ my: 0.5, }} >
                       <MenuItem
-                        key={n.id}
                         sx={{ bgcolor: n.read ? '#dfdcdc' : n.color, color: n.read ? 'gray' : 'black' }}
                       >
                         <IconButton aria-label="comment">
@@ -226,9 +225,9 @@ export default function HeaderMenu() {
                 </IconButton>
                 <Menu open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)} anchorEl={anchorEl}>
                   {
-                    notifications.map((n) => (
+                    notifications.map((n, i) => (
                       <MenuItem
-                        key={n.id}
+                        key={n.id ?? i}
                         sx={{ bgcolor: n.read ? '#dfdcdc' : n.color, color: n.read ? 'gray' : 'black' }}
                       >
                         <IconButton aria-label="comment">

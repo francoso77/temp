@@ -44,16 +44,17 @@ interface MesPesquisado {
   mes: string
 }
 
-
 interface PesquisaInterface {
   itemPesquisa: string
+  idTecelao: number
+  idProduto: number
+  turno: TurnoType | number
 }
 export function ProducaoMalharia() {
 
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud = new ClsCrud()
   const clsFormatacao = new ClsFormatacao()
-
 
   const ResetDadosPeca: DadosPecaInterface = {
     nomeProduto: '',
@@ -86,7 +87,7 @@ export function ProducaoMalharia() {
   const [openGraficos, setOpenGraficos] = useState(false)
   const [openPerdas, setOpenPerdas] = useState(false)
   const [erros, setErros] = useState({})
-  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState, mensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [producaoMalharia, setProducaoMalharia] = useState<ProducaoMalhariaInterface>(ResetDados)
   const [rsDadosPeca, setRsDadosPeca] = useState<DadosPecaInterface>(ResetDadosPeca)
   const [rsRevisador, setRsRevisador] = useState<Array<PessoaInterface>>([])
@@ -97,20 +98,15 @@ export function ProducaoMalharia() {
   const [rsTotais, setRsTotais] = useState<DadosTotaisInterface>(ResetDadosTotais)
   const [selectedValue, setSelectedValue] = useState<MesPesquisado>({ mes: "" })
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const [rsProducaoMalharia, setRsProducaoMalharia] = useState<Array<ProducaoMalhariaInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
+  const [rsProducaoMalharia, setRsProducaoMalharia] = useState<Array<any>>([])
+  const [producaoMalhariaAll, setProducaoMalhariaAll] = useState<Array<any>>([])
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '', idTecelao: 0, idProduto: 0, turno: TurnoType.segundo })
 
 
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
   const firstFieldRef = useRef<HTMLInputElement>(null)
 
   const cabecalhoProducaoMalharia: Array<DataTableCabecalhoInterface> = [
-    // {
-    //   cabecalho: 'Maquina',
-    //   alinhamento: 'center',
-    //   campo: 'idMaquina',
-    //   format: (idMaquina) => rsMaquina.find(x => x.idMaquina === idMaquina)?.nome
-    // },
     {
       cabecalho: 'Peça',
       alinhamento: 'left',
@@ -183,11 +179,6 @@ export function ProducaoMalharia() {
     return clsCrud
       .pesquisar({
         entidade: "ProducaoMalharia",
-        // relations: [
-        //   'tecelao',
-        //   'maquina',
-        //   'produto'
-        // ],
         criterio: {
           idMalharia: id,
         },
@@ -216,90 +207,97 @@ export function ProducaoMalharia() {
     setErros(erros)
     return retorno
   }
-  const BuscarDados = () => {
+  const loadDados = async () => {
 
-    clsCrud.pesquisar({
-      entidade: 'Pessoa',
-      criterio: {
-        tipoPessoa: 'R'
-      },
-      campoOrder: ['nome'],
+    setMensagemState({
+      ...mensagemState,
+      titulo: 'Carregando dados...',
+      exibir: true,
+      tipo: MensagemTipo.Loading
     })
-      .then((rs: Array<PessoaInterface>) => {
-        setRsRevisador(rs && rs.length > 0 ? rs : [])
-      })
 
-    clsCrud.pesquisar({
-      entidade: 'Pessoa',
-      criterio: {
-        tipoPessoa: 'T'
-      },
-      campoOrder: ['nome'],
-    })
-      .then((rs: Array<PessoaInterface>) => {
-        setRsTecelao(rs && rs.length > 0 ? rs : [])
-      })
+    try {
 
-    clsCrud.pesquisar({
-      entidade: 'Maquina',
-      criterio: {
-        ativo: true
-      },
-      campoOrder: ['nome'],
-    })
-      .then((rs: Array<MaquinaInterface>) => {
-        setRsMaquina(rs && rs.length > 0 ? rs : [])
-      })
+      const [revisadores, teceloes, maquinas, produtos, producao, meses] = await Promise.all([
 
-    clsCrud.pesquisar({
-      entidade: 'Produto',
-      criterio: {
-        tipoProduto: 9,
-        ativo: true
-      },
-      campoOrder: ['nome'],
-    })
-      .then((rs: Array<ProdutoInterface>) => {
-        setRsProduto(rs && rs.length > 0 ? rs : [])
-      })
+        clsCrud.pesquisar({
+          entidade: 'Pessoa',
+          criterio: {
+            tipoPessoa: 'R'
+          },
+          campoOrder: ['nome'],
+          tipoOrder: 'ASC'
+        }),
+        clsCrud.pesquisar({
+          entidade: 'Pessoa',
+          criterio: {
+            tipoPessoa: 'T'
+          },
+          campoOrder: ['nome'],
+          tipoOrder: 'ASC'
+        }),
+        clsCrud.pesquisar({
+          entidade: 'Maquina',
+          criterio: {
+            ativo: true
+          },
+          campoOrder: ['nome'],
+          tipoOrder: 'ASC'
+        }),
+        clsCrud.pesquisar({
+          entidade: 'Produto',
+          criterio: {
+            tipoProduto: 9,
+            ativo: true
+          },
+          campoOrder: ['nome'],
+          tipoOrder: 'ASC'
+        }),
+        clsCrud.pesquisar({
+          entidade: 'ProducaoMalharia',
+          tipoOrder: 'DESC',
+          campoOrder: ['dataProducao'],
+          select: ['idMalharia', 'dataProducao', 'peca', 'peso', 'idPessoa_tecelao', 'idMaquina', 'idProduto', 'fechado', 'turno']
+        }),
+        clsCrud.consultar({
+          entidade: 'ProducaoMalharia',
+          joins: [{ tabelaRelacao: 'producaomalharia.produto', relacao: 'produto' }],
+          tipoOrder: 'DESC',
+          groupBy: 'mes',
+          campoOrder: ['mes'],
+          select: ['CONCAT( LPAD(MONTH(dataProducao), 2, "0"), "/",YEAR(dataProducao)) AS mes']
+        }),
+      ]);
 
-    clsCrud.consultar({
-      entidade: 'ProducaoMalharia',
-      joins: [{ tabelaRelacao: 'producaomalharia.produto', relacao: 'produto' }],
-      tipoOrder: 'DESC',
-      groupBy: 'mes',
-      campoOrder: ['mes'],
-      select: ['CONCAT( LPAD(MONTH(dataProducao), 2, "0"), "/",YEAR(dataProducao)) AS mes']
-    })
-      .then((rs: Array<any>) => {
-        setRsMeses(rs || []);
-        if (rs && rs.length > 0) {
-          setSelectedValue({ mes: rs[0].mes });
-        } else {
-          setSelectedValue({ mes: '' });
-        }
-      })
+      if (meses && meses.length > 0) {
+        setSelectedValue({ mes: meses[0].mes });
+      } else {
+        setSelectedValue({ mes: '' });
+      }
 
-    clsCrud.pesquisar({
-      entidade: 'ProducaoMalharia',
-      // relations: [
-      //   'tecelao',
-      //   'maquina',
-      //   'produto'
-      // ],
-      tipoOrder: 'DESC',
-      campoOrder: ['dataProducao'],
-      // criterio: {
-      //   fechado: 0
-      // },
-      // camposLike: ['fechado'],
-      select: ['idMalharia', 'dataProducao', 'peca', 'peso', 'idPessoa_tecelao', 'idMaquina', 'idProduto', 'fechado', 'turno']
-    })
-      .then((rs: Array<any>) => {
-        setRsProducaoMalharia(rs)
+      setRsRevisador(revisadores && revisadores.length > 0 ? revisadores : [])
+      setRsTecelao(teceloes && teceloes.length > 0 ? teceloes : [])
+      setRsMaquina(maquinas && maquinas.length > 0 ? maquinas : [])
+      setRsProduto(produtos && produtos.length > 0 ? produtos : [])
+      setRsProducaoMalharia(producao && producao.length > 0 ? producao : [])
+      setProducaoMalhariaAll(producao && producao.length > 0 ? producao : [])
+      setRsMeses(meses && meses.length > 0 ? meses : [])
+
+      setMensagemState({
+        ...mensagemState,
+        exibir: false
       })
+    } catch (error) {
+      console.log(error)
+      setMensagemState({
+        ...mensagemState,
+        titulo: 'Erro ao carregar dados',
+        tipo: MensagemTipo.Error,
+        exibir: true,
+        exibirBotao: true
+      })
+    }
   }
-
 
   const Totalizador = async () => {
     try {
@@ -397,14 +395,6 @@ export function ProducaoMalharia() {
     }
   }
 
-
-  // const btCancelarProducao = () => {
-  //   setErros({})
-  //   setProducaoMalharia(ResetDados)
-  //   setLocalState({ action: actionTypes.pesquisando })
-  //   setOpen(false)
-  //   btPesquisar()
-  // }
   const btCancelar = () => {
     setOpen(false)
   }
@@ -522,9 +512,10 @@ export function ProducaoMalharia() {
 
   const irPara = useNavigate()
   const btFechar = () => {
+
     if (['incluindo', 'editando', 'excluindo'].includes(localState.action)) {
       setLocalState({ action: actionTypes.pesquisando })
-      btPesquisar()
+      loadDados()
     } else {
 
       setLayoutState({
@@ -538,78 +529,65 @@ export function ProducaoMalharia() {
     }
   }
 
-  const formatDateTimeForMySQL = (dateString: string): string => {
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month}-${day} 00:00:00`
+  const filtrarProducaoMalharia = (producaoMalharia: any[], pes: PesquisaInterface) => {
+
+    const termo = pes.itemPesquisa.trim().toUpperCase()
+    let filtrados = [...producaoMalharia]
+
+    if (termo !== '') {
+      const pareceData = /\d+\/\d*/.test(termo) // reconhece fragmentos como "27/", "10/2025" etc.
+
+      filtrados = filtrados.filter(malharia => {
+        if (pareceData) {
+          // 🔎 Comparação com data parcial
+          const dataProducao = malharia.dataProducao
+          if (!dataProducao) return false
+
+          const dataFormatada = new Date(dataProducao)
+            .toLocaleDateString('pt-BR')
+            .toUpperCase()
+
+          // Permite busca parcial como "27/" ou "10/2025"
+          return dataFormatada.includes(termo)
+        } else {
+          const peca = malharia.peca
+          return peca.includes(termo)
+        }
+      })
+    }
+
+    if (pes.idTecelao && pes.idTecelao > 0) {
+      filtrados = filtrados.filter(
+        (malharia) => malharia.idPessoa_tecelao === pes.idTecelao
+      )
+    }
+
+    if (pes.idProduto && pes.idProduto > 0) {
+      filtrados = filtrados.filter(
+        (malharia) => malharia.idProduto === pes.idProduto
+      )
+    }
+
+    if (pes.turno && pes.turno > 0) {
+      filtrados = filtrados.filter(
+        (malharia) => malharia.turno === pes.turno
+      )
+    }
+
+    return filtrados
   }
+
   const btPesquisar = () => {
-    const relations = [
-      'tecelao',
-      'maquina',
-      'produto'
-    ]
-
-    const msg = 'Pesquisando dados ...'
-    const setMensagem = setMensagemState
-    const idsTec = rsTecelao
-      .filter(tecelao => tecelao.nome.includes(pesquisa.itemPesquisa))
-      .map(tecelao => tecelao.idPessoa)
-
-    let dadosPesquisa = {}
-    let criterio = {}
-    let camposLike = []
-    let comparador = "L"
-    let tipoOrder = 'DESC'
-    let campoOrder = ['dataProducao']
-
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
-
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-
-      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-      criterio = {
-        dataProducao: formattedDateTime,
-        // fechado: 0
-      }
-      camposLike = ['dataProducao']
-    } else if (temNumero && pesquisa.itemPesquisa.includes('-')) {
-
-      criterio = {
-        peca: pesquisa.itemPesquisa,
-        // fechado: 0
-      }
-      camposLike = ['peca']
-    } else {
-      criterio = {
-        idPessoa_tecelao: idsTec,
-        // fechado: 0
-      }
-      camposLike = ['idPessoa_tecelao']
-      comparador = 'I'
-    }
-
-    dadosPesquisa = {
-      entidade: "ProducaoMalharia",
-      relations,
-      comparador,
-      criterio,
-      camposLike,
-      tipoOrder,
-      campoOrder,
-      msg,
-      setMensagemState: setMensagem
-    }
-
-    clsCrud
-      .pesquisar(dadosPesquisa)
-      .then((rs: Array<any>) => {
-
-        setRsProducaoMalharia(rs);
-      });
+    setRsProducaoMalharia(filtrarProducaoMalharia(producaoMalhariaAll, pesquisa))
   }
 
   useEffect(() => {
-    BuscarDados()
+    const resultado = filtrarProducaoMalharia(producaoMalhariaAll, pesquisa)
+    setRsProducaoMalharia(resultado)
+  }, [pesquisa, producaoMalhariaAll])
+
+  useEffect(() => {
+    loadDados()
     Totalizador()
     if (firstFieldRef.current) {
       firstFieldRef.current.focus()
@@ -912,9 +890,9 @@ export function ProducaoMalharia() {
                 </IconButton>
               </Tooltip>
             </Grid>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={6} md={4}>
               <InputText
-                label='Buscar Peça, Data de Produção, Tecelão'
+                label='Buscar Peça e Data'
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"
@@ -923,6 +901,45 @@ export function ProducaoMalharia() {
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
+              />
+            </Grid>
+            <Grid item xs={6} md={2}>
+              <ComboBox
+                opcoes={TurnoTypes}
+                campoDescricao="descricao"
+                campoID="idTurno"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os turnos"
+                field="turno"
+                label="Turno"
+                erros={erros}
+                setState={setPesquisa}
+              />
+            </Grid>
+            <Grid item xs={4} md={2}>
+              <ComboBox
+                opcoes={rsTecelao}
+                campoDescricao="nome"
+                campoID="idPessoa"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os tecelões"
+                field="idTecelao"
+                label="Tecelão"
+                erros={erros}
+                setState={setPesquisa}
+              />
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <ComboBox
+                opcoes={rsProduto}
+                campoDescricao="nome"
+                campoID="idProduto"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os produtos"
+                field="idProduto"
+                label="Produto"
+                erros={erros}
+                setState={setPesquisa}
               />
             </Grid>
             <Grid item xs={2} md={1}>

@@ -1,4 +1,4 @@
-import { Grid, IconButton, Paper, TableContainer, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, IconButton, Paper, TableContainer, Tooltip, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
@@ -537,26 +537,59 @@ export default function DetalheTinturaria({ rsMaster, masterLocalState, setMaste
   return (
     <>
       <Condicional condicao={masterLocalState.action !== actionTypes.excluindo}>
-        <Paper variant="outlined" sx={{ display: { xs: '', md: 'flex' }, justifyContent: 'space-between', mb: 1.5, padding: 1.5 }}>
-          <Grid item xs={12}>
-            <ShowText
-              titulo="Cliente"
-              descricao={
-                rsPessoas.
-                  find((pessoa) => pessoa.idPessoa === rsMaster.idPessoa_cliente)?.nome || 'Cliente não encontrado!'
-              }
-            />
+        <Grid container spacing={1.2} sx={{ mb: 2 }}>
+          {/* Paper 1 - Cliente */}
+          <Grid item xs={12} md={6}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 2,
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+              }}
+            >
+              <Box>
+                <ShowText
+                  titulo="Cliente"
+                  descricao={
+                    rsPessoas.find(
+                      (pessoa) => pessoa.idPessoa === rsMaster.idPessoa_cliente
+                    )?.nome || 'Cliente não encontrado!'
+                  }
+                />
+              </Box>
+            </Paper>
           </Grid>
-          <Grid item xs={12}>
-            <ShowText
-              titulo="Tinturaria"
-              descricao={
-                rsPessoas.
-                  find(pessoa => pessoa.idPessoa === rsMaster.idPessoa_fornecedor)?.nome || 'Tinturaria não encontrada!'
-              }
-            />
+
+          {/* Paper 2 - Tinturaria */}
+          <Grid item xs={12} md={6}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 2,
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+              }}
+            >
+              <Box>
+                <ShowText
+                  titulo="Tinturaria"
+                  descricao={
+                    rsPessoas.find(
+                      (pessoa) => pessoa.idPessoa === rsMaster.idPessoa_fornecedor
+                    )?.nome || 'Tinturaria não encontrada!'
+                  }
+                />
+              </Box>
+            </Paper>
           </Grid>
-        </Paper>
+        </Grid>
       </Condicional>
       <Paper variant="outlined" sx={{ padding: 1 }}>
         <Grid container spacing={1.2} sx={{ alignItems: 'flex-start' }}>

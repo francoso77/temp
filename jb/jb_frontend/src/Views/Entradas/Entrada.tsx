@@ -49,9 +49,10 @@ export default function Entrada() {
     total: '',
     totalQtd: ''
   }
-  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState, mensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
+  const [entradasAll, setEntradasAll] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [entrada, setEntrada] = useState<EntradaInterface>(ResetDados)
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
@@ -295,74 +296,43 @@ export default function Entrada() {
     }
   }
 
-  const formatDateTimeForMySQL = (dateString: string): string => {
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month}-${day} 00:00:00`
+  const filtrarEntradas = (entradas: any[], pes: PesquisaInterface) => {
+    const termo = pes.itemPesquisa.trim().toUpperCase()
+    let filtrados = [...entradas]
+
+    if (termo !== '') {
+      const temNumero = /\d/.test(termo)
+      const pareceData = /\d+\/\d*/.test(termo) // reconhece fragmentos como "27/", "10/2025" etc.
+
+      filtrados = filtrados.filter(entrada => {
+        if (pareceData) {
+          // 🔎 Comparação com data parcial
+          const dataEntrada = entrada.dataEntrada || entrada.dataEmissao
+          if (!dataEntrada) return false
+
+          const dataFormatada = new Date(dataEntrada)
+            .toLocaleDateString('pt-BR')
+            .toUpperCase()
+
+          // Permite busca parcial como "27/" ou "10/2025"
+          return dataFormatada.includes(termo)
+        } else if (temNumero) {
+          // 🔎 Pesquisa por número da nota fiscal
+          return entrada.notaFiscal?.toString().includes(termo)
+        } else {
+          // 🔎 Pesquisa por nome do fornecedor
+          return entrada.fornecedor?.nome?.toUpperCase().includes(termo)
+        }
+      })
+    }
+
+    return filtrados
   }
+
 
   const btPesquisar = () => {
-
-    const relations = [
-      "fornecedor",
-      "detalheEntradas",
-      "detalheEntradas.produto",
-      "detalheEntradas.cor",
-      "detalheEntradas.revisador",
-      "detalheEntradas.romaneio",
-    ];
-
-    const msg = 'Pesquisando dados ...'
-    const setMensagem = setMensagemState
-    const idsFor = rsFornecedor
-      .filter(fornecedor => fornecedor.nome.includes(pesquisa.itemPesquisa))
-      .map(fornecedor => fornecedor.idPessoa)
-
-    let dadosPesquisa = {}
-    let criterio = {}
-    let camposLike = []
-    let comparador = "L"
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
-
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-
-      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-      criterio = {
-        dataEmissao: formattedDateTime
-      }
-      camposLike = ['dataEmissao']
-    } else if (temNumero) {
-
-      //const formattedNumber = formatNumber(pesquisa.itemPesquisa);
-      criterio = {
-        notaFiscal: pesquisa.itemPesquisa
-      }
-      camposLike = ['notaFiscal']
-    } else {
-      criterio = {
-        idPessoa_fornecedor: idsFor,
-      }
-      camposLike = ['idPessoa_fornecedor']
-      comparador = 'I'
-    }
-
-    dadosPesquisa = {
-      entidade: "Entrada",
-      relations,
-      comparador,
-      criterio,
-      camposLike,
-      msg,
-      setMensagemState: setMensagem
-    }
-
-    clsCrud
-      .pesquisar(dadosPesquisa)
-      .then((rs: Array<any>) => {
-        setRsPesquisa(rs);
-      });
+    setRsPesquisa(filtrarEntradas(entradasAll, pesquisa))
   }
-
-
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -375,35 +345,77 @@ export default function Entrada() {
     irPara('/')
   }
 
-  const BuscarDados = () => {
+  const loadDados = async () => {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        campoOrder: ['nome'],
-        comparador: 'I',
-        criterio: {
-          tipoPessoa: ['J', 'C', 'F'],
-        },
-        camposLike: ['tipoPessoa'],
+    setMensagemState({
+      ...mensagemState,
+      titulo: 'Carregando dados...',
+      exibir: true,
+    })
+
+    try {
+
+      const [fornecedores, entradas] = await Promise.all([
+        clsCrud.pesquisar({
+          entidade: "Pessoa",
+          campoOrder: ['nome'],
+          tipoOrder: "ASC",
+          comparador: 'I',
+          criterio: {
+            tipoPessoa: ['J', 'C', 'F'],
+          },
+          camposLike: ['tipoPessoa'],
+        }),
+
+        clsCrud.pesquisar({
+          entidade: "Entrada",
+          relations: [
+            "fornecedor",
+            "detalheEntradas",
+            "detalheEntradas.produto",
+            "detalheEntradas.cor",
+            "detalheEntradas.revisador",
+            "detalheEntradas.romaneio",
+          ],
+          campoOrder: ['dataEmissao'],
+          tipoOrder: "DESC",
+        }),
+      ]);
+
+      setRsFornecedor(fornecedores)
+      setEntradasAll(entradas)
+      setRsPesquisa(entradas)
+
+      setMensagemState({
+        ...mensagemState,
+        exibir: false
       })
-      .then((rsFornecedores: Array<PessoaInterface>) => {
-        setRsFornecedor(rsFornecedores)
+    }
+    catch (error) {
+      console.log(error)
+      setMensagemState({
+        titulo: 'Erro...',
+        exibir: true,
+        mensagem: 'Erro na conexão com o servidor',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
       })
+    }
   }
 
   useEffect(() => {
     const carregarDados = async () => {
-      await BuscarDados()
+      await loadDados()
     }
     carregarDados()
-  }, [])
+  }, [localState])
 
   useEffect(() => {
-    if (rsFornecedor.length > 0) {
-      btPesquisar()
-    }
-  }, [rsFornecedor])
+    // Aplica filtro toda vez que pesquisa ou produtosAll mudar
+    const resultado = filtrarEntradas(entradasAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, entradasAll])
 
   return (
 

@@ -26,7 +26,7 @@ export default class Pessoa implements PessoaInterface {
   endereco: string
 
   @Column({ nullable: true })
-  numero: number
+  numero: string
 
   @Column({ nullable: true, length: 60 })
   bairro: string
@@ -47,7 +47,7 @@ export default class Pessoa implements PessoaInterface {
   @Index()
   whatsapp: string
 
-  @Column({ nullable: true, length: 255 })
+  @Column({ nullable: true, length: 500 })
   @Index()
   email: string
 
@@ -59,11 +59,6 @@ export default class Pessoa implements PessoaInterface {
 
   @Column()
   ativo: boolean
-
-  // @JoinColumn({ name: 'idPessoa_cliente' })
-  // @OneToMany(() => Programacao, (programacao) =>
-  //   programacao.cliente, { cascade: true })
-  // clienteProgramacoes: Programacao[]
 
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', nullable: false })
   createAt: Date

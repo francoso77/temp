@@ -14,6 +14,9 @@ export default class DetalheProducaoDublagem implements DetalheProducaoDublagemI
   idDublagem: number
 
   @Column({ type: 'float', precision: 4 })
+  qtdPedida: number
+
+  @Column({ type: 'float', precision: 4 })
   metrosTotal: number
 
   @Column({ type: 'int', precision: 0 })

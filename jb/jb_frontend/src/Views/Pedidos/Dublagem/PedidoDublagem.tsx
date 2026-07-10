@@ -2,28 +2,28 @@ import { Box, Chip, Container, Grid, IconButton, Paper, Tooltip } from '@mui/mat
 import { useContext, useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
-import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
-import Condicional from '../../Componentes/Condicional/Condicional';
-import ClsValidacao from '../../Utils/ClsValidacao';
-import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
-import ClsCrud from '../../Utils/ClsCrudApi';
-import DataTable, { DataTableCabecalhoInterface } from '../../Componentes/DataTable';
-import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
+import { ActionInterface, actionTypes } from '../../../Interfaces/ActionInterface';
+import Condicional from '../../../Componentes/Condicional/Condicional';
+import ClsValidacao from '../../../Utils/ClsValidacao';
+import { GlobalContext, GlobalContextInterface } from '../../../ContextoGlobal/ContextoGlobal';
+import ClsCrud from '../../../Utils/ClsCrudApi';
+import DataTable, { DataTableCabecalhoInterface } from '../../../Componentes/DataTable';
+import { MensagemTipo } from '../../../ContextoGlobal/MensagemState';
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import DeleteIcon from '@mui/icons-material/Delete';
-import InputText from '../../Componentes/InputText';
-import ComboBox from '../../Componentes/ComboBox';
-import { PessoaInterface } from '../../Interfaces/pessoaInterface';
-import { PrazoEntregaInterface } from '../../Interfaces/prazoEntregaInterface';
-import ClsFormatacao from '../../Utils/ClsFormatacao';
-import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
-import DetalhePedido from './DetalhePedido';
-import { UsuarioType } from '../../types/usuarioTypes';
-import { StatusType, StatusTypes } from '../../types/statusTypes';
-import ClsApi from '../../Utils/ClsApi';
-import { NotificationInterface } from '../../Interfaces/sistema/notificationInterface';
+import InputText from '../../../Componentes/InputText';
+import ComboBox from '../../../Componentes/ComboBox';
+import { PessoaInterface } from '../../../Interfaces/pessoaInterface';
+import { PrazoEntregaInterface } from '../../../Interfaces/prazoEntregaInterface';
+import ClsFormatacao from '../../../Utils/ClsFormatacao';
+import { DetalhePedidoDublagemInterface, PedidoDublagemInterface } from '../../../Interfaces/pedidoDublagemInterface';
+import DetalhePedido from './DetalhePedidoDublagem';
+import { UsuarioType } from '../../../types/usuarioTypes';
+import { StatusType, StatusTypes } from '../../../types/statusTypes';
+import ClsApi from '../../../Utils/ClsApi';
+import { NotificationInterface } from '../../../Interfaces/sistema/notificationInterface';
 
 export interface SomatorioPedidoInterface {
   total: string
@@ -38,10 +38,10 @@ export interface PedidoBackInterface {
   idPessoa_vendedor: number
   idPrazoEntrega: number
   statusPedido: StatusType
-  detalhePedidos: DetalhePedidoInterface[]
+  detalhePedidos: DetalhePedidoDublagemInterface[]
 }
 
-export default function Pedido() {
+export default function PedidoDublagem() {
 
   const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const validaCampo: ClsValidacao = new ClsValidacao()
@@ -61,6 +61,8 @@ export default function Pedido() {
 
   interface PesquisaInterface {
     itemPesquisa: string
+    idVendedor: number
+    status: StatusType | number
   }
 
   const SomatorioDados: SomatorioPedidoInterface = {
@@ -72,10 +74,11 @@ export default function Pedido() {
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [pedido, setPedido] = useState<PedidoBackInterface>(ResetDados)
+  const [pedidosAll, setPedidosAll] = useState<any[]>([])
   const [rsPrazo, setRsPrazo] = useState<Array<PrazoEntregaInterface>>([])
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsVendedor, setRsVendedor] = useState<Array<PessoaInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '', idVendedor: 0, status: StatusType.todos })
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioPedidoInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -159,7 +162,7 @@ export default function Pedido() {
     },
   ]
 
-  const pesquisarID = async (id: string | number): Promise<PedidoInterface | null> => {
+  const pesquisarID = async (id: string | number): Promise<PedidoDublagemInterface | null> => {
     const rs = await clsCrud
       .pesquisar({
         entidade: "Pedido",
@@ -239,7 +242,7 @@ export default function Pedido() {
     return retorno
   }
 
-  const AtualizaSomatorio = (rs: PedidoInterface) => {
+  const AtualizaSomatorio = (rs: PedidoDublagemInterface) => {
 
     let totalQtd: number = 0
     let total: number = 0
@@ -272,9 +275,9 @@ export default function Pedido() {
       dados: noti,
       token: usuarioState.token
     })
-    if (notifications) {
-      console.log(notifications)
-    }
+    // if (notifications) {
+    //   console.log(notifications)
+    // }
   }
 
   const btConfirmar = () => {
@@ -344,90 +347,50 @@ export default function Pedido() {
     }
   }
 
-  const formatDateTimeForMySQL = (dateString: string): string => {
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month}-${day} 00:00:00`
-  }
+  const btPesquisar = () => {
 
-  const btPesquisar = async () => {
+    const termo = pesquisa.itemPesquisa.trim().toUpperCase();
+    let filtrados = [...pedidosAll];
 
-    const idCliente = rsCliente
-      .filter(cliente => cliente.nome.includes(pesquisa.itemPesquisa))
-      .map(cliente => cliente.idPessoa)
+    // 🔎 Filtro por termo digitado
+    if (termo !== '') {
+      const temNumero = /\d/.test(termo);
 
-    const relations = [
-      "cliente",
-      "vendedor",
-      "prazoEntrega",
-      "detalhePedidos",
-      "detalhePedidos.produto",
-      "detalhePedidos.cor",
-    ];
-
-    const msg = 'Pesquisando dados ...'
-    const setMensagem = setMensagemState
-
-    let dadosPesquisa = {}
-    let criterio = {}
-    let camposLike = []
-    let comparador = "L"
-    let tipoOrder = 'DESC'
-    let campoOrder = ['dataPedido']
-
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
-
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-      criterio = {
-        dataPedido: formattedDateTime,
-        //statusPedido: 1,
-      }
-      camposLike = ['dataPedido']
-    } else if (temNumero) {
-
-      criterio = {
-        idPedido: pesquisa.itemPesquisa
-      }
-      camposLike = ['idPedido']
-    } else {
-
-      criterio = {
-        idPessoa_cliente: idCliente,
-        //statusPedido: 1,
-      }
-      camposLike = ['idPessoa_cliente']
-      comparador = 'I'
-    }
-
-    if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
-      const vendedor = await clsCrud.pesquisar({
-        entidade: "Usuario",
-        criterio: { idUsuario: usuarioState.idUsuario },
-        camposLike: ["idUsuario"],
-        token: usuarioState.token
-      })
-      criterio = { ...criterio, idPessoa_vendedor: vendedor.filter((item) => item.idPessoa_vendedor)[0].idPessoa_vendedor }
-    }
-
-    dadosPesquisa = {
-      entidade: "Pedido",
-      relations,
-      criterio,
-      comparador,
-      camposLike,
-      campoOrder,
-      tipoOrder,
-      msg,
-      setMensagemState: setMensagem
-    }
-
-    await clsCrud
-      .pesquisar(dadosPesquisa)
-      .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
+      filtrados = filtrados.filter(pedido => {
+        if (temNumero && termo.includes('/')) {
+          // Data formatada (dd/mm/yyyy)
+          const dataFormatada = new Date(pedido.dataPedido).toLocaleDateString('pt-BR');
+          return dataFormatada.includes(termo);
+        } else if (temNumero) {
+          return pedido.idPedido.toString().includes(termo);
+        } else {
+          // Pesquisa pelo nome do cliente
+          return pedido.cliente?.nome?.toUpperCase().includes(termo);
+        }
       });
+    }
 
-  }
+    // 👔 Filtro por vendedor
+    if (pesquisa.idVendedor && pesquisa.idVendedor > 0) {
+      filtrados = filtrados.filter(
+        (pedido) => pedido.idPessoa_vendedor === pesquisa.idVendedor
+      );
+    } else if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+      filtrados = filtrados.filter(
+        (pedido) => pedido.idPessoa_vendedor === usuarioState.idVendedor
+      );
+    }
+
+    // 📦 Filtro por status
+    if (pesquisa.status && pesquisa.status !== StatusType.todos) {
+      filtrados = filtrados.filter(
+        (pedido) => pedido.statusPedido === pesquisa.status
+      );
+    }
+
+    setRsPesquisa(filtrados);
+  };
+
 
   const irPara = useNavigate()
   const btFechar = () => {
@@ -452,88 +415,103 @@ export default function Pedido() {
       }
     }
   }
-  const BuscarDados = async () => {
+  const loadDados = async () => {
 
-    await clsCrud
-      .pesquisar({
-        entidade: "PrazoEntrega",
-        campoOrder: ["nome"],
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-      })
-      .then((rs: Array<PrazoEntregaInterface>) => {
-        setRsPrazo(rs)
+    try {
+
+      setMensagemState({
+        titulo: 'Carregando dados...',
+        exibir: true,
+        mensagem: '',
+        tipo: MensagemTipo.Loading,
+        exibirBotao: false,
+        cb: null
       })
 
-    await clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        campoOrder: ['nome'],
-        comparador: 'I',
-        criterio: {
-          tipoPessoa: ['J', 'C'],
-        },
-        camposLike: ['tipoPessoa'],
-      })
-      .then((rsClientes: Array<PessoaInterface>) => {
-        setRsCliente(rsClientes)
-      })
+      const [prazos, clientes, vendedores, pedidos] = await Promise.all([
+        clsCrud
+          .pesquisar({
+            entidade: "PrazoEntrega",
+            campoOrder: ["nome"],
+            tipoOrder: "ASC",
+          }),
 
-    if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+        clsCrud
+          .pesquisar({
+            entidade: "Pessoa",
+            campoOrder: ['nome'],
+            tipoOrder: "ASC",
+            comparador: 'I',
+            criterio: {
+              tipoPessoa: ['J', 'C'],
+            },
+            camposLike: ['tipoPessoa'],
+          }),
 
-      const usuario = await clsCrud.pesquisar({
-        entidade: "Usuario",
-        criterio: { idUsuario: usuarioState.idUsuario },
-        camposLike: ["idUsuario"],
-        token: usuarioState.token
-      })
+        clsCrud
+          .pesquisar({
+            entidade: "Pessoa",
+            campoOrder: ['nome'],
+            tipoOrder: "ASC",
+            criterio: {
+              tipoPessoa: "V",
+            },
+            camposLike: ["tipoPessoa"],
+          }),
 
-      const vendedor = usuario.filter((item) => item.idPessoa_vendedor)[0].idPessoa_vendedor
-
-      await clsCrud
-        .pesquisar({
-          entidade: "Pessoa",
-          campoOrder: ['nome'],
-          criterio: {
-            tipoPessoa: "V",
-            idPessoa: vendedor
-          },
-          camposLike: ["tipoPessoa"],
+        clsCrud.pesquisar({
+          entidade: "Pedido",
+          relations: [
+            "cliente",
+            "vendedor",
+            "prazoEntrega",
+            "detalhePedidos",
+            "detalhePedidos.produto",
+            "detalhePedidos.cor"
+          ],
+          campoOrder: ["dataPedido"],
+          tipoOrder: "DESC",
         })
-        .then((rsVendedores: Array<PessoaInterface>) => {
-          setRsVendedor(rsVendedores)
+      ]);
+
+      if (usuarioState.tipoUsuario === UsuarioType.vendedor) {
+
+        const usuario = await clsCrud.pesquisar({
+          entidade: "Usuario",
+          criterio: { idUsuario: usuarioState.idUsuario },
+          camposLike: ["idUsuario"],
+          token: usuarioState.token
         })
-    } else {
-      await clsCrud
-        .pesquisar({
-          entidade: "Pessoa",
-          campoOrder: ['nome'],
-          criterio: {
-            tipoPessoa: "V",
-          },
-          camposLike: ["tipoPessoa"],
-        })
-        .then((rsVendedores: Array<PessoaInterface>) => {
-          setRsVendedor(rsVendedores)
-        })
+
+        const idVendedor = usuario.filter((item) => item.idPessoa_vendedor)[0].idPessoa_vendedor
+        const vendedor = vendedores.filter((item) => item.idPessoa === idVendedor)
+
+        setRsVendedor(vendedor);
+      } else {
+        setRsVendedor(vendedores);
+      }
+      setRsPrazo(prazos);
+      setRsCliente(clientes);
+      setPedidosAll(pedidos);
+      setRsPesquisa(pedidos);
+
+      setMensagemState({ titulo: '', exibir: false, mensagem: '', tipo: MensagemTipo.Loading, exibirBotao: false, cb: null });
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error);
+      setMensagemState({ titulo: 'Error', exibir: true, mensagem: 'Erro ao buscar dados, ' + error, tipo: MensagemTipo.Error, exibirBotao: true, cb: null });
     }
-
   }
 
   useEffect(() => {
     const carregarDados = async () => {
-      await BuscarDados()
+      await loadDados()
     }
     carregarDados()
   }, [])
 
   useEffect(() => {
-    if (rsCliente.length > 0) {
-      btPesquisar()
-    }
-  }, [rsCliente])
+    if (pedidosAll.length > 0) btPesquisar();
+  }, [pesquisa, pedidosAll]);
 
   return (
 
@@ -548,7 +526,7 @@ export default function Pedido() {
             </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={12} md={4}>
               <InputText
                 label="Buscar por pedido, data ou cliente"
                 tipo="uppercase"
@@ -558,6 +536,33 @@ export default function Pedido() {
                 iconeEnd='searchicon'
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <ComboBox
+                opcoes={rsVendedor}
+                campoDescricao="nome"
+                campoID="idPessoa"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Escolha um Vendedor"
+                field="idVendedor"
+                label="Vendedor"
+                erros={erros}
+                setState={setPesquisa}
+                disabled={localState.action === 'excluindo' || usuarioState.tipoUsuario === UsuarioType.vendedor ? true : false}
+              />
+            </Grid>
+            <Grid item xs={10} md={3}>
+              <ComboBox
+                opcoes={StatusTypes}
+                campoDescricao="descricao"
+                campoID="idStatus"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os status"
+                field="status"
+                label="Status do Pedido"
+                erros={erros}
+                setState={setPesquisa}
               />
             </Grid>
             <Grid item xs={2} md={1}>
@@ -653,7 +658,7 @@ export default function Pedido() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+            {/* <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <ComboBox
                   opcoes={rsPrazo}
@@ -670,9 +675,9 @@ export default function Pedido() {
                   onKeyDown={(event: any) => btPulaCampo(event, 4)}
                 />
               </Box>
-            </Grid>
-            <Grid item xs={12} md={8} sx={{ mt: 2, pl: { md: 1 } }}>
-              <Box ref={(el: any) => (fieldRefs.current[4] = el)}>
+            </Grid> */}
+            <Grid item xs={12} md={12} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Box ref={(el: any) => (fieldRefs.current[3] = el)}>
                 <InputText
                   type='text'
                   tipo='uppercase'

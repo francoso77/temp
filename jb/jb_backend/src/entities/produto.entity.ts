@@ -29,6 +29,9 @@ export default class Produto implements ProdutoInterface {
   @Column({ nullable: true, type: 'float', precision: 4 })
   gm2: number
 
+  @Column({ nullable: true, type: 'float', precision: 4 })
+  preco: number
+
   @Column({ nullable: false })
   ativo: boolean
 

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { PedidoInterface } from '../interfaces/pedidoInterface';
+import { PedidoDublagemInterface } from '../interfaces/pedidoDublagemInterface';
 import PrazoEntrega from './prazoEntrega.entity';
 import DetalhePedido from './detalhePedido.entity';
 import Pessoa from './pessoa.entity';
@@ -11,7 +11,7 @@ import { StatusType } from '../types/statusTypes';
 @Index('IDX_STATUS', ['statusPedido'])
 @Index('IDX_STATUS_DATA', ['statusPedido', 'dataPedido'])
 @Index('IDX_CLIENTE_STATUS', ['idPessoa_cliente', 'statusPedido'])
-export default class Pedido implements PedidoInterface {
+export default class Pedido implements PedidoDublagemInterface {
 
   @PrimaryGeneratedColumn()
   idPedido: number

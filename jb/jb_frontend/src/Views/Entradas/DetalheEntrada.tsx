@@ -66,7 +66,7 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
       apelido: '',
       cpf_cnpj: '',
       endereco: '',
-      numero: 0,
+      numero: '',
       bairro: '',
       cidade: '',
       uf: '',
@@ -109,6 +109,12 @@ export default function DetalheEntrada({ rsMaster, setRsMaster, masterLocalState
       alinhamento: 'left',
       campo: 'idProduto',
       format: (_v, rs: any) => rs.produto.nome
+    },
+    {
+      cabecalho: 'Cor',
+      alinhamento: 'left',
+      campo: 'idCor',
+      format: (_v, rs: any) => rs.cor ? rs.cor.nome : ''
     },
     {
       cabecalho: 'Qtd',

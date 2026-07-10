@@ -11,7 +11,7 @@ import { DetalheProgramacaoDublagemInterface, ProgramacaoDublagemInterface } fro
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import GerenciadorPedido from './GerenciadorPedidos';
 import ClsApi from '../../Utils/ClsApi';
-import { PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { PedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
 import EditCalendarTwoToneIcon from '@mui/icons-material/EditCalendarTwoTone';
 
@@ -31,7 +31,7 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
 
   const [open, setOpen] = useState(false);
   const { setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface;
-  const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
+  const [rsPedido, setRsPedido] = useState<Array<PedidoDublagemInterface>>([])
   const [rsPessoa, setRsPessoa] = useState<Array<PessoaInterface>>([])
   const [_rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
 
@@ -121,7 +121,7 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
   ]
 
   const AlterarStatusPedido = async (pedidos: Array<number>) => {
-    await clsApi.execute<Array<PedidoInterface>>({
+    await clsApi.execute<Array<PedidoDublagemInterface>>({
       url: 'produzirPedidos',
       method: 'post',
       pedidos,
@@ -170,7 +170,7 @@ export default function DetalheProgramacaoDublagem({ rsMaster, setRsMaster, mast
           "detalhePedidos",
         ],
       })
-      .then((rsPedidos: Array<PedidoInterface>) => {
+      .then((rsPedidos: Array<PedidoDublagemInterface>) => {
         setRsPedido(rsPedidos)
       })
 

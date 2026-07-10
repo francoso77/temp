@@ -37,6 +37,8 @@ var modulo_entity_1 = require("./entities/sistema/modulo.entity");
 var moduloPermissao_entity_1 = require("./entities/sistema/moduloPermissao.entity");
 var dotenv = require("dotenv");
 var notification_entity_1 = require("./entities/sistema/notification.entity");
+var pedidoMalharia_entity_1 = require("./entities/pedidoMalharia.entity");
+var detalhePedidoMalharia_entity_1 = require("./entities/detalhePedidoMalharia.entity");
 dotenv.config();
 exports.AppDataSource = new typeorm_1.DataSource({
     type: process.env.DB_TYPE,
@@ -53,6 +55,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         detalheEstrutura_entity_1.default,
         detalhePeca_entity_1.default,
         detalhePedido_entity_1.default,
+        detalhePedidoMalharia_entity_1.default,
         detalheProducaoDublagem_entity_1.default,
         detalheProgramacao_entity_1.default,
         detalheProgramacaoDublagem_entity_1.default,
@@ -67,6 +70,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         modulo_entity_1.Modulo,
         moduloPermissao_entity_1.ModuloPermissao,
         pedido_entity_1.default,
+        pedidoMalharia_entity_1.default,
         pessoa_entity_1.default,
         perdaMalharia_entity_1.default,
         prazoEntrega_entity_1.default,

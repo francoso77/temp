@@ -8,7 +8,6 @@ import Produto from '../Views/Crud/Produto';
 import Pessoa from '../Views/Crud/Pessoa';
 import Estrutura from '../Views/Crud/Estrutura';
 import PrazoEntrega from '../Views/Crud/PrazoEntrega';
-import Pedido from '../Views/Pedidos/Pedido';
 import Entrada from '../Views/Entradas/Entrada';
 import { ProducaoMalharia } from '../Views/ProducaoMalharia/ProducaoMalharia';
 import { Tinturaria } from '../Views/Tinturaria/Tinturaria';
@@ -21,6 +20,7 @@ import ProgramacaoTinturaria from '../Views/ProgramacaoTinturaria/ProgramacaoTin
 import Home from '../Home';
 import Perfil from '../Views/Usuario/Perfil';
 import ModulosPage from '../Views/Usuario/Modulo';
+import Pedidos from '../Views/Pedidos/Pedidos';
 
 export const router = createBrowserRouter([
   {
@@ -71,7 +71,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/Pedido",
-        element: <Pedido />,
+        element: <Pedidos />,
       },
       {
         path: "/Entrada",

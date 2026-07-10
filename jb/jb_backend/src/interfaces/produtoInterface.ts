@@ -6,6 +6,7 @@ export interface ProdutoInterface {
   idUnidade: number
   largura?: number
   gm2?: number
+  preco?: number
   localizacao?: string
   tipoProduto: TipoProdutoType
   ativo: boolean

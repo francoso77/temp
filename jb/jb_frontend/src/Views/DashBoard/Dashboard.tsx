@@ -19,13 +19,12 @@ import {
 import Grafico from '../../Componentes/Grafico';
 import Rankings from '../../Componentes/Rankings';
 import Comparation from '../../Componentes/Comparation';
-import ClsApi from '../../Utils/ClsApi';
 import ClsCrud from '../../Utils/ClsCrudApi';
 import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 import ComboBox from '../../Componentes/ComboBox';
 import { MiniTipoProdutoTypes } from '../../types/tipoProdutoypes';
 import { PeriodoTypes } from '../../types/periodoTypes';
-import { PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { PedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import { StatusType } from '../../types/statusTypes';
 import ClsValidacao, { ProductionData, ResultadoPeriodo, TopCliente, TopProduto } from '../../Utils/ClsValidacao';
 import { GlobalContext, GlobalContextInterface } from '../../ContextoGlobal/ContextoGlobal';
@@ -149,7 +148,7 @@ const Dashboard: React.FC = () => {
 
     }
 
-    const pedidos: PedidoInterface[] = await clsCrud.pesquisar({
+    const pedidos: PedidoDublagemInterface[] = await clsCrud.pesquisar({
       entidade: "Pedido",
       relations: [
         "cliente",
@@ -218,7 +217,7 @@ const Dashboard: React.FC = () => {
 
           <Box>
             <Typography variant={isMobile ? "h6" : "h2"} component="h1" gutterBottom>
-              Dashboard de Vendas
+              Dashboard Dublagem
             </Typography>
             <Typography variant={isMobile ? "subtitle2" : "h6"} color="text.secondary">
               Acompanhe seus pedidos e performance em tempo real

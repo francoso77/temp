@@ -31,6 +31,7 @@ export default function Produto() {
     idUnidade: 0,
     localizacao: '',
     largura: 0,
+    preco: 0,
     gm2: 0,
     ativo: true,
     tipoProduto: TipoProdutoType.tecidoTinto
@@ -39,15 +40,17 @@ export default function Produto() {
 
   interface PesquisaInterface {
     nome: string
+    tipo: TipoProdutoType | number
   }
 
   const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<ProdutoInterface>>([])
+  const [produtosAll, setProdutosAll] = useState<Array<ProdutoInterface>>([])
   const [erros, setErros] = useState({})
   const [produto, setProduto] = useState<ProdutoInterface>(ResetDados)
   const [rsUnidade, setRsUnidade] = useState<Array<UnidadeMedidaInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '', tipo: TipoProdutoType.todos })
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
@@ -130,165 +133,80 @@ export default function Produto() {
 
   const btConfirmar = () => {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        criterio: {
-          nome: produto.nome,
-        },
-        camposLike: ["nome"],
-        select: ["nome"],
-        msg: 'Pesquisando produtos ...',
-        setMensagemState: setMensagemState
+
+    const jaExiste = produtosAll.some(p =>
+      p.nome.toLowerCase() === produto.nome.toLowerCase() &&
+      p.idProduto !== produto.idProduto
+    )
+
+    if (jaExiste && localState.action === actionTypes.incluindo) {
+      setMensagemState({
+        titulo: 'Erro...',
+        exibir: true,
+        mensagem: 'Item já cadastrado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
       })
-      .then((rs) => {
-        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
-          setMensagemState({
-            titulo: 'Erro...',
-            exibir: true,
-            mensagem: 'Item já cadastrado!',
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null
-          })
-        } else {
+      return
+    }
 
-          if (validarDados()) {
+    if (validarDados()) {
 
-            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-              clsCrud.incluir({
-                entidade: "Produto",
-                criterio: produto,
-                localState: localState,
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState,
-                token: usuarioState.token
+      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+        clsCrud.incluir({
+          entidade: "Produto",
+          criterio: produto,
+          localState: localState,
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState,
+          token: usuarioState.token
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
               })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
-            } else if (localState.action === actionTypes.excluindo) {
-              clsCrud.excluir({
-                entidade: "Produto",
-                criterio: {
-                  idProduto: produto.idProduto
-                },
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
-              })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
             }
-          }
-        }
-      })
+          })
+      } else if (localState.action === actionTypes.excluindo) {
+        clsCrud.excluir({
+          entidade: "Produto",
+          criterio: {
+            idProduto: produto.idProduto
+          },
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      }
+    }
   }
 
   const btPesquisar = () => {
-    // const query = `
-    //   SELECT 
-    //       p.*,
-    //       p.nome AS produto_nome,
-    //       um.sigla AS unidadeMedida_sigla,
-    //       p.tipoProduto AS tipoProduto
-    //   FROM 
-    //       produtos p
-    //   INNER JOIN 
-    //       unidademedidas um ON um.idUnidade = p.idUnidade
-    //   WHERE 
-    //       p.nome LIKE '%${pesquisa.nome}%';
-    //   `;
-    // clsCrud
-    //   .query({
-    //     entidade: "Produto",
-    //     sql: query,
-    //     msg: 'Pesquisando Produtos ...',
-    //     setMensagemState: setMensagemState
-    //   })
-    //   .then((rs: Array<any>) => {
-    //     setRsPesquisa(rs)
-    //   })
-
-    clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        relations: [
-          "unidadeMedida",
-        ],
-        criterio: {
-          "nome": "%".concat(pesquisa.nome).concat("%")
-        },
-        camposLike: ["nome"],
-        select: [
-          "idProduto",
-          "nome",
-          "idUnidade",
-          "tipoProduto",
-          "localizacao",
-          "largura",
-          "gm2",
-          "ativo",
-        ],
-        msg: 'Pesquisando produtos ...',
-        setMensagemState: setMensagemState
-      })
-      .then((rs: Array<any>) => {
-        setRsPesquisa(rs)
-      })
-
+    setRsPesquisa(filtrarProdutos(produtosAll, pesquisa))
   }
-  // const btPesquisar = () => {
-  //   clsCrud
-  //     .query({
-  //       entidade: "Produto",
-  //       criterio: {
-  //         nome: "%".concat(pesquisa.nome).concat("%"),
-  //       },
-  //       camposLike: ["nome"],
-  //       joins: [
-  //         { tabelaRelacao: 'produto.tipoProduto', relacao: 'tipoProduto' },
-  //         { tabelaRelacao: 'produto.unidadeMedida', relacao: 'unidadeMedida' },
-  //       ],
-  //       select: [
-  //         "idProduto",
-  //         "produto.nome",
-  //         "unidadeMedida.sigla",
-  //         "tipoProduto.nome",
-  //         "localizacao",
-  //         "largura",
-  //         "gm2",
-  //         "ativo",
-  //       ],
-  //       msg: 'Pesquisando produtos ...',
-  //       setMensagemState: setMensagemState
-  //     })
-  //     .then((rs: Array<any>) => {
-  //       setRsPesquisa(rs)
-  //     })
-  // }
+
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -313,26 +231,53 @@ export default function Produto() {
     }
   }
 
-  const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "UnidadeMedida",
-        criterio: {
-          nome: "%".concat("%"),
-        },
-        camposLike: ["nome"],
-        campoOrder: ['nome'],
-      })
-      .then((rs: Array<UnidadeMedidaInterface>) => {
-        setRsUnidade(rs)
-      })
+  // --- FILTRO DE PESQUISA MAIS LIMPO E RÁPIDO ---
+  const filtrarProdutos = (todos: ProdutoInterface[], filtro: PesquisaInterface) => {
+    const nome = filtro.nome.trim().toLowerCase()
+    const tipo = filtro.tipo
 
+    if (!nome && (tipo === TipoProdutoType.todos || !tipo)) {
+      // Nenhum filtro -> mostra tudo
+      return todos
+    }
+
+    return todos.filter(p => {
+      const matchNome = nome ? p.nome.toLowerCase().includes(nome) : true
+      const matchTipo = tipo && tipo !== TipoProdutoType.todos ? p.tipoProduto === tipo : true
+      return matchNome && matchTipo
+    })
   }
 
   useEffect(() => {
-    BuscarDados()
-  }, []);
+    // Aplica filtro toda vez que pesquisa ou produtosAll mudar
+    const resultado = filtrarProdutos(produtosAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, produtosAll])
 
+  const loadDados = async () => {
+    const [unidades, produtos] = await Promise.all([
+      clsCrud.pesquisar({
+        entidade: "UnidadeMedida",
+        criterio: { nome: "%" },
+        camposLike: ["nome"],
+        campoOrder: ['nome'],
+      }),
+      clsCrud.pesquisar({
+        entidade: "Produto",
+        relations: ["unidadeMedida"],
+        msg: 'Pesquisando produtos ...',
+        setMensagemState: setMensagemState
+      })
+    ])
+
+    setRsUnidade(unidades)
+    setProdutosAll(produtos)
+    setRsPesquisa(produtos) // <- já exibe tudo inicialmente
+  }
+
+  useEffect(() => {
+    loadDados()
+  }, []);
 
   return (
 
@@ -347,7 +292,7 @@ export default function Produto() {
             </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={6} md={8}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -358,6 +303,19 @@ export default function Produto() {
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
+              />
+            </Grid>
+            <Grid item xs={4} md={3}>
+              <ComboBox
+                opcoes={TipoProdutoTypes}
+                campoDescricao="descricao"
+                campoID="idTipoProduto"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os tipos"
+                field="tipo"
+                label="Tipo de Produto"
+                erros={erros}
+                setState={setPesquisa}
               />
             </Grid>
             <Grid item xs={2} md={1}>
@@ -473,7 +431,7 @@ export default function Produto() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={2} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
               <Box ref={(el: any) => (fieldRefs.current[5] = el)}>
                 <InputText
                   tipo='currency'
@@ -483,14 +441,30 @@ export default function Produto() {
                   setState={setProduto}
                   disabled={localState.action === 'excluindo' ? true : false}
                   erros={erros}
+                  scale={6}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(event: any) => btPulaCampo(event, 7)}
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={2} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
+              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+                <InputText
+                  tipo='currency'
+                  label="Preço"
+                  dados={produto}
+                  field="preco"
+                  setState={setProduto}
+                  disabled={localState.action === 'excluindo' ? true : false}
+                  erros={erros}
                   scale={2}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(event: any) => btPulaCampo(event, 7)}
                 />
               </Box>
             </Grid>
-            <Grid item xs={3} md={3} sx={{ ml: 8, mt: 5 }}>
-              <Box ref={(el: any) => (fieldRefs.current[6] = el)}>
+            <Grid item xs={2} md={1} sx={{ ml: 8, mt: 5 }}>
+              <Box ref={(el: any) => (fieldRefs.current[7] = el)}>
                 <InputText
                   label="Ativo"
                   tipo="checkbox"

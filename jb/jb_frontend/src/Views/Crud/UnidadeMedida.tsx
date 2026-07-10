@@ -259,7 +259,14 @@ export default function UnidadeMedida() {
                       onExcluir(rs.idUnidade as number),
                     toolTip: "Excluir",
                   },
-                ] : []}
+                ] : [
+                  {
+                    icone: "edit",
+                    onAcionador: (rs: UnidadeMedidaInterface) =>
+                      onEditar(rs.idUnidade as number),
+                    toolTip: "Editar",
+                  },
+                ]}
               />
             </Grid>
           </Condicional>

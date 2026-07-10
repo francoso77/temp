@@ -15,7 +15,7 @@ import { SomatorioProducaoDublagemInterface } from './ProducaoDublagem';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import { ProdutoInterface } from '../../Interfaces/produtoInterface';
 import ClsCrud from '../../Utils/ClsCrudApi';
-import { DetalhePedidoInterface } from '../../Interfaces/pedidoInterface';
+import { DetalhePedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import ComboBox from '../../Componentes/ComboBox';
 import DetalhePeca from './DetalhePeca';
 
@@ -38,6 +38,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
   const ResetDados: DetalheProducaoDublagemInterface = {
     idDublagem: 0,
     idProduto: 0,
+    qtdPedida: 0,
     metrosTotal: 0,
     pecasTotal: 0,
     produto: {
@@ -66,6 +67,12 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       alinhamento: 'left',
       campo: 'idProduto',
       format: (_v, rs: any) => rsProduto.find(x => x.idProduto === rs.idProduto)?.nome
+    },
+    {
+      cabecalho: 'Qtd. Pedida',
+      alinhamento: 'right',
+      campo: 'qtdPedida',
+      format: (qtd) => clsFormatacao.currency(qtd)
     },
     {
       cabecalho: 'Metros',
@@ -159,10 +166,28 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
 
     if (validarDados() && podeIncluirDetalhe()) {
 
+      const qtd = await clsCrud.pesquisar({
+        entidade: "DetalhePedido",
+        criterio: {
+          idPedido: rsMaster.idPedido,
+          idProduto: detalheProducaoDublagem.idProduto,
+        },
+        camposLike: ['idPedido', 'idProduto'],
+      }).then((rs: Array<DetalhePedidoDublagemInterface>) => {
+        if (rs.length > 0) {
+          return rs[0].qtdPedida
+        } else {
+          return 0
+        }
+      })
+
+      detalheProducaoDublagem.qtdPedida = qtd
+
       let tmpDetalhe: Array<DetalheProducaoDublagemInterface> = [...rsMaster.detalheProducaoDublagens]
       tmpDetalhe.push({
         idDublagem: rsMaster.idDublagem as number,
         idProduto: detalheProducaoDublagem.idProduto,
+        qtdPedida: detalheProducaoDublagem.qtdPedida,
         metrosTotal: detalheProducaoDublagem.metrosTotal,
         pecasTotal: detalheProducaoDublagem.pecasTotal,
         produto: { ...rsProduto[rsProduto.findIndex(v => v.idProduto === detalheProducaoDublagem.idProduto)] },
@@ -180,7 +205,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
     setOpenMetros(false)
   }
 
-  const btConfirmaAlteracao = () => {
+  const btConfirmaAlteracao = async () => {
 
     let pecasTotal = rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.length
     let metrosTotal = rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas.reduce((a, b) => a + b.metros, 0)
@@ -191,6 +216,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
       ...detalheProducaoDublagem,
       detalhePecas: rsMaster.detalheProducaoDublagens[indiceEdicao].detalhePecas,
       idProduto: rsMaster.detalheProducaoDublagens[indiceEdicao].idProduto,
+      qtdPedida: rsMaster.detalheProducaoDublagens[indiceEdicao].qtdPedida,
       pecasTotal: pecasTotal,
       metrosTotal: metrosTotal,
       produto: produto,
@@ -250,7 +276,7 @@ export default function DetalheProducaoDubalgem({ rsMaster, setRsMaster, masterL
         },
         camposLike: ['idPedido'],
       })
-      .then((rs: Array<DetalhePedidoInterface>) => {
+      .then((rs: Array<DetalhePedidoDublagemInterface>) => {
 
         let produtos = rs
           // .filter((d: any) => d.statusItem === 3)

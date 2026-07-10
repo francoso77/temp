@@ -16,7 +16,7 @@ import { ActionInterface, actionTypes } from '../../Interfaces/ActionInterface';
 import { useNavigate } from 'react-router-dom';
 import DetalheProgramacaoDublagem from './DetalheProgramacaoDublagem';
 import { MensagemTipo } from '../../ContextoGlobal/MensagemState';
-import { PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { PedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import ClsApi from '../../Utils/ClsApi';
 import EtiquetasPedido from './EtiquetasPedido';
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
@@ -46,8 +46,9 @@ export default function ProgramacaoDublagem() {
 
   const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
+  const [pedidosProgramadosAll, setPedidosProgramadosAll] = useState<Array<any>>([])
   const [programacaoDublagem, setProgramacaoDublagem] = useState<ProgramacaoDublagemInterface>(resetDados)
-  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState, mensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [erros, setErros] = useState({})
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -189,28 +190,71 @@ export default function ProgramacaoDublagem() {
     })
     irPara('/')
   }
-  const formatDateTimeForMySQL = (dateString: string): string => {
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month}-${day} 00:00:00`
-  }
-  const btPesquisar = async () => {
 
-    let itemPesquisado = pesquisa.itemPesquisa
-    const temNumero = /\d/.test(itemPesquisado)
+  const filtrarPedidosProgramados = (todos: ProgramacaoDublagemInterface[], filtro: PesquisaInterface) => {
+    const termo = filtro.itemPesquisa.trim().toUpperCase()
+    let filtrados = [...todos]
 
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-      itemPesquisado = formatDateTimeForMySQL(itemPesquisado)
+    if (termo !== '') {
+      const pareceData = /\d+\/\d*/.test(termo) // reconhece fragmentos como "27/", "10/2025" etc.
+
+      filtrados = filtrados.filter(programacao => {
+        if (pareceData) {
+          // 🔎 Comparação com data parcial
+          const dataProgramacao = programacao.dataProgramacao
+          if (!dataProgramacao) return false
+
+          const dataFormatada = new Date(dataProgramacao)
+            .toLocaleDateString('pt-BR')
+            .toUpperCase()
+
+          // Permite busca parcial como "27/" ou "10/2025"
+          return dataFormatada.includes(termo)
+        }
+      })
     }
-    clsApi.execute<Array<ProgramacaoDublagemInterface>>({
-      url: 'programacaoPedidos',
-      method: 'post',
-      itemPesquisa: itemPesquisado,
-      mensagem: 'Pesquisando Programação de Dublagem ...',
-      setMensagemState: setMensagemState,
-      token: usuarioState.token
-    }).then((rs: Array<any>) => {
-      setRsPesquisa(rs)
+
+    return filtrados
+  }
+
+  const loadDados = async () => {
+    setMensagemState({
+      ...mensagemState,
+      titulo: 'Carregando dados...',
+      exibir: true,
+      tipo: MensagemTipo.Loading
     })
+
+    try {
+      const [pedidosProgramados] = await Promise.all([
+
+        clsApi.execute<Array<ProgramacaoDublagemInterface>>({
+          url: 'programacaoPedidos',
+          method: 'post',
+          token: usuarioState.token
+        })
+      ]);
+
+      setRsPesquisa(pedidosProgramados)
+      setPedidosProgramadosAll(pedidosProgramados)
+
+      setMensagemState({
+        ...mensagemState,
+        exibir: false
+      })
+
+    }
+    catch (erro: any) {
+      console.log(erro)
+      setMensagemState({
+        ...mensagemState,
+        titulo: 'Erro...',
+        exibir: true,
+        mensagem: erro.concat(' - Consulte Suporte'),
+        tipo: MensagemTipo.Error,
+        exibirBotao: true
+      })
+    }
   }
 
   const validarDados = (): boolean => {
@@ -224,7 +268,7 @@ export default function ProgramacaoDublagem() {
   }
 
   const AlterarStatusPedido = async (pedidos: Array<number>) => {
-    await clsApi.execute<Array<PedidoInterface>>({
+    await clsApi.execute<Array<PedidoDublagemInterface>>({
       url: 'produzirPedidos',
       method: 'post',
       pedidos,
@@ -243,7 +287,7 @@ export default function ProgramacaoDublagem() {
           localState: localState,
           setMensagemState: setMensagemState,
           token: usuarioState.token,
-          cb: btPesquisar
+          cb: () => btPesquisar(),
         })
           .then((rs) => {
             if (rs.ok) {
@@ -302,10 +346,19 @@ export default function ProgramacaoDublagem() {
 
   useEffect(() => {
     const carregarDados = async () => {
-      await btPesquisar()
+      await loadDados()
     }
     carregarDados()
-  }, [])
+  }, [localState])
+
+  const btPesquisar = () => {
+    setRsPesquisa(filtrarPedidosProgramados(pedidosProgramadosAll, pesquisa))
+  }
+
+  useEffect(() => {
+    const resultado = filtrarPedidosProgramados(pedidosProgramadosAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, pedidosProgramadosAll])
 
 
   const theme = useTheme()

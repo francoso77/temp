@@ -34,6 +34,8 @@ import { Modulo } from './entities/sistema/modulo.entity'
 import { ModuloPermissao } from './entities/sistema/moduloPermissao.entity'
 import * as dotenv from "dotenv";
 import { Notification } from './entities/sistema/notification.entity'
+import PedidoMalharia from './entities/pedidoMalharia.entity'
+import DetalhePedidoMalharia from './entities/detalhePedidoMalharia.entity'
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -51,6 +53,7 @@ export const AppDataSource = new DataSource({
     DetalheEstrutura,
     DetalhePeca,
     DetalhePedido,
+    DetalhePedidoMalharia,
     DetalheProducaoDublagem,
     DetalheProgramacao,
     DetalheProgramacaoDublagem,
@@ -65,6 +68,7 @@ export const AppDataSource = new DataSource({
     Modulo,
     ModuloPermissao,
     Pedido,
+    PedidoMalharia,
     Pessoa,
     PerdaMalharia,
     PrazoEntrega,

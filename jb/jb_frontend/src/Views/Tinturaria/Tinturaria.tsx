@@ -4,7 +4,7 @@ import { PessoaInterface } from '../../Interfaces/pessoaInterface'
 import ClsCrud from '../../Utils/ClsCrudApi'
 import ClsFormatacao from '../../Utils/ClsFormatacao'
 import ClsValidacao from '../../Utils/ClsValidacao'
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@mui/material'
+import { Box, Container, Dialog, Grid, IconButton, Paper, Tooltip, useMediaQuery, useTheme } from '@mui/material'
 import InputText from '../../Componentes/InputText'
 import CloseIcon from '@mui/icons-material/Close'
 import AddCircleIcon from "@mui/icons-material/AddCircle"
@@ -26,6 +26,9 @@ import { EstoqueInterface } from '../../Interfaces/estoqueInterface'
 import TableSelect from '../../Componentes/DataTable/tableSelect'
 import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao'
 import { UsuarioType } from '../../types/usuarioTypes'
+import EditCalendarTwoToneIcon from '@mui/icons-material/EditCalendarTwoTone';
+import GerenciadorPedidoMalharia from '../Pedidos/GerenciadorPedidosMalharia'
+
 
 
 
@@ -46,17 +49,21 @@ export function Tinturaria() {
 
   interface PesquisaInterface {
     itemPesquisa: string
+    idCliente: number
+    idTinturaria: number
   }
 
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
-  const { setLayoutState, layoutState, setMensagemState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setLayoutState, layoutState, setMensagemState, usuarioState, mensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [tinturaria, setTinturaria] = useState<TinturariaInterface>(ResetDados)
   const [erros, setErros] = useState({})
   const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
   const [rsFornecedor, setRsFornecedor] = useState<Array<PessoaInterface>>([])
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
+  const [tinturariasAll, setTinturariasAll] = useState<Array<any>>([])
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '', idCliente: 0, idTinturaria: 0 })
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [open, setOpen] = useState(false);
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -180,35 +187,78 @@ export function Tinturaria() {
     setLocalState({ action: actionTypes.pesquisando })
   }
 
-  const BuscarDados = () => {
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        criterio: {
-          tipoPessoa: ['J', 'C']
-        },
-        comparador: 'I',
-        camposLike: ['tipoPessoa'],
-        campoOrder: ['nome'],
-      }).then((rsClientes: Array<PessoaInterface>) => {
-        if (rsClientes.length > 0) {
-          setRsCliente(rsClientes)
-        }
+  const btOpen = () => {
+    setOpen(true)
+  }
+  const loadDados = async () => {
+
+    setMensagemState({
+      ...mensagemState,
+      titulo: 'Carregando dados...',
+      exibir: true,
+      tipo: MensagemTipo.Loading
+    })
+
+    try {
+      const [clientes, fornecedores, tinturarias] = await Promise.all([
+
+        clsCrud.pesquisar({
+          entidade: "Pessoa",
+          criterio: {
+            tipoPessoa: ['J', 'C']
+          },
+          comparador: 'I',
+          camposLike: ['tipoPessoa'],
+          campoOrder: ['nome'],
+          tipoOrder: "ASC"
+        }),
+        clsCrud.pesquisar({
+          entidade: "Pessoa",
+          criterio: {
+            tipoPessoa: ['F']
+          },
+          camposLike: ['tipoPessoa'],
+          campoOrder: ['nome'],
+          tipoOrder: "ASC"
+        }),
+
+        clsCrud.pesquisar({
+          entidade: "Tinturaria",
+          relations: [
+            "cliente",
+            "fornecedor",
+            "detalheTinturarias",
+            "detalheTinturarias.malharia",
+          ],
+          campoOrder: ['dataTinturaria'],
+          tipoOrder: "DESC"
+        })
+      ]);
+
+
+      setRsCliente(clientes)
+      setRsFornecedor(fornecedores)
+      setRsPesquisa(tinturarias)
+      setTinturariasAll(tinturarias)
+
+      setMensagemState({
+        ...mensagemState,
+        exibir: false
       })
 
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        criterio: {
-          tipoPessoa: ['F']
-        },
-        camposLike: ['tipoPessoa'],
-        campoOrder: ['nome'],
-      }).then((rsFornecedores: Array<PessoaInterface>) => {
-        if (rsFornecedores.length > 0) {
-          setRsFornecedor(rsFornecedores)
-        }
+    }
+    catch (erro: any) {
+      console.log(erro)
+      setMensagemState({
+        ...mensagemState,
+        titulo: 'Erro...',
+        exibir: true,
+        mensagem: erro.concat(' - Consulte Suporte'),
+        tipo: MensagemTipo.Error,
+        exibirBotao: true
       })
+    }
+
   }
 
   const irPara = useNavigate();
@@ -236,69 +286,45 @@ export function Tinturaria() {
     }
   }
 
-  const formatDateTimeForMySQL = (dateString: string): string => {
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month}-${day} 00:00:00`
-  }
-  const btPesquisar = () => {
+  const filtrarTintuarias = (todos: TinturariaInterface[], filtro: PesquisaInterface) => {
+    const termo = filtro.itemPesquisa.trim().toUpperCase()
+    let filtrados = [...todos]
 
-    const relations = [
-      "cliente",
-      "fornecedor",
-      "detalheTinturarias",
-      "detalheTinturarias.malharia",
-    ];
+    if (termo !== '') {
+      const pareceData = /\d+\/\d*/.test(termo) // reconhece fragmentos como "27/", "10/2025" etc.
 
-    const msg = 'Pesquisando dados ...'
-    const setMensagem = setMensagemState
-    const idsCli = rsCliente
-      .filter(cliente => cliente.nome.includes(pesquisa.itemPesquisa))
-      .map(cliente => cliente.idPessoa)
+      filtrados = filtrados.filter(tinturaria => {
+        if (pareceData) {
+          // 🔎 Comparação com data parcial
+          const dataTinturaria = tinturaria.dataTinturaria
+          if (!dataTinturaria) return false
 
-    let dadosPesquisa = {}
-    let criterio = {}
-    let camposLike = []
-    let comparador = "L"
+          const dataFormatada = new Date(dataTinturaria)
+            .toLocaleDateString('pt-BR')
+            .toUpperCase()
 
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
-
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-
-      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-      criterio = {
-        dataTinturaria: formattedDateTime
-      }
-      camposLike = ['dataTinturaria']
-    } else if (temNumero) {
-
-      criterio = {
-        idTinturaria: pesquisa.itemPesquisa
-      }
-      camposLike = ['idTinturaria']
-    } else {
-      criterio = {
-        idPessoa_cliente: idsCli,
-      }
-      camposLike = ['idPessoa_cliente']
-      comparador = 'I'
-    }
-
-    dadosPesquisa = {
-      entidade: "Tinturaria",
-      relations,
-      comparador,
-      criterio,
-      camposLike,
-      msg,
-      setMensagemState: setMensagem
-    }
-
-    clsCrud
-      .pesquisar(dadosPesquisa)
-      .then((rs: Array<any>) => {
-
-        setRsPesquisa(rs)
+          // Permite busca parcial como "27/" ou "10/2025"
+          return dataFormatada.includes(termo)
+        } else {
+          const id = tinturaria.idTinturaria
+          return id?.toString().includes(termo)
+        }
       })
+    }
+
+    if (filtro.idCliente && filtro.idCliente > 0) {
+      filtrados = filtrados.filter(
+        (tinturaria) => tinturaria.idPessoa_cliente === filtro.idCliente
+      )
+    }
+
+    if (filtro.idTinturaria && filtro.idTinturaria > 0) {
+      filtrados = filtrados.filter(
+        (tinturaria) => tinturaria.idPessoa_fornecedor === filtro.idTinturaria
+      )
+    }
+
+    return filtrados
   }
 
   const validarDados = (): boolean => {
@@ -527,20 +553,35 @@ export function Tinturaria() {
 
   useEffect(() => {
     const carregarDados = async () => {
-      await BuscarDados()
+      await loadDados()
     }
     carregarDados()
   }, [])
 
-  useEffect(() => {
-    if (rsCliente.length > 0) {
-      btPesquisar()
-    }
-  }, [rsCliente])
+  const btPesquisar = () => {
+    setRsPesquisa(filtrarTintuarias(tinturariasAll, pesquisa))
+  }
 
+  useEffect(() => {
+    const resultado = filtrarTintuarias(tinturariasAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, tinturariasAll])
+
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <>
+      <Dialog
+        open={open}
+        fullScreen={fullScreen}
+        fullWidth
+        maxWidth='md'>
+        <GerenciadorPedidoMalharia
+          //detalhe={[]}//rsMaster.detalheProgramacaoDublagens}
+          setOpenDetalhe={setOpen}
+        />
+      </Dialog >
       <Container maxWidth="xl" sx={{ mt: 0 }}>
         <Paper variant="outlined" sx={{ padding: 1 }}>
           <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -552,7 +593,7 @@ export function Tinturaria() {
               </Tooltip>
             </Grid>
             <Condicional condicao={localState.action === 'pesquisando'}>
-              <Grid item xs={10} md={11}>
+              <Grid item xs={12} md={5}>
                 <InputText
                   label="Buscar por romaneio, data ou cliente"
                   tipo="uppercase"
@@ -565,7 +606,33 @@ export function Tinturaria() {
                   autoFocus
                 />
               </Grid>
-              <Grid item xs={2} md={1}>
+              <Grid item xs={12} md={3}>
+                <ComboBox
+                  opcoes={rsCliente}
+                  campoDescricao="nome"
+                  campoID="idPessoa"
+                  dados={pesquisa}
+                  mensagemPadraoCampoEmBranco="Clientes"
+                  field="idCliente"
+                  label="Clientes"
+                  erros={erros}
+                  setState={setPesquisa}
+                />
+              </Grid>
+              <Grid item xs={10} md={3}>
+                <ComboBox
+                  opcoes={rsFornecedor}
+                  campoDescricao="nome"
+                  campoID="idPessoa"
+                  dados={pesquisa}
+                  mensagemPadraoCampoEmBranco="Tinturarias"
+                  field="idTinturaria"
+                  label="Tinturarias"
+                  erros={erros}
+                  setState={setPesquisa}
+                />
+              </Grid>
+              {/* <Grid item xs={2} md={1}>
                 <Tooltip title={'Incluir'}>
                   <IconButton
                     color="secondary"
@@ -573,6 +640,17 @@ export function Tinturaria() {
                     onClick={() => btIncluir()}
                   >
                     <AddCircleIcon sx={{ fontSize: 50 }} />
+                  </IconButton>
+                </Tooltip>
+              </Grid> */}
+              <Grid item xs={2} md={1}>
+                <Tooltip title={'Incluir'}>
+                  <IconButton
+                    color="secondary"
+                    sx={{ mt: 5, ml: { xs: 1, md: 2 } }}
+                    onClick={() => btOpen()}
+                  >
+                    <EditCalendarTwoToneIcon sx={{ fontSize: 50 }} />
                   </IconButton>
                 </Tooltip>
               </Grid>

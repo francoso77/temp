@@ -26,7 +26,6 @@ import ClsRelatorioProgramacao from '../../Utils/ClsRelatorioProgramacao';
 import { UsuarioType } from '../../types/usuarioTypes';
 
 
-
 export interface SomatorioProgramacaoInterface {
   total: string
   totalQtd: string
@@ -40,6 +39,11 @@ export interface RomaneioInterface {
   qtd_peca: number
 }
 
+export const statusList = [
+  { idStatus: 'all', descricao: 'Todos' },
+  { idStatus: 'programado', descricao: 'Programado' },
+  { idStatus: 'naoProgramado', descricao: 'Não Programado' },
+];
 export default function ProgramacaoTinturaria() {
 
   const ResetDados: ProgramacaoInterface = {
@@ -62,6 +66,8 @@ export default function ProgramacaoTinturaria() {
   }
   interface PesquisaInterface {
     itemPesquisa: string
+    idCliente: number
+    status: 'all' | 'programado' | 'naoProgramado'
   }
 
   const SomatorioDados: SomatorioProgramacaoInterface = {
@@ -77,20 +83,23 @@ export default function ProgramacaoTinturaria() {
     qtd_peca: 0
   }
 
+
+
   const validaCampo: ClsValidacao = new ClsValidacao()
   const clsCrud: ClsCrud = new ClsCrud()
   const clsFormatacao: ClsFormatacao = new ClsFormatacao()
   const clsRelatorios = new ClsRelatorioProgramacao()
 
 
-  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, mensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
+  const [programacaoAll, setProgramacaoAll] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [programacao, setProgramacao] = useState<ProgramacaoInterface>(ResetDados)
   const [rsClientes, setRsClientes] = useState<Array<PessoaInterface>>([])
   const [rsProdutos, setRsProdutos] = useState<Array<ProdutoInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '', idCliente: 0, status: 'all' })
   const [rsTinturaria, setRsTinturaria] = useState<Array<TinturariaInterface>>([])
   const [rsTinturariaGeral, setRsTinturariaGeral] = useState<Array<TinturariaInterface>>([])
   const [rsSomatorioTinturaria, setRsSomatorioTinturaria] = useState<SomatorioProgramacaoInterface>(SomatorioDados)
@@ -116,7 +125,7 @@ export default function ProgramacaoTinturaria() {
     },
     {
       cabecalho: 'Romaneio',
-      alinhamento: 'left',
+      alinhamento: 'center',
       campo: 'idTinturaria',
       //format: (_v, rs: any) => rs.clientes.nome
     },
@@ -136,26 +145,27 @@ export default function ProgramacaoTinturaria() {
       campo: 'idTinturaria',
       render: (_valor: any, row: any) => { // O _valor aqui seria o que 'campo' aponta, mas não usaremos diretamente
 
+        let statusID: 'all' | 'programado' | 'naoProgramado' = 'all';
         const statusCode = row.romaneio?.finalizado ?? undefined;
 
-        const tiposStatus = [
-          { idStatus: true, descricao: 'Programado' },
-          { idStatus: false, descricao: 'Não Programado' },
-        ]
-        const statusInfo = tiposStatus.find(
-          (status) => status.idStatus === statusCode
+        if (statusCode === true) {
+          statusID = 'programado';
+        } else if (statusCode === false) {
+          statusID = 'naoProgramado';
+        }
+        const statusInfo = statusList.find(
+          (status) => status.idStatus === statusID
         );
-
         const descricaoStatus = statusInfo ? statusInfo.descricao : 'Desconhecido';
 
         // Define a cor com base no tipo de status. Você pode ajustar as cores conforme sua necessidade.
         let color: 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' = 'default';
-        switch (statusCode) {
-          case true:
-            color = 'error'; // Exemplo: azul para aberto
+        switch (statusID) {
+          case 'naoProgramado':
+            color = 'info'; // Não programado
             break;
-          case false:
-            color = 'success'; // Exemplo: roxo para produção
+          case 'programado':
+            color = 'success'; // Programado
             break;
           default:
             color = 'default'; // Cor padrão para qualquer outro caso
@@ -278,7 +288,7 @@ export default function ProgramacaoTinturaria() {
   }
 
   const btIncluir = () => {
-    BuscarDados()
+    loadDados()
     setProgramacao(ResetDados)
     setHeadTableStatus(true)
     setRsSomatorio({ total: "", totalQtd: "" })
@@ -319,135 +329,139 @@ export default function ProgramacaoTinturaria() {
     }
   }
 
-  const BuscarDados = () => {
+  const loadDados = async () => {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        //campoOrder: ['nome'],
-        comparador: 'I',
-        criterio: {
-          tipoPessoa: ['J', 'C'],
-        },
-        camposLike: ['tipoPessoa'],
-      })
-      .then((rsClientes: Array<PessoaInterface>) => {
-        setRsClientes(rsClientes)
-      })
+    setMensagemState({
+      ...mensagemState,
+      titulo: 'Carregando dados...',
+      exibir: true,
+      tipo: MensagemTipo.Info,
+    });
 
-    clsCrud
-      .pesquisar({
-        entidade: "Tinturaria",
-        criterio: {
-          programado: 0
-        },
-        camposLike: ['programado'],
-      })
-      .then((rsTinturarias: Array<TinturariaInterface>) => {
-        setRsTinturaria(rsTinturarias)
-      })
+    try {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Tinturaria",
-      })
-      .then((rsTinturarias: Array<TinturariaInterface>) => {
-        setRsTinturariaGeral(rsTinturarias)
-      })
+      const [clientes, tinturarias, tinturariasGerais, produtos, programacoes] = await Promise.all([
 
-    clsCrud
-      .pesquisar({
-        entidade: "Produto",
-        criterio: {
-          tipoProduto: [TipoProdutoType.tecidoCru],
-        },
-        campoOrder: ["nome"],
-      })
-      .then((rs: Array<ProdutoInterface>) => {
-        setRsProdutos(rs)
-      })
-  }
+        clsCrud.pesquisar({
+          entidade: "Pessoa",
+          campoOrder: ['nome'],
+          tipoOrder: "ASC",
+          comparador: 'I',
+          criterio: {
+            tipoPessoa: ['J', 'C'],
+          },
+          camposLike: ['tipoPessoa'],
+        }),
 
-  const formatDateTimeForMySQL = (dateString: string): string => {
-    const [day, month, year] = dateString.split('/')
-    return `${year}-${month}-${day} 00:00:00`
-  }
+        clsCrud.pesquisar({
+          entidade: "Tinturaria",
+          criterio: {
+            programado: 0
+          },
+          camposLike: ['programado'],
+        }),
 
-  const formatNumber = (numString: string): string => {
-    const paddedNum = numString.padStart(9, '0')
-    return paddedNum.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
-  }
+        clsCrud.pesquisar({
+          entidade: "Tinturaria",
+        }),
 
-  const btPesquisar = async () => {
+        clsCrud.pesquisar({
+          entidade: "Produto",
+          criterio: {
+            tipoProduto: [TipoProdutoType.tecidoCru],
+          },
+          campoOrder: ["nome"],
+          tipoOrder: "ASC",
+        }),
 
-    const relations = [
-      "romaneio",
-      "romaneio.cliente",
-      "romaneio.fornecedor",
-      "detalheProgramacoes",
-      "detalheProgramacoes.produto",
-      "detalheProgramacoes.cor",
-    ];
+        clsCrud.pesquisar({
+          entidade: "Programacao",
+          relations: [
+            "romaneio",
+            "romaneio.cliente",
+            "romaneio.fornecedor",
+            "detalheProgramacoes",
+            "detalheProgramacoes.produto",
+            "detalheProgramacoes.cor",
+          ],
+        }),
+      ]);
 
-    const msg = 'Pesquisando programações ...'
-    const setMensagem = setMensagemState
-    // const idsCli = rsClientes
-    //   .filter(clientes => clientes.nome.includes(pesquisa.itemPesquisa))
-    //   .map(clientes => clientes.idPessoa)
+      setRsClientes(clientes)
+      setRsTinturaria(tinturarias)
+      setRsTinturariaGeral(tinturariasGerais)
+      setRsProdutos(produtos)
 
-    let dadosPesquisa = {}
-    let criterio = {}
-    let camposLike: any = []
-    let comparador = "L"
-    const temNumero = /\d/.test(pesquisa.itemPesquisa)
-    const temNome = /\w/.test(pesquisa.itemPesquisa)
-
-    if (temNumero && pesquisa.itemPesquisa.includes('/')) {
-      const formattedDateTime = formatDateTimeForMySQL(pesquisa.itemPesquisa)
-      criterio = {
-        dataProgramacao: formattedDateTime
-      }
-      camposLike = ['dataProgramacao']
-    } else if (temNumero) {
-
-      const formattedNumber = formatNumber(pesquisa.itemPesquisa);
-      criterio = {
-        notaFiscal: formattedNumber
-      }
-      camposLike = ['notaFiscal']
-    }
-
-    dadosPesquisa = {
-      entidade: "Programacao",
-      relations,
-      comparador,
-      criterio,
-      camposLike,
-      msg,
-      setMensagemState: setMensagem
-    }
-
-    await clsCrud
-      .pesquisar(dadosPesquisa)
-      .then((rs: Array<any>) => {
-
-        rs.forEach((programacao, index) => {
-          rs[index].romaneio.cliente = programacao.romaneio.cliente.nome
+      if (programacoes) {
+        programacoes.forEach((programacao, index) => {
+          programacoes[index].romaneio.cliente = programacao.romaneio.cliente.nome
         })
+      }
+      setProgramacaoAll(programacoes)
+      setRsPesquisa(programacoes)
 
-        if (temNome) {
-
-          const filtrado = rs.filter((item) =>
-            item.romaneio.cliente.toLowerCase().includes(pesquisa.itemPesquisa.toLowerCase()))
-
-          setRsPesquisa(filtrado)
-        } else {
-          setRsPesquisa(rs)
-        }
+      setMensagemState({
+        ...mensagemState,
+        exibir: false,
       });
 
-  }
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error);
+      setMensagemState({
+        ...mensagemState,
+        titulo: 'Erro ao carregar dados',
+        mensagem: 'Não foi possível carregar os dados. Tente novamente mais tarde.',
+        exibir: true,
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      });
+    }
+  };
 
+  const filtrarProgramacao = (todos: any[], filtro: PesquisaInterface) => {
+    const termo = filtro.itemPesquisa.trim().toUpperCase()
+    let filtrados = [...todos]
+
+    // 🔍 Filtro por data ou nota fiscal
+    if (termo !== '') {
+      const pareceData = /\d+\/\d*/.test(termo)
+      filtrados = filtrados.filter(programacao => {
+        if (pareceData) {
+          const dataProgramacao = programacao.dataProgramacao
+          if (!dataProgramacao) return false
+          const dataFormatada = new Date(dataProgramacao)
+            .toLocaleDateString('pt-BR')
+            .toUpperCase()
+          return dataFormatada.includes(termo)
+        } else {
+          const notaFiscal = programacao.notaFiscal
+          return notaFiscal ? notaFiscal.toString().includes(termo) : false
+        }
+      })
+    }
+
+    // 🔍 Filtro por cliente
+    if (filtro.idCliente && filtro.idCliente > 0) {
+      filtrados = filtrados.filter(
+        (programacao) => programacao.romaneio?.idPessoa_cliente === filtro.idCliente
+      )
+    }
+
+    // 🔍 Filtro por status
+    if (filtro.status && filtro.status !== 'all') {
+      let statusBool: boolean
+      if (filtro.status === 'programado') {
+        statusBool = true
+      } else {
+        statusBool = false
+      }
+      filtrados = filtrados.filter((programacao) => {
+        return programacao.romaneio.finalizado === statusBool
+      })
+    }
+    return filtrados
+  }
 
   const AtualizaSomatorio = (rs: ProgramacaoInterface) => {
     let totalQtd: number = 0
@@ -651,16 +665,19 @@ export default function ProgramacaoTinturaria() {
 
   useEffect(() => {
     const carregarDados = async () => {
-      await BuscarDados()
+      await loadDados()
     }
     carregarDados()
-  }, [])
+  }, [localState])
+
+  const btPesquisar = () => {
+    setRsPesquisa(filtrarProgramacao(programacaoAll, pesquisa))
+  }
 
   useEffect(() => {
-    if (rsClientes.length > 0) {
-      btPesquisar()
-    }
-  }, [rsClientes])
+    const resultado = filtrarProgramacao(programacaoAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, programacaoAll])
 
   return (
     <Container maxWidth="xl" sx={{ mt: 0 }}>
@@ -672,7 +689,7 @@ export default function ProgramacaoTinturaria() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={12} md={4}>
               <InputText
                 label="Buscar por data, nota fiscal ou cliente"
                 tipo="uppercase"
@@ -683,6 +700,30 @@ export default function ProgramacaoTinturaria() {
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <ComboBox
+                opcoes={rsClientes}
+                campoDescricao="nome"
+                campoID="idPessoa"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Clientes"
+                field="idCliente"
+                label="Clientes"
+                setState={setPesquisa}
+              />
+            </Grid>
+            <Grid item xs={10} md={3}>
+              <ComboBox
+                opcoes={statusList}
+                campoDescricao="descricao"
+                campoID="idStatus"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Status"
+                field="status"
+                label="Status do Romaneio"
+                setState={setPesquisa}
               />
             </Grid>
             <Grid item xs={2} md={1}>

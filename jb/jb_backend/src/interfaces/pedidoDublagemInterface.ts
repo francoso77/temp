@@ -1,10 +1,8 @@
 import { StatusType } from '../types/statusTypes'
 import { CorInterface } from './corInteface'
-import { PessoaInterface } from './pessoaInterface'
 import { ProdutoInterface } from './produtoInterface'
 
-export interface PedidoInterface {
-  cliente: PessoaInterface
+export interface PedidoDublagemInterface {
   idPedido?: number
   dataPedido: string
   observacao: string
@@ -12,10 +10,10 @@ export interface PedidoInterface {
   idPessoa_vendedor: number
   idPrazoEntrega: number
   statusPedido: StatusType
-  detalhePedidos: DetalhePedidoInterface[]
+  detalhePedidos: DetalhePedidoDublagemInterface[]
 }
 
-export interface DetalhePedidoInterface {
+export interface DetalhePedidoDublagemInterface {
   idDetalhePedido?: number
   idPedido: number | null
   idProduto: number

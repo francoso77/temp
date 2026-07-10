@@ -27,6 +27,10 @@ var DetalheProducaoDublagem = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
         __metadata("design:type", Number)
+    ], DetalheProducaoDublagem.prototype, "qtdPedida", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ type: 'float', precision: 4 }),
+        __metadata("design:type", Number)
     ], DetalheProducaoDublagem.prototype, "metrosTotal", void 0);
     __decorate([
         (0, typeorm_1.Column)({ type: 'int', precision: 0 }),

@@ -180,10 +180,6 @@ class ClsRelatorioProgramacao {
 
 
     const detalhesFiltrados = this.tecidos.filter(tecido => tecido.idPedido === dados.idPedido);
-
-    console.log('detalhesFiltrados', detalhesFiltrados);
-    console.log('pedido', dados);
-
     const itensFiltrados = this.tecidos.filter(item =>
       detalhesFiltrados.some(detalhe => detalhe.idPedido === item.idPedido) && item.tipoProduto === 10
     );
@@ -315,7 +311,7 @@ class ClsRelatorioProgramacao {
         ['Pedido', 'Cliente'],
         [item.pedido, item.cliente],
         ['Produto', item.produto],
-        ['QtdPedida', this.clsFormatacao.currency(item.metros)],
+        ['Qtd Pedida', this.clsFormatacao.currency(item.metros)],
       ];
 
 

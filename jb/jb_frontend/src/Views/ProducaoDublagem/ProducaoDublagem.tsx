@@ -19,10 +19,11 @@ import ClsFormatacao from '../../Utils/ClsFormatacao';
 import ClsApi from '../../Utils/ClsApi';
 import { DetalheProducaoDublagemInterface, ProducaoDublagemInterface } from '../../Interfaces/producaoDublagemInterface';
 import { TipoColagemType, TipoColagemTypes } from '../../types/tipoColagemTypes';
-import { DetalhePedidoInterface, PedidoInterface } from '../../Interfaces/pedidoInterface';
+import { DetalhePedidoDublagemInterface, PedidoDublagemInterface } from '../../Interfaces/pedidoDublagemInterface';
 import DetalheProducaoDubalgem from './DetalheProducaoDublagem';
 import { StatusType, StatusTypes } from '../../types/statusTypes';
 import { UsuarioType } from '../../types/usuarioTypes';
+import { PessoaInterface } from '../../Interfaces/pessoaInterface';
 
 export interface SomatorioProducaoDublagemInterface {
   total: string
@@ -44,19 +45,23 @@ export default function ProducaoDublagem() {
 
   interface PesquisaInterface {
     itemPesquisa: string
+    idCliente: number
+    status: StatusType | number
   }
 
   const SomatorioDados: SomatorioProducaoDublagemInterface = {
     total: '',
   }
 
-  const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
+  const { setMensagemState, setLayoutState, layoutState, usuarioState, mensagemState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<any>>([])
+  const [producaoDublagemAll, setProducaoDublagemAll] = useState<Array<any>>([])
   const [erros, setErros] = useState({})
   const [producaoDublagem, setProducaoDublagem] = useState<ProducaoDublagemInterface>(ResetDados)
-  const [rsPedido, setRsPedido] = useState<Array<PedidoInterface>>([])
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '' })
+  const [rsPedido, setRsPedido] = useState<Array<PedidoDublagemInterface>>([])
+  const [rsCliente, setRsCliente] = useState<Array<PessoaInterface>>([])
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ itemPesquisa: '', idCliente: 0, status: 0 })
   const [rsSomatorio, setRsSomatorio] = useState<SomatorioProducaoDublagemInterface>(SomatorioDados)
   const [rsQtdPedida, setRsQtdPedida] = useState<SomatorioProducaoDublagemInterface>(SomatorioDados)
   const fieldRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -144,6 +149,7 @@ export default function ProducaoDublagem() {
       .pesquisar({
         entidade: "ProducaoDublagem",
         relations: [
+          "pedido",
           "detalheProducaoDublagens",
           "detalheProducaoDublagens.detalhePecas",
         ],
@@ -162,11 +168,10 @@ export default function ProducaoDublagem() {
 
   const pedidoValido = async (pedido: number): Promise<boolean> => {
 
-    const rs: Array<PedidoInterface> = await clsCrud.pesquisar({
+    const rs: Array<PedidoDublagemInterface> = await clsCrud.pesquisar({
       entidade: "Pedido",
       criterio: { idPedido: pedido }
     })
-
     return rs.length > 0 && rs[0].statusPedido !== StatusType.finalizado
   }
 
@@ -249,7 +254,7 @@ export default function ProducaoDublagem() {
     try {
       let statusPedido: StatusType = StatusType.finalizado
 
-      const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
+      const rsPedido: PedidoDublagemInterface[] = await clsCrud.pesquisar({
         entidade: "Pedido",
         relations: ["detalhePedidos"],
         criterio: {
@@ -258,12 +263,12 @@ export default function ProducaoDublagem() {
       })
 
       if (rsPedido.length > 0) {
-        let tmpPedido: PedidoInterface = rsPedido[0]
-        let tmpDetalhe: Array<DetalhePedidoInterface> = tmpPedido.detalhePedidos
+        let tmpPedido: PedidoDublagemInterface = rsPedido[0]
+        let tmpDetalhe: Array<DetalhePedidoDublagemInterface> = tmpPedido.detalhePedidos
 
         producaoDublagem.detalheProducaoDublagens.forEach((detalhe: DetalheProducaoDublagemInterface) => {
 
-          tmpDetalhe.forEach((detalhePedido: DetalhePedidoInterface) => {
+          tmpDetalhe.forEach((detalhePedido: DetalhePedidoDublagemInterface) => {
             if (detalhe.idProduto === detalhePedido.idProduto) {
               detalhePedido.qtdAtendida = detalhe.metrosTotal
               if (detalhePedido.qtdAtendida >= detalhePedido.qtdPedida) {
@@ -278,8 +283,8 @@ export default function ProducaoDublagem() {
           })
         })
 
-        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem !== StatusType.finalizado)
-        const temProducao = tmpDetalhe.findIndex((rs: DetalhePedidoInterface) => rs.statusItem === StatusType.parcial)
+        const temPedidoAberto = tmpDetalhe.findIndex((rs: DetalhePedidoDublagemInterface) => rs.statusItem !== StatusType.finalizado)
+        const temProducao = tmpDetalhe.findIndex((rs: DetalhePedidoDublagemInterface) => rs.statusItem === StatusType.parcial)
 
         if (temPedidoAberto < 0) {
 
@@ -306,7 +311,7 @@ export default function ProducaoDublagem() {
       return
     }
     try {
-      const rsPedido: PedidoInterface[] = await clsCrud.pesquisar({
+      const rsPedido: PedidoDublagemInterface[] = await clsCrud.pesquisar({
         entidade: "Pedido",
         relations: ["detalhePedidos"],
         criterio: {
@@ -315,8 +320,8 @@ export default function ProducaoDublagem() {
       })
 
       if (rsPedido.length > 0) {
-        let tmpPedido: PedidoInterface = rsPedido[0]
-        let tmpDetalhe: Array<DetalhePedidoInterface> = tmpPedido.detalhePedidos
+        let tmpPedido: PedidoDublagemInterface = rsPedido[0]
+        let tmpDetalhe: Array<DetalhePedidoDublagemInterface> = tmpPedido.detalhePedidos
 
         tmpDetalhe.map((detalhe) => {
 
@@ -402,26 +407,6 @@ export default function ProducaoDublagem() {
 
   }
 
-  const btPesquisar = () => {
-
-    const campo = validaCampo.isValidDate(clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)) ? 'data' : 'nome'
-    const itemPesquisa = campo === 'data'
-      ? clsFormatacao.dataISOtoDatetime(pesquisa.itemPesquisa)
-      : pesquisa.itemPesquisa
-
-    clsApi.execute<Array<ProducaoDublagemInterface>>({
-      url: 'corteProducaoDublagem',
-      method: 'post',
-      itemPesquisa,
-      campo,
-      mensagem: 'Pesquisando produção dublagem ...',
-      setMensagemState: setMensagemState
-    })
-      .then((rs: Array<ProducaoDublagemInterface>) => {
-        setRsPesquisa(rs)
-      })
-  }
-
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -446,32 +431,134 @@ export default function ProducaoDublagem() {
     }
   }
 
-  const BuscarDados = async () => {
+  const filtrarCortesProducao = (todos: any[], filtro: PesquisaInterface) => {
+
+    const termo = filtro.itemPesquisa.trim().toUpperCase()
+    let filtrados = [...todos]
+
+    if (termo !== '') {
+      const pareceData = /\d+\/\d*/.test(termo) // reconhece fragmentos como "27/", "10/2025" etc.
+
+      filtrados = filtrados.filter(producao => {
+        if (pareceData) {
+          // 🔎 Comparação com data parcial
+          const dataProducao = producao.dataProducao
+          if (!dataProducao) return false
+
+          const dataFormatada = new Date(dataProducao)
+            .toLocaleDateString('pt-BR')
+            .toUpperCase()
+
+          // Permite busca parcial como "27/" ou "10/2025"
+          return dataFormatada.includes(termo)
+        } else {
+          const id = producao.pedido
+          return id ? id.toString().includes(termo) : false
+        }
+      })
+    }
+
+    if (filtro.idCliente && filtro.idCliente > 0) {
+      filtrados = filtrados.filter(
+        (producao) => producao.idPessoa_cliente === filtro.idCliente
+      )
+    }
+
+    if (filtro.status && filtro.status !== StatusType.todos) {
+      filtrados = filtrados.filter(
+        (producao) => producao.statusPedido === filtro.status
+      );
+    }
+
+    return filtrados
+  }
+
+  const loadDados = async () => {
+
+    setMensagemState({
+      ...mensagemState,
+      titulo: 'Carregando dados...',
+      exibir: true,
+      tipo: MensagemTipo.Info,
+    });
+
     try {
-      const detalhes: Array<DetalhePedidoInterface> = await clsCrud.pesquisar({
-        entidade: "ProducaoDublagem",
-        select: ["idPedido"]
+
+      if (['editando', 'excluindo'].includes(localState.action)) {
+        const rsPedidos: Array<PedidoDublagemInterface> = await clsCrud.pesquisar({
+          entidade: "Pedido",
+          relations: ["detalhePedidos"],
+          select: ["idPedido", "statusPedido"]
+        });
+
+        setRsPedido(rsPedidos)
+      } else {
+        const detalhes: Array<DetalhePedidoDublagemInterface> = await clsCrud.pesquisar({
+          entidade: "ProducaoDublagem",
+          select: ["idPedido"]
+        });
+
+        const ids = new Set(detalhes.map(d => d.idPedido));
+
+        const rsPedidos: Array<PedidoDublagemInterface> = await clsCrud.pesquisar({
+          entidade: "Pedido",
+          criterio: {
+            statusPedido: StatusType.producao
+          },
+          camposLike: ["statusPedido"],
+          campoOrder: ["idPedido"],
+          relations: ["detalhePedidos"],
+          select: ["idPedido", "statusPedido"]
+        });
+
+        const dadosFiltrados = rsPedidos.filter(p => !ids.has(p.idPedido ?? null));
+        setRsPedido(dadosFiltrados);
+      }
+
+      const [clientes, corteProducao] = await Promise.all([
+        clsCrud.pesquisar({
+          entidade: "Pessoa",
+          criterio: { tipoPessoa: ['C', 'J'] },
+          camposLike: ['tipoPessoa'],
+          comparador: 'I',
+          campoOrder: ['nome'],
+          tipoOrder: 'ASC'
+        }),
+
+        clsApi.execute<Array<any>>({
+          url: 'corteProducaoDublagem',
+          method: 'post',
+        })
+      ]);
+
+      // console.log("detalhes:", detalhes);
+      // console.log("ids:", ids);
+      // console.log("rsPedidos:", rsPedidos);
+      // console.log("dadosFiltrados:", dadosFiltrados);
+      // console.log("clientes:", clientes);
+      // console.log("corteProducao:", corteProducao);
+
+      setRsCliente(clientes);
+      setRsPesquisa(corteProducao);
+      setProducaoDublagemAll(corteProducao);
+
+      setMensagemState({
+        ...mensagemState,
+        exibir: false,
       });
-
-      const ids = new Set(detalhes.map(d => d.idPedido));
-
-      const rsPedidos: Array<PedidoInterface> = await clsCrud.pesquisar({
-        entidade: "Pedido",
-        criterio: {
-          statusPedido: StatusType.producao
-        },
-        camposLike: ["statusPedido"],
-        campoOrder: ["idPedido"],
-        relations: ["detalhePedidos"],
-        select: ["idPedido", "statusPedido"]
-      });
-
-      const dadosFiltrados = rsPedidos.filter(p => !ids.has(p.idPedido ?? null));
-      setRsPedido(dadosFiltrados);
 
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
       setRsPedido([]); // opcional: limpa os dados se erro
+      setMensagemState({
+        ...mensagemState,
+        titulo: 'Erro ao carregar dados',
+        mensagem: 'Não foi possível carregar os dados. Tente novamente mais tarde.',
+        exibir: true,
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
+      });
     }
   };
 
@@ -491,7 +578,7 @@ export default function ProducaoDublagem() {
         },
         camposLike: ['idPedido'],
       })
-      .then((rs: Array<DetalhePedidoInterface>) => {
+      .then((rs: Array<DetalhePedidoDublagemInterface>) => {
         if (rs.length > 0) {
           let total: number = 0
           rs.forEach((detalhe) => {
@@ -501,16 +588,23 @@ export default function ProducaoDublagem() {
         }
       })
   }
+
+
   useEffect(() => {
-    BuscarDados()
-    btPesquisar()
-    setLayoutState({
-      titulo: 'Produção Dublagem',
-      tituloAnterior: '',
-      pathTitulo: '/ProducaoDublagem',
-      pathTituloAnterior: '/'
-    })
-  }, [])
+    const carregarDados = async () => {
+      await loadDados()
+    }
+    carregarDados()
+  }, [localState])
+
+  const btPesquisar = () => {
+    setRsPesquisa(filtrarCortesProducao(producaoDublagemAll, pesquisa))
+  }
+
+  useEffect(() => {
+    const resultado = filtrarCortesProducao(producaoDublagemAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, producaoDublagemAll])
 
   return (
 
@@ -523,9 +617,9 @@ export default function ProducaoDublagem() {
             </IconButton>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={12} md={4}>
               <InputText
-                label="Buscar por data ou cliente"
+                label="Buscar por data ou pedido"
                 tipo="uppercase"
                 dados={pesquisa}
                 field="itemPesquisa"
@@ -534,6 +628,32 @@ export default function ProducaoDublagem() {
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <ComboBox
+                opcoes={rsCliente}
+                campoDescricao="nome"
+                campoID="idPessoa"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Clientes"
+                field="idCliente"
+                label="Clientes"
+                erros={erros}
+                setState={setPesquisa}
+              />
+            </Grid>
+            <Grid item xs={10} md={3}>
+              <ComboBox
+                opcoes={StatusTypes}
+                campoDescricao="descricao"
+                campoID="idStatus"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os status"
+                field="status"
+                label="Status do Pedido"
+                erros={erros}
+                setState={setPesquisa}
               />
             </Grid>
             <Grid item xs={2} md={1}>
@@ -577,7 +697,7 @@ export default function ProducaoDublagem() {
             </Grid>
           </Condicional>
           <Condicional condicao={['incluindo', 'editando', 'excluindo'].includes(localState.action)}>
-            <Grid item xs={12} md={4} sx={{ mt: 2, pl: { md: 1 } }}>
+            <Grid item xs={12} md={4} sm={4} sx={{ mt: 2, pl: { md: 1 } }}>
               <Box ref={(el: any) => (fieldRefs.current[0] = el)}>
                 <InputText
                   type='tel'
@@ -596,7 +716,7 @@ export default function ProducaoDublagem() {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm={4} sx={{ mt: 2 }}>
+            <Grid item xs={12} md={4} sm={4} sx={{ mt: 2 }}>
               <Box ref={(el: any) => (fieldRefs.current[1] = el)}>
                 <ComboBox
                   opcoes={rsPedido}

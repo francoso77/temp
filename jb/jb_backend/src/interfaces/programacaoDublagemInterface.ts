@@ -1,4 +1,4 @@
-import { PedidoInterface } from './pedidoInterface';
+import { PedidoDublagemInterface } from './pedidoDublagemInterface';
 
 export interface ProgramacaoDublagemInterface {
   idProgramacaoDublagem?: number
@@ -12,5 +12,5 @@ export interface DetalheProgramacaoDublagemInterface {
   idDetalheProgramacaoDublagem?: number
   idProgramacaoDublagem: number | null
   idPedido: number
-  pedido: PedidoInterface
+  pedido: PedidoDublagemInterface
 }

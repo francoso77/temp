@@ -13,6 +13,7 @@ export interface DetalheProducaoDublagemInterface {
   idDetalheProducaoDublagem?: number
   idDublagem: number | null
   idProduto: number
+  qtdPedida: number
   metrosTotal: number
   pecasTotal: number
   produto: ProdutoInterface

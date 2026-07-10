@@ -1,4 +1,5 @@
 export enum TipoProdutoType {
+  todos = 0,
   cola = 1,
   espuma = 2,
   eva = 3,
@@ -12,6 +13,10 @@ export enum TipoProdutoType {
 }
 
 export const TipoProdutoTypes = [
+  {
+    idTipoProduto: TipoProdutoType.todos,
+    descricao: "Todos os Tipos"
+  },
   {
     idTipoProduto: TipoProdutoType.cola,
     descricao: "COLA"

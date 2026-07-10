@@ -148,8 +148,11 @@ export default function DetalhePeca({ indiceEdicao, rsMaster, setRsMaster, maste
   }
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (open) {
+      const timer = setTimeout(() => inputRef.current?.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'))

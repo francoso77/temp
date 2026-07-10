@@ -19,6 +19,7 @@ import { PessoaType, PessoaTypes } from '../../types/pessoaTypes';
 import { THEME } from '../../app/Layout/Theme';
 import DialogPessoas from '../../Componentes/Dialog/DialogPessoas';
 import { UsuarioType } from '../../types/usuarioTypes';
+import ComboBox from '../../Componentes/ComboBox';
 
 
 export default function Pessoa() {
@@ -47,7 +48,7 @@ export default function Pessoa() {
     apelido: '',
     cpf_cnpj: '',
     endereco: '',
-    numero: 0,
+    numero: '',
     bairro: '',
     cidade: '',
     uf: '',
@@ -62,13 +63,16 @@ export default function Pessoa() {
 
   interface PesquisaInterface {
     nome: string
+    tipo: PessoaType | string
   }
+
   const { setMensagemState, setLayoutState, layoutState, usuarioState } = useContext(GlobalContext) as GlobalContextInterface
   const [localState, setLocalState] = useState<ActionInterface>({ action: actionTypes.pesquisando })
   const [rsPesquisa, setRsPesquisa] = useState<Array<PessoaInterface>>([])
+  const [pessoasAll, setPessoasAll] = useState<Array<PessoaInterface>>([])
   const [erros, setErros] = useState({})
   const [pessoa, setPessoa] = useState<PessoaInterface>(ResetDados)
-  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '' })
+  const [pesquisa, setPesquisa] = useState<PesquisaInterface>({ nome: '', tipo: PessoaType.todos })
 
   const cabecalhoForm: Array<DataTableCabecalhoInterface> = [
     {
@@ -162,91 +166,82 @@ export default function Pessoa() {
       retorno = validaCampo.naoVazio('bairro', pessoa, erros, retorno, 'Informe um bairro')
       retorno = validaCampo.naoVazio('cidade', pessoa, erros, retorno, 'Informe a cidade')
       retorno = validaCampo.eUF('uf', pessoa, erros, retorno, false)
-      retorno = validaCampo.eEmail('email', pessoa, erros, retorno)
       retorno = validaCampo.eTelefone('telefone', pessoa, erros, retorno, false)
+      retorno = validaCampo.eEmail('email', pessoa, erros, retorno)
     }
+
     setErros(erros)
     return retorno
   }
 
   const btConfirmar = () => {
 
-    clsCrud
-      .pesquisar({
-        entidade: "Pessoa",
-        criterio: {
-          nome: "%".concat(pessoa.nome).concat("%"),
-          tipoPessoa: pessoa.tipoPessoa
-        },
-        camposLike: ["nome"],
-        select: ["nome", "tipoPessoa"],
-        msg: 'Pesquisando pessoas ...',
-        setMensagemState: setMensagemState
+    const jaExiste = pessoasAll.some(p =>
+      p.nome.toLowerCase() === pessoa.nome.toLowerCase() &&
+      p.idPessoa !== pessoa.idPessoa
+    )
+    if (jaExiste && localState.action === actionTypes.incluindo) {
+      setMensagemState({
+        titulo: 'Erro...',
+        exibir: true,
+        mensagem: 'Pessoa já cadastrado!',
+        tipo: MensagemTipo.Error,
+        exibirBotao: true,
+        cb: null
       })
-      .then((rs) => {
-        if (rs.length > 0 && localState.action === actionTypes.incluindo) {
-          setMensagemState({
-            titulo: 'Erro...',
-            exibir: true,
-            mensagem: 'Item já cadastrado!',
-            tipo: MensagemTipo.Error,
-            exibirBotao: true,
-            cb: null
-          })
-        } else {
+      return
+    }
 
-          if (validarDados()) {
+    if (validarDados()) {
 
-            if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
-              clsCrud.incluir({
-                entidade: "Pessoa",
-                criterio: pessoa,
-                localState: localState,
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState,
-                token: usuarioState.token
+      if (localState.action === actionTypes.incluindo || localState.action === actionTypes.editando) {
+        clsCrud.incluir({
+          entidade: "Pessoa",
+          criterio: pessoa,
+          localState: localState,
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState,
+          token: usuarioState.token
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
               })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
-            } else if (localState.action === actionTypes.excluindo) {
-              clsCrud.excluir({
-                entidade: "Pessoa",
-                criterio: {
-                  idPessoa: pessoa.idPessoa
-                },
-                cb: () => btPesquisar(),
-                setMensagemState: setMensagemState
-              })
-                .then((rs) => {
-                  if (rs.ok) {
-                    setLocalState({ action: actionTypes.pesquisando })
-                  } else {
-                    setMensagemState({
-                      titulo: 'Erro...',
-                      exibir: true,
-                      mensagem: 'Erro no cadastro - Consulte Suporte',
-                      tipo: MensagemTipo.Error,
-                      exibirBotao: true,
-                      cb: null
-                    })
-                  }
-                })
             }
-          }
-        }
-      })
+          })
+      } else if (localState.action === actionTypes.excluindo) {
+        clsCrud.excluir({
+          entidade: "Pessoa",
+          criterio: {
+            idPessoa: pessoa.idPessoa
+          },
+          cb: () => btPesquisar(),
+          setMensagemState: setMensagemState
+        })
+          .then((rs) => {
+            if (rs.ok) {
+              setLocalState({ action: actionTypes.pesquisando })
+            } else {
+              setMensagemState({
+                titulo: 'Erro...',
+                exibir: true,
+                mensagem: 'Erro no cadastro - Consulte Suporte',
+                tipo: MensagemTipo.Error,
+                exibirBotao: true,
+                cb: null
+              })
+            }
+          })
+      }
+    }
   }
 
   const btPesquisar = () => {
@@ -264,6 +259,43 @@ export default function Pessoa() {
         setRsPesquisa(rs)
       })
   }
+
+  // --- FILTRO DE PESQUISA MAIS LIMPO E RÁPIDO ---
+  const filtrarPessoas = (todos: PessoaInterface[], filtro: PesquisaInterface) => {
+    const nome = filtro.nome.trim().toLowerCase()
+    const tipo = filtro.tipo
+
+    if (!nome && (tipo === PessoaType.todos || !tipo)) {
+      // Nenhum filtro -> mostra tudo
+      return todos
+    }
+
+    return todos.filter(p => {
+      const matchNome = nome ? p.nome.toLowerCase().includes(nome) : true
+      const matchTipo = tipo && tipo !== PessoaType.todos ? p.tipoPessoa === tipo : true
+      return matchNome && matchTipo
+    })
+  }
+
+  useEffect(() => {
+    // Aplica filtro toda vez que pesquisa ou produtosAll mudar
+    const resultado = filtrarPessoas(pessoasAll, pesquisa)
+    setRsPesquisa(resultado)
+  }, [pesquisa, pessoasAll])
+
+  const loadDados = async () => {
+    const [pessoas] = await Promise.all([
+      clsCrud.pesquisar({
+        entidade: "Pessoa",
+        msg: 'Pesquisando pessoas ...',
+        setMensagemState: setMensagemState
+      })
+    ])
+
+    setPessoasAll(pessoas)
+    setRsPesquisa(pessoas) // <- já exibe tudo inicialmente
+  }
+
   const irPara = useNavigate()
   const btFechar = () => {
     setLayoutState({
@@ -316,7 +348,7 @@ export default function Pessoa() {
 
   useEffect(() => {
     const carregarDados = async () => {
-      await btPesquisar()
+      await loadDados()
     }
     carregarDados()
   }, [])
@@ -334,7 +366,7 @@ export default function Pessoa() {
             </Tooltip>
           </Grid>
           <Condicional condicao={localState.action === 'pesquisando'}>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={6} md={8}>
               <InputText
                 label="Pesquisa"
                 tipo="uppercase"
@@ -345,6 +377,19 @@ export default function Pessoa() {
                 onClickIconeEnd={() => btPesquisar()}
                 mapKeyPress={[{ key: 'Enter', onKey: btPesquisar }]}
                 autoFocus
+              />
+            </Grid>
+            <Grid item xs={4} md={3}>
+              <ComboBox
+                opcoes={PessoaTypes}
+                campoDescricao="descricao"
+                campoID="idPessoaType"
+                dados={pesquisa}
+                mensagemPadraoCampoEmBranco="Todos os tipos"
+                field="tipo"
+                label="Tipo de Pessoa"
+                erros={erros}
+                setState={setPesquisa}
               />
             </Grid>
             <Grid item xs={2} md={1}>
@@ -529,8 +574,7 @@ export default function Pessoa() {
               <Grid item xs={3} md={2} sx={{ mt: 2, pl: { md: 1 } }}>
                 <InputText
                   label="Número"
-                  tipo="number"
-                  type='tel'
+                  tipo="text"
                   dados={pessoa}
                   field="numero"
                   setState={setPessoa}

@@ -256,7 +256,7 @@ export default function Usuario() {
         cpf_cnpj: usuario.cpf,
         email: usuario.email,
         endereco: '',
-        numero: 0,
+        numero: '',
         bairro: '',
         cidade: '',
         uf: '',

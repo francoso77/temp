@@ -8,6 +8,7 @@ import ProducaoDublagem from '../entities/producaoDublagem.entity'
 import Tinturaria from '../entities/tinturaria.entity'
 import Estoque from '../entities/estoque.entity'
 import Programacao from '../entities/programacao.entity'
+import PedidoMalharia from '../entities/pedidoMalharia.entity'
 
 @Controller()
 export class OutController {
@@ -211,6 +212,43 @@ export class OutController {
     return AppDataSource.getRepository(ProgramacaoDublagem).query(sql, params)
   }
 
+  @Post("gerenciadorPedidosMalhariaEmAberto")
+  async gerenciadorPedidosMalhariaEmAberto(): Promise<Array<PedidoMalharia>> {
+
+    const sql = `
+    SELECT
+      p.idPedido,
+      p.dataPedido,
+      p.statusPedido,
+      pc.nome AS nomeCliente,
+      pf.nome AS nomeFornecedor,
+        JSON_ARRAYAGG(
+    JSON_OBJECT(
+      'idPedido', p.idPedido,
+      'idDetalhePedido', dp.idDetalhePedido,
+      'Produto', pp.nome,
+      'qtd', dp.qtdPedida,
+      'vrUnitario', dp.vrUnitario,
+      'total', dp.qtdPedida * dp.vrUnitario
+    )
+  ) AS details
+    FROM 
+      pedidomalharias p
+    INNER JOIN
+      pessoas pc ON pc.idPessoa = p.idPessoa_cliente
+    INNER JOIN
+      pessoas pf ON pf.idPessoa = p.idPessoa_fornecedor
+    INNER JOIN
+      detalhepedidomalharias dp ON dp.idPedido = p.idPedido
+    INNER JOIN
+      produtos pp ON pp.idProduto = dp.idProduto
+    GROUP BY p.idPedido, p.dataPedido, pc.nome, pf.nome, p.statusPedido
+    ORDER BY p.dataPedido DESC
+    ;  
+  `
+    return AppDataSource.getRepository(PedidoMalharia).query(sql)
+  }
+
   @Post("gerenciadorPedidosEmAberto")
   async gerenciadorPedidosEmAberto(): Promise<Array<Pedido>> {
 
@@ -251,8 +289,7 @@ export class OutController {
 
   @Post("corteProducaoDublagem")
   async corteProducaoDublagem(
-    @Body("itemPesquisa") itemPesquisa: string,
-    @Body("campo") campo: 'data' | 'nome',
+
   ): Promise<Array<ProducaoDublagem>> {
 
     const sql = `
@@ -273,19 +310,16 @@ export class OutController {
       INNER JOIN 
         pedidos ped ON ped.idPedido = pd.idPedido
       INNER JOIN
-        detalhepedidos dped ON dped.idPedido = ped.idPedido
+        detalhepedidos dped ON dped.idPedido = ped.idPedido AND dped.idProduto = dpd.idProduto
       INNER JOIN
         pessoas pc ON pc.idPessoa = ped.idPessoa_cliente
-      WHERE
-        ${campo === 'data' ? 'pd.dataProducao = ?' : 'pc.nome LIKE ?'}
       GROUP BY
         dataProducao, pedido, cliente, statusPedido
       ORDER BY
-        dataProducao, pedido, cliente
+        dataProducao, pedido, cliente;
   `
 
-    const params = [campo === 'data' ? itemPesquisa : `%${itemPesquisa}%`]
-    return AppDataSource.getRepository(ProducaoDublagem).query(sql, params)
+    return AppDataSource.getRepository(ProducaoDublagem).query(sql)
   }
 
 
@@ -505,6 +539,27 @@ export class OutController {
   `
     const params = [novoStatusPedido, novoStatusItem, qtd, pedido, produto]
     return AppDataSource.getRepository(Pedido).query(sql, params)
+  }
+
+  @Post("produzirPedidosMalharia")
+  async produzirPedidosMalharia(
+    @Body("pedidos") pedidos: Array<number>,
+    @Body("tipoProducao") tipoProducao: 2 | 1,
+  ): Promise<Array<PedidoMalharia>> {
+
+    const ped = '(' + pedidos.map((v) => v).join(", ") + ')'
+    const sql = `
+    UPDATE
+      pedidomalharias p
+    JOIN detalhepedidomalharias dp on dp.idPedido = p.idPedido 
+    SET
+      p.statusPedido = '${tipoProducao}'
+    WHERE
+      p.idPedido IN ${ped};
+  `
+
+    const params = [ped, tipoProducao]
+    return AppDataSource.getRepository(PedidoMalharia).query(sql, params)
   }
 
   @Post("produzirPedidos")

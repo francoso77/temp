@@ -18,7 +18,6 @@ import { CorInterface } from '../../Interfaces/corInteface';
 import { TipoProdutoType } from '../../types/tipoProdutoypes';
 import ClsFormatacao from '../../Utils/ClsFormatacao';
 
-
 interface PropsInterface {
   rsMaster: EstruturaInterface
   setRsMaster: React.Dispatch<React.SetStateAction<EstruturaInterface>>,
@@ -168,7 +167,7 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     setLocalState({ action: actionTypes.pesquisando })
   }
 
-  const pegaTipo = () => {
+  const pegaTipo = async () => {
     const auxTipo = rsProduto.find(produto => produto.idProduto === detalheEstrutura.idProduto)?.tipoProduto;
     if (auxTipo !== undefined) {
       setTipo(auxTipo);
@@ -249,30 +248,32 @@ export default function DetalheEstrutura({ rsMaster, setRsMaster, masterLocalSta
     }
   }
 
-  const BuscarDados = () => {
+  const BuscarDados = async () => {
 
-    clsCrud
-      .pesquisar({
+    const [produtos, cores] = await Promise.all([
+      clsCrud.pesquisar({
         entidade: "Produto",
         campoOrder: ["nome"],
-        comparador: 'N',
-        criterio: {
-          idProduto: rsMaster.idProduto
-        },
-        camposLike: ["idProduto"],
-      })
-      .then((rsProdutos: Array<ProdutoInterface>) => {
-        setRsProduto(rsProdutos)
-      })
-
-    clsCrud
-      .pesquisar({
+        tipoOrder: "ASC",
+      }),
+      clsCrud.pesquisar({
         entidade: "Cor",
         campoOrder: ["nome"],
+        tipoOrder: "ASC",
       })
-      .then((rsCores: Array<CorInterface>) => {
-        setRsCor(rsCores)
-      })
+    ]);
+
+    const tipoProduto = produtos.find((p: ProdutoInterface) => p.idProduto === rsMaster.idProduto)?.tipoProduto;
+
+    if (tipoProduto === TipoProdutoType.tecidoCru) {
+      const produtosFiltrados = (produtos as Array<ProdutoInterface>).filter(
+        (p: ProdutoInterface) => p.tipoProduto === TipoProdutoType.fio
+      );
+      setRsProduto(produtosFiltrados);
+    } else {
+      setRsProduto(produtos as Array<ProdutoInterface>);
+    }
+    setRsCor(cores as Array<CorInterface>);
   }
 
   useEffect(() => {

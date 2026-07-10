@@ -1,4 +1,5 @@
 export enum PessoaType {
+  todos = 'todos',
   clienteFisica = 'C',
   clienteJuridica = 'J',
   fornecedor = 'F',
@@ -8,6 +9,10 @@ export enum PessoaType {
 }
 
 export const PessoaTypes = [
+  {
+    idPessoaType: PessoaType.todos,
+    descricao: 'Todos os Tipos'
+  },
   {
     idPessoaType: PessoaType.clienteFisica,
     descricao: 'Cliente Pessoa Física'

@@ -41,7 +41,7 @@ var Pessoa = /** @class */ (function () {
     ], Pessoa.prototype, "endereco", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
-        __metadata("design:type", Number)
+        __metadata("design:type", String)
     ], Pessoa.prototype, "numero", void 0);
     __decorate([
         (0, typeorm_1.Column)({ nullable: true, length: 60 }),
@@ -69,7 +69,7 @@ var Pessoa = /** @class */ (function () {
         __metadata("design:type", String)
     ], Pessoa.prototype, "whatsapp", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true, length: 255 }),
+        (0, typeorm_1.Column)({ nullable: true, length: 500 }),
         (0, typeorm_1.Index)(),
         __metadata("design:type", String)
     ], Pessoa.prototype, "email", void 0);

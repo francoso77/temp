@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { PedidoInterface } from '../Interfaces/pedidoInterface';
+import { PedidoDublagemInterface } from '../Interfaces/pedidoDublagemInterface';
 import { PeriodoType } from '../types/periodoTypes';
 
 interface IntervaloDatas {
@@ -29,8 +29,8 @@ export interface TopCliente {
 export interface ResultadoPeriodo {
   periodoAtual: IntervaloDatas;
   periodoAnterior: IntervaloDatas | null;
-  pedidosAtual: PedidoInterface[];
-  pedidosAnterior: PedidoInterface[];
+  pedidosAtual: PedidoDublagemInterface[];
+  pedidosAnterior: PedidoDublagemInterface[];
   productionData: ProductionData[];
   topProdutos: TopProduto[];
   topClientes: TopCliente[];
@@ -231,7 +231,8 @@ export default class ClsValidacao {
  * @param mensagemErroVazio conteúdo de erro caso seja vazio e não permitido vazio
  * @returns 
  */
-  public eEmail(campo: string,
+  public eEmail(
+    campo: string,
     dados: { [key: string]: any },
     erros: { [key: string]: string },
     retorno: boolean,
@@ -240,12 +241,34 @@ export default class ClsValidacao {
     mensagemErroVazio: string = 'Forneça um Email Válido'
   ): boolean {
 
-    //eslint-disable-next-line
-    const regExpEmail: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+    // eslint-disable-next-line
+    const regExpEmail: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/;
 
-    return this.validarComRegEx(regExpEmail, campo, dados, erros, retorno, permiteVazio, mensagemErro, mensagemErroVazio)
+    const valorCampo = dados[campo];
 
+    // Caso o campo esteja vazio
+    if (!valorCampo || valorCampo.trim() === '') {
+      if (!permiteVazio) {
+        erros[campo] = mensagemErroVazio;
+        return false;
+      }
+      return retorno;
+    }
+
+    // Divide por vírgula e remove espaços extras
+    const emails = valorCampo.split(',').map((e: any) => e.trim()).filter((e: any) => e !== '');
+
+    // Valida cada e-mail individualmente
+    const invalido = emails.some((email: any) => !regExpEmail.test(email));
+
+    if (invalido) {
+      erros[campo] = mensagemErro;
+      return false;
+    }
+
+    return retorno;
   }
+
 
   /**
    * Verifica se determinado campo é "vazio". String ou Número
@@ -495,7 +518,7 @@ export default class ClsValidacao {
     return `${mes}/${ano}`;
   }
 
-  private gerarProductionData(pedidos: PedidoInterface[]): ProductionData[] {
+  private gerarProductionData(pedidos: PedidoDublagemInterface[]): ProductionData[] {
     const mapa = new Map<string, ProductionData>();
 
     pedidos.forEach((p) => {
@@ -534,7 +557,7 @@ export default class ClsValidacao {
     return Array.from(mapa.values());
   }
   public filtraPedidosPorPeriodo(
-    pedidos: PedidoInterface[],
+    pedidos: PedidoDublagemInterface[],
     idPeriodo: number,
     idTipoProduto: number,
     idCliente: number,
@@ -615,7 +638,7 @@ export default class ClsValidacao {
     // ==========================================================
     // 2) Aplicar filtros (data, cliente, vendedor, produto)
     // ==========================================================
-    const aplicarFiltros = (lista: PedidoInterface[], inicio?: Date, fim?: Date) => {
+    const aplicarFiltros = (lista: PedidoDublagemInterface[], inicio?: Date, fim?: Date) => {
       return lista.filter((p) => {
         const dataPedido = new Date(p.dataPedido);
 
