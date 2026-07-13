@@ -1,13 +1,13 @@
 import { router } from "expo-router";
 
-import { Button, EmptyState, Screen, Typography } from "../../components";
+import { EmptyState, NexaButton, NexaScreen, NexaText } from "../../components";
 
 export default function AgendaScreen() {
   return (
-    <Screen>
-      <Typography variant="title">
+    <NexaScreen>
+      <NexaText variant="title">
         Agenda
-      </Typography>
+      </NexaText>
 
       <EmptyState
         emoji="📅"
@@ -15,11 +15,11 @@ export default function AgendaScreen() {
         description="Organize seu dia criando seu primeiro atendimento."
       />
 
-      <Button
+      <NexaButton
         title="+ Novo Agendamento"
         onPress={() => router.push("/appointment/new")}
       />
-    </Screen>
+    </NexaScreen>
   );
 }
 

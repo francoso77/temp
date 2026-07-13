@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 
 import { Spacing } from "../../theme";
-import { Typography } from "../Typography";
+import { NexaText } from '../base/NexaText';
 
 type Props = {
   emoji: string;
@@ -16,21 +16,21 @@ export function EmptyState({
 }: Props) {
   return (
     <View style={styles.container}>
-      <Typography variant="title">
+      <NexaText variant="title">
         {emoji}
-      </Typography>
+      </NexaText>
 
       <View style={{ height: Spacing.sm }} />
 
-      <Typography variant="h2">
+      <NexaText variant="h2">
         {title}
-      </Typography>
+      </NexaText>
 
       <View style={{ height: Spacing.xs }} />
 
-      <Typography>
+      <NexaText>
         {description}
-      </Typography>
+      </NexaText>
     </View>
   );
 }

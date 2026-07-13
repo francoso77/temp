@@ -1,29 +1,30 @@
 import { router } from "expo-router";
 
 import {
-  Button,
   EmptyState,
-  Screen,
-  Typography,
+  NexaButton,
+  NexaScreen,
+  NexaText,
 } from "../../components";
+
 
 export default function SelectClientScreen() {
   return (
-    <Screen>
-      <Typography variant="title">
+    <NexaScreen>
+      <NexaText variant="title">
         Selecionar Cliente
-      </Typography>
+      </NexaText>
 
       <EmptyState
         emoji="👤"
-        title="Nenhuma cliente cadastrada"
-        description="Cadastre sua primeira cliente para começar."
+        title="Nenhum cliente cadastrado"
+        description="Cadastre seu primeiro cliente para começar."
       />
 
-      <Button
+      <NexaButton
         title="Cadastrar Cliente"
         onPress={() => router.push("/clients/new")}
       />
-    </Screen>
+    </NexaScreen>
   );
 }

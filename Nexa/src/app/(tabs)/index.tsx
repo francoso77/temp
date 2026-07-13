@@ -1,17 +1,17 @@
 import { View } from "react-native";
-import { InfoCard, Screen, Typography } from "../../components";
+import { InfoCard, NexaScreen, NexaText } from "../../components";
 import { Spacing } from "../../theme";
 
 export default function Home() {
   return (
-    <Screen>
-      <Typography variant="title">
+    <NexaScreen>
+      <NexaText variant="title">
         Bom dia ☀️
-      </Typography>
+      </NexaText>
 
-      <Typography variant="small">
+      <NexaText variant="small">
         Sexta-feira, 10 de julho
-      </Typography>
+      </NexaText>
 
       <View style={{ height: Spacing.lg }} />
 
@@ -19,32 +19,32 @@ export default function Home() {
         icon="📅"
         title="Hoje"
       >
-        <Typography>
+        <NexaText>
           Você ainda não possui atendimentos cadastrados.
-        </Typography>
+        </NexaText>
       </InfoCard>
 
       <InfoCard
         icon="💰"
         title="Receita Prevista"
       >
-        <Typography variant="title">
+        <NexaText variant="title">
           R$ 0,00
-        </Typography>
+        </NexaText>
       </InfoCard>
 
       <InfoCard
         icon="💬"
         title="Nexa"
       >
-        <Typography>
-          Bem-vinda!
-        </Typography>
+        <NexaText>
+          Bem-vindo ao Nexa!
+        </NexaText>
 
-        <Typography>
+        <NexaText>
           Vamos organizar seu dia?
-        </Typography>
+        </NexaText>
       </InfoCard>
-    </Screen>
+    </NexaScreen>
   );
 }

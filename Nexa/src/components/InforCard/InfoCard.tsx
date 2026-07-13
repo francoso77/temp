@@ -2,9 +2,8 @@ import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { Spacing } from "../../theme";
-import { Card } from "../Card";
-import { Typography } from "../Typography";
-
+import { NexaCard } from '../base/NexaCard';
+import { NexaText } from '../base/NexaText';
 type Props = {
   icon: string;
   title: string;
@@ -17,17 +16,17 @@ export function InfoCard({
   children,
 }: Props) {
   return (
-    <Card>
+    <NexaCard>
       <View style={styles.header}>
-        <Typography variant="h2">
+        <NexaText variant="h2">
           {icon} {title}
-        </Typography>
+        </NexaText>
       </View>
 
       <View style={styles.content}>
         {children}
       </View>
-    </Card>
+    </NexaCard>
   );
 }
 
