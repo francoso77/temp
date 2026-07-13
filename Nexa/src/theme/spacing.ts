@@ -12,6 +12,4 @@ export const Spacing = {
 
   xxl: 48,
 
-  radius: 18,
-
 };

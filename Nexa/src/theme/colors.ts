@@ -1,25 +1,30 @@
 export const Colors = {
 
-  primary: "#5B6CFF",
+  // Marca Nexa
+  primary: "#6C63FF",
+  primaryDark: "#574FE6",
+  primaryLight: "#ECEBFF",
 
-  primaryLight: "#8A7DFF",
-
-  background: "#F7F8FC",
-
+  // Fundo
+  background: "#F8F8FC",
   surface: "#FFFFFF",
 
-  text: "#1D2433",
-
+  // Texto
+  text: "#1F2937",
   textSecondary: "#6B7280",
+  textLight: "#9CA3AF",
 
-  success: "#4CAF50",
-
+  // Estados
+  success: "#22C55E",
   warning: "#F59E0B",
+  danger: "#EF4444",
+  info: "#3B82F6",
 
-  error: "#EF4444",
-
+  // Interface
   border: "#E5E7EB",
+  divider: "#F1F5F9",
 
-  shadow: "rgba(0,0,0,0.08)",
+  white: "#FFFFFF",
+  black: "#000000",
 
 };
