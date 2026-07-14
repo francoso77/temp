@@ -1,14 +1,13 @@
 import { router } from "expo-router";
-import { View } from "react-native";
 
 import {
   InfoCard,
   NexaButton,
   NexaScreen,
+  NexaSpacer,
   NexaText,
 } from "../../components";
 
-import { Spacing } from "../../theme";
 
 export default function NewAppointmentScreen() {
   return (
@@ -17,7 +16,7 @@ export default function NewAppointmentScreen() {
         Novo Agendamento
       </NexaText>
 
-      <View style={{ height: Spacing.lg }} />
+      <NexaSpacer size="lg" />
 
       <InfoCard
         icon="👤"
@@ -27,7 +26,7 @@ export default function NewAppointmentScreen() {
           Nenhum cliente selecionado.
         </NexaText>
 
-        <View style={{ height: Spacing.md }} />
+        <NexaSpacer size="md" />
 
         <NexaButton
           title="Selecionar Cliente"
@@ -35,7 +34,7 @@ export default function NewAppointmentScreen() {
         />
       </InfoCard>
 
-      <View style={{ height: Spacing.lg }} />
+      <NexaSpacer size="lg" />
 
       <InfoCard
         icon="📅"

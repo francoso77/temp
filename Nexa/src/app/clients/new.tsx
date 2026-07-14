@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Alert, View } from "react-native";
+import { Alert } from "react-native";
 
 import {
   NexaButton,
   NexaInput,
   NexaScreen,
+  NexaSpacer,
   NexaText
 } from "../../components";
 
 import { phoneMask } from '@/utils/masks/phone';
-import { Spacing } from "../../theme";
 
 export default function NewClientScreen() {
 
@@ -31,7 +31,7 @@ export default function NewClientScreen() {
         Novo Cliente
       </NexaText>
 
-      <View style={{ height: Spacing.lg }} />
+      <NexaSpacer size="lg" />
 
       <NexaInput
         label="Nome"
@@ -40,7 +40,7 @@ export default function NewClientScreen() {
         onChangeText={setName}
       />
 
-      <View style={{ height: Spacing.md }} />
+      <NexaSpacer size="md" />
 
       <NexaInput
         label="WhatsApp"
@@ -51,7 +51,7 @@ export default function NewClientScreen() {
         onChangeText={setPhone}
       />
 
-      <View style={{ height: Spacing.md }} />
+      <NexaSpacer size="md" />
 
       <NexaInput
         label="Observações"
@@ -60,13 +60,13 @@ export default function NewClientScreen() {
         multiline
       />
 
-      <View style={{ height: Spacing.xl }} />
+      <NexaSpacer size="xl" />
 
       <NexaText variant="small">
         Campos com * são obrigatórios.
       </NexaText>
 
-      <View style={{ height: Spacing.xl }} />
+      <NexaSpacer size="xl" />
 
       <NexaButton
         title="Salvar Cliente"

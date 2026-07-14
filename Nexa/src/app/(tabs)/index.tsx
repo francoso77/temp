@@ -1,6 +1,4 @@
-import { View } from "react-native";
-import { InfoCard, NexaScreen, NexaText } from "../../components";
-import { Spacing } from "../../theme";
+import { InfoCard, NexaScreen, NexaSpacer, NexaText } from "../../components";
 
 export default function Home() {
   return (
@@ -13,7 +11,7 @@ export default function Home() {
         Sexta-feira, 10 de julho
       </NexaText>
 
-      <View style={{ height: Spacing.lg }} />
+      <NexaSpacer size="lg" />
 
       <InfoCard
         icon="📅"
