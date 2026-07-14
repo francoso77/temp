@@ -6,15 +6,11 @@ export const mockServices: Service[] = [
 
     id: "1",
 
-    name: "Manicure",
-
-    category: "Unhas",
+    name: "Manicure Tradicional",
 
     duration: 45,
 
     price: 60,
-
-    color: "#F48FB1",
 
     active: true,
 
@@ -24,15 +20,25 @@ export const mockServices: Service[] = [
 
     id: "2",
 
-    name: "Pedicure",
+    name: "Blindagem",
 
-    category: "Pés",
+    duration: 90,
 
-    duration: 60,
+    price: 120,
 
-    price: 75,
+    active: true,
 
-    color: "#CE93D8",
+  },
+
+  {
+
+    id: "3",
+
+    name: "Alongamento",
+
+    duration: 150,
+
+    price: 220,
 
     active: true,
 

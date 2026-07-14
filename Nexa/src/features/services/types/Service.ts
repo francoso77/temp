@@ -4,16 +4,14 @@ export interface Service {
 
   name: string;
 
-  category: string;
-
   duration: number;
 
   price: number;
 
-  color: string;
-
   active: boolean;
 
   description?: string;
+
+  color?: string;
 
 }

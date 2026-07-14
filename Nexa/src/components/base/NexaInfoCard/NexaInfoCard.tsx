@@ -1,16 +1,16 @@
 import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { Spacing } from "../../theme";
-import { NexaCard } from '../base/NexaCard';
-import { NexaText } from '../base/NexaText';
+import { Spacing } from "../../../theme";
+import { NexaCard } from '../NexaCard';
+import { NexaText } from '../NexaText';
 type Props = {
   icon: string;
   title: string;
   children: ReactNode;
 };
 
-export function InfoCard({
+export function NexaInfoCard({
   icon,
   title,
   children,

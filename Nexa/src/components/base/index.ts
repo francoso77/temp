@@ -4,7 +4,8 @@ export * from "./NexaButton";
 export * from "./NexaCard";
 export * from "./NexaDivider";
 export * from "./NexaIcon";
+export * from "./NexaInfoCard";
 export * from "./NexaInput";
-export * from "./NexaScreen";
 export * from "./NexaSpacer";
 export * from "./NexaText";
+
