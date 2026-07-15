@@ -1,7 +1,7 @@
 import { StyleSheet, Switch, View } from "react-native";
 
+import { NexaText } from '@/components/base';
 import { Colors, Spacing } from "../../../theme";
-import { NexaText } from "../../base/NexaText";
 
 type Props = {
   label: string;

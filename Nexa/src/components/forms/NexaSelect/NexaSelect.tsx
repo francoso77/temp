@@ -1,159 +1,59 @@
-import { ReactNode } from "react";
-import {
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextStyle,
-} from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
-import {
-  Colors,
-  Typography,
-} from "../../../theme";
+import { Colors, Radius, Spacing } from "../../../theme";
+import { NexaText } from "../../base/NexaText";
 
-export type NexaTextVariant =
-  | "display"
-  | "title"
-  | "h1"
-  | "h2"
-  | "body"
-  | "small"
-  | "caption";
-
-type Props = {
-  children: ReactNode;
-
-  variant?: NexaTextVariant;
-
-  color?: string;
-
-  align?: "left" | "center" | "right";
-
-  weight?:
-  | "400"
-  | "500"
-  | "600"
-  | "700";
-
-  style?: StyleProp<TextStyle>;
-
-  numberOfLines?: number;
+export type NexaSelectOption = {
+  label: string;
+  value: string;
 };
 
-export function NexaText({
+type Props = {
+  label: string;
+  value?: string;
+  placeholder?: string;
+  onPress?: () => void;
+};
 
-  children,
-
-  variant = "body",
-
-  color = Colors.text,
-
-  align = "left",
-
-  weight,
-
-  style,
-
-  numberOfLines,
-
+export function NexaSelect({
+  label,
+  value,
+  placeholder = "Selecione...",
+  onPress,
 }: Props) {
-
   return (
+    <View style={styles.container}>
+      <NexaText variant="small">
+        {label}
+      </NexaText>
 
-    <Text
-
-      numberOfLines={numberOfLines}
-
-      style={[
-
-        styles.base,
-
-        styles[variant],
-
-        {
-
-          color,
-
-          textAlign: align,
-
-          fontWeight: weight,
-
-        },
-
-        style,
-
-      ]}
-
-    >
-
-      {children}
-
-    </Text>
-
+      <Pressable
+        style={styles.select}
+        onPress={onPress}
+      >
+        <NexaText
+          color={value ? Colors.text : Colors.textSecondary}
+        >
+          {value || placeholder}
+        </NexaText>
+      </Pressable>
+    </View>
   );
-
 }
 
 const styles = StyleSheet.create({
-
-  base: {
-
-    color: Colors.text,
-
+  container: {
+    gap: Spacing.xs,
   },
 
-  display: {
-
-    fontSize: Typography.display,
-
-    fontWeight: "700",
-
+  select: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    backgroundColor: Colors.surface,
+    justifyContent: "center",
+    minHeight: 52,
   },
-
-  title: {
-
-    fontSize: Typography.title,
-
-    fontWeight: "700",
-
-  },
-
-  h1: {
-
-    fontSize: Typography.h1,
-
-    fontWeight: "700",
-
-  },
-
-  h2: {
-
-    fontSize: Typography.h2,
-
-    fontWeight: "600",
-
-  },
-
-  body: {
-
-    fontSize: Typography.body,
-
-  },
-
-  small: {
-
-    fontSize: Typography.small,
-
-    color: Colors.textSecondary,
-
-  },
-
-  caption: {
-
-    fontSize: Typography.caption,
-
-    color: Colors.textLight,
-
-  },
-
 });

@@ -26,10 +26,6 @@ export function ServiceCard({
       <NexaSpacer size="xs" />
 
       <NexaText>
-        Categoria: {service.category}
-      </NexaText>
-
-      <NexaText>
         Duração: {service.duration} min
       </NexaText>
 

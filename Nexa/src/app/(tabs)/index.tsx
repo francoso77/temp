@@ -1,4 +1,4 @@
-import { InfoCard, NexaScreen, NexaSpacer, NexaText } from "../../components";
+import { NexaInfoCard, NexaScreen, NexaSpacer, NexaText } from "../../components";
 
 export default function Home() {
   return (
@@ -13,25 +13,25 @@ export default function Home() {
 
       <NexaSpacer size="lg" />
 
-      <InfoCard
+      <NexaInfoCard
         icon="📅"
         title="Hoje"
       >
         <NexaText>
           Você ainda não possui atendimentos cadastrados.
         </NexaText>
-      </InfoCard>
+      </NexaInfoCard>
 
-      <InfoCard
+      <NexaInfoCard
         icon="💰"
         title="Receita Prevista"
       >
         <NexaText variant="title">
           R$ 0,00
         </NexaText>
-      </InfoCard>
+      </NexaInfoCard>
 
-      <InfoCard
+      <NexaInfoCard
         icon="💬"
         title="Nexa"
       >
@@ -42,7 +42,7 @@ export default function Home() {
         <NexaText>
           Vamos organizar seu dia?
         </NexaText>
-      </InfoCard>
+      </NexaInfoCard>
     </NexaScreen>
   );
 }
