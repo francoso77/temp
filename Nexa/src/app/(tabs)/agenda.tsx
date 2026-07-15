@@ -12,7 +12,7 @@ export default function AgendaScreen() {
       <NexaEmptyState
         emoji="📅"
         title="Nenhum horário agendado"
-        description="Organize seu dia criando seu primeiro atendimento."
+        subtitle="Organize seu dia criando seu primeiro atendimento."
       />
 
       <NexaButton

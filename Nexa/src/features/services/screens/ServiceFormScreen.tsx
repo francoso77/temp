@@ -18,7 +18,11 @@ export function ServiceFormScreen() {
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");
+
   const [active, setActive] = useState(true);
+
+  const [onlineBooking, setOnlineBooking] = useState(true);
+  const [advanceBookingHours, setAdvanceBookingHours] = useState("24");
 
   function handleSave() {
     Alert.alert(
@@ -32,6 +36,8 @@ export function ServiceFormScreen() {
       duration,
       description,
       active,
+      onlineBooking,
+      advanceBookingHours,
     });
   }
 
@@ -43,10 +49,10 @@ export function ServiceFormScreen() {
 
       <NexaSpacer size="lg" />
 
-      <NexaFormSection title="Informações do serviço">
+      <NexaFormSection title="Informações">
 
         <NexaInput
-          label="Nome"
+          label="Nome do serviço"
           value={name}
           onChangeText={setName}
           placeholder="Ex.: Blindagem em Gel"
@@ -76,15 +82,37 @@ export function ServiceFormScreen() {
           label="Descrição"
           value={description}
           onChangeText={setDescription}
-          placeholder="Opcional"
+          placeholder="Descreva este serviço..."
         />
 
-        <NexaSpacer />
+      </NexaFormSection>
+
+      <NexaSpacer size="lg" />
+
+      <NexaFormSection title="Configurações">
 
         <NexaSwitch
           label="Serviço ativo"
           value={active}
           onValueChange={setActive}
+        />
+
+        <NexaSpacer />
+
+        <NexaSwitch
+          label="Disponível para agendamento online"
+          value={onlineBooking}
+          onValueChange={setOnlineBooking}
+        />
+
+        <NexaSpacer />
+
+        <NexaInput
+          label="Antecedência mínima (horas)"
+          value={advanceBookingHours}
+          onChangeText={setAdvanceBookingHours}
+          keyboardType="numeric"
+          placeholder="24"
         />
 
       </NexaFormSection>

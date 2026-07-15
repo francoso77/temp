@@ -1,13 +1,6 @@
 import { router } from "expo-router";
 
-import {
-  EmptyState,
-  NexaButton,
-  NexaScreen,
-  NexaText,
-} from "../../components";
-
-
+import { NexaButton, NexaEmptyState, NexaScreen, NexaText } from "../../components";
 export default function SelectClientScreen() {
   return (
     <NexaScreen>
@@ -15,10 +8,10 @@ export default function SelectClientScreen() {
         Selecionar Cliente
       </NexaText>
 
-      <EmptyState
+      <NexaEmptyState
         emoji="👤"
         title="Nenhum cliente cadastrado"
-        description="Cadastre seu primeiro cliente para começar."
+        subtitle="Cadastre seu primeiro cliente para começar."
       />
 
       <NexaButton

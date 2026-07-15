@@ -1,3 +1,5 @@
-import { ServicesScreen } from '../../features/services/screens/ServicesScreen';
+import { ServiceFormScreen } from "@/features/services/screens/ServiceFormScreen";
 
-export default ServicesScreen;
+export default function Services() {
+  return <ServiceFormScreen />;
+}

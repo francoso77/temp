@@ -1,4 +1,4 @@
-import { Service } from "../types/Service";
+import { Service } from "../models/Service";
 
 export const mockServices: Service[] = [
 
@@ -14,6 +14,10 @@ export const mockServices: Service[] = [
 
     active: true,
 
+    onlineBooking: true,
+
+    advanceBookingHours: 24,
+
   },
 
   {
@@ -28,6 +32,10 @@ export const mockServices: Service[] = [
 
     active: true,
 
+    onlineBooking: true,
+
+    advanceBookingHours: 24,
+
   },
 
   {
@@ -41,6 +49,10 @@ export const mockServices: Service[] = [
     price: 220,
 
     active: true,
+
+    onlineBooking: true,
+
+    advanceBookingHours: 24,
 
   },
 

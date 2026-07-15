@@ -1,27 +1,52 @@
-import { StyleSheet, TextInput } from "react-native";
-import { Colors, Radius, Spacing, Typography } from "../../../theme";
+import { StyleSheet, TextInput, View } from "react-native";
+
+import {
+  Colors,
+  Radius,
+  Spacing,
+  Typography,
+} from "../../../theme";
+
+import { NexaSpacer } from "../../base/NexaSpacer";
+import { NexaText } from "../../base/NexaText";
 
 type Props = {
-  value: string;
-  onChangeText: (text: string) => void;
+  label?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
   placeholder?: string;
 };
 
 export function NexaTextArea({
+  label,
   value,
   onChangeText,
   placeholder,
 }: Props) {
   return (
-    <TextInput
-      multiline
-      numberOfLines={5}
-      value={value}
-      onChangeText={onChangeText}
-      placeholder={placeholder}
-      textAlignVertical="top"
-      style={styles.input}
-    />
+    <View>
+
+      {label && (
+        <>
+          <NexaText variant="small">
+            {label}
+          </NexaText>
+
+          <NexaSpacer size="xs" />
+        </>
+      )}
+
+      <TextInput
+        multiline
+        numberOfLines={5}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        textAlignVertical="top"
+        style={styles.input}
+      />
+
+    </View>
   );
 }
 

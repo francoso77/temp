@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { Service } from "../types/Service";
+import { Service } from "../models/Service";
 
 import {
   NexaButton,

@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 
 import {
-  InfoCard,
   NexaButton,
+  NexaInfoCard,
   NexaScreen,
   NexaSpacer,
   NexaText,
@@ -18,7 +18,7 @@ export default function NewAppointmentScreen() {
 
       <NexaSpacer size="lg" />
 
-      <InfoCard
+      <NexaInfoCard
         icon="👤"
         title="Cliente"
       >
@@ -32,18 +32,18 @@ export default function NewAppointmentScreen() {
           title="Selecionar Cliente"
           onPress={() => router.push("/clients/select")}
         />
-      </InfoCard>
+      </NexaInfoCard>
 
       <NexaSpacer size="lg" />
 
-      <InfoCard
+      <NexaInfoCard
         icon="📅"
         title="Data e Horário"
       >
         <NexaText>
           Selecione um cliente para continuar.
         </NexaText>
-      </InfoCard>
+      </NexaInfoCard>
     </NexaScreen>
   );
 }

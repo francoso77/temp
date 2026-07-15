@@ -4,15 +4,15 @@ import { NexaSpacer } from "../../base/NexaSpacer";
 import { NexaText } from "../../base/NexaText";
 
 type Props = {
-  emoji: string;
+  emoji?: string;
   title: string;
-  description: string;
+  subtitle?: string;
 };
 
 export function NexaEmptyState({
   emoji,
   title,
-  description,
+  subtitle,
 }: Props) {
   return (
     <View style={styles.container}>
@@ -32,7 +32,7 @@ export function NexaEmptyState({
       <NexaSpacer size="xs" />
 
       <NexaText>
-        {description}
+        {subtitle}
       </NexaText>
 
     </View>
