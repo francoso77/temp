@@ -1,13 +1,14 @@
-import { View } from "react-native";
-
-import { Service } from "../models/Service";
+import { router } from "expo-router";
+import { Pressable } from "react-native";
 
 import {
-  NexaButton,
+  NexaBadge,
   NexaCard,
   NexaSpacer,
   NexaText,
 } from "../../../components";
+
+import { Service } from "../models/Service";
 
 type Props = {
   service: Service;
@@ -17,45 +18,47 @@ export function ServiceCard({
   service,
 }: Props) {
   return (
-    <NexaCard>
+    <Pressable
+      onPress={() =>
+        router.push(`/services/${service.id}`)
+      }
+    >
 
-      <NexaText variant="h2">
-        {service.name}
-      </NexaText>
+      <NexaCard>
 
-      <NexaSpacer size="xs" />
+        <NexaText variant="h2">
+          {service.name}
+        </NexaText>
 
-      <NexaText>
-        Duração: {service.duration} min
-      </NexaText>
+        <NexaSpacer size="xs" />
 
-      <NexaText>
-        R$ {service.price.toFixed(2)}
-      </NexaText>
+        <NexaText>
 
-      <NexaSpacer size="md" />
+          {service.duration} min
 
-      <View
-        style={{
-          flexDirection: "row",
-          gap: 12,
-        }}
-      >
-        <NexaButton
-          title="Editar"
-          fullWidth={false}
-          variant="secondary"
-          onPress={() => { }}
+        </NexaText>
+
+        <NexaSpacer size="xs" />
+
+        <NexaText>
+
+          R$ {service.price}
+
+        </NexaText>
+
+        <NexaSpacer size="sm" />
+
+        <NexaBadge
+          text={service.active ? "Ativo" : "Inativo"}
+          color={
+            service.active
+              ? "#2E7D32"
+              : "#9E9E9E"
+          }
         />
 
-        <NexaButton
-          title="Excluir"
-          fullWidth={false}
-          variant="danger"
-          onPress={() => { }}
-        />
-      </View>
+      </NexaCard>
 
-    </NexaCard>
+    </Pressable>
   );
 }

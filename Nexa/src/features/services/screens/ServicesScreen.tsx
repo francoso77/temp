@@ -1,100 +1,47 @@
-import { useState } from "react";
-import { Alert } from "react-native";
+import { router } from "expo-router";
+
+import { useServices } from "../hooks/useServices";
 
 import {
   NexaButton,
-  NexaFormSection,
-  NexaInput,
-  NexaMoneyInput,
+  NexaList,
   NexaScreen,
   NexaSpacer,
-  NexaSwitch,
   NexaText,
-  NexaTextArea,
 } from "../../../components";
 
-export function ServiceFormScreen() {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [duration, setDuration] = useState("");
-  const [description, setDescription] = useState("");
-  const [active, setActive] = useState(true);
+import { ServiceCard } from "../components/ServiceCard";
 
-  function handleSave() {
-    Alert.alert(
-      "Serviço",
-      "Em breve este serviço será salvo no banco de dados."
-    );
+export function ServicesScreen() {
 
-    console.log({
-      name,
-      price,
-      duration,
-      description,
-      active,
-    });
-  }
+  const { services } = useServices();
 
   return (
     <NexaScreen>
+
       <NexaText variant="title">
-        Novo Serviço
+        Meus Serviços
       </NexaText>
 
       <NexaSpacer size="lg" />
 
-      <NexaFormSection title="Informações do serviço">
+      <NexaList
+        data={services}
+        keyExtractor={(item) => item.id}
+        renderItem={(item) => (
+          <ServiceCard service={item} />
+        )}
+        emptyTitle="Nenhum serviço cadastrado"
+        emptyMessage="Cadastre seu primeiro serviço."
+      />
 
-        <NexaInput
-          label="Nome"
-          value={name}
-          onChangeText={setName}
-          placeholder="Ex.: Blindagem em Gel"
-        />
-
-        <NexaSpacer />
-
-        <NexaMoneyInput
-          label="Valor"
-          value={price}
-          onChangeText={setPrice}
-        />
-
-        <NexaSpacer />
-
-        <NexaInput
-          label="Duração (minutos)"
-          value={duration}
-          onChangeText={setDuration}
-          keyboardType="numeric"
-          placeholder="60"
-        />
-
-        <NexaSpacer />
-
-        <NexaTextArea
-          label="Descrição"
-          value={description}
-          onChangeText={setDescription}
-          placeholder="Opcional"
-        />
-
-        <NexaSpacer />
-
-        <NexaSwitch
-          label="Serviço ativo"
-          value={active}
-          onValueChange={setActive}
-        />
-
-      </NexaFormSection>
-
-      <NexaSpacer size="xl" />
+      <NexaSpacer size="md" />
 
       <NexaButton
-        title="Salvar"
-        onPress={handleSave}
+        title="Novo Serviço"
+        onPress={() => router.push("/services/new")}
       />
+
     </NexaScreen>
   );
 }

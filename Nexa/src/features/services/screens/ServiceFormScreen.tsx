@@ -1,5 +1,5 @@
+import { router } from "expo-router";
 import { useState } from "react";
-import { Alert } from "react-native";
 
 import {
   NexaButton,
@@ -25,10 +25,6 @@ export function ServiceFormScreen() {
   const [advanceBookingHours, setAdvanceBookingHours] = useState("24");
 
   function handleSave() {
-    Alert.alert(
-      "Serviço",
-      "Em breve este serviço será salvo no banco de dados."
-    );
 
     console.log({
       name,
@@ -39,6 +35,9 @@ export function ServiceFormScreen() {
       onlineBooking,
       advanceBookingHours,
     });
+
+    router.back();
+
   }
 
   return (

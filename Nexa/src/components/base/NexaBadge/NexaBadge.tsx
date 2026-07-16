@@ -3,22 +3,41 @@ import { StyleSheet, View } from "react-native";
 import { Colors, Radius, Spacing } from "../../../theme";
 import { NexaText } from "../NexaText";
 
+type Variant =
+  | "primary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "default";
+
 type Props = {
   text: string;
   color?: string;
+  variant?: Variant;
+};
+
+const variantColors = {
+  primary: Colors.primary,
+  success: "#2E7D32",
+  warning: "#F9A825",
+  danger: "#C62828",
+  default: "#9E9E9E",
 };
 
 export function NexaBadge({
   text,
-  color = Colors.primary,
+  color,
+  variant = "primary",
 }: Props) {
+
+  const backgroundColor =
+    color ?? variantColors[variant];
+
   return (
     <View
       style={[
         styles.container,
-        {
-          backgroundColor: color,
-        },
+        { backgroundColor },
       ]}
     >
       <NexaText
