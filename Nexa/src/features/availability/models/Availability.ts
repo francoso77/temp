@@ -2,7 +2,9 @@ export type Availability = {
 
   id: string;
 
-  weekday: number;
+  dayOfWeek: number;
+
+  label: string;
 
   enabled: boolean;
 

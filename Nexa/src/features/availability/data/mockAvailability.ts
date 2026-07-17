@@ -4,7 +4,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "1",
-    weekday: 1,
+    dayOfWeek: 1,
+    label: "Segunda-feira",
     enabled: true,
     startTime: "08:00",
     endTime: "18:00",
@@ -15,7 +16,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "2",
-    weekday: 2,
+    dayOfWeek: 2,
+    label: "Terça-feira",
     enabled: true,
     startTime: "08:00",
     endTime: "18:00",
@@ -26,7 +28,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "3",
-    weekday: 3,
+    dayOfWeek: 3,
+    label: "Quarta-feira",
     enabled: true,
     startTime: "08:00",
     endTime: "18:00",
@@ -37,7 +40,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "4",
-    weekday: 4,
+    dayOfWeek: 4,
+    label: "Quinta-feira",
     enabled: true,
     startTime: "08:00",
     endTime: "18:00",
@@ -48,7 +52,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "5",
-    weekday: 5,
+    dayOfWeek: 5,
+    label: "Sexta-feira",
     enabled: true,
     startTime: "08:00",
     endTime: "18:00",
@@ -59,7 +64,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "6",
-    weekday: 6,
+    dayOfWeek: 6,
+    label: "Sábado",
     enabled: true,
     startTime: "08:00",
     endTime: "14:00",
@@ -70,7 +76,8 @@ export const mockAvailability: Availability[] = [
 
   {
     id: "7",
-    weekday: 0,
+    dayOfWeek: 0,
+    label: "Domingo",
     enabled: false,
     startTime: "",
     endTime: "",

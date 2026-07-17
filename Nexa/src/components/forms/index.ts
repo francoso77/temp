@@ -5,4 +5,6 @@ export * from "./NexaPhoneInput";
 export * from "./NexaSelect";
 export * from "./NexaSwitch";
 export * from "./NexaTextArea";
+export * from "./NexaTimeInput";
+export * from "./NexaTimePicker";
 
