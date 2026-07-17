@@ -1,6 +1,8 @@
 import { router } from "expo-router";
 import { useState } from "react";
+import { useServices } from "../hooks/useServices";
 
+import { Alert } from 'react-native';
 import {
   NexaButton,
   NexaFormSection,
@@ -23,17 +25,49 @@ export function ServiceFormScreen() {
 
   const [onlineBooking, setOnlineBooking] = useState(true);
   const [advanceBookingHours, setAdvanceBookingHours] = useState("24");
+  const { addService } = useServices();
+  const [category, setCategory] = useState("");
 
   function handleSave() {
 
-    console.log({
+    if (!name.trim()) {
+      Alert.alert(
+        "Atenção",
+        "Informe o nome do atendimento."
+      );
+      return;
+    }
+
+    addService({
+
       name,
-      price,
-      duration,
+
       description,
+
+      category,
+
+      price: Number(
+        price
+          .replace("R$", "")
+          .replace(/\./g, "")
+          .replace(",", ".")
+          .trim()
+      ),
+
+      durationMinutes: Number(duration),
+
       active,
+
       onlineBooking,
-      advanceBookingHours,
+
+      minimumAdvanceHours: Number(
+        advanceBookingHours
+      ),
+
+      createdAt: new Date(),
+
+      updatedAt: new Date(),
+
     });
 
     router.back();
@@ -43,7 +77,7 @@ export function ServiceFormScreen() {
   return (
     <NexaScreen>
       <NexaText variant="title">
-        Novo Serviço
+        Novo Atendimento
       </NexaText>
 
       <NexaSpacer size="lg" />
@@ -51,7 +85,7 @@ export function ServiceFormScreen() {
       <NexaFormSection title="Informações">
 
         <NexaInput
-          label="Nome do serviço"
+          label="Nome do atendimento"
           value={name}
           onChangeText={setName}
           placeholder="Ex.: Blindagem em Gel"
@@ -81,7 +115,16 @@ export function ServiceFormScreen() {
           label="Descrição"
           value={description}
           onChangeText={setDescription}
-          placeholder="Descreva este serviço..."
+          placeholder="Descreva este atendimento..."
+        />
+
+        <NexaSpacer />
+
+        <NexaInput
+          label="Categoria"
+          value={category}
+          onChangeText={setCategory}
+          placeholder="Ex.: Unhas"
         />
 
       </NexaFormSection>
@@ -91,7 +134,7 @@ export function ServiceFormScreen() {
       <NexaFormSection title="Configurações">
 
         <NexaSwitch
-          label="Serviço ativo"
+          label="Atendimento ativo"
           value={active}
           onValueChange={setActive}
         />

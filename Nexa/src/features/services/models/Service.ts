@@ -1,11 +1,25 @@
-export interface Service {
+export type Service = {
+
   id: string;
+
   name: string;
-  duration: number;
+
+  description: string;
+
+  category: string;
+
   price: number;
+
+  durationMinutes: number;
+
   active: boolean;
-  description?: string;
-  color?: string;
+
   onlineBooking: boolean;
-  advanceBookingHours: number;
-}
+
+  minimumAdvanceHours: number;
+
+  createdAt: Date;
+
+  updatedAt: Date;
+
+};

@@ -2,6 +2,7 @@ import { useLocalSearchParams } from "expo-router";
 
 import {
   NexaButton,
+  NexaCard,
   NexaScreen,
   NexaSpacer,
   NexaText,
@@ -16,27 +17,35 @@ export function ServiceDetailsScreen() {
     <NexaScreen>
 
       <NexaText variant="title">
-        Serviço
+        Atendimento
       </NexaText>
 
       <NexaSpacer size="lg" />
 
-      <NexaText>
+      <NexaCard>
 
-        ID:
+        <NexaText>
+          ID
+        </NexaText>
 
-      </NexaText>
+        <NexaText weight="600">
+          {id}
+        </NexaText>
 
-      <NexaText>
-
-        {id}
-
-      </NexaText>
+      </NexaCard>
 
       <NexaSpacer size="xl" />
 
       <NexaButton
         title="Editar"
+        onPress={() => { }}
+      />
+
+      <NexaSpacer />
+
+      <NexaButton
+        variant="danger"
+        title="Excluir"
         onPress={() => { }}
       />
 

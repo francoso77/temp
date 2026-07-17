@@ -1,5 +1,4 @@
 import { router } from "expo-router";
-import { Pressable } from "react-native";
 
 import {
   NexaBadge,
@@ -18,47 +17,66 @@ export function ServiceCard({
   service,
 }: Props) {
   return (
-    <Pressable
+    <NexaCard
+      pressable
       onPress={() =>
         router.push(`/services/${service.id}`)
       }
     >
 
-      <NexaCard>
+      <NexaText variant="h2">
+        {service.name}
+      </NexaText>
 
-        <NexaText variant="h2">
-          {service.name}
-        </NexaText>
+      <NexaSpacer size="xs" />
 
-        <NexaSpacer size="xs" />
+      <NexaText variant="small">
+        {service.category}
+      </NexaText>
 
-        <NexaText>
+      <NexaSpacer size="xs" />
 
-          {service.duration} min
+      <NexaText>
+        {service.description}
+      </NexaText>
 
-        </NexaText>
+      <NexaSpacer size="sm" />
 
-        <NexaSpacer size="xs" />
+      <NexaText>
 
-        <NexaText>
+        ⏱ {service.durationMinutes} min
 
-          R$ {service.price}
+      </NexaText>
 
-        </NexaText>
+      <NexaSpacer size="xs" />
 
-        <NexaSpacer size="sm" />
+      <NexaText>
 
-        <NexaBadge
-          text={service.active ? "Ativo" : "Inativo"}
-          color={
-            service.active
-              ? "#2E7D32"
-              : "#9E9E9E"
+        {new Intl.NumberFormat(
+          "pt-BR",
+          {
+            style: "currency",
+            currency: "BRL",
           }
-        />
+        ).format(service.price)}
 
-      </NexaCard>
+      </NexaText>
 
-    </Pressable>
+      <NexaSpacer size="sm" />
+
+      <NexaBadge
+        text={
+          service.active
+            ? "Ativo"
+            : "Inativo"
+        }
+        variant={
+          service.active
+            ? "success"
+            : "default"
+        }
+      />
+
+    </NexaCard>
   );
 }

@@ -20,7 +20,7 @@ export function ServicesScreen() {
     <NexaScreen>
 
       <NexaText variant="title">
-        Meus Serviços
+        Meus Atendimentos
       </NexaText>
 
       <NexaSpacer size="lg" />
@@ -31,14 +31,14 @@ export function ServicesScreen() {
         renderItem={(item) => (
           <ServiceCard service={item} />
         )}
-        emptyTitle="Nenhum serviço cadastrado"
-        emptyMessage="Cadastre seu primeiro serviço."
+        emptyTitle="Nenhum atendimento cadastrado"
+        emptyMessage="Cadastre seu primeiro atendimento."
       />
 
       <NexaSpacer size="md" />
 
       <NexaButton
-        title="Novo Serviço"
+        title="Novo Atendimento"
         onPress={() => router.push("/services/new")}
       />
 

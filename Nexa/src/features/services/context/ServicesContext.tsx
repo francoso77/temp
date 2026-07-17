@@ -10,7 +10,7 @@ import { Service } from "../models/Service";
 type ServicesContextData = {
   services: Service[];
 
-  addService: (service: Service) => void;
+  addService: (service: Omit<Service, "id">) => void;
 
   updateService: (service: Service) => void;
 
@@ -31,22 +31,39 @@ export function ServicesProvider({
   const [services, setServices] =
     useState<Service[]>(mockServices);
 
-  function addService(service: Service) {
-    setServices((old) => [...old, service]);
+  function addService(
+    service: Omit<Service, "id">
+  ) {
+
+    const newService: Service = {
+      id: Date.now().toString(),
+      ...service,
+    };
+    setServices((old) => [...old, newService]);
   }
 
-  function updateService(service: Service) {
-    setServices((old) =>
-      old.map((item) =>
-        item.id === service.id ? service : item
+  function updateService(
+    service: Service
+  ) {
+
+    setServices(old =>
+      old.map(item =>
+        item.id === service.id
+          ? service
+          : item
       )
     );
+
   }
 
-  function removeService(id: string) {
-    setServices((old) =>
-      old.filter((item) => item.id !== id)
+  function removeService(
+    id: string
+  ) {
+
+    setServices(old =>
+      old.filter(item => item.id !== id)
     );
+
   }
 
   return (
