@@ -17,7 +17,7 @@ type ContextData = {
 
 };
 
-export const ScheduleContext =
+export const AvailabilityContext =
   createContext({} as ContextData);
 
 type Props = {
@@ -26,7 +26,7 @@ type Props = {
 
 };
 
-export function ScheduleProvider({
+export function AvailabilityProvider({
   children,
 }: Props) {
 
@@ -35,14 +35,14 @@ export function ScheduleProvider({
 
   return (
 
-    <ScheduleContext.Provider
+    <AvailabilityContext.Provider
       value={{
         availability,
         setAvailability,
       }}
     >
       {children}
-    </ScheduleContext.Provider>
+    </AvailabilityContext.Provider>
 
   );
 

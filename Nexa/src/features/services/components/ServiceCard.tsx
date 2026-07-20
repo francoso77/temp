@@ -7,6 +7,7 @@ import {
   NexaText,
 } from "../../../components";
 
+import { Colors } from '@/theme';
 import { Service } from "../models/Service";
 
 type Props = {
@@ -23,15 +24,15 @@ export function ServiceCard({
         router.push(`/services/${service.id}`)
       }
     >
+      <NexaBadge
+        text={service.specialtyName}
+        color={Colors.primaryDark}
+      />
+
+      <NexaSpacer size="sm" />
 
       <NexaText variant="h2">
         {service.name}
-      </NexaText>
-
-      <NexaSpacer size="xs" />
-
-      <NexaText variant="small">
-        {service.category}
       </NexaText>
 
       <NexaSpacer size="xs" />

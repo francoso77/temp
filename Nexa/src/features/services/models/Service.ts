@@ -6,7 +6,9 @@ export type Service = {
 
   description: string;
 
-  category: string;
+  specialtyId: string;
+
+  specialtyName: string;
 
   price: number;
 

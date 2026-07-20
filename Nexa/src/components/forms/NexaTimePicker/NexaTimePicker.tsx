@@ -1,11 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-
-import {
-  Platform,
-  Pressable,
-  View,
-} from "react-native";
+import { Platform } from "react-native";
 
 import { NexaInput } from "@/components/base";
 
@@ -70,25 +65,21 @@ export function NexaTimePicker({
 
   return (
 
-    <View>
+    <>
 
-      <Pressable
+      <NexaInput
+
+        label={label}
+
+        value={value}
+
+        pressable
+
         onPress={() => setShow(true)}
-      >
 
-        <NexaInput
+        rightComponent={<></>}
 
-          editable={false}
-
-          pointerEvents="none"
-
-          label={label}
-
-          value={value}
-
-        />
-
-      </Pressable>
+      />
 
       {show && (
 
@@ -112,7 +103,7 @@ export function NexaTimePicker({
 
       )}
 
-    </View>
+    </>
 
   );
 

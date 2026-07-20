@@ -1,29 +1,37 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-import { ScheduleProvider } from "@/features/availability/context/ScheduleContext";
+import { AppointmentsProvider } from '@/features/appointments/context/AppointmentsContext';
+import { AvailabilityProvider } from '@/features/availability';
 import { ServicesProvider } from "@/features/services/context/ServicesContext";
+import { SpecialtiesProvider } from '@/features/specialties/context/SpecialtiesContext';
 
 export default function RootLayout() {
 
   return (
+    <SpecialtiesProvider>
 
-    <ServicesProvider>
+      <ServicesProvider>
 
-      <ScheduleProvider>
+        <AvailabilityProvider>
 
-        <StatusBar style="dark" />
+          <AppointmentsProvider>
 
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        />
+            <StatusBar style="dark" />
 
-      </ScheduleProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            />
 
-    </ServicesProvider>
+          </AppointmentsProvider>
 
+        </AvailabilityProvider>
+
+      </ServicesProvider>
+
+    </SpecialtiesProvider>
   );
 
 }

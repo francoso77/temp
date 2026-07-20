@@ -1,9 +1,12 @@
 import { router } from "expo-router";
 import { useState } from "react";
+import { Alert } from "react-native";
+
+import { useSpecialties } from "@/features/specialties/hooks/useSpecialties";
 import { useServices } from "../hooks/useServices";
 
-import { Alert } from 'react-native';
 import {
+  NexaAutocomplete,
   NexaButton,
   NexaFormSection,
   NexaInput,
@@ -16,35 +19,65 @@ import {
 } from "../../../components";
 
 export function ServiceFormScreen() {
+
+  const { addService } = useServices();
+
+  const { specialties } = useSpecialties();
+
+  const [specialtyId, setSpecialtyId] = useState("");
+
   const [name, setName] = useState("");
+
   const [price, setPrice] = useState("");
+
   const [duration, setDuration] = useState("");
+
   const [description, setDescription] = useState("");
 
   const [active, setActive] = useState(true);
 
   const [onlineBooking, setOnlineBooking] = useState(true);
-  const [advanceBookingHours, setAdvanceBookingHours] = useState("24");
-  const { addService } = useServices();
-  const [category, setCategory] = useState("");
+
+  const [advanceBookingHours, setAdvanceBookingHours] =
+    useState("24");
 
   function handleSave() {
 
+    if (!specialtyId) {
+
+      Alert.alert(
+        "Especialidade",
+        "Selecione uma especialidade."
+      );
+
+      return;
+
+    }
+
     if (!name.trim()) {
+
       Alert.alert(
         "Atenção",
         "Informe o nome do atendimento."
       );
+
       return;
+
     }
 
+    const specialty = specialties.find(
+      item => item.id === specialtyId
+    );
+
     addService({
+
+      specialtyId,
+
+      specialtyName: specialty?.name ?? "",
 
       name,
 
       description,
-
-      category,
 
       price: Number(
         price
@@ -75,7 +108,9 @@ export function ServiceFormScreen() {
   }
 
   return (
+
     <NexaScreen>
+
       <NexaText variant="title">
         Novo Atendimento
       </NexaText>
@@ -83,6 +118,24 @@ export function ServiceFormScreen() {
       <NexaSpacer size="lg" />
 
       <NexaFormSection title="Informações">
+
+        <NexaAutocomplete
+
+          label="Especialidade"
+
+          items={specialties}
+
+          value={specialtyId}
+
+          labelKey="name"
+
+          valueKey="id"
+
+          onChange={setSpecialtyId}
+
+        />
+
+        <NexaSpacer />
 
         <NexaInput
           label="Nome do atendimento"
@@ -118,15 +171,6 @@ export function ServiceFormScreen() {
           placeholder="Descreva este atendimento..."
         />
 
-        <NexaSpacer />
-
-        <NexaInput
-          label="Categoria"
-          value={category}
-          onChangeText={setCategory}
-          placeholder="Ex.: Unhas"
-        />
-
       </NexaFormSection>
 
       <NexaSpacer size="lg" />
@@ -154,7 +198,6 @@ export function ServiceFormScreen() {
           value={advanceBookingHours}
           onChangeText={setAdvanceBookingHours}
           keyboardType="numeric"
-          placeholder="24"
         />
 
       </NexaFormSection>
@@ -165,6 +208,9 @@ export function ServiceFormScreen() {
         title="Salvar"
         onPress={handleSave}
       />
+
     </NexaScreen>
+
   );
+
 }

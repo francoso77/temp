@@ -6,9 +6,9 @@ import {
   NexaText,
 } from "../../../components";
 
-import { useSchedule } from "../hooks/useSchedule";
 
 import { AvailabilityCard } from "../components/AvailabilityCard";
+import { useAvailability } from '../hooks/useAvailability';
 import { Availability } from "../models/Availability";
 
 export function AvailabilityScreen() {
@@ -16,7 +16,7 @@ export function AvailabilityScreen() {
   const {
     availability,
     setAvailability,
-  } = useSchedule();
+  } = useAvailability();
 
   function handleChange(
     updated: Availability
