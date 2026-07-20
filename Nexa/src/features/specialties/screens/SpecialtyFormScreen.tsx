@@ -1,5 +1,6 @@
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 
 import {
   NexaButton,
@@ -14,38 +15,69 @@ import {
 import { useSpecialties } from "../hooks/useSpecialties";
 
 export function SpecialtyFormScreen() {
+  const { id } = useLocalSearchParams<{ id?: string }>();
 
   const {
-
+    specialties,
     addSpecialty,
-
+    updateSpecialty,
   } = useSpecialties();
 
-  const [
+  const editing = !!id;
 
-    name,
+  const [name, setName] = useState("");
+  const [active, setActive] = useState(true);
 
-    setName,
+  useEffect(() => {
+    if (!editing) return;
 
-  ] = useState("");
+    const specialty = specialties.find(
+      item => item.id === id
+    );
 
-  const [
+    if (!specialty) return;
 
-    active,
+    setName(specialty.name);
+    setActive(specialty.active);
 
-    setActive,
-
-  ] = useState(true);
+  }, [editing, id, specialties]);
 
   function handleSave() {
 
-    addSpecialty({
+    if (!name.trim()) {
 
-      name,
+      Alert.alert(
+        "Atenção",
+        "Informe o nome da especialidade."
+      );
 
-      active,
+      return;
 
-    });
+    }
+
+    if (editing) {
+
+      updateSpecialty({
+
+        id: String(id),
+
+        name,
+
+        active,
+
+      });
+
+    } else {
+
+      addSpecialty({
+
+        name,
+
+        active,
+
+      });
+
+    }
 
     router.back();
 
@@ -57,7 +89,9 @@ export function SpecialtyFormScreen() {
 
       <NexaText variant="title">
 
-        Nova Especialidade
+        {editing
+          ? "Editar Especialidade"
+          : "Nova Especialidade"}
 
       </NexaText>
 
@@ -68,25 +102,18 @@ export function SpecialtyFormScreen() {
       >
 
         <NexaInput
-
           label="Nome"
-
           value={name}
-
           onChangeText={setName}
-
+          placeholder="Ex.: Unhas"
         />
 
         <NexaSpacer />
 
         <NexaSwitch
-
           label="Especialidade ativa"
-
           value={active}
-
           onValueChange={setActive}
-
         />
 
       </NexaFormSection>
@@ -94,11 +121,12 @@ export function SpecialtyFormScreen() {
       <NexaSpacer size="xl" />
 
       <NexaButton
-
-        title="Salvar"
-
+        title={
+          editing
+            ? "Salvar alterações"
+            : "Cadastrar"
+        }
         onPress={handleSave}
-
       />
 
     </NexaScreen>

@@ -11,7 +11,7 @@ import { Specialty } from "../models/Specialty";
 
 type Props = {
   specialty: Specialty;
-  onPress?: () => void;
+  onPress: () => void;
 };
 
 export function SpecialtyCard({
@@ -37,10 +37,10 @@ export function SpecialtyCard({
               ? "Ativa"
               : "Inativa"
           }
-          color={
+          variant={
             specialty.active
-              ? "#22C55E"
-              : "#9CA3AF"
+              ? "success"
+              : "default"
           }
         />
 

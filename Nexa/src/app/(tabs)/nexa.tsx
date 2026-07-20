@@ -1,11 +1,5 @@
-import { NexaScreen, NexaText } from '@/components';
+import { NexaHomeScreen } from "@/features/nexa/screens/NexaHomeScreen";
 
-export default function Nexa() {
-  return (
-    <NexaScreen>
-      <NexaText variant="title">
-        Nexa
-      </NexaText>
-    </NexaScreen>
-  );
+export default function NexaPage() {
+  return <NexaHomeScreen />;
 }

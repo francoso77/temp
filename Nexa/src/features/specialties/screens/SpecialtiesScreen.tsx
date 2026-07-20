@@ -1,70 +1,75 @@
 import { router } from "expo-router";
+import { useMemo, useState } from "react";
 
 import {
   NexaButton,
-  NexaList,
+  NexaEmptyState,
   NexaPageHeader,
   NexaScreen,
+  NexaSearchBar,
 } from "@/components";
 
+import { FlatList } from 'react-native';
 import { SpecialtyCard } from "../components/SpecialtyCard";
-
 import { useSpecialties } from "../hooks/useSpecialties";
 
 export function SpecialtiesScreen() {
+  const { specialties } = useSpecialties();
 
-  const {
+  const [search, setSearch] = useState("");
 
-    specialties,
+  const filtered = useMemo(() => {
+    const value = search.trim().toLowerCase();
 
-  } = useSpecialties();
+    if (!value) {
+      return specialties;
+    }
+
+    return specialties.filter((item) =>
+      item.name.toLowerCase().includes(value)
+    );
+  }, [search, specialties]);
 
   return (
-
     <NexaScreen>
 
       <NexaPageHeader
-
         title="Especialidades"
-
+        subtitle="Organize os tipos de atendimento oferecidos."
       />
 
-      <NexaList
-
-        data={specialties}
-
-        keyExtractor={
-
-          item => item.id
-
-        }
-
-        renderItem={item =>
-
-          <SpecialtyCard
-
-            specialty={item}
-
-          />
-
-        }
-
+      <NexaSearchBar
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Pesquisar especialidade..."
       />
 
       <NexaButton
-
         title="Nova Especialidade"
+        onPress={() => router.push("/specialties/new")}
+      />
 
-        onPress={() =>
-
-          router.push("/specialties/new")
-
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <SpecialtyCard
+            specialty={item}
+            onPress={() =>
+              router.push(`/specialties/${item.id}`)
+            }
+          />
+        )}
+        ListEmptyComponent={
+          <NexaEmptyState
+            emoji="📂"
+            title="Nenhuma especialidade encontrada"
+            subtitle="Cadastre a primeira especialidade."
+          />
         }
-
+        showsVerticalScrollIndicator={false}
       />
 
     </NexaScreen>
-
   );
-
 }
