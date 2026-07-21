@@ -1,3 +1,4 @@
+export * from "./NexaAppBar";
 export * from "./NexaEmptyState";
 export * from "./NexaFloatingButton";
 export * from "./NexaHeader";

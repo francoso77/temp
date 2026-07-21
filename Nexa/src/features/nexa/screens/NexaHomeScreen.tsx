@@ -34,8 +34,7 @@ export function NexaHomeScreen() {
 
       <NexaButton
         title="Clientes"
-        onPress={() => { }}
-        variant="secondary"
+        onPress={() => router.push("/clients")}
       />
 
       <NexaSpacer />

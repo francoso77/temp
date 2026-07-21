@@ -2,15 +2,12 @@ import { router } from "expo-router";
 import { useMemo, useState } from "react";
 
 import {
-  NexaButton,
-  NexaEmptyState,
-  NexaPageHeader,
-  NexaScreen,
-  NexaSearchBar,
+  NexaCrudHeader,
+  NexaCrudList,
+  NexaScreen
 } from "@/components";
 
-import { FlatList } from 'react-native';
-import { SpecialtyCard } from "../components/SpecialtyCard";
+import { SpecialtyCard } from '../components';
 import { useSpecialties } from "../hooks/useSpecialties";
 
 export function SpecialtiesScreen() {
@@ -33,41 +30,48 @@ export function SpecialtiesScreen() {
   return (
     <NexaScreen>
 
-      <NexaPageHeader
+      <NexaCrudHeader
+
         title="Especialidades"
-        subtitle="Organize os tipos de atendimento oferecidos."
-      />
 
-      <NexaSearchBar
-        value={search}
-        onChangeText={setSearch}
-        placeholder="Pesquisar especialidade..."
-      />
+        subtitle="Organize os tipos de atendimento"
 
-      <NexaButton
-        title="Nova Especialidade"
-        onPress={() => router.push("/specialties/new")}
-      />
+        search={search}
 
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <SpecialtyCard
-            specialty={item}
-            onPress={() =>
-              router.push(`/specialties/${item.id}`)
-            }
-          />
-        )}
-        ListEmptyComponent={
-          <NexaEmptyState
-            emoji="📂"
-            title="Nenhuma especialidade encontrada"
-            subtitle="Cadastre a primeira especialidade."
-          />
+        onSearch={setSearch}
+
+        newButtonTitle="Nova Especialidade"
+
+        onNew={() =>
+
+          router.push("/specialties/new")
+
         }
-        showsVerticalScrollIndicator={false}
+
+      />
+
+      <NexaCrudList
+
+        data={filtered}
+
+        keyExtractor={(item) => item.id}
+
+        renderItem={(item) => (
+
+          <SpecialtyCard
+
+            specialty={item}
+
+            onPress={() => router.push(`/specialties/${item.id}`)}
+
+          />
+
+        )}
+
+        emptyTitle="Nenhuma especialidade"
+
+        emptyDescription="Cadastre sua primeira especialidade."
+
       />
 
     </NexaScreen>

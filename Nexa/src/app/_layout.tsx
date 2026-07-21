@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { AppointmentsProvider } from '@/features/appointments/context/AppointmentsContext';
 import { AvailabilityProvider } from '@/features/availability';
+import { ClientsProvider } from '@/features/clients';
 import { ServicesProvider } from "@/features/services/context/ServicesContext";
 import { SpecialtiesProvider } from '@/features/specialties/context/SpecialtiesContext';
 
@@ -15,17 +16,21 @@ export default function RootLayout() {
 
         <AvailabilityProvider>
 
-          <AppointmentsProvider>
+          <ClientsProvider>
 
-            <StatusBar style="dark" />
+            <AppointmentsProvider>
 
-            <Stack
-              screenOptions={{
-                headerShown: false,
-              }}
-            />
+              <StatusBar style="dark" />
 
-          </AppointmentsProvider>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                }}
+              />
+
+            </AppointmentsProvider>
+
+          </ClientsProvider>
 
         </AvailabilityProvider>
 

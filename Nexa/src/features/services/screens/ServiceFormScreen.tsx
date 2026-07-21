@@ -1,11 +1,9 @@
 import { router } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert } from "react-native";
 
-import { useSpecialties } from "@/features/specialties/hooks/useSpecialties";
-import { useServices } from "../hooks/useServices";
-
 import {
+  NexaAppBar,
   NexaAutocomplete,
   NexaButton,
   NexaFormSection,
@@ -14,9 +12,11 @@ import {
   NexaScreen,
   NexaSpacer,
   NexaSwitch,
-  NexaText,
   NexaTextArea,
-} from "../../../components";
+} from "@/components";
+
+import { useSpecialties } from "@/features/specialties/hooks/useSpecialties";
+import { useServices } from "../hooks/useServices";
 
 export function ServiceFormScreen() {
 
@@ -36,18 +36,40 @@ export function ServiceFormScreen() {
 
   const [active, setActive] = useState(true);
 
-  const [onlineBooking, setOnlineBooking] = useState(true);
+  const [onlineBooking, setOnlineBooking] =
+    useState(true);
 
-  const [advanceBookingHours, setAdvanceBookingHours] =
-    useState("24");
+  const [
+    advanceBookingHours,
+    setAdvanceBookingHours,
+  ] = useState("24");
+
+  const selectedSpecialty = useMemo(() => {
+
+    return specialties.find(
+
+      item => item.id === specialtyId
+
+    );
+
+  }, [
+
+    specialties,
+
+    specialtyId,
+
+  ]);
 
   function handleSave() {
 
     if (!specialtyId) {
 
       Alert.alert(
+
         "Especialidade",
+
         "Selecione uma especialidade."
+
       );
 
       return;
@@ -57,34 +79,40 @@ export function ServiceFormScreen() {
     if (!name.trim()) {
 
       Alert.alert(
+
         "Atenção",
+
         "Informe o nome do atendimento."
+
       );
 
       return;
 
     }
 
-    const specialty = specialties.find(
-      item => item.id === specialtyId
-    );
-
     addService({
 
       specialtyId,
 
-      specialtyName: specialty?.name ?? "",
+      specialtyName:
+        selectedSpecialty?.name ?? "",
 
       name,
 
       description,
 
       price: Number(
+
         price
+
           .replace("R$", "")
+
           .replace(/\./g, "")
+
           .replace(",", ".")
+
           .trim()
+
       ),
 
       durationMinutes: Number(duration),
@@ -111,11 +139,9 @@ export function ServiceFormScreen() {
 
     <NexaScreen>
 
-      <NexaText variant="title">
-        Novo Atendimento
-      </NexaText>
-
-      <NexaSpacer size="lg" />
+      <NexaAppBar
+        title="Novo Atendimento"
+      />
 
       <NexaFormSection title="Informações">
 
@@ -138,37 +164,57 @@ export function ServiceFormScreen() {
         <NexaSpacer />
 
         <NexaInput
+
           label="Nome do atendimento"
+
           value={name}
+
           onChangeText={setName}
+
           placeholder="Ex.: Blindagem em Gel"
+
         />
 
         <NexaSpacer />
 
         <NexaMoneyInput
+
           label="Valor"
+
           value={price}
+
           onChangeText={setPrice}
+
         />
 
         <NexaSpacer />
 
         <NexaInput
+
           label="Duração (minutos)"
+
           value={duration}
+
           onChangeText={setDuration}
+
           keyboardType="numeric"
+
           placeholder="60"
+
         />
 
         <NexaSpacer />
 
         <NexaTextArea
+
           label="Descrição"
+
           value={description}
+
           onChangeText={setDescription}
+
           placeholder="Descreva este atendimento..."
+
         />
 
       </NexaFormSection>
@@ -178,26 +224,39 @@ export function ServiceFormScreen() {
       <NexaFormSection title="Configurações">
 
         <NexaSwitch
+
           label="Atendimento ativo"
+
           value={active}
+
           onValueChange={setActive}
+
         />
 
         <NexaSpacer />
 
         <NexaSwitch
+
           label="Disponível para agendamento online"
+
           value={onlineBooking}
+
           onValueChange={setOnlineBooking}
+
         />
 
         <NexaSpacer />
 
         <NexaInput
+
           label="Antecedência mínima (horas)"
+
           value={advanceBookingHours}
+
           onChangeText={setAdvanceBookingHours}
+
           keyboardType="numeric"
+
         />
 
       </NexaFormSection>
@@ -205,8 +264,11 @@ export function ServiceFormScreen() {
       <NexaSpacer size="xl" />
 
       <NexaButton
+
         title="Salvar"
+
         onPress={handleSave}
+
       />
 
     </NexaScreen>

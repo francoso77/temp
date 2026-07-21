@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 import {
+  NexaAppBar,
   NexaButton,
   NexaFormSection,
   NexaInput,
   NexaScreen,
   NexaSpacer,
-  NexaSwitch,
-  NexaText,
+  NexaSwitch
 } from "@/components";
 
 import { useSpecialties } from "../hooks/useSpecialties";
@@ -58,42 +58,35 @@ export function SpecialtyFormScreen() {
     if (editing) {
 
       updateSpecialty({
-
         id: String(id),
-
         name,
-
         active,
-
       });
 
     } else {
 
       addSpecialty({
-
         name,
-
         active,
-
       });
-
     }
 
     router.back();
-
   }
 
   return (
 
     <NexaScreen>
 
-      <NexaText variant="title">
+      <NexaAppBar
 
-        {editing
-          ? "Editar Especialidade"
-          : "Nova Especialidade"}
+        title={
+          editing
+            ? "Editar Especialidade"
+            : "Nova Especialidade"
+        }
 
-      </NexaText>
+      />
 
       <NexaSpacer size="lg" />
 
