@@ -1,7 +1,6 @@
-import {
-  NexaButton,
-  NexaSpacer,
-} from "@/components";
+import { StyleSheet, View } from "react-native";
+
+import { NexaButton } from "@/components";
 
 type Props = {
 
@@ -14,6 +13,22 @@ type Props = {
   saveText?: string;
 
   cancelText?: string;
+
+  saveDisabled?: boolean;
+
+  cancelDisabled?: boolean;
+
+  saveVariant?:
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "ghost";
+
+  cancelVariant?:
+  | "primary"
+  | "secondary"
+  | "danger"
+  | "ghost";
 
 };
 
@@ -29,44 +44,78 @@ export function NexaFormActions({
 
   cancelText = "Cancelar",
 
+  saveDisabled = false,
+
+  cancelDisabled = false,
+
+  saveVariant = "primary",
+
+  cancelVariant = "secondary",
+
 }: Props) {
 
   return (
 
-    <>
+    <View style={styles.container}>
 
       {onCancel && (
 
-        <>
+        <View style={styles.button}>
 
           <NexaButton
 
             title={cancelText}
 
-            variant="secondary"
+            variant={cancelVariant}
+
+            disabled={cancelDisabled}
 
             onPress={onCancel}
 
           />
 
-          <NexaSpacer />
-
-        </>
+        </View>
 
       )}
 
-      <NexaButton
+      <View style={styles.button}>
 
-        title={saveText}
+        <NexaButton
 
-        loading={loading}
+          title={saveText}
 
-        onPress={onSave}
+          variant={saveVariant}
 
-      />
+          loading={loading}
 
-    </>
+          disabled={saveDisabled}
+
+          onPress={onSave}
+
+        />
+
+      </View>
+
+    </View>
 
   );
 
 }
+
+const styles = StyleSheet.create({
+
+  container: {
+
+    flexDirection: "row",
+
+    gap: 12,
+
+  },
+
+  button: {
+
+    flex: 1,
+
+  },
+
+});

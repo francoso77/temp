@@ -1,4 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { ReactNode } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
@@ -10,7 +9,7 @@ import {
   Spacing,
 } from "@/theme";
 
-import { NexaText } from "@/components";
+import { NexaIcon, NexaText } from "@/components";
 
 type Props = {
 
@@ -63,14 +62,13 @@ export function NexaAppBar({
         {showBack && (
 
           <Pressable
-            hitSlop={12}
+            hitSlop={16}
             onPress={handleBack}
           >
 
-            <Ionicons
+            <NexaIcon
               name="chevron-back"
               size={26}
-              color={Colors.text}
             />
 
           </Pressable>

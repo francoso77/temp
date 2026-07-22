@@ -8,13 +8,11 @@ import {
   useState,
 } from "react";
 
-import {
-  Alert,
-} from "react-native";
 
 import {
   NexaAppBar,
-  NexaButton,
+  NexaConfirmDialog,
+  NexaFormActions,
   NexaFormSection,
   NexaInput,
   NexaScreen,
@@ -58,9 +56,13 @@ export function ClientFormScreen() {
   function handleSave() {
 
     if (!name.trim()) {
-      Alert.alert(
-        "Informe o nome."
-      );
+
+      NexaConfirmDialog({
+        message: "Informe o nome.",
+        confirmText: "OK",
+        onConfirm() { }
+      });
+
       return;
     }
 
@@ -146,9 +148,9 @@ export function ClientFormScreen() {
 
       <NexaSpacer size="xl" />
 
-      <NexaButton
-        title="Salvar"
-        onPress={handleSave}
+      <NexaFormActions
+        onSave={handleSave}
+        onCancel={() => router.back()}
       />
 
     </NexaScreen>

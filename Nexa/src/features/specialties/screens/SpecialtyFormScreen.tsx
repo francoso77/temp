@@ -1,10 +1,10 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
 
 import {
   NexaAppBar,
-  NexaButton,
+  NexaConfirmDialog,
+  NexaFormActions,
   NexaFormSection,
   NexaInput,
   NexaScreen,
@@ -46,10 +46,12 @@ export function SpecialtyFormScreen() {
 
     if (!name.trim()) {
 
-      Alert.alert(
-        "Atenção",
-        "Informe o nome da especialidade."
-      );
+      NexaConfirmDialog({
+        title: "Atenção",
+        message: "Informe o nome da especialidade.",
+        confirmText: "OK",
+        onConfirm() { }
+      });
 
       return;
 
@@ -113,13 +115,14 @@ export function SpecialtyFormScreen() {
 
       <NexaSpacer size="xl" />
 
-      <NexaButton
-        title={
+      <NexaFormActions
+        saveText={
           editing
             ? "Salvar alterações"
             : "Cadastrar"
         }
-        onPress={handleSave}
+        onSave={handleSave}
+        onCancel={() => router.back()}
       />
 
     </NexaScreen>

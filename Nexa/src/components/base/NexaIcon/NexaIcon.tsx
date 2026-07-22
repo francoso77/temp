@@ -1,30 +1,23 @@
-import { NexaText } from "../NexaText";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+import { Colors } from "@/theme";
 
 type Props = {
-  name:
-  | "calendar"
-  | "client"
-  | "money"
-  | "service"
-  | "home"
-  | "chat";
-};
-
-const icons = {
-  calendar: "📅",
-  client: "👤",
-  money: "💰",
-  service: "💅",
-  home: "🏠",
-  chat: "💬",
+  name: keyof typeof Ionicons.glyphMap;
+  size?: number;
+  color?: string;
 };
 
 export function NexaIcon({
   name,
+  size = 22,
+  color = Colors.text,
 }: Props) {
   return (
-    <NexaText>
-      {icons[name]}
-    </NexaText>
+    <Ionicons
+      name={name}
+      size={size}
+      color={color}
+    />
   );
 }

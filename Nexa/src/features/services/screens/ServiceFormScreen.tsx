@@ -1,18 +1,18 @@
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { Alert } from "react-native";
 
 import {
   NexaAppBar,
   NexaAutocomplete,
-  NexaButton,
+  NexaConfirmDialog,
+  NexaFormActions,
   NexaFormSection,
   NexaInput,
   NexaMoneyInput,
   NexaScreen,
   NexaSpacer,
   NexaSwitch,
-  NexaTextArea,
+  NexaTextArea
 } from "@/components";
 
 import { useSpecialties } from "@/features/specialties/hooks/useSpecialties";
@@ -64,13 +64,17 @@ export function ServiceFormScreen() {
 
     if (!specialtyId) {
 
-      Alert.alert(
+      NexaConfirmDialog({
 
-        "Especialidade",
+        title: "Especialidade",
 
-        "Selecione uma especialidade."
+        message: "Selecione uma especialidade.",
 
-      );
+        confirmText: "OK",
+
+        onConfirm() { }
+
+      });
 
       return;
 
@@ -78,13 +82,17 @@ export function ServiceFormScreen() {
 
     if (!name.trim()) {
 
-      Alert.alert(
+      NexaConfirmDialog({
 
-        "Atenção",
+        title: "Atenção",
 
-        "Informe o nome do atendimento."
+        message: "Informe o nome do atendimento.",
 
-      );
+        confirmText: "OK",
+
+        onConfirm() { }
+
+      });
 
       return;
 
@@ -263,12 +271,9 @@ export function ServiceFormScreen() {
 
       <NexaSpacer size="xl" />
 
-      <NexaButton
-
-        title="Salvar"
-
-        onPress={handleSave}
-
+      <NexaFormActions
+        onSave={handleSave}
+        onCancel={() => router.back()}
       />
 
     </NexaScreen>
