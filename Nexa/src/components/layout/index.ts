@@ -1,3 +1,4 @@
+export * from "./NexaActionCard";
 export * from "./NexaAppBar";
 export * from "./NexaEmptyState";
 export * from "./NexaFloatingButton";

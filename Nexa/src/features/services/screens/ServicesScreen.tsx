@@ -1,47 +1,128 @@
-import { router } from "expo-router";
-
-import { useServices } from "../hooks/useServices";
-
 import {
+  NexaAppBar,
   NexaButton,
-  NexaList,
   NexaScreen,
   NexaSpacer,
-  NexaText,
-} from "../../../components";
+} from "@/components";
+import { router } from "expo-router";
+import { useMemo, useState } from "react";
+import { ServiceFilter } from '../components/ServiceFilter';
+import { ServiceList } from '../components/ServiceList';
+import { ServiceSearch } from '../components/ServiceSearch';
+import { useServices } from "../hooks/useServices";
+import {
+  ServiceFilter as Filter,
+  ServiceOrder,
+} from "../types";
+import {
+  serviceFilter,
+  serviceSearch,
+  serviceSort,
+} from "../utils";
 
-import { ServiceCard } from "../components/ServiceCard";
+
+
 
 export function ServicesScreen() {
 
   const { services } = useServices();
 
+  const [search, setSearch] = useState("");
+
+  const [filter, setFilter] =
+    useState<Filter>("all");
+
+  const [order] =
+    useState<ServiceOrder>("name");
+
+  const data = useMemo(() => {
+
+    return serviceSort(
+
+      serviceFilter(
+
+        serviceSearch(
+
+          services,
+
+          search
+
+        ),
+
+        filter
+
+      ),
+
+      order
+
+    );
+
+  }, [
+
+    services,
+
+    search,
+
+    filter,
+
+    order,
+
+  ]);
+
   return (
+
     <NexaScreen>
 
-      <NexaText variant="title">
-        Meus Atendimentos
-      </NexaText>
+      <NexaAppBar
 
-      <NexaSpacer size="lg" />
+        title="Atendimentos"
 
-      <NexaList
-        data={services}
-        keyExtractor={(item) => item.id}
-        renderItem={(item) => (
-          <ServiceCard service={item} />
-        )}
-        emptyTitle="Nenhum atendimento cadastrado"
-        emptyMessage="Cadastre seu primeiro atendimento."
       />
 
-      <NexaSpacer size="md" />
+      <NexaSpacer />
+
+      <ServiceSearch
+
+        value={search}
+
+        onChange={setSearch}
+
+      />
+
+      <NexaSpacer />
+
+      <ServiceFilter
+
+        value={filter}
+
+        onChange={setFilter}
+
+      />
+
+      <NexaSpacer />
+
+      <ServiceList
+
+        services={data}
+
+      />
+
+      <NexaSpacer />
 
       <NexaButton
+
         title="Novo Atendimento"
-        onPress={() => router.push("/services/new")}
+
+        onPress={() =>
+
+          router.push("/services/new")
+
+        }
+
       />
 
     </NexaScreen>
+
   );
+
 }

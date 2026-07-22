@@ -6,15 +6,19 @@ import {
 
 import { mockServices } from "../data/mockServices";
 import { Service } from "../models/Service";
+import {
+  findServiceById as findById
+} from "../services/services.service";
 
 type ServicesContextData = {
+
   services: Service[];
-
   addService: (service: Omit<Service, "id">) => void;
-
   updateService: (service: Service) => void;
-
   removeService: (id: string) => void;
+  findServiceById: (id: string) => Service | undefined;
+  duplicateService: (id: string) => void;
+  toggleService: (id: string) => void;
 };
 
 export const ServicesContext =
@@ -65,6 +69,71 @@ export function ServicesProvider({
     );
 
   }
+  function findServiceById(
+    id: string
+  ) {
+
+    return findById(
+      services,
+      id
+    );
+
+  }
+
+  function duplicateService(
+    id: string
+  ) {
+
+    const current =
+      services.find(
+        item => item.id === id
+      );
+
+    if (!current) return;
+
+    addService({
+
+      ...current,
+
+      name:
+        `${current.name} (Cópia)`,
+
+      createdAt:
+        new Date(),
+
+      updatedAt:
+        new Date(),
+
+    });
+
+  }
+  function toggleService(
+    id: string
+  ) {
+
+    setServices(old =>
+
+      old.map(item =>
+
+        item.id === id
+
+          ? {
+
+            ...item,
+
+            active: !item.active,
+
+            updatedAt: new Date(),
+
+          }
+
+          : item
+
+      )
+
+    );
+
+  }
 
   return (
     <ServicesContext.Provider
@@ -73,6 +142,9 @@ export function ServicesProvider({
         addService,
         updateService,
         removeService,
+        findServiceById,
+        duplicateService,
+        toggleService,
       }}
     >
       {children}

@@ -1,10 +1,10 @@
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { Alert } from "react-native";
 
 import {
   NexaAppBar,
   NexaAutocomplete,
-  NexaConfirmDialog,
   NexaFormActions,
   NexaFormSection,
   NexaInput,
@@ -12,130 +12,118 @@ import {
   NexaScreen,
   NexaSpacer,
   NexaSwitch,
-  NexaTextArea
+  NexaTextArea,
 } from "@/components";
 
 import { useSpecialties } from "@/features/specialties/hooks/useSpecialties";
+
 import { useServices } from "../hooks/useServices";
+
+import {
+  createEmptyServiceForm,
+} from "../utils";
+
+import {
+  ServiceFormData,
+} from "../types";
 
 export function ServiceFormScreen() {
 
-  const { addService } = useServices();
+  const { addService } =
+    useServices();
 
-  const { specialties } = useSpecialties();
+  const { specialties } =
+    useSpecialties();
 
-  const [specialtyId, setSpecialtyId] = useState("");
-
-  const [name, setName] = useState("");
-
-  const [price, setPrice] = useState("");
-
-  const [duration, setDuration] = useState("");
-
-  const [description, setDescription] = useState("");
-
-  const [active, setActive] = useState(true);
-
-  const [onlineBooking, setOnlineBooking] =
-    useState(true);
-
-  const [
-    advanceBookingHours,
-    setAdvanceBookingHours,
-  ] = useState("24");
-
-  const selectedSpecialty = useMemo(() => {
-
-    return specialties.find(
-
-      item => item.id === specialtyId
-
+  const [form, setForm] =
+    useState<ServiceFormData>(
+      createEmptyServiceForm()
     );
 
-  }, [
+  function updateField(
+    field: keyof ServiceFormData,
+    value: string | boolean
+  ) {
 
-    specialties,
+    setForm(old => ({
+      ...old,
+      [field]: value,
+    }));
 
-    specialtyId,
-
-  ]);
+  }
 
   function handleSave() {
 
-    if (!specialtyId) {
+    if (!form.specialtyId) {
 
-      NexaConfirmDialog({
-
-        title: "Especialidade",
-
-        message: "Selecione uma especialidade.",
-
-        confirmText: "OK",
-
-        onConfirm() { }
-
-      });
+      Alert.alert(
+        "Especialidade",
+        "Selecione uma especialidade."
+      );
 
       return;
 
     }
 
-    if (!name.trim()) {
+    if (!form.name.trim()) {
 
-      NexaConfirmDialog({
-
-        title: "Atenção",
-
-        message: "Informe o nome do atendimento.",
-
-        confirmText: "OK",
-
-        onConfirm() { }
-
-      });
+      Alert.alert(
+        "Atenção",
+        "Informe o nome do atendimento."
+      );
 
       return;
 
     }
+
+    const specialty =
+      specialties.find(
+        item =>
+          item.id === form.specialtyId
+      );
 
     addService({
 
-      specialtyId,
+      specialtyId:
+        form.specialtyId,
 
       specialtyName:
-        selectedSpecialty?.name ?? "",
+        specialty?.name ?? "",
 
-      name,
+      name:
+        form.name,
 
-      description,
+      description:
+        form.description,
 
       price: Number(
-
-        price
-
+        form.price
           .replace("R$", "")
-
           .replace(/\./g, "")
-
           .replace(",", ".")
-
           .trim()
-
       ),
 
-      durationMinutes: Number(duration),
-
-      active,
-
-      onlineBooking,
-
-      minimumAdvanceHours: Number(
-        advanceBookingHours
+      durationMinutes: Number(
+        form.durationMinutes
       ),
 
-      createdAt: new Date(),
+      active:
+        form.active,
 
-      updatedAt: new Date(),
+      onlineBooking:
+        form.onlineBooking,
+
+      minimumAdvanceHours:
+        Number(
+          form.minimumAdvanceHours
+        ),
+
+      createdAt:
+        new Date(),
+
+      updatedAt:
+        new Date(),
 
     });
 
@@ -151,120 +139,134 @@ export function ServiceFormScreen() {
         title="Novo Atendimento"
       />
 
-      <NexaFormSection title="Informações">
+      <NexaSpacer size="lg" />
+
+      <NexaFormSection
+        title="Informações"
+      >
 
         <NexaAutocomplete
-
           label="Especialidade"
-
           items={specialties}
-
-          value={specialtyId}
-
+          value={form.specialtyId}
           labelKey="name"
-
           valueKey="id"
-
-          onChange={setSpecialtyId}
-
+          onChange={(value) =>
+            updateField(
+              "specialtyId",
+              value
+            )
+          }
         />
 
         <NexaSpacer />
 
         <NexaInput
-
           label="Nome do atendimento"
-
-          value={name}
-
-          onChangeText={setName}
-
+          value={form.name}
+          onChangeText={(value) =>
+            updateField(
+              "name",
+              value
+            )
+          }
           placeholder="Ex.: Blindagem em Gel"
-
         />
 
         <NexaSpacer />
 
         <NexaMoneyInput
-
           label="Valor"
-
-          value={price}
-
-          onChangeText={setPrice}
-
+          value={form.price}
+          onChangeText={(value) =>
+            updateField(
+              "price",
+              value
+            )
+          }
         />
 
         <NexaSpacer />
 
         <NexaInput
-
           label="Duração (minutos)"
-
-          value={duration}
-
-          onChangeText={setDuration}
-
+          value={
+            form.durationMinutes
+          }
+          onChangeText={(value) =>
+            updateField(
+              "durationMinutes",
+              value
+            )
+          }
           keyboardType="numeric"
-
           placeholder="60"
-
         />
 
         <NexaSpacer />
 
         <NexaTextArea
-
           label="Descrição"
-
-          value={description}
-
-          onChangeText={setDescription}
-
+          value={
+            form.description
+          }
+          onChangeText={(value) =>
+            updateField(
+              "description",
+              value
+            )
+          }
           placeholder="Descreva este atendimento..."
-
         />
 
       </NexaFormSection>
 
       <NexaSpacer size="lg" />
 
-      <NexaFormSection title="Configurações">
+      <NexaFormSection
+        title="Configurações"
+      >
 
         <NexaSwitch
-
           label="Atendimento ativo"
-
-          value={active}
-
-          onValueChange={setActive}
-
+          value={form.active}
+          onValueChange={(value) =>
+            updateField(
+              "active",
+              value
+            )
+          }
         />
 
         <NexaSpacer />
 
         <NexaSwitch
-
           label="Disponível para agendamento online"
-
-          value={onlineBooking}
-
-          onValueChange={setOnlineBooking}
-
+          value={
+            form.onlineBooking
+          }
+          onValueChange={(value) =>
+            updateField(
+              "onlineBooking",
+              value
+            )
+          }
         />
 
         <NexaSpacer />
 
         <NexaInput
-
           label="Antecedência mínima (horas)"
-
-          value={advanceBookingHours}
-
-          onChangeText={setAdvanceBookingHours}
-
+          value={
+            form.minimumAdvanceHours
+          }
+          onChangeText={(value) =>
+            updateField(
+              "minimumAdvanceHours",
+              value
+            )
+          }
           keyboardType="numeric"
-
         />
 
       </NexaFormSection>
@@ -272,8 +274,11 @@ export function ServiceFormScreen() {
       <NexaSpacer size="xl" />
 
       <NexaFormActions
+        saveText="Salvar"
         onSave={handleSave}
-        onCancel={() => router.back()}
+        onCancel={() =>
+          router.back()
+        }
       />
 
     </NexaScreen>

@@ -1,5 +1,7 @@
-import { ServiceDetailsScreen } from "@/features/services/screens/ServiceDetailsScreen";
+import {
+  ServiceDetailsScreen,
+} from "@/features/services/screens/ServiceDetailsScreen";
 
-export default function ServiceDetailsPage() {
+export default function Page() {
   return <ServiceDetailsScreen />;
 }
