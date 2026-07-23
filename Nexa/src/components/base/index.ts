@@ -9,5 +9,6 @@ export * from "./NexaInfoRow";
 export * from "./NexaInput";
 export * from "./NexaLabelValue";
 export * from "./NexaSpacer";
+export * from "./NexaStatusBadge";
 export * from "./NexaText";
 

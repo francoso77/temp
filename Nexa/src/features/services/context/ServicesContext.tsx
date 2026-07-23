@@ -19,6 +19,7 @@ type ServicesContextData = {
   findServiceById: (id: string) => Service | undefined;
   duplicateService: (id: string) => void;
   toggleService: (id: string) => void;
+  findService(id: string): Service | undefined
 };
 
 export const ServicesContext =
@@ -112,29 +113,25 @@ export function ServicesProvider({
   ) {
 
     setServices(old =>
-
       old.map(item =>
-
         item.id === id
-
           ? {
-
             ...item,
-
             active: !item.active,
-
             updatedAt: new Date(),
-
           }
-
           : item
-
       )
+    );
+  }
 
+  function findService(id: string) {
+
+    return services.find(
+      item => item.id === id
     );
 
   }
-
   return (
     <ServicesContext.Provider
       value={{
@@ -145,6 +142,7 @@ export function ServicesProvider({
         findServiceById,
         duplicateService,
         toggleService,
+        findService,
       }}
     >
       {children}

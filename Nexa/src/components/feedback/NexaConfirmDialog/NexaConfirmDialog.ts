@@ -14,6 +14,8 @@ type Props = {
 
   onConfirm: () => void;
 
+  onCancel?: () => void;
+
 };
 
 export function NexaConfirmDialog({
@@ -29,6 +31,8 @@ export function NexaConfirmDialog({
   destructive = false,
 
   onConfirm,
+
+  onCancel,
 
 }: Props) {
 
@@ -46,6 +50,8 @@ export function NexaConfirmDialog({
 
         style: "cancel",
 
+        onPress: onCancel,
+
       },
 
       {
@@ -53,9 +59,7 @@ export function NexaConfirmDialog({
         text: confirmText,
 
         style: destructive
-
           ? "destructive"
-
           : "default",
 
         onPress: onConfirm,

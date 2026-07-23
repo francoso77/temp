@@ -1,22 +1,20 @@
 import { useServices } from "./useServices";
 
-export function useService(
-  id: string
-) {
+export function useService(id: string) {
 
-  const context =
-    useServices();
-
-  const service =
-    context.services.find(
-      item => item.id === id
-    );
+  const context = useServices();
 
   return {
 
-    service,
+    service: context.findService(id),
 
-    ...context,
+    updateService: context.updateService,
+
+    removeService: context.removeService,
+
+    duplicateService: context.duplicateService,
+
+    toggleService: context.toggleService,
 
   };
 

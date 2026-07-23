@@ -9,7 +9,7 @@ import {
 } from "@/components";
 
 
-import { formatCurrency } from '@/utils/formatCurrency';
+import { formatCurrency } from '@/utils/formatters/formatCurrency';
 import { Service } from "../models/Service";
 
 type Props = {

@@ -1,52 +1,183 @@
-import { useLocalSearchParams } from "expo-router";
+import {
+  useLocalSearchParams
+} from "expo-router";
 
 import {
-  NexaButton,
-  NexaCard,
+  useState,
+} from "react";
+
+import {
+  NexaActionCard,
+  NexaAppBar,
+  NexaConfirmDialog,
+  NexaDetailsSection,
   NexaScreen,
   NexaSpacer,
-  NexaText,
-} from "../../../components";
+  NexaStatusBadge,
+} from "@/components";
+
+import {
+  formatCurrency,
+  formatDuration,
+} from "@/utils";
+
+import {
+  useServiceDetails,
+} from "../hooks";
 
 export function ServiceDetailsScreen() {
 
-  const { id } = useLocalSearchParams();
+  const { id } =
+    useLocalSearchParams<{
+      id: string;
+    }>();
+
+  const {
+    service,
+    edit,
+    duplicate,
+    toggle,
+    remove,
+  } = useServiceDetails(
+    String(id)
+  );
+
+  const [
+    confirmVisible,
+    setConfirmVisible,
+  ] = useState(false);
+
+  if (!service) {
+
+    return (
+      <NexaScreen>
+
+        <NexaAppBar
+          title="Atendimento"
+        />
+
+      </NexaScreen>
+    );
+
+  }
 
   return (
 
     <NexaScreen>
 
-      <NexaText variant="title">
-        Atendimento
-      </NexaText>
-
-      <NexaSpacer size="lg" />
-
-      <NexaCard>
-
-        <NexaText>
-          ID
-        </NexaText>
-
-        <NexaText weight="600">
-          {id}
-        </NexaText>
-
-      </NexaCard>
-
-      <NexaSpacer size="xl" />
-
-      <NexaButton
-        title="Editar"
-        onPress={() => { }}
+      <NexaAppBar
+        title="Atendimento"
       />
 
       <NexaSpacer />
 
-      <NexaButton
-        variant="danger"
+      <NexaActionCard
+        title={service.name}
+        subtitle={service.specialtyName}
+      >
+
+        <NexaDetailsSection
+          items={[
+            {
+              label: "Especialidade",
+              value: service.specialtyName,
+            },
+            {
+              label: "Valor",
+              value: formatCurrency(service.price),
+            },
+            {
+              label: "Duração",
+              value: formatDuration(service.durationMinutes),
+            },
+            {
+              label:
+                "Agendamento online",
+              value:
+                service.onlineBooking
+                  ? "Sim"
+                  : "Não",
+            },
+            {
+              label:
+                "Antecedência",
+              value:
+                `${service.minimumAdvanceHours}h`,
+            },
+          ]}
+        />
+
+        <NexaSpacer />
+
+        <NexaStatusBadge
+          active={
+            service.active
+          }
+        />
+
+      </NexaActionCard>
+
+      <NexaSpacer />
+
+      <NexaActionCard
+        title="Ações"
+        actions={[
+          {
+            title: "Editar",
+            onPress: edit,
+          },
+          {
+            title: "Duplicar",
+            onPress: duplicate,
+          },
+          {
+            title:
+              service.active
+                ? "Desativar"
+                : "Ativar",
+            onPress: toggle,
+          },
+          {
+            title: "Excluir",
+            variant: "danger",
+            onPress: () =>
+              setConfirmVisible(
+                true
+              ),
+          },
+        ]}
+      />
+
+      <NexaConfirmDialog
+
+        visible={
+          confirmVisible
+        }
+
         title="Excluir"
-        onPress={() => { }}
+
+        message={
+          "Deseja excluir este atendimento?"
+        }
+
+        confirmText="Excluir"
+
+        onConfirm={() => {
+
+          setConfirmVisible(
+            false
+          );
+
+          remove();
+
+        }}
+
+        onCancel={() =>
+          setConfirmVisible(
+            false
+          )
+        }
+
       />
 
     </NexaScreen>

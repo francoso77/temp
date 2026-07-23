@@ -18,6 +18,8 @@ type Props = {
 
   value: string;
 
+  multiline?: boolean;
+
 };
 
 export function NexaInfoRow({
@@ -25,6 +27,8 @@ export function NexaInfoRow({
   label,
 
   value,
+
+  multiline,
 
 }: Props) {
 
@@ -41,7 +45,21 @@ export function NexaInfoRow({
       </NexaText>
 
       <NexaText
+
         weight="600"
+
+        style={
+
+          multiline && {
+
+            flex: 1,
+
+            textAlign: "right",
+
+          }
+
+        }
+
       >
 
         {value}
@@ -57,15 +75,10 @@ export function NexaInfoRow({
 const styles = StyleSheet.create({
 
   row: {
-
     flexDirection: "row",
-
-    justifyContent:
-      "space-between",
-
-    marginBottom:
-      Spacing.sm,
-
-  },
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: Spacing.md,
+  }
 
 });

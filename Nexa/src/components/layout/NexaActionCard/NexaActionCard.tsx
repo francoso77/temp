@@ -36,9 +36,11 @@ type Props = {
 
   subtitle?: string;
 
+  footer?: ReactNode;
+
   children?: ReactNode;
 
-  actions: Action[];
+  actions?: Action[];
 
 };
 
@@ -48,9 +50,11 @@ export function NexaActionCard({
 
   subtitle,
 
+  footer,
+
   children,
 
-  actions,
+  actions = [],
 
 }: Props) {
 
@@ -67,15 +71,12 @@ export function NexaActionCard({
       {!!subtitle && (
 
         <>
-
           <NexaSpacer size="xs" />
 
           <NexaText
             color={Colors.textSecondary}
           >
-
             {subtitle}
-
           </NexaText>
 
         </>
@@ -85,44 +86,63 @@ export function NexaActionCard({
       {!!children && (
 
         <>
-
-          <NexaSpacer />
-
+          <NexaSpacer size="lg" />
           {children}
         </>
 
       )}
 
-      <NexaSpacer size="lg" />
+      {!!footer && (
 
-      <View style={styles.actions}>
+        <>
+          <NexaSpacer />
+          {footer}
+        </>
 
-        {
+      )}
 
-          actions.map(action => (
+      {
 
-            <NexaButton
+        actions.length > 0 && (
 
-              key={action.title}
+          <>
 
-              title={action.title}
+            <NexaSpacer size="lg" />
 
-              variant={
-                action.variant ??
-                "secondary"
+            <View style={styles.actions}>
+
+              {
+
+                actions.map(action => (
+
+                  <NexaButton
+
+                    key={action.title}
+
+                    title={action.title}
+
+                    variant={
+                      action.variant ??
+                      "secondary"
+                    }
+
+                    onPress={
+                      action.onPress
+                    }
+
+                  />
+
+                ))
+
               }
 
-              onPress={
-                action.onPress
-              }
+            </View>
 
-            />
+          </>
 
-          ))
+        )
 
-        }
-
-      </View>
+      }
 
     </NexaCard>
 

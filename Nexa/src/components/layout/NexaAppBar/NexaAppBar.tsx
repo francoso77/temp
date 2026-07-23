@@ -12,45 +12,32 @@ import {
 import { NexaIcon, NexaText } from "@/components";
 
 type Props = {
-
   title: string;
-
   subtitle?: string;
-
   showBack?: boolean;
-
   onBack?: () => void;
-
   rightComponent?: ReactNode;
-
+  children?: ReactNode;
 };
 
 export function NexaAppBar({
 
   title,
-
   subtitle,
-
   showBack = true,
-
   onBack,
-
   rightComponent,
-
+  children,
 }: Props) {
 
   function handleBack() {
 
     if (onBack) {
-
       onBack();
-
       return;
-
     }
 
     router.back();
-
   }
 
   return (
@@ -72,7 +59,6 @@ export function NexaAppBar({
             />
 
           </Pressable>
-
         )}
 
         <View>
@@ -100,43 +86,29 @@ export function NexaAppBar({
       </View>
 
       {rightComponent}
+      {children}
 
     </View>
-
   );
-
 }
 
 const styles = StyleSheet.create({
 
   container: {
-
     flexDirection: "row",
-
     justifyContent: "space-between",
-
     alignItems: "center",
-
     backgroundColor: Colors.surface,
-
     borderRadius: Radius.md,
-
     padding: Spacing.lg,
-
     marginBottom: Spacing.lg,
-
     ...Shadows.card,
-
   },
 
   left: {
 
     flexDirection: "row",
-
     alignItems: "center",
-
     gap: Spacing.md,
-
   },
-
 });
